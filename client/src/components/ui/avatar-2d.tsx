@@ -1,4 +1,5 @@
 import { User } from "@shared/schema";
+import avatarImage from "@assets/ChatGPT Image Jul 18, 2025, 02_29_02 PM_1752863551284.png";
 
 interface Avatar2DProps {
   user?: User;
@@ -12,213 +13,76 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
   const endurance = user?.endurance || 0;
   const flexibility = user?.flexibility || 0;
 
-  // Calculate muscle definition based on strength
-  const muscleDefinition = Math.min(strength / 20, 1); // 0-1 scale
-  const athleticBuild = Math.min((stamina + endurance) / 40, 1); // 0-1 scale
-  const posture = Math.min(flexibility / 15, 1); // 0-1 scale
-
   const sizes = {
-    sm: { width: 120, height: 180, scale: 0.6 },
-    md: { width: 160, height: 240, scale: 0.8 },
-    lg: { width: 200, height: 300, scale: 1 }
+    sm: { width: 120, height: 180 },
+    md: { width: 160, height: 240 },
+    lg: { width: 200, height: 300 }
   };
 
-  const { width, height, scale } = sizes[size];
+  const { width, height } = sizes[size];
 
-  // Color variations based on fitness level
-  const skinTone = "#FDBCB4";
-  const hairColor = "#8B4513";
-  const shirtColor = level < 5 ? "#4A5568" : level < 10 ? "#2B6CB0" : "#7C2D12";
-  const shortsColor = "#2D3748";
+  // Calculate fitness effects for visual overlays
+  const muscleDefinition = Math.min(strength / 20, 1);
+  const athleticBuild = Math.min((stamina + endurance) / 40, 1);
+  const overallFitness = (strength + stamina + endurance + flexibility) / 80;
 
   return (
-    <div className="flex justify-center items-center">
-      <svg 
-        width={width} 
-        height={height} 
-        viewBox="0 0 200 300" 
-        className="drop-shadow-lg"
-        style={{ transform: `scale(${scale})` }}
+    <div className="flex justify-center items-center relative">
+      <div 
+        className="relative rounded-lg overflow-hidden shadow-lg"
+        style={{ width, height }}
       >
-        {/* Background circle */}
-        <circle
-          cx="100"
-          cy="150"
-          r="90"
-          fill="url(#avatarBg)"
-          opacity="0.3"
+        {/* Main character image */}
+        <img 
+          src={avatarImage}
+          alt="Character Avatar"
+          className="w-full h-full object-cover"
+          style={{
+            filter: `brightness(${0.9 + overallFitness * 0.3}) contrast(${1 + muscleDefinition * 0.2})`
+          }}
+        />
+        
+        {/* Glow effect overlay based on fitness level */}
+        <div 
+          className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-transparent"
+          style={{
+            background: `radial-gradient(circle at center, rgba(99, 102, 241, ${athleticBuild * 0.2}) 0%, rgba(168, 85, 247, ${muscleDefinition * 0.15}) 50%, transparent 70%)`,
+            mixBlendMode: 'overlay'
+          }}
         />
 
-        {/* Define gradients */}
-        <defs>
-          <radialGradient id="avatarBg" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(243, 75%, 59%)" />
-            <stop offset="100%" stopColor="hsl(258, 70%, 60%)" />
-          </radialGradient>
-          <linearGradient id="muscleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={skinTone} />
-            <stop offset="100%" stopColor="#E2A88B" />
-          </linearGradient>
-        </defs>
-
-        {/* Head */}
-        <ellipse
-          cx="100"
-          cy="80"
-          rx="25"
-          ry="30"
-          fill={skinTone}
-          stroke="#D69E2E"
-          strokeWidth="1"
-        />
-
-        {/* Hair */}
-        <ellipse
-          cx="100"
-          cy="65"
-          rx="28"
-          ry="20"
-          fill={hairColor}
-        />
-
-        {/* Eyes */}
-        <circle cx="92" cy="75" r="2" fill="#2D3748" />
-        <circle cx="108" cy="75" r="2" fill="#2D3748" />
-
-        {/* Smile */}
-        <path
-          d="M 90 85 Q 100 90 110 85"
-          stroke="#2D3748"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinecap="round"
-        />
-
-        {/* Neck */}
-        <rect
-          x="95"
-          y="105"
-          width="10"
-          height="15"
-          fill={skinTone}
-        />
-
-        {/* Torso - Athletic build affects width */}
-        <ellipse
-          cx="100"
-          cy="160"
-          rx={20 + athleticBuild * 8}
-          ry="35"
-          fill={shirtColor}
-          opacity="0.9"
-        />
-
-        {/* Arms - Muscle definition affects size */}
-        <ellipse
-          cx="75"
-          cy="145"
-          rx={6 + muscleDefinition * 4}
-          ry="25"
-          fill="url(#muscleGradient)"
-          transform="rotate(-15 75 145)"
-        />
-        <ellipse
-          cx="125"
-          cy="145"
-          rx={6 + muscleDefinition * 4}
-          ry="25"
-          fill="url(#muscleGradient)"
-          transform="rotate(15 125 145)"
-        />
-
-        {/* Hands */}
-        <circle cx="68" cy="165" r="4" fill={skinTone} />
-        <circle cx="132" cy="165" r="4" fill={skinTone} />
-
-        {/* Legs */}
-        <ellipse
-          cx="88"
-          cy="220"
-          rx="8"
-          ry="30"
-          fill={shortsColor}
-        />
-        <ellipse
-          cx="112"
-          cy="220"
-          rx="8"
-          ry="30"
-          fill={shortsColor}
-        />
-
-        {/* Lower legs */}
-        <ellipse
-          cx="88"
-          cy="270"
-          rx="6"
-          ry="20"
-          fill={skinTone}
-        />
-        <ellipse
-          cx="112"
-          cy="270"
-          rx="6"
-          ry="20"
-          fill={skinTone}
-        />
-
-        {/* Feet */}
-        <ellipse
-          cx="88"
-          cy="290"
-          rx="8"
-          ry="4"
-          fill="#1A202C"
-        />
-        <ellipse
-          cx="112"
-          cy="290"
-          rx="8"
-          ry="4"
-          fill="#1A202C"
-        />
+        {/* Level indicator */}
+        <div className="absolute top-2 right-2">
+          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full border-2 border-yellow-400 shadow-lg">
+            <span className="text-white text-xs font-bold">
+              {level}
+            </span>
+          </div>
+        </div>
 
         {/* Fitness accessories based on level */}
         {level >= 5 && (
-          <>
-            {/* Wristbands */}
-            <rect x="65" y="160" width="6" height="3" fill="#E53E3E" />
-            <rect x="129" y="160" width="6" height="3" fill="#E53E3E" />
-          </>
+          <div className="absolute bottom-2 left-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full shadow-lg animate-pulse" title="Fitness Gear Unlocked" />
+          </div>
         )}
 
         {level >= 10 && (
-          <>
-            {/* Champion headband */}
-            <rect x="80" y="62" width="40" height="4" fill="#D69E2E" />
-          </>
+          <div className="absolute top-2 left-2">
+            <div className="w-6 h-2 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full shadow-lg" title="Champion Status" />
+          </div>
         )}
 
-        {/* Level indicator */}
-        <circle
-          cx="140"
-          cy="60"
-          r="15"
-          fill="hsl(243, 75%, 59%)"
-          stroke="#D69E2E"
-          strokeWidth="2"
-        />
-        <text
-          x="140"
-          y="65"
-          textAnchor="middle"
-          fill="white"
-          fontSize="12"
-          fontWeight="bold"
-        >
-          {level}
-        </text>
-      </svg>
+        {/* Progress aura effect for high-level characters */}
+        {level >= 15 && (
+          <div 
+            className="absolute inset-0 rounded-lg"
+            style={{
+              boxShadow: `0 0 20px rgba(255, 215, 0, ${overallFitness * 0.4}), 0 0 40px rgba(255, 215, 0, ${overallFitness * 0.2})`
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }
