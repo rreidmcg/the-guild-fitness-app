@@ -11,8 +11,7 @@ export const users = pgTable("users", {
   experience: integer("experience").default(0),
   strength: integer("strength").default(0),
   stamina: integer("stamina").default(0),
-  endurance: integer("endurance").default(0),
-  flexibility: integer("flexibility").default(0),
+  agility: integer("agility").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -20,10 +19,14 @@ export const users = pgTable("users", {
 export const exercises = pgTable("exercises", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  category: text("category").notNull(), // strength, cardio, flexibility, etc.
+  category: text("category").notNull(), // strength, cardio, plyometric, etc.
   muscleGroups: text("muscle_groups").array().notNull(),
   description: text("description"),
-  statType: text("stat_type").notNull(), // strength, stamina, endurance, flexibility
+  statTypes: json("stat_types").$type<{
+    strength?: number;
+    stamina?: number;
+    agility?: number;
+  }>().notNull(), // Points awarded per stat type
 });
 
 // Workout templates
@@ -55,8 +58,7 @@ export const workoutSessions = pgTable("workout_sessions", {
   statsEarned: json("stats_earned").$type<{
     strength?: number;
     stamina?: number;
-    endurance?: number;
-    flexibility?: number;
+    agility?: number;
   }>().default({}),
   completedAt: timestamp("completed_at").defaultNow(),
 });

@@ -58,16 +58,18 @@ export class DatabaseStorage implements IStorage {
     if (existingExercises.length > 0) return;
 
     const defaultExercises = [
-      { name: "Bench Press", category: "strength", muscleGroups: ["chest", "triceps", "shoulders"], description: "Chest pressing exercise", statType: "strength" },
-      { name: "Deadlift", category: "strength", muscleGroups: ["back", "legs", "core"], description: "Full body compound movement", statType: "strength" },
-      { name: "Squats", category: "strength", muscleGroups: ["legs", "glutes", "core"], description: "Lower body compound exercise", statType: "strength" },
-      { name: "Pull-ups", category: "strength", muscleGroups: ["back", "biceps"], description: "Upper body pulling exercise", statType: "strength" },
-      { name: "Push-ups", category: "strength", muscleGroups: ["chest", "triceps", "shoulders"], description: "Bodyweight pushing exercise", statType: "strength" },
-      { name: "Running", category: "cardio", muscleGroups: ["legs", "core"], description: "Cardiovascular endurance", statType: "endurance" },
-      { name: "Cycling", category: "cardio", muscleGroups: ["legs"], description: "Low impact cardio", statType: "stamina" },
-      { name: "Yoga Flow", category: "flexibility", muscleGroups: ["full body"], description: "Flexibility and balance", statType: "flexibility" },
-      { name: "Plank", category: "core", muscleGroups: ["core", "shoulders"], description: "Core stability exercise", statType: "endurance" },
-      { name: "Burpees", category: "cardio", muscleGroups: ["full body"], description: "High intensity full body", statType: "stamina" },
+      { name: "Bench Press", category: "strength", muscleGroups: ["chest", "triceps", "shoulders"], description: "Chest pressing exercise", statTypes: { strength: 3 } },
+      { name: "Deadlift", category: "strength", muscleGroups: ["back", "legs", "core"], description: "Full body compound movement", statTypes: { strength: 3 } },
+      { name: "Squats", category: "strength", muscleGroups: ["legs", "glutes", "core"], description: "Lower body compound exercise", statTypes: { strength: 3 } },
+      { name: "Pull-ups", category: "strength", muscleGroups: ["back", "biceps"], description: "Upper body pulling exercise", statTypes: { strength: 2, agility: 1 } },
+      { name: "Push-ups", category: "strength", muscleGroups: ["chest", "triceps", "shoulders"], description: "Bodyweight pushing exercise", statTypes: { strength: 2, stamina: 1 } },
+      { name: "Running", category: "cardio", muscleGroups: ["legs", "core"], description: "Cardiovascular endurance", statTypes: { stamina: 3 } },
+      { name: "Cycling", category: "cardio", muscleGroups: ["legs"], description: "Low impact cardio", statTypes: { stamina: 2, strength: 1 } },
+      { name: "Burpees", category: "plyometric", muscleGroups: ["full body"], description: "High intensity full body", statTypes: { stamina: 1, agility: 2 } },
+      { name: "Plank", category: "core", muscleGroups: ["core", "shoulders"], description: "Core stability exercise", statTypes: { strength: 1, stamina: 2 } },
+      { name: "Box Jumps", category: "plyometric", muscleGroups: ["legs", "glutes"], description: "Explosive jump training", statTypes: { agility: 3 } },
+      { name: "Power Clean", category: "olympic", muscleGroups: ["full body"], description: "Olympic lifting movement", statTypes: { strength: 1, stamina: 1, agility: 1 } },
+      { name: "Mountain Climbers", category: "cardio", muscleGroups: ["core", "shoulders", "legs"], description: "High intensity cardio", statTypes: { stamina: 2, agility: 1 } },
     ];
 
     try {

@@ -12,7 +12,8 @@ import {
   Target,
   Zap,
   TrendingUp,
-  Calendar
+  Calendar,
+  Wind
 } from "lucide-react";
 
 export default function Stats() {
@@ -124,16 +125,10 @@ export default function Stats() {
                 color="from-green-500 to-green-400"
               />
               <StatBar 
-                icon={<Zap className="w-4 h-4 text-purple-400" />}
-                name="Flexibility"
-                value={userStats?.flexibility || 0}
+                icon={<Wind className="w-4 h-4 text-purple-400" />}
+                name="Agility"
+                value={userStats?.agility || 0}
                 color="from-purple-500 to-purple-400"
-              />
-              <StatBar 
-                icon={<Target className="w-4 h-4 text-blue-400" />}
-                name="Endurance"
-                value={userStats?.endurance || 0}
-                color="from-blue-500 to-blue-400"
               />
             </div>
           </CardContent>

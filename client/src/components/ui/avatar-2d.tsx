@@ -10,8 +10,7 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
   const level = user?.level || 1;
   const strength = user?.strength || 0;
   const stamina = user?.stamina || 0;
-  const endurance = user?.endurance || 0;
-  const flexibility = user?.flexibility || 0;
+  const agility = user?.agility || 0;
 
   const sizes = {
     sm: { width: 120, height: 180 },
@@ -23,8 +22,9 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
 
   // Calculate fitness effects for visual overlays
   const muscleDefinition = Math.min(strength / 20, 1);
-  const athleticBuild = Math.min((stamina + endurance) / 40, 1);
-  const overallFitness = (strength + stamina + endurance + flexibility) / 80;
+  const athleticBuild = Math.min(stamina / 20, 1);
+  const explosiveness = Math.min(agility / 20, 1);
+  const overallFitness = (strength + stamina + agility) / 60;
 
   return (
     <div className="flex justify-center items-center relative">
@@ -46,7 +46,7 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
         <div 
           className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-transparent"
           style={{
-            background: `radial-gradient(circle at center, rgba(99, 102, 241, ${athleticBuild * 0.2}) 0%, rgba(168, 85, 247, ${muscleDefinition * 0.15}) 50%, transparent 70%)`,
+            background: `radial-gradient(circle at center, rgba(239, 68, 68, ${muscleDefinition * 0.15}) 0%, rgba(34, 197, 94, ${athleticBuild * 0.15}) 30%, rgba(168, 85, 247, ${explosiveness * 0.15}) 60%, transparent 80%)`,
             mixBlendMode: 'overlay'
           }}
         />
