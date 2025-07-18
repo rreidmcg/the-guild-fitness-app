@@ -1,0 +1,64 @@
+System / project brief
+You are building the stat‑allocation engine for an RPG‑fitness app. Each logged exercise awards XP, which then splits into three character stats—Strength (STR), Stamina (STA), Agility (AGI)—according to the session’s dominant energy system. Implement the logic below as a callable function (or micro‑service) with clean, testable code and clear inline comments.
+
+1. Input object (per exercise or interval)
+
+* movement\_type: “resistance”, “cardio”, or “skill”
+* sets: integer (resistance only)
+* reps: integer (resistance only)
+* load\_kg: float (resistance only)
+* bodyweight\_kg: float (user body mass; use for body‑weight lifts)
+* minutes: float (duration for cardio / skill)
+* RPE: 1–10 perceived effort scale
+* interval\_seconds: float (length of work burst for energy classification)
+* average\_HR\_pct: float (optional, % of HRmax)
+  (Fields not relevant to a session may be null.)
+
+2. Work‑unit calculation
+
+* Resistance: WorkUnits = sets × reps × (load\_kg ÷ bodyweight\_kg) — use 1.0 if the load equals body weight.
+* Cardio or skill: WorkUnits = minutes.
+
+3. RPE multipliers
+   RPE 4‑5 → 0.5
+   RPE 6‑7 → 1.0
+   RPE 8‑9 → 1.5
+   RPE 10  → 2.0
+   EffortScore = WorkUnits × multiplier.
+
+4. Base XP
+   BaseXP = EffortScore × 10 (adjust this constant during play‑testing).
+
+5. Energy‑system classification (assign a single code)
+   P  ATP‑PC (≤ 10 s work OR > 95 % HRmax)
+   G  Anaerobic glycolytic (10 s–120 s OR 90–95 % HRmax)
+   M  Mixed glycolytic→aerobic (120 s–360 s OR 75–90 % HRmax)
+   O  Aerobic oxidative (> 360 s OR < 75 % HRmax)
+   R  Recovery / skill (RPE ≤ 5 and HR < 65 %)
+   If both interval\_seconds and HR are missing, fall back to total minutes: ≤ 0.17 min = P, 0.17‑2 min = G, 2‑6 min = M, > 6 min = O.
+
+6. XP split by energy code
+   P: STR 65 %, STA 15 %, AGI 20 %
+   G: STR 40 %, STA 40 %, AGI 20 %
+   M: STR 25 %, STA 55 %, AGI 20 %
+   O: STR 10 %, STA 80 %, AGI 10 %
+   R: STR 5 %,  STA 25 %, AGI 70 %
+
+7. Output object
+
+* xp\_total: integer
+* xp\_str: integer
+* xp\_sta: integer
+* xp\_agi: integer
+* energy\_code: “P”, “G”, “M”, “O”, or “R”
+  Values are rounded to whole integers.
+
+8. Edge‑case and extensibility notes
+
+* Cap daily STA gain if more than 80 % of XP comes from O‑code sessions.
+* Allow optional hybrid tagging via an energy\_mix array, e.g. 70 % P and 30 % G, and blend splits accordingly.
+* Expose a config file so percentage splits and multipliers can be tweaked without code edits.
+* Provide unit tests for: heavy triple back‑squat (P), 90‑second row (G), “Fran” at \~4 min (M), 45‑minute run (O), 15‑minute mobility flow (R).
+
+Deliverable
+A function allocateXP(activity) (TypeScript preferred, Python acceptable) that implements all steps above and passes the test suite.

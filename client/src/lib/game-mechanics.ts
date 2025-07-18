@@ -1,3 +1,5 @@
+import { allocateXP, allocateSessionXP, type ActivityInput } from "@shared/stat-allocation";
+
 export interface LevelInfo {
   level: number;
   xpRequired: number;
@@ -8,8 +10,7 @@ export interface LevelInfo {
 export interface StatGains {
   strength: number;
   stamina: number;
-  endurance: number;
-  flexibility: number;
+  agility: number;
 }
 
 export function calculateLevel(experience: number): LevelInfo {
@@ -33,23 +34,123 @@ export function calculateLevel(experience: number): LevelInfo {
   };
 }
 
-export function calculateXPReward(duration: number, totalVolume: number, exerciseCount: number): number {
-  const baseDurationXP = Math.floor(duration / 5) * 10; // 10 XP per 5 minutes
-  const baseVolumeXP = Math.floor(totalVolume / 100) * 5; // 5 XP per 100 lbs
-  const baseExerciseXP = exerciseCount * 15; // 15 XP per exercise
+/**
+ * Calculate XP and stat gains using the sophisticated stat allocation engine
+ */
+export function calculateWorkoutRewards(
+  exercisePerformances: Array<{
+    exerciseId: number;
+    exercise: { category: string; statTypes: { strength?: number; stamina?: number; agility?: number } };
+    sets: Array<{ reps: number; weight?: number; duration?: number; completed: boolean }>;
+  }>,
+  duration: number,
+  userBodyweight: number,
+  perceivedEffort: number = 7
+): { xpGained: number; statGains: StatGains } {
   
-  return Math.max(baseDurationXP + baseVolumeXP + baseExerciseXP, 50); // Minimum 50 XP
+  // Convert exercise performances to activities for the stat allocation engine
+  const activities: ActivityInput[] = exercisePerformances.flatMap(performance => {
+    return performance.sets
+      .filter(set => set.completed)
+      .map(set => {
+        const activity: ActivityInput = {
+          movement_type: getMovementType(performance.exercise.category),
+          bodyweight_kg: userBodyweight * 0.453592, // Convert lbs to kg if needed
+          RPE: perceivedEffort
+        };
+
+        if (performance.exercise.category === "strength" || performance.exercise.category === "core") {
+          activity.sets = 1; // Each set is processed individually
+          activity.reps = set.reps;
+          activity.load_kg = set.weight ? set.weight * 0.453592 : userBodyweight * 0.453592;
+          activity.interval_seconds = estimateSetDuration(set.reps, set.weight);
+        } else {
+          activity.minutes = set.duration ? set.duration / 60 : estimateExerciseDuration(performance.exercise.category, set.reps);
+          activity.interval_seconds = set.duration || estimateExerciseDuration(performance.exercise.category, set.reps) * 60;
+        }
+
+        return activity;
+      });
+  });
+
+  // Calculate session rewards using the stat allocation engine
+  const sessionResults = allocateSessionXP(activities);
+
+  return {
+    xpGained: sessionResults.xp_total,
+    statGains: {
+      strength: sessionResults.xp_str,
+      stamina: sessionResults.xp_sta,
+      agility: sessionResults.xp_agi
+    }
+  };
 }
 
+/**
+ * Map exercise categories to movement types for the stat allocation engine
+ */
+function getMovementType(category: string): "resistance" | "cardio" | "skill" {
+  switch (category.toLowerCase()) {
+    case "strength":
+    case "core":
+      return "resistance";
+    case "cardio":
+      return "cardio";
+    case "plyometric":
+    case "olympic":
+    case "flexibility":
+      return "skill";
+    default:
+      return "skill";
+  }
+}
+
+/**
+ * Estimate duration for a resistance training set
+ */
+function estimateSetDuration(reps: number, weight?: number): number {
+  const baseTimePerRep = weight && weight > 0 ? 3 : 2; // Heavier weights take longer
+  return reps * baseTimePerRep + 30; // Include setup time
+}
+
+/**
+ * Estimate duration for cardio/skill exercises
+ */
+function estimateExerciseDuration(category: string, reps: number): number {
+  switch (category.toLowerCase()) {
+    case "cardio":
+      return Math.max(reps * 0.5, 5); // Minimum 5 minutes for cardio
+    case "plyometric":
+      return reps * 0.1; // Short bursts
+    case "flexibility":
+      return Math.max(reps * 0.5, 10); // Longer holds
+    default:
+      return reps * 0.2;
+  }
+}
+
+/**
+ * Legacy function for simple XP calculation (fallback)
+ */
+export function calculateXPReward(duration: number, totalVolume: number, exerciseCount: number): number {
+  const baseDurationXP = Math.floor(duration / 5) * 10;
+  const baseVolumeXP = Math.floor(totalVolume / 100) * 5;
+  const baseExerciseXP = exerciseCount * 15;
+  
+  return Math.max(baseDurationXP + baseVolumeXP + baseExerciseXP, 50);
+}
+
+/**
+ * Legacy function for simple stat calculation (fallback)
+ */
 export function calculateStatGains(workoutType: string, duration: number, intensity: number): StatGains {
-  const baseDuration = Math.floor(duration / 10); // Base stat gain per 10 minutes
+  const baseDuration = Math.floor(duration / 10);
   const intensityMultiplier = intensity / 100;
   
   const baseGains = {
     strength: 0,
     stamina: 0,
-    endurance: 0,
-    flexibility: 0
+    agility: 0
   };
   
   switch (workoutType.toLowerCase()) {
@@ -58,24 +159,17 @@ export function calculateStatGains(workoutType: string, duration: number, intens
       baseGains.stamina = Math.floor((baseDuration * 0.5));
       break;
     case 'cardio':
-      baseGains.endurance = Math.floor((baseDuration * 2 + intensityMultiplier * 3));
-      baseGains.stamina = Math.floor((baseDuration * 1.5));
+      baseGains.stamina = Math.floor((baseDuration * 2 + intensityMultiplier * 3));
+      baseGains.agility = Math.floor((baseDuration * 1));
       break;
-    case 'flexibility':
-      baseGains.flexibility = Math.floor((baseDuration * 2 + intensityMultiplier * 2));
-      baseGains.endurance = Math.floor((baseDuration * 0.5));
-      break;
-    case 'core':
+    case 'plyometric':
+      baseGains.agility = Math.floor((baseDuration * 2 + intensityMultiplier * 3));
       baseGains.strength = Math.floor((baseDuration * 1));
-      baseGains.endurance = Math.floor((baseDuration * 1));
-      baseGains.flexibility = Math.floor((baseDuration * 0.5));
       break;
     default:
-      // Mixed workout
       baseGains.strength = Math.floor((baseDuration * 1));
       baseGains.stamina = Math.floor((baseDuration * 1));
-      baseGains.endurance = Math.floor((baseDuration * 1));
-      baseGains.flexibility = Math.floor((baseDuration * 0.5));
+      baseGains.agility = Math.floor((baseDuration * 0.5));
   }
   
   // Ensure minimum gains

@@ -28,11 +28,11 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful API with JSON responses
 
 ### Database Schema
-- **Users**: Character progression with level, experience, and stat tracking
-- **Exercises**: Exercise library with categories and muscle group targeting
+- **Users**: Character progression with level, experience, and three-stat tracking (Strength, Stamina, Agility)
+- **Exercises**: Exercise library with multi-stat allocation system using JSON statTypes field
 - **Workouts**: Template-based workout creation with JSON exercise configuration
-- **Workout Sessions**: Completed workout tracking with performance metrics
-- **Exercise Performances**: Individual exercise set/rep/weight tracking
+- **Workout Sessions**: Completed workout tracking with sophisticated XP and stat allocation
+- **Exercise Performances**: Individual exercise set/rep/weight tracking with RPE integration
 - **Personal Records**: Achievement tracking for user milestones
 
 ## Key Components
@@ -54,9 +54,13 @@ Preferred communication style: Simple, everyday language.
 - Progress tracking and performance logging
 
 ### Gamification Features
-- XP calculation based on workout duration, volume, and exercise count
+- **Advanced Stat Allocation Engine**: Sophisticated XP calculation based on exercise science
+  - Energy system classification (ATP-PC, Glycolytic, Mixed, Aerobic, Recovery)
+  - RPE-based effort scaling (1-10 perceived effort scale)
+  - Work unit calculations for resistance vs cardio exercises
+  - Three-stat system: Strength, Stamina, Agility
 - Level progression with title system
-- Stat gains based on workout type and intensity
+- Multi-stat exercises (e.g., power cleans award all three stats)
 - Achievement system through personal records
 
 ### User Interface
