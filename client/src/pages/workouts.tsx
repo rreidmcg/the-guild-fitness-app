@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WorkoutCard } from "@/components/ui/workout-card";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Dumbbell, 
   Plus, 
@@ -13,6 +14,7 @@ import {
 
 export default function Workouts() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const { data: workoutSessions } = useQuery({
     queryKey: ["/api/workout-sessions"],
@@ -24,6 +26,26 @@ export default function Workouts() {
 
   const recentSessions = workoutSessions?.slice(0, 5) || [];
   const programs = workoutPrograms || [];
+
+  const handleProgramClick = (program: any) => {
+    toast({
+      title: "Program Selected",
+      description: `Opening ${program.name} program details...`,
+    });
+    // For now, navigate to workout builder with the program selected
+    // In the future, this could navigate to a program details page
+    setLocation(`/workout-builder?program=${program.id}`);
+  };
+
+  const handleStartProgram = (program: any) => {
+    toast({
+      title: "Starting Workout",
+      description: `Beginning ${program.name} workout session...`,
+    });
+    // Start the first workout in the program
+    // For now, navigate to workout session with program context
+    setLocation(`/workout-session?program=${program.id}`);
+  };
 
   return (
     <div className="min-h-screen bg-game-dark text-white pb-20">
@@ -88,12 +110,24 @@ export default function Workouts() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {programs.map((program) => (
-                  <Card key={program.id} className="bg-gray-800 border-gray-600 hover:border-game-primary transition-colors cursor-pointer">
+                  <Card 
+                    key={program.id} 
+                    className="bg-gray-800 border-gray-600 hover:border-game-primary transition-colors cursor-pointer"
+                    onClick={() => handleProgramClick(program)}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="font-semibold text-white">{program.name}</h3>
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="ghost" className="text-game-primary">
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="text-game-primary hover:bg-game-primary/20"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartProgram(program);
+                            }}
+                          >
                             <Play className="w-3 h-3" />
                           </Button>
                         </div>
