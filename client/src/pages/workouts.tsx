@@ -18,12 +18,12 @@ export default function Workouts() {
     queryKey: ["/api/workout-sessions"],
   });
 
-  const { data: workouts } = useQuery({
-    queryKey: ["/api/workouts"],
+  const { data: workoutPrograms } = useQuery({
+    queryKey: ["/api/workout-programs"],
   });
 
   const recentSessions = workoutSessions?.slice(0, 5) || [];
-  const savedWorkouts = workouts || [];
+  const programs = workoutPrograms || [];
 
   return (
     <div className="min-h-screen bg-game-dark text-white pb-20">
@@ -74,34 +74,34 @@ export default function Workouts() {
           </CardContent>
         </Card>
 
-        {/* Saved Workout Templates */}
+        {/* Workout Programs */}
         <Card className="bg-game-slate border-gray-700">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-white">My Workout Templates</CardTitle>
+            <CardTitle className="text-xl font-bold text-white">Workout Programs</CardTitle>
           </CardHeader>
           <CardContent>
-            {savedWorkouts.length === 0 ? (
+            {programs.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
-                <Plus className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="mb-4">No saved workout templates yet. Create one using the "New Workout" button.</p>
+                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p className="mb-4">No workout programs available yet.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {savedWorkouts.map((workout) => (
-                  <Card key={workout.id} className="bg-gray-800 border-gray-600 hover:border-game-primary transition-colors cursor-pointer">
+                {programs.map((program) => (
+                  <Card key={program.id} className="bg-gray-800 border-gray-600 hover:border-game-primary transition-colors cursor-pointer">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-white">{workout.name}</h3>
+                        <h3 className="font-semibold text-white">{program.name}</h3>
                         <div className="flex space-x-2">
                           <Button size="sm" variant="ghost" className="text-game-primary">
                             <Play className="w-3 h-3" />
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-400 mb-3">{workout.description}</p>
+                      <p className="text-sm text-gray-400 mb-3">{program.description}</p>
                       <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>{workout.exercises?.length || 0} exercises</span>
-                        <span>Created {workout.createdAt ? new Date(workout.createdAt).toLocaleDateString() : 'N/A'}</span>
+                        <span className="bg-game-primary/20 text-game-primary px-2 py-1 rounded">{program.difficultyLevel}</span>
+                        <span>{program.durationWeeks} weeks</span>
                       </div>
                     </CardContent>
                   </Card>

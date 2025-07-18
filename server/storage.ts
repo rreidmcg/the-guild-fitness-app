@@ -1,9 +1,11 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
-  type PersonalRecord, type InsertPersonalRecord
+  type PersonalRecord, type InsertPersonalRecord,
+  type WorkoutProgram, type InsertWorkoutProgram,
+  type ProgramWorkout, type InsertProgramWorkout
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -40,6 +42,11 @@ export interface IStorage {
   getUserPersonalRecords(userId: number): Promise<PersonalRecord[]>;
   createPersonalRecord(record: InsertPersonalRecord): Promise<PersonalRecord>;
   updatePersonalRecord(id: number, updates: Partial<PersonalRecord>): Promise<PersonalRecord>;
+
+  // Workout programs
+  getAllWorkoutPrograms(): Promise<WorkoutProgram[]>;
+  getWorkoutProgram(id: number): Promise<WorkoutProgram | undefined>;
+  getProgramWorkouts(programId: number): Promise<ProgramWorkout[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -213,6 +220,22 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!record) throw new Error("Personal record not found");
     return record;
+  }
+
+  // Workout program operations
+  async getAllWorkoutPrograms(): Promise<WorkoutProgram[]> {
+    return await db.select().from(workoutPrograms).orderBy(workoutPrograms.createdAt);
+  }
+
+  async getWorkoutProgram(id: number): Promise<WorkoutProgram | undefined> {
+    const [program] = await db.select().from(workoutPrograms).where(eq(workoutPrograms.id, id));
+    return program || undefined;
+  }
+
+  async getProgramWorkouts(programId: number): Promise<ProgramWorkout[]> {
+    return await db.select().from(programWorkouts)
+      .where(eq(programWorkouts.programId, programId))
+      .orderBy(programWorkouts.weekNumber, programWorkouts.dayName);
   }
 }
 

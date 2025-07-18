@@ -90,8 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           level: newLevel,
           strength: user.strength + (statsEarned.strength || 0),
           stamina: user.stamina + (statsEarned.stamina || 0),
-          endurance: user.endurance + (statsEarned.endurance || 0),
-          flexibility: user.flexibility + (statsEarned.flexibility || 0),
+          agility: user.agility + (statsEarned.agility || 0),
         });
       }
       
@@ -120,6 +119,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(records);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch personal records" });
+    }
+  });
+
+  // Workout Programs routes
+  app.get("/api/workout-programs", async (req, res) => {
+    try {
+      const programs = await storage.getAllWorkoutPrograms();
+      res.json(programs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch workout programs" });
+    }
+  });
+
+  app.get("/api/workout-programs/:id/workouts", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const workouts = await storage.getProgramWorkouts(programId);
+      res.json(workouts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch program workouts" });
     }
   });
 
@@ -154,8 +173,7 @@ function calculateRewards(sessionData: any) {
   const statsEarned = {
     strength: Math.floor(Math.random() * 3) + 1,
     stamina: Math.floor(Math.random() * 2) + 1,
-    endurance: Math.floor(Math.random() * 2) + 1,
-    flexibility: Math.floor(Math.random() * 1) + 1,
+    agility: Math.floor(Math.random() * 2) + 1,
   };
   
   return { xpEarned, statsEarned };

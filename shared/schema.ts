@@ -87,6 +87,35 @@ export const personalRecords = pgTable("personal_records", {
   achievedAt: timestamp("achieved_at").defaultNow(),
 });
 
+// Workout programs (structured fitness plans)
+export const workoutPrograms = pgTable("workout_programs", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  durationWeeks: integer("duration_weeks"),
+  difficultyLevel: text("difficulty_level"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Program workouts (individual sessions within programs)
+export const programWorkouts = pgTable("program_workouts", {
+  id: serial("id").primaryKey(),
+  programId: integer("program_id").references(() => workoutPrograms.id),
+  weekNumber: integer("week_number"),
+  dayName: text("day_name"),
+  workoutName: text("workout_name"),
+  exercises: json("exercises").$type<Array<{
+    name: string;
+    reps?: string;
+    duration?: string;
+    holdTime?: string;
+    instructions?: string;
+  }>>().notNull(),
+  instructions: text("instructions"),
+  rounds: integer("rounds"),
+  restSeconds: integer("rest_seconds"),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -116,6 +145,15 @@ export const insertPersonalRecordSchema = createInsertSchema(personalRecords).om
   achievedAt: true,
 });
 
+export const insertWorkoutProgramSchema = createInsertSchema(workoutPrograms).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProgramWorkoutSchema = createInsertSchema(programWorkouts).omit({
+  id: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -129,3 +167,7 @@ export type ExercisePerformance = typeof exercisePerformances.$inferSelect;
 export type InsertExercisePerformance = z.infer<typeof insertExercisePerformanceSchema>;
 export type PersonalRecord = typeof personalRecords.$inferSelect;
 export type InsertPersonalRecord = z.infer<typeof insertPersonalRecordSchema>;
+export type WorkoutProgram = typeof workoutPrograms.$inferSelect;
+export type InsertWorkoutProgram = z.infer<typeof insertWorkoutProgramSchema>;
+export type ProgramWorkout = typeof programWorkouts.$inferSelect;
+export type InsertProgramWorkout = z.infer<typeof insertProgramWorkoutSchema>;
