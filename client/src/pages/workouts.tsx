@@ -47,30 +47,6 @@ export default function Workouts() {
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button 
-            className="h-16 bg-game-primary hover:bg-blue-600 flex flex-col space-y-2"
-            onClick={() => setLocation("/workout-builder")}
-          >
-            <Play className="w-6 h-6" />
-            <span>Quick Start</span>
-          </Button>
-          <Button 
-            className="h-16 bg-game-secondary hover:bg-purple-600 flex flex-col space-y-2"
-            onClick={() => setLocation("/workout-builder")}
-          >
-            <Plus className="w-6 h-6" />
-            <span>Custom Workout</span>
-          </Button>
-          <Button 
-            variant="secondary"
-            className="h-16 bg-gray-700 hover:bg-gray-600 flex flex-col space-y-2"
-          >
-            <Calendar className="w-6 h-6" />
-            <span>Schedule</span>
-          </Button>
-        </div>
 
         {/* Recent Workouts */}
         <Card className="bg-game-slate border-gray-700">
@@ -88,14 +64,7 @@ export default function Workouts() {
               <div className="text-center py-12 text-gray-400">
                 <Dumbbell className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-semibold mb-2">No workouts yet</h3>
-                <p className="mb-6">Start your fitness journey today!</p>
-                <Button 
-                  onClick={() => setLocation("/workout-builder")}
-                  className="bg-game-primary hover:bg-blue-600"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  Start Your First Workout
-                </Button>
+                <p className="mb-6">Start your fitness journey today! Use the "New Workout" button above.</p>
               </div>
             ) : (
               recentSessions.map((session) => (
@@ -108,29 +77,13 @@ export default function Workouts() {
         {/* Saved Workout Templates */}
         <Card className="bg-game-slate border-gray-700">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-white">My Workout Templates</CardTitle>
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation("/workout-builder")}
-                className="text-game-primary hover:text-blue-400"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Create New
-              </Button>
-            </div>
+            <CardTitle className="text-xl font-bold text-white">My Workout Templates</CardTitle>
           </CardHeader>
           <CardContent>
             {savedWorkouts.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 <Plus className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="mb-4">No saved workout templates</p>
-                <Button 
-                  variant="outline"
-                  onClick={() => setLocation("/workout-builder")}
-                >
-                  Create Your First Template
-                </Button>
+                <p className="mb-4">No saved workout templates yet. Create one using the "New Workout" button.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
