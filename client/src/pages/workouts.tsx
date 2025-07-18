@@ -32,9 +32,8 @@ export default function Workouts() {
       title: "Program Selected",
       description: `Opening ${program.name} program details...`,
     });
-    // For now, navigate to workout builder with the program selected
-    // In the future, this could navigate to a program details page
-    setLocation(`/workout-builder?program=${program.id}`);
+    // Navigate to workout builder
+    setLocation("/workout-builder");
   };
 
   const handleStartProgram = (program: any) => {
@@ -42,9 +41,8 @@ export default function Workouts() {
       title: "Starting Workout",
       description: `Beginning ${program.name} workout session...`,
     });
-    // Start the first workout in the program
-    // For now, navigate to workout session with program context
-    setLocation(`/workout-session?program=${program.id}`);
+    // Navigate to workout session with program ID
+    setLocation(`/workout-session/${program.id}`);
   };
 
   return (
