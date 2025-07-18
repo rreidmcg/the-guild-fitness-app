@@ -1,0 +1,35 @@
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Dashboard from "@/pages/dashboard";
+import WorkoutBuilder from "@/pages/workout-builder";
+import WorkoutSession from "@/pages/workout-session";
+import NotFound from "@/pages/not-found";
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={Dashboard} />
+      <Route path="/workout-builder" component={WorkoutBuilder} />
+      <Route path="/workout-session/:id" component={WorkoutSession} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <div className="min-h-screen bg-game-dark text-white">
+          <Toaster />
+          <Router />
+        </div>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
