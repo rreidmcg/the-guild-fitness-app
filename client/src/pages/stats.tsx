@@ -64,18 +64,22 @@ export default function Stats() {
         {/* Character Profile */}
         <Card className="bg-game-slate border-gray-700">
           <CardContent className="pt-6">
+            {/* Character Info Above Avatar */}
+            <div className="text-center mb-6">
+              <div className="mb-2">
+                <span className="text-sm text-green-400 font-medium px-3 py-1 bg-green-400/10 rounded-full border border-green-400/20">
+                  &lt;{getLevelTitle(currentLevel)}&gt;
+                </span>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-6">{userStats?.username || 'Player'}</h3>
+            </div>
+
             {/* 2D Avatar Display */}
             <div className="flex flex-col items-center mb-6">
               <Avatar2D user={userStats} size="lg" />
               
-              {/* Character Info */}
+              {/* Character Stats Below Avatar */}
               <div className="text-center mt-6">
-                <div className="mb-2">
-                  <span className="text-sm text-game-warning font-medium px-3 py-1 bg-game-warning/10 rounded-full border border-game-warning/20">
-                    &lt;{getLevelTitle(currentLevel)}&gt;
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-4">{userStats?.username || 'Player'}</h3>
                 <div className="flex items-center justify-center space-x-6 text-sm text-gray-300">
                   <span className="flex items-center">
                     <Star className="w-4 h-4 text-game-warning mr-1" />
