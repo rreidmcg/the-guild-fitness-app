@@ -41,9 +41,10 @@ export default function Stats() {
 
   // Calculate level title
   const getLevelTitle = (level: number) => {
+    if (level === 1) return "Fitness Novice";
     const titles = [
-      "Novice", "Apprentice", "Warrior", "Veteran", "Champion", 
-      "Master", "Grandmaster", "Legend", "Mythic", "Godlike"
+      "Fitness Novice", "Fitness Apprentice", "Fitness Warrior", "Fitness Veteran", "Fitness Champion", 
+      "Fitness Master", "Fitness Grandmaster", "Fitness Legend", "Fitness Mythic", "Fitness Godlike"
     ];
     const titleIndex = Math.min(Math.floor(level / 5), titles.length - 1);
     return titles[titleIndex];
@@ -62,17 +63,19 @@ export default function Stats() {
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Character Profile */}
         <Card className="bg-game-slate border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-white text-center">Your Avatar</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {/* 2D Avatar Display */}
             <div className="flex flex-col items-center mb-6">
               <Avatar2D user={userStats} size="lg" />
               
               {/* Character Info */}
               <div className="text-center mt-6">
-                <h3 className="text-2xl font-bold text-white mb-2">Fitness {getLevelTitle(currentLevel)}</h3>
+                <div className="mb-2">
+                  <span className="text-sm text-game-warning font-medium px-3 py-1 bg-game-warning/10 rounded-full border border-game-warning/20">
+                    &lt;{getLevelTitle(currentLevel)}&gt;
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">{userStats?.username || 'Player'}</h3>
                 <div className="flex items-center justify-center space-x-6 text-sm text-gray-300">
                   <span className="flex items-center">
                     <Star className="w-4 h-4 text-game-warning mr-1" />
