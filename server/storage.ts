@@ -5,6 +5,8 @@ import {
   type ExercisePerformance, type InsertExercisePerformance,
   type PersonalRecord, type InsertPersonalRecord
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -40,26 +42,21 @@ export interface IStorage {
   updatePersonalRecord(id: number, updates: Partial<PersonalRecord>): Promise<PersonalRecord>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User> = new Map();
-  private exercises: Map<number, Exercise> = new Map();
-  private workouts: Map<number, Workout> = new Map();
-  private workoutSessions: Map<number, WorkoutSession> = new Map();
-  private exercisePerformances: Map<number, ExercisePerformance> = new Map();
-  private personalRecords: Map<number, PersonalRecord> = new Map();
-  
-  private currentUserId = 1;
-  private currentExerciseId = 1;
-  private currentWorkoutId = 1;
-  private currentSessionId = 1;
-  private currentPerformanceId = 1;
-  private currentRecordId = 1;
+export class DatabaseStorage implements IStorage {
+  private initialized = false;
 
-  constructor() {
-    this.initializeDefaultExercises();
+  private async ensureInitialized() {
+    if (!this.initialized) {
+      await this.initializeDefaultExercises();
+      this.initialized = true;
+    }
   }
 
-  private initializeDefaultExercises() {
+  private async initializeDefaultExercises() {
+    // Check if exercises already exist
+    const existingExercises = await db.select().from(exercises).limit(1);
+    if (existingExercises.length > 0) return;
+
     const defaultExercises = [
       { name: "Bench Press", category: "strength", muscleGroups: ["chest", "triceps", "shoulders"], description: "Chest pressing exercise", statType: "strength" },
       { name: "Deadlift", category: "strength", muscleGroups: ["back", "legs", "core"], description: "Full body compound movement", statType: "strength" },
@@ -73,153 +70,148 @@ export class MemStorage implements IStorage {
       { name: "Burpees", category: "cardio", muscleGroups: ["full body"], description: "High intensity full body", statType: "stamina" },
     ];
 
-    defaultExercises.forEach(exercise => {
-      this.createExercise(exercise);
-    });
+    try {
+      await db.insert(exercises).values(defaultExercises);
+    } catch (error) {
+      console.log("Default exercises already exist or error inserting:", error);
+    }
   }
 
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const user: User = {
-      ...insertUser,
-      id: this.currentUserId++,
-      level: 1,
-      experience: 0,
-      strength: 0,
-      stamina: 0,
-      endurance: 0,
-      flexibility: 0,
-      createdAt: new Date(),
-    };
-    this.users.set(user.id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async updateUser(id: number, updates: Partial<User>): Promise<User> {
-    const user = this.users.get(id);
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
     if (!user) throw new Error("User not found");
-    
-    const updatedUser = { ...user, ...updates };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    return user;
   }
 
   // Exercise operations
   async getAllExercises(): Promise<Exercise[]> {
-    return Array.from(this.exercises.values());
+    await this.ensureInitialized();
+    return await db.select().from(exercises);
   }
 
   async getExercise(id: number): Promise<Exercise | undefined> {
-    return this.exercises.get(id);
+    const [exercise] = await db.select().from(exercises).where(eq(exercises.id, id));
+    return exercise || undefined;
   }
 
   async createExercise(insertExercise: InsertExercise): Promise<Exercise> {
-    const exercise: Exercise = {
-      ...insertExercise,
-      id: this.currentExerciseId++,
-    };
-    this.exercises.set(exercise.id, exercise);
+    const [exercise] = await db
+      .insert(exercises)
+      .values(insertExercise)
+      .returning();
     return exercise;
   }
 
   // Workout operations
   async getUserWorkouts(userId: number): Promise<Workout[]> {
-    return Array.from(this.workouts.values()).filter(workout => workout.userId === userId);
+    return await db.select().from(workouts).where(eq(workouts.userId, userId));
   }
 
   async getWorkout(id: number): Promise<Workout | undefined> {
-    return this.workouts.get(id);
+    const [workout] = await db.select().from(workouts).where(eq(workouts.id, id));
+    return workout || undefined;
   }
 
   async createWorkout(insertWorkout: InsertWorkout): Promise<Workout> {
-    const workout: Workout = {
-      ...insertWorkout,
-      id: this.currentWorkoutId++,
-      createdAt: new Date(),
-    };
-    this.workouts.set(workout.id, workout);
+    const [workout] = await db
+      .insert(workouts)
+      .values(insertWorkout)
+      .returning();
     return workout;
   }
 
   async updateWorkout(id: number, updates: Partial<Workout>): Promise<Workout> {
-    const workout = this.workouts.get(id);
+    const [workout] = await db
+      .update(workouts)
+      .set(updates)
+      .where(eq(workouts.id, id))
+      .returning();
     if (!workout) throw new Error("Workout not found");
-    
-    const updatedWorkout = { ...workout, ...updates };
-    this.workouts.set(id, updatedWorkout);
-    return updatedWorkout;
+    return workout;
   }
 
   async deleteWorkout(id: number): Promise<void> {
-    this.workouts.delete(id);
+    await db.delete(workouts).where(eq(workouts.id, id));
   }
 
   // Workout session operations
   async getUserWorkoutSessions(userId: number): Promise<WorkoutSession[]> {
-    return Array.from(this.workoutSessions.values())
-      .filter(session => session.userId === userId)
-      .sort((a, b) => b.completedAt!.getTime() - a.completedAt!.getTime());
+    return await db.select().from(workoutSessions)
+      .where(eq(workoutSessions.userId, userId))
+      .orderBy(workoutSessions.completedAt);
   }
 
   async getWorkoutSession(id: number): Promise<WorkoutSession | undefined> {
-    return this.workoutSessions.get(id);
+    const [session] = await db.select().from(workoutSessions).where(eq(workoutSessions.id, id));
+    return session || undefined;
   }
 
   async createWorkoutSession(insertSession: InsertWorkoutSession): Promise<WorkoutSession> {
-    const session: WorkoutSession = {
-      ...insertSession,
-      id: this.currentSessionId++,
-      completedAt: new Date(),
-    };
-    this.workoutSessions.set(session.id, session);
+    const [session] = await db
+      .insert(workoutSessions)
+      .values(insertSession)
+      .returning();
     return session;
   }
 
   // Exercise performance operations
   async getSessionPerformances(sessionId: number): Promise<ExercisePerformance[]> {
-    return Array.from(this.exercisePerformances.values()).filter(perf => perf.sessionId === sessionId);
+    return await db.select().from(exercisePerformances).where(eq(exercisePerformances.sessionId, sessionId));
   }
 
   async createExercisePerformance(insertPerformance: InsertExercisePerformance): Promise<ExercisePerformance> {
-    const performance: ExercisePerformance = {
-      ...insertPerformance,
-      id: this.currentPerformanceId++,
-    };
-    this.exercisePerformances.set(performance.id, performance);
+    const [performance] = await db
+      .insert(exercisePerformances)
+      .values(insertPerformance)
+      .returning();
     return performance;
   }
 
   // Personal records
   async getUserPersonalRecords(userId: number): Promise<PersonalRecord[]> {
-    return Array.from(this.personalRecords.values()).filter(record => record.userId === userId);
+    return await db.select().from(personalRecords).where(eq(personalRecords.userId, userId));
   }
 
   async createPersonalRecord(insertRecord: InsertPersonalRecord): Promise<PersonalRecord> {
-    const record: PersonalRecord = {
-      ...insertRecord,
-      id: this.currentRecordId++,
-      achievedAt: new Date(),
-    };
-    this.personalRecords.set(record.id, record);
+    const [record] = await db
+      .insert(personalRecords)
+      .values(insertRecord)
+      .returning();
     return record;
   }
 
   async updatePersonalRecord(id: number, updates: Partial<PersonalRecord>): Promise<PersonalRecord> {
-    const record = this.personalRecords.get(id);
+    const [record] = await db
+      .update(personalRecords)
+      .set(updates)
+      .where(eq(personalRecords.id, id))
+      .returning();
     if (!record) throw new Error("Personal record not found");
-    
-    const updatedRecord = { ...record, ...updates };
-    this.personalRecords.set(id, updatedRecord);
-    return updatedRecord;
+    return record;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
