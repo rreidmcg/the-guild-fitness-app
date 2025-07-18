@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { NavBar } from "@/components/ui/nav-bar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,7 +46,7 @@ export default function WorkoutBuilder() {
         title: "Success!",
         description: "Workout created successfully",
       });
-      setLocation("/");
+      setLocation("/workouts");
     },
     onError: () => {
       toast({
@@ -124,42 +123,44 @@ export default function WorkoutBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-game-dark text-white">
-      <NavBar />
-      
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => setLocation("/")}
-              className="text-gray-300 hover:text-white"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            <h1 className="text-3xl font-bold">Create Workout</h1>
-          </div>
-          
-          <div className="flex space-x-3">
-            <Button 
-              variant="outline" 
-              onClick={handleSaveWorkout}
-              disabled={createWorkoutMutation.isPending}
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Save Workout
-            </Button>
-            <Button 
-              className="bg-game-primary hover:bg-blue-600"
-              onClick={handleStartWorkout}
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Start Now
-            </Button>
+    <div className="min-h-screen bg-game-dark text-white pb-20">
+      <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => setLocation("/workouts")}
+                className="text-gray-300 hover:text-white"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Workouts
+              </Button>
+              <h1 className="text-3xl font-bold">Create Workout</h1>
+            </div>
+            
+            <div className="flex space-x-3">
+              <Button 
+                variant="outline" 
+                onClick={handleSaveWorkout}
+                disabled={createWorkoutMutation.isPending}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Workout
+              </Button>
+              <Button 
+                className="bg-game-primary hover:bg-blue-600"
+                onClick={handleStartWorkout}
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Start Now
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="max-w-4xl mx-auto p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Workout Details */}
           <div className="lg:col-span-2 space-y-6">

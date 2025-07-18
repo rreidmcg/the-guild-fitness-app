@@ -2,7 +2,7 @@
 
 ## Overview
 
-FitQuest is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create workouts, track their sessions, and earn experience points while building their character's stats (strength, stamina, endurance, flexibility).
+FitQuest is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create workouts, track their sessions, and earn experience points while building their character's stats (strength, stamina, endurance, flexibility). The app features a mobile-friendly bottom navigation with dedicated pages for Stats, Workouts, and Settings, plus a custom 2D avatar system.
 
 ## User Preferences
 
@@ -61,9 +61,11 @@ Preferred communication style: Simple, everyday language.
 
 ### User Interface
 - Dark gaming theme with custom color palette
-- Mobile-responsive design
+- Mobile-responsive design with bottom navigation
+- Bottom navigation bar with Stats, Workouts, and Settings pages
+- Custom 2D avatar system with visual progression based on stats
 - Real-time workout session interface
-- Dashboard with character stats and recent activity
+- Dedicated pages for different app functions
 
 ## Data Flow
 

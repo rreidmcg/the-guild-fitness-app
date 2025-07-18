@@ -128,11 +128,11 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xl font-bold text-white">Recent Workouts</CardTitle>
                   <Button 
-                    onClick={() => setLocation("/workout-builder")}
+                    onClick={() => setLocation("/workouts")}
                     className="bg-game-primary hover:bg-blue-600"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Start Workout
+                    View Workouts
                   </Button>
                 </div>
               </CardHeader>

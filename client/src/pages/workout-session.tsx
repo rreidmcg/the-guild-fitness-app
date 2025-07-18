@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { NavBar } from "@/components/ui/nav-bar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,7 +43,7 @@ export default function WorkoutSession() {
         title: "Workout Complete!",
         description: "Great job! You earned XP and improved your stats.",
       });
-      setLocation("/");
+      setLocation("/workouts");
     },
     onError: () => {
       toast({
@@ -81,38 +80,40 @@ export default function WorkoutSession() {
   const progress = exerciseData.length > 0 ? (currentExerciseIndex / exerciseData.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-game-dark text-white">
-      <NavBar />
-      
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => setLocation("/")}
-              className="text-gray-300 hover:text-white"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <h1 className="text-3xl font-bold">Workout Session</h1>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <div className="text-2xl font-bold">{formatTime(time)}</div>
-              <div className="text-sm text-gray-400">Duration</div>
+    <div className="min-h-screen bg-game-dark text-white pb-20">
+      <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => setLocation("/workouts")}
+                className="text-gray-300 hover:text-white"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Workouts
+              </Button>
+              <h1 className="text-3xl font-bold">Workout Session</h1>
             </div>
-            <Button 
-              onClick={handleStartPause}
-              className={isActive ? "bg-orange-600 hover:bg-orange-700" : "bg-game-primary hover:bg-blue-600"}
-            >
-              {isActive ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-              {isActive ? "Pause" : "Start"}
-            </Button>
+            
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <div className="text-2xl font-bold">{formatTime(time)}</div>
+                <div className="text-sm text-gray-400">Duration</div>
+              </div>
+              <Button 
+                onClick={handleStartPause}
+                className={isActive ? "bg-orange-600 hover:bg-orange-700" : "bg-game-primary hover:bg-blue-600"}
+              >
+                {isActive ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
+                {isActive ? "Pause" : "Start"}
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="max-w-4xl mx-auto p-6">
         {/* Progress Bar */}
         <Card className="bg-game-slate border-gray-700 mb-8">
           <CardContent className="p-6">
