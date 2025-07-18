@@ -51,14 +51,7 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
           }}
         />
 
-        {/* Level indicator */}
-        <div className="absolute top-2 right-2">
-          <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full border-2 border-yellow-400 shadow-lg">
-            <span className="text-white text-xs font-bold">
-              {level}
-            </span>
-          </div>
-        </div>
+        
 
         {/* Fitness accessories based on level */}
         {level >= 5 && (
