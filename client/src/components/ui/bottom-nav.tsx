@@ -12,7 +12,7 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-game-slate border-t border-gray-700 px-4 py-2 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-game-slate/100 border-t border-gray-700 px-4 py-2 z-50">
       <div className="max-w-md mx-auto">
         <div className="flex items-center justify-around">
           {navItems.map((item) => {
