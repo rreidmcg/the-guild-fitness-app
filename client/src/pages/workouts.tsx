@@ -33,7 +33,7 @@ export default function Workouts() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-white">Workouts</h1>
-              <p className="text-gray-400 mt-1">Track your fitness journey</p>
+              <p className="text-gray-300 mt-1">Track your fitness journey</p>
             </div>
             <Button 
               onClick={() => setLocation("/workout-builder")}
@@ -61,9 +61,9 @@ export default function Workouts() {
           </CardHeader>
           <CardContent className="space-y-4">
             {recentSessions.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
+              <div className="text-center py-12 text-gray-300">
                 <Dumbbell className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold mb-2">No workouts yet</h3>
+                <h3 className="text-lg font-semibold mb-2 text-white">No workouts yet</h3>
                 <p className="mb-6">Start your fitness journey today! Use the "New Workout" button above.</p>
               </div>
             ) : (
@@ -81,7 +81,7 @@ export default function Workouts() {
           </CardHeader>
           <CardContent>
             {programs.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-gray-300">
                 <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p className="mb-4">No workout programs available yet.</p>
               </div>
@@ -98,8 +98,8 @@ export default function Workouts() {
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-400 mb-3">{program.description}</p>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <p className="text-sm text-gray-300 mb-3">{program.description}</p>
+                      <div className="flex items-center justify-between text-xs text-gray-400">
                         <span className="bg-game-primary/20 text-game-primary px-2 py-1 rounded">{program.difficultyLevel}</span>
                         <span>{program.durationWeeks} weeks</span>
                       </div>
@@ -115,31 +115,31 @@ export default function Workouts() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="bg-game-slate border-gray-700">
             <CardContent className="p-6 text-center">
-              <h3 className="text-sm font-medium text-gray-300 mb-2">This Week</h3>
+              <h3 className="text-sm font-medium text-gray-200 mb-2">This Week</h3>
               <div className="text-3xl font-bold text-game-primary mb-1">
                 {recentSessions.length}
               </div>
-              <p className="text-xs text-gray-400">Workouts completed</p>
+              <p className="text-xs text-gray-300">Workouts completed</p>
             </CardContent>
           </Card>
 
           <Card className="bg-game-slate border-gray-700">
             <CardContent className="p-6 text-center">
-              <h3 className="text-sm font-medium text-gray-300 mb-2">Total Time</h3>
+              <h3 className="text-sm font-medium text-gray-200 mb-2">Total Time</h3>
               <div className="text-3xl font-bold text-game-success mb-1">
                 {recentSessions.reduce((total, session) => total + (session.duration || 0), 0)}
               </div>
-              <p className="text-xs text-gray-400">Minutes this week</p>
+              <p className="text-xs text-gray-300">Minutes this week</p>
             </CardContent>
           </Card>
 
           <Card className="bg-game-slate border-gray-700">
             <CardContent className="p-6 text-center">
-              <h3 className="text-sm font-medium text-gray-300 mb-2">Volume</h3>
+              <h3 className="text-sm font-medium text-gray-200 mb-2">Volume</h3>
               <div className="text-3xl font-bold text-game-warning mb-1">
                 {recentSessions.reduce((total, session) => total + (session.totalVolume || 0), 0).toLocaleString()}
               </div>
-              <p className="text-xs text-gray-400">lbs lifted this week</p>
+              <p className="text-xs text-gray-300">lbs lifted this week</p>
             </CardContent>
           </Card>
         </div>

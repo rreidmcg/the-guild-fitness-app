@@ -57,7 +57,7 @@ export default function Stats() {
       <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-white">Character Stats</h1>
-          <p className="text-gray-400 mt-1">Your fitness progression journey</p>
+          <p className="text-gray-300 mt-1">Your fitness progression journey</p>
         </div>
       </div>
 
@@ -142,7 +142,7 @@ export default function Stats() {
                 <Trophy className="w-5 h-5 text-game-warning" />
               </div>
               <div className="text-2xl font-bold text-white">{currentLevel}</div>
-              <p className="text-xs text-gray-400">Current Level</p>
+              <p className="text-xs text-gray-300">Current Level</p>
             </CardContent>
           </Card>
 
@@ -152,7 +152,7 @@ export default function Stats() {
                 <Flame className="w-5 h-5 text-orange-500" />
               </div>
               <div className="text-2xl font-bold text-orange-400">{streak}</div>
-              <p className="text-xs text-gray-400">Day Streak</p>
+              <p className="text-xs text-gray-300">Day Streak</p>
             </CardContent>
           </Card>
 
@@ -162,7 +162,7 @@ export default function Stats() {
                 <ChartLine className="w-5 h-5 text-game-success" />
               </div>
               <div className="text-2xl font-bold text-white">{currentXP}</div>
-              <p className="text-xs text-gray-400">Total XP</p>
+              <p className="text-xs text-gray-300">Total XP</p>
             </CardContent>
           </Card>
 
@@ -172,7 +172,7 @@ export default function Stats() {
                 <Dumbbell className="w-5 h-5 text-game-primary" />
               </div>
               <div className="text-xl font-bold text-white">{totalVolumeThisMonth.toLocaleString()}</div>
-              <p className="text-xs text-gray-400">lbs this month</p>
+              <p className="text-xs text-gray-300">lbs this month</p>
             </CardContent>
           </Card>
         </div>
@@ -187,7 +187,7 @@ export default function Stats() {
           </CardHeader>
           <CardContent>
             {topRecords.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-gray-300">
                 <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No personal records yet. Complete workouts to set PRs!</p>
               </div>
@@ -201,8 +201,8 @@ export default function Stats() {
                         <h3 className="font-semibold text-white">Exercise #{record.exerciseId}</h3>
                       </div>
                       <div className="text-2xl font-bold text-game-primary">{record.value}</div>
-                      <p className="text-sm text-gray-400">{record.recordType}</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-sm text-gray-300">{record.recordType}</p>
+                      <p className="text-xs text-gray-400 mt-1">
                         {record.achievedAt ? new Date(record.achievedAt).toLocaleDateString() : 'N/A'}
                       </p>
                     </CardContent>
@@ -219,9 +219,9 @@ export default function Stats() {
             <CardTitle className="text-xl font-bold text-white">Progress Chart</CardTitle>
           </CardHeader>
           <CardContent className="p-8">
-            <div className="text-center text-gray-400">
+            <div className="text-center text-gray-300">
               <ChartLine className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">Progress Visualization</h3>
+              <h3 className="text-lg font-semibold mb-2 text-white">Progress Visualization</h3>
               <p>Track your fitness journey over time</p>
               <p className="text-sm mt-2">Charts coming soon!</p>
             </div>
