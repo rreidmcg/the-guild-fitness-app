@@ -122,6 +122,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Wardrobe routes
+  app.get("/api/wardrobe/items", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const items = await storage.getWardrobeItemsWithOwnership(userId);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch wardrobe items" });
+    }
+  });
+
+  app.post("/api/wardrobe/purchase", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const { itemId } = req.body;
+      const result = await storage.purchaseWardrobeItem(userId, itemId);
+      res.json(result);
+    } catch (error) {
+      res.status(400).json({ error: error.message || "Failed to purchase item" });
+    }
+  });
+
+  app.post("/api/wardrobe/equip", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const { itemId, category } = req.body;
+      await storage.equipWardrobeItem(userId, itemId, category);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(400).json({ error: error.message || "Failed to equip item" });
+    }
+  });
+
+  app.post("/api/wardrobe/unequip", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const { category } = req.body;
+      await storage.unequipWardrobeItem(userId, category);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(400).json({ error: error.message || "Failed to unequip item" });
+    }
+  });
+
   // Workout Programs routes
   app.get("/api/workout-programs", async (req, res) => {
     try {

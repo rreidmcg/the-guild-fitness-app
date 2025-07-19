@@ -10,6 +10,7 @@ import Settings from "@/pages/settings";
 import WorkoutBuilder from "@/pages/workout-builder";
 import WorkoutSession from "@/pages/workout-session";
 import Battle from "@/pages/battle";
+import Wardrobe from "@/pages/wardrobe";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/workout-builder" component={WorkoutBuilder} />
       <Route path="/workout-session/:id" component={WorkoutSession} />
       <Route path="/battle" component={Battle} />
+      <Route path="/wardrobe" component={Wardrobe} />
       <Route component={NotFound} />
     </Switch>
   );

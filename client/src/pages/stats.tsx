@@ -228,46 +228,86 @@ export default function Stats() {
           </CardContent>
         </Card>
 
-        {/* Battle Arena */}
-        <Card className="bg-game-slate border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-white flex items-center">
-              <Dumbbell className="w-5 h-5 mr-2" />
-              Battle Arena
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 mb-4">
-                <h3 className="text-lg font-semibold mb-2 text-white flex items-center justify-center">
-                  <Target className="w-5 h-5 mr-2 text-red-400" />
-                  Fight Monsters
-                </h3>
-                <p className="text-gray-300 mb-4">
-                  Test your strength against fierce creatures and gain experience points!
-                </p>
-                <div className="flex items-center justify-center space-x-4 text-sm text-gray-300">
-                  <div className="flex items-center">
-                    <Heart className="w-4 h-4 mr-1 text-red-400" />
-                    HP: {(userStats?.stamina || 10) * 2}
-                  </div>
-                  <div className="flex items-center">
-                    <Dumbbell className="w-4 h-4 mr-1 text-orange-400" />
-                    ATK: {Math.max(1, Math.floor((userStats?.strength || 5) / 2))}
+        {/* Character Customization & Battle */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Character Wardrobe */}
+          <Card className="bg-game-slate border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-white flex items-center">
+                <Star className="w-5 h-5 mr-2" />
+                Character Wardrobe
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-6 mb-4">
+                  <h3 className="text-lg font-semibold mb-2 text-white flex items-center justify-center">
+                    <Star className="w-5 h-5 mr-2 text-purple-400" />
+                    Customize Appearance
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    Purchase and equip new clothing items for your character!
+                  </p>
+                  <div className="flex items-center justify-center space-x-4 text-sm text-gray-300">
+                    <div className="flex items-center">
+                      <Coins className="w-4 h-4 mr-1 text-yellow-400" />
+                      Gold: {userStats?.gold || 0}
+                    </div>
                   </div>
                 </div>
+                
+                <Button 
+                  onClick={() => setLocation('/wardrobe')}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
+                >
+                  <Star className="w-4 h-4 mr-2" />
+                  Open Wardrobe
+                </Button>
               </div>
-              
-              <Button 
-                onClick={() => setLocation('/battle')}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2"
-              >
-                <Target className="w-4 h-4 mr-2" />
-                Enter Battle Arena
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          {/* Battle Arena */}
+          <Card className="bg-game-slate border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-white flex items-center">
+                <Dumbbell className="w-5 h-5 mr-2" />
+                Battle Arena
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 mb-4">
+                  <h3 className="text-lg font-semibold mb-2 text-white flex items-center justify-center">
+                    <Target className="w-5 h-5 mr-2 text-red-400" />
+                    Fight Monsters
+                  </h3>
+                  <p className="text-gray-300 mb-4">
+                    Battle creatures to earn gold for purchasing wardrobe items!
+                  </p>
+                  <div className="flex items-center justify-center space-x-4 text-sm text-gray-300">
+                    <div className="flex items-center">
+                      <Heart className="w-4 h-4 mr-1 text-red-400" />
+                      HP: {(userStats?.stamina || 10) * 2}
+                    </div>
+                    <div className="flex items-center">
+                      <Dumbbell className="w-4 h-4 mr-1 text-orange-400" />
+                      ATK: {Math.max(1, Math.floor((userStats?.strength || 5) / 2))}
+                    </div>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={() => setLocation('/battle')}
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2"
+                >
+                  <Target className="w-4 h-4 mr-2" />
+                  Enter Battle Arena
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
