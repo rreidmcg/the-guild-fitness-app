@@ -57,27 +57,27 @@ export default function Stats() {
   };
 
   return (
-    <div className="min-h-screen bg-game-dark text-white pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20" style={{ color: 'rgb(30, 30, 30)', fontWeight: 600 }}>
       {/* Header */}
-      <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+      <div className="bg-card border-b border-border px-4 py-6">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-white">Character Stats</h1>
-          <p className="text-gray-300 mt-1">Your fitness progression journey</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>Character Stats</h1>
+          <p className="mt-1" style={{ color: 'rgb(60, 60, 60)', fontWeight: 600 }}>Your fitness progression journey</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Character Profile */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
               <div className="mb-2">
-                <span className="text-sm text-green-400 font-medium px-3 py-1 bg-green-400/10 rounded-full border border-green-400/20">
+                <span className="text-sm text-green-600 font-semibold px-3 py-1 bg-green-100 rounded-full border border-green-200">
                   &lt;{getLevelTitle(currentLevel)}&gt;
                 </span>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-6">{userStats?.username || 'Player'}</h3>
+              <h3 className="text-2xl font-bold mb-6" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{userStats?.username || 'Player'}</h3>
             </div>
 
             {/* 2D Avatar Display */}
@@ -86,17 +86,17 @@ export default function Stats() {
               
               {/* Character Stats Below Avatar */}
               <div className="text-center mt-6">
-                <div className="flex items-center justify-center space-x-6 text-sm text-gray-300">
+                <div className="flex items-center justify-center space-x-6 text-sm font-semibold" style={{ color: 'rgb(60, 60, 60)' }}>
                   <span className="flex items-center">
-                    <Star className="w-4 h-4 text-game-warning mr-1" />
+                    <Star className="w-4 h-4 text-yellow-600 mr-1" />
                     Level {currentLevel}
                   </span>
                   <span className="flex items-center">
-                    <Flame className="w-4 h-4 text-orange-500 mr-1" />
+                    <Flame className="w-4 h-4 text-orange-600 mr-1" />
                     {streak} day streak
                   </span>
                   <span className="flex items-center">
-                    <Calendar className="w-4 h-4 text-blue-400 mr-1" />
+                    <Calendar className="w-4 h-4 text-blue-600 mr-1" />
                     45 days active
                   </span>
                 </div>

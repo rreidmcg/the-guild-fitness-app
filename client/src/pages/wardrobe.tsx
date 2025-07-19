@@ -159,7 +159,7 @@ export default function Wardrobe() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20" style={{ color: 'rgb(30, 30, 30)', fontWeight: 600 }}>
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-6">
         <div className="max-w-4xl mx-auto">
