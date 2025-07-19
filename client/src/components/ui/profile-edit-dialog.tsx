@@ -96,7 +96,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
@@ -104,7 +104,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 pb-4">
           {/* Avatar Preview */}
           <div className="flex justify-center">
             <Avatar2D user={{...userStats, ...formData}} size="sm" />
@@ -147,19 +147,19 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
           {/* Skin Color */}
           <div className="space-y-2">
             <Label htmlFor="skinColor">Skin Color</Label>
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 items-center">
               <Input
                 id="skinColor"
                 type="color"
                 value={formData.skinColor}
                 onChange={(e) => setFormData({ ...formData, skinColor: e.target.value })}
-                className="w-12 h-10 p-1 border rounded"
+                className="w-12 h-8 p-1 border rounded"
               />
               <Input
                 value={formData.skinColor}
                 onChange={(e) => setFormData({ ...formData, skinColor: e.target.value })}
                 placeholder="#F5C6A0"
-                className="flex-1"
+                className="flex-1 h-8"
               />
             </div>
           </div>
@@ -167,25 +167,25 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
           {/* Hair Color */}
           <div className="space-y-2">
             <Label htmlFor="hairColor">Hair Color</Label>
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 items-center">
               <Input
                 id="hairColor"
                 type="color"
                 value={formData.hairColor}
                 onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
-                className="w-12 h-10 p-1 border rounded"
+                className="w-12 h-8 p-1 border rounded"
               />
               <Input
                 value={formData.hairColor}
                 onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
                 placeholder="#8B4513"
-                className="flex-1"
+                className="flex-1 h-8"
               />
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end space-x-2 pt-2 border-t">
             <Button
               type="button"
               variant="outline"
