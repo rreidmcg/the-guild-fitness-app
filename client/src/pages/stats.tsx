@@ -106,88 +106,75 @@ export default function Stats() {
             {/* XP Progress */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-medium text-gray-300">Experience Points</h4>
-                <span className="text-sm text-gray-400">{currentXP} / {xpForNextLevel} XP</span>
+                <h4 className="text-sm font-semibold" style={{ color: 'rgb(60, 60, 60)' }}>Experience Points</h4>
+                <span className="text-sm font-semibold" style={{ color: 'rgb(80, 80, 80)' }}>{currentXP} / {xpForNextLevel} XP</span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-3">
-                <div className="xp-bar h-3 rounded-full transition-all duration-300" style={{ width: `${xpProgress}%` }}></div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="h-3 rounded-full transition-all duration-300 bg-gradient-to-r from-green-500 to-green-600" style={{ width: `${xpProgress}%` }}></div>
               </div>
-              <p className="text-xs text-gray-400 mt-1">{xpForNextLevel - currentXP} XP to Level {currentLevel + 1}</p>
+              <p className="text-xs font-semibold mt-1" style={{ color: 'rgb(100, 100, 100)' }}>{xpForNextLevel - currentXP} XP to Level {currentLevel + 1}</p>
             </div>
 
-            {/* Character Stats */}
-            <div className="space-y-4">
-              <StatBar 
-                icon={<Dumbbell className="w-4 h-4 text-red-400" />}
-                name="Strength"
-                value={userStats?.strength || 0}
-                color="from-red-500 to-red-400"
-              />
-              <StatBar 
-                icon={<Heart className="w-4 h-4 text-green-400" />}
-                name="Stamina"
-                value={userStats?.stamina || 0}
-                color="from-green-500 to-green-400"
-              />
-              <StatBar 
-                icon={<Wind className="w-4 h-4 text-purple-400" />}
-                name="Agility"
-                value={userStats?.agility || 0}
-                color="from-purple-500 to-purple-400"
-              />
+            {/* Character Stats - Numerical Display */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+                <Dumbbell className="w-6 h-6 text-red-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-red-700">{userStats?.strength || 0}</div>
+                <div className="text-sm font-semibold text-red-600">Strength</div>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                <Heart className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-700">{userStats?.stamina || 0}</div>
+                <div className="text-sm font-semibold text-green-600">Stamina</div>
+              </div>
+              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <Wind className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-purple-700">{userStats?.agility || 0}</div>
+                <div className="text-sm font-semibold text-purple-600">Agility</div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Quick Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <Coins className="w-6 h-6 text-yellow-400" />
+                <Coins className="w-6 h-6 text-yellow-600" />
               </div>
-              <div className="text-2xl font-bold text-white">{userStats?.gold || 0}</div>
-              <div className="text-xs text-gray-300">Gold Coins</div>
+              <div className="text-2xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{userStats?.gold || 0}</div>
+              <div className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Gold Coins</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <Trophy className="w-5 h-5 text-game-warning" />
+                <Trophy className="w-5 h-5 text-yellow-600" />
               </div>
-              <div className="text-2xl font-bold text-white">{currentLevel}</div>
-              <p className="text-xs text-gray-300">Current Level</p>
+              <div className="text-2xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{currentLevel}</div>
+              <p className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Current Level</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <Flame className="w-5 h-5 text-orange-500" />
+                <Flame className="w-5 h-5 text-orange-600" />
               </div>
-              <div className="text-2xl font-bold text-orange-400">{streak}</div>
-              <p className="text-xs text-gray-300">Day Streak</p>
+              <div className="text-2xl font-bold text-orange-700">{streak}</div>
+              <p className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Day Streak</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center mb-2">
-                <ChartLine className="w-5 h-5 text-game-success" />
+                <ChartLine className="w-5 h-5 text-green-600" />
               </div>
-              <div className="text-2xl font-bold text-white">{currentXP}</div>
-              <p className="text-xs text-gray-300">Total XP</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Dumbbell className="w-5 h-5 text-game-primary" />
-              </div>
-              <div className="text-xl font-bold text-white">{totalVolumeThisMonth.toLocaleString()}</div>
-              <p className="text-xs text-gray-300">lbs this month</p>
+              <div className="text-2xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{currentXP}</div>
+              <p className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Total XP</p>
             </CardContent>
           </Card>
         </div>
