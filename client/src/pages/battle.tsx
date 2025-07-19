@@ -12,7 +12,10 @@ import {
   Zap, 
   Trophy,
   ArrowLeft,
-  Skull
+  Skull,
+  ChevronDown,
+  ChevronRight,
+  Coins
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 
@@ -23,7 +26,7 @@ interface Monster {
   maxHp: number;
   currentHp: number;
   attack: number;
-  xpReward: number;
+  goldReward: number;
   description: string;
 }
 
@@ -36,58 +39,70 @@ interface BattleState {
   battleResult: 'ongoing' | 'victory' | 'defeat';
 }
 
+// E-rank dungeon monsters (levels 1-10)
+const ERANK_MONSTERS: Monster[] = [
+  { id: 1, name: "Green Slime", level: 1, maxHp: 12, currentHp: 12, attack: 2, goldReward: 5, description: "A gelatinous blob that bounces menacingly" },
+  { id: 2, name: "Cave Rat", level: 2, maxHp: 18, currentHp: 18, attack: 3, goldReward: 8, description: "A mangy rodent with sharp teeth" },
+  { id: 3, name: "Wild Goblin", level: 3, maxHp: 25, currentHp: 25, attack: 4, goldReward: 12, description: "A mischievous creature wielding a rusty dagger" },
+  { id: 4, name: "Forest Spider", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 15, description: "An eight-legged predator with venomous fangs" },
+  { id: 5, name: "Skeleton Warrior", level: 5, maxHp: 40, currentHp: 40, attack: 7, goldReward: 20, description: "Animated bones wielding ancient weapons" },
+  { id: 6, name: "Stone Golem", level: 6, maxHp: 55, currentHp: 55, attack: 8, goldReward: 25, description: "A sturdy construct of animated rock" },
+  { id: 7, name: "Shadow Wolf", level: 7, maxHp: 48, currentHp: 48, attack: 10, goldReward: 30, description: "A spectral predator that hunts in darkness" },
+  { id: 8, name: "Fire Elemental", level: 8, maxHp: 60, currentHp: 60, attack: 12, goldReward: 35, description: "A being of pure flame and fury" },
+  { id: 9, name: "Orc Berserker", level: 9, maxHp: 75, currentHp: 75, attack: 14, goldReward: 45, description: "A brutal warrior lost to bloodlust" },
+  { id: 10, name: "Lesser Dragon", level: 10, maxHp: 100, currentHp: 100, attack: 18, goldReward: 60, description: "A young but fierce draconic beast" },
+];
+
 export default function Battle() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
+  const [isMonsterListOpen, setIsMonsterListOpen] = useState(true);
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
   });
 
   // Initialize battle state
-  const [battleState, setBattleState] = useState<BattleState>(() => {
-    const slime: Monster = {
-      id: 1,
-      name: "Green Slime",
-      level: 1,
-      maxHp: 10,
-      currentHp: 10,
-      attack: 1,
-      xpReward: 25,
-      description: "A gelatinous blob that bounces menacingly"
-    };
+  const [battleState, setBattleState] = useState<BattleState | null>(null);
 
+  const startBattle = (monster: Monster) => {
     const playerMaxHp = Math.max(10, (userStats?.stamina || 10) * 2);
+    const battleMonster = { ...monster, currentHp: monster.maxHp };
     
-    return {
+    setBattleState({
       playerHp: playerMaxHp,
       playerMaxHp,
-      monster: slime,
-      battleLog: [`A wild ${slime.name} appears!`],
+      monster: battleMonster,
+      battleLog: [`A wild ${monster.name} appears!`],
       isPlayerTurn: true,
       battleResult: 'ongoing'
-    };
-  });
+    });
+    setSelectedMonster(null);
+  };
 
   // Update player HP when stats load
   useEffect(() => {
-    if (userStats && battleState.battleResult === 'ongoing') {
+    if (userStats && battleState && battleState.battleResult === 'ongoing') {
       const newMaxHp = Math.max(10, userStats.stamina * 2);
-      setBattleState(prev => ({
-        ...prev,
-        playerMaxHp: newMaxHp,
-        playerHp: Math.min(prev.playerHp, newMaxHp)
-      }));
+      setBattleState(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          playerMaxHp: newMaxHp,
+          playerHp: Math.min(prev.playerHp, newMaxHp)
+        };
+      });
     }
-  }, [userStats]);
+  }, [userStats, battleState]);
 
   const updateStatsMutation = useMutation({
-    mutationFn: async (xpGain: number) => {
+    mutationFn: async (goldGain: number) => {
       const response = await fetch('/api/user/stats', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          experienceGain: xpGain 
+          goldGain: goldGain 
         })
       });
       if (!response.ok) throw new Error('Failed to update stats');
@@ -99,7 +114,7 @@ export default function Battle() {
   });
 
   const playerAttack = () => {
-    if (!battleState.isPlayerTurn || battleState.battleResult !== 'ongoing') return;
+    if (!battleState || !battleState.isPlayerTurn || battleState.battleResult !== 'ongoing') return;
 
     const playerStrength = userStats?.strength || 5;
     const baseDamage = Math.max(1, Math.floor(playerStrength / 2));
@@ -108,26 +123,32 @@ export default function Battle() {
     const newMonsterHp = Math.max(0, battleState.monster.currentHp - damage);
     const isMonsterDefeated = newMonsterHp === 0;
 
-    setBattleState(prev => ({
-      ...prev,
-      monster: { ...prev.monster, currentHp: newMonsterHp },
-      battleLog: [...prev.battleLog, `You strike for ${damage} damage!`],
-      isPlayerTurn: false,
-      battleResult: isMonsterDefeated ? 'victory' : 'ongoing'
-    }));
+    setBattleState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        monster: { ...prev.monster, currentHp: newMonsterHp },
+        battleLog: [...prev.battleLog, `You strike for ${damage} damage!`],
+        isPlayerTurn: false,
+        battleResult: isMonsterDefeated ? 'victory' : 'ongoing'
+      };
+    });
 
     if (isMonsterDefeated) {
       setTimeout(() => {
-        setBattleState(prev => ({
-          ...prev,
-          battleLog: [...prev.battleLog, `${prev.monster.name} is defeated!`, `You gain ${prev.monster.xpReward} XP!`]
-        }));
+        setBattleState(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            battleLog: [...prev.battleLog, `${prev.monster.name} is defeated!`, `You gain ${prev.monster.goldReward} gold coins!`]
+          };
+        });
         
-        updateStatsMutation.mutate(battleState.monster.xpReward);
+        updateStatsMutation.mutate(battleState.monster.goldReward);
         
         toast({
           title: "Victory!",
-          description: `You defeated the ${battleState.monster.name} and gained ${battleState.monster.xpReward} XP!`,
+          description: `You defeated the ${battleState.monster.name} and gained ${battleState.monster.goldReward} gold!`,
         });
       }, 1000);
     } else {
@@ -136,19 +157,22 @@ export default function Battle() {
   };
 
   const monsterAttack = () => {
-    if (battleState.battleResult !== 'ongoing') return;
+    if (!battleState || battleState.battleResult !== 'ongoing') return;
 
     const damage = battleState.monster.attack;
     const newPlayerHp = Math.max(0, battleState.playerHp - damage);
     const isPlayerDefeated = newPlayerHp === 0;
 
-    setBattleState(prev => ({
-      ...prev,
-      playerHp: newPlayerHp,
-      battleLog: [...prev.battleLog, `${prev.monster.name} attacks for ${damage} damage!`],
-      isPlayerTurn: true,
-      battleResult: isPlayerDefeated ? 'defeat' : 'ongoing'
-    }));
+    setBattleState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        playerHp: newPlayerHp,
+        battleLog: [...prev.battleLog, `${prev.monster.name} attacks for ${damage} damage!`],
+        isPlayerTurn: true,
+        battleResult: isPlayerDefeated ? 'defeat' : 'ongoing'
+      };
+    });
 
     if (isPlayerDefeated) {
       toast({
@@ -159,33 +183,110 @@ export default function Battle() {
     }
   };
 
-  const restartBattle = () => {
-    const slime: Monster = {
-      id: 1,
-      name: "Green Slime",
-      level: 1,
-      maxHp: 10,
-      currentHp: 10,
-      attack: 1,
-      xpReward: 25,
-      description: "A gelatinous blob that bounces menacingly"
-    };
-
-    const playerMaxHp = Math.max(10, (userStats?.stamina || 10) * 2);
-    
-    setBattleState({
-      playerHp: playerMaxHp,
-      playerMaxHp,
-      monster: slime,
-      battleLog: [`A wild ${slime.name} appears!`],
-      isPlayerTurn: true,
-      battleResult: 'ongoing'
-    });
+  const returnToMonsterList = () => {
+    setBattleState(null);
   };
+
+  // Monster Selection View
+  if (!battleState) {
+    return (
+      <div className="min-h-screen bg-game-dark text-white pb-20">
+        {/* Header */}
+        <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setLocation("/")}
+                  className="text-gray-300 hover:text-white"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Stats
+                </Button>
+                <div>
+                  <h1 className="text-3xl font-bold text-white">Battle Arena</h1>
+                  <p className="text-gray-300 mt-1">Choose your opponent and fight for gold coins</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="flex items-center space-x-2 text-yellow-400">
+                  <Coins className="w-5 h-5" />
+                  <span className="font-bold">{userStats?.gold || 0} Gold</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto p-6">
+          {/* E-rank Dungeon */}
+          <Card className="bg-game-slate border-gray-700">
+            <CardHeader>
+              <CardTitle 
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => setIsMonsterListOpen(!isMonsterListOpen)}
+              >
+                <div className="flex items-center space-x-2">
+                  <Skull className="w-6 h-6 text-red-400" />
+                  <span>E-rank Dungeon</span>
+                  <span className="text-sm text-gray-400">(Levels 1-10)</span>
+                </div>
+                {isMonsterListOpen ? (
+                  <ChevronDown className="w-5 h-5" />
+                ) : (
+                  <ChevronRight className="w-5 h-5" />
+                )}
+              </CardTitle>
+            </CardHeader>
+            {isMonsterListOpen && (
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {ERANK_MONSTERS.map((monster) => (
+                    <Card 
+                      key={monster.id}
+                      className="bg-game-dark border-gray-600 hover:border-game-primary transition-colors cursor-pointer"
+                      onClick={() => startBattle(monster)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-bold text-white">{monster.name}</h3>
+                          <span className="text-sm bg-red-700 text-white px-2 py-1 rounded">
+                            Lv.{monster.level}
+                          </span>
+                        </div>
+                        <p className="text-gray-400 text-sm mb-3">{monster.description}</p>
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div className="flex items-center space-x-1">
+                            <Heart className="w-3 h-3 text-red-400" />
+                            <span>{monster.maxHp}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Sword className="w-3 h-3 text-orange-400" />
+                            <span>{monster.attack}</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-yellow-400">
+                            <Coins className="w-3 h-3" />
+                            <span>{monster.goldReward}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const playerHpPercentage = (battleState.playerHp / battleState.playerMaxHp) * 100;
   const monsterHpPercentage = (battleState.monster.currentHp / battleState.monster.maxHp) * 100;
 
+  // Battle View
   return (
     <div className="min-h-screen bg-game-dark text-white pb-20">
       {/* Header */}
@@ -196,15 +297,21 @@ export default function Battle() {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => setLocation("/")}
+                onClick={returnToMonsterList}
                 className="text-gray-300 hover:text-white"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Stats
+                Back to Monster List
               </Button>
               <div>
-                <h1 className="text-3xl font-bold text-white">Battle Arena</h1>
-                <p className="text-gray-300 mt-1">Fight monsters to gain experience</p>
+                <h1 className="text-3xl font-bold text-white">Battle: {battleState.monster.name}</h1>
+                <p className="text-gray-300 mt-1">Level {battleState.monster.level} Monster</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center space-x-2 text-yellow-400">
+                <Coins className="w-5 h-5" />
+                <span className="font-bold">{userStats?.gold || 0} Gold</span>
               </div>
             </div>
           </div>
@@ -247,7 +354,7 @@ export default function Battle() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Zap className="w-4 h-4 text-blue-400" />
-                  <span>STA: {userStats?.stamina || 5}</span>
+                  <span>STA: {userStats?.stamina || 10}</span>
                 </div>
               </div>
             </CardContent>
@@ -321,8 +428,8 @@ export default function Battle() {
                   <span className="font-semibold">Victory!</span>
                 </div>
                 <div className="flex space-x-4">
-                  <Button onClick={restartBattle} className="bg-green-600 hover:bg-green-700">
-                    Fight Again
+                  <Button onClick={returnToMonsterList} className="bg-green-600 hover:bg-green-700">
+                    Choose Another Monster
                   </Button>
                   <Button variant="outline" onClick={() => setLocation("/")}>
                     Return to Stats
@@ -338,8 +445,8 @@ export default function Battle() {
                   <span className="font-semibold">Defeat!</span>
                 </div>
                 <div className="flex space-x-4">
-                  <Button onClick={restartBattle} className="bg-red-600 hover:bg-red-700">
-                    Try Again
+                  <Button onClick={returnToMonsterList} className="bg-red-600 hover:bg-red-700">
+                    Choose Different Monster
                   </Button>
                   <Button variant="outline" onClick={() => setLocation("/")}>
                     Return to Stats

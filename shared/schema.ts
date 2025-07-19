@@ -12,6 +12,7 @@ export const users = pgTable("users", {
   strength: integer("strength").default(0),
   stamina: integer("stamina").default(0),
   agility: integer("agility").default(0),
+  gold: integer("gold").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

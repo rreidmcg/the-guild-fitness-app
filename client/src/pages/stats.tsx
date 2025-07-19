@@ -15,7 +15,8 @@ import {
   Zap,
   TrendingUp,
   Calendar,
-  Wind
+  Wind,
+  Coins
 } from "lucide-react";
 
 export default function Stats() {
@@ -140,6 +141,16 @@ export default function Stats() {
 
         {/* Quick Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+            <CardContent className="p-4 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Coins className="w-6 h-6 text-yellow-400" />
+              </div>
+              <div className="text-2xl font-bold text-white">{userStats?.gold || 0}</div>
+              <div className="text-xs text-gray-300">Gold Coins</div>
+            </CardContent>
+          </Card>
+          
           <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center mb-2">

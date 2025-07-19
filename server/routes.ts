@@ -158,10 +158,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update user stats (for battle rewards)
+  // Update user stats (for battle rewards and workouts)
   app.patch("/api/user/stats", async (req, res) => {
     try {
-      const { experienceGain, strengthGain, staminaGain, agilityGain } = req.body;
+      const { experienceGain, strengthGain, staminaGain, agilityGain, goldGain } = req.body;
       const userId = 1; // TODO: Get from session/auth
       
       const user = await storage.getUser(userId);
@@ -171,6 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newXP = user.experience + (experienceGain || 0);
       const newLevel = calculateLevel(newXP);
+      const newGold = (user.gold || 0) + (goldGain || 0);
       
       const updatedUser = await storage.updateUser(userId, {
         experience: newXP,
@@ -178,6 +179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         strength: user.strength + (strengthGain || 0),
         stamina: user.stamina + (staminaGain || 0),
         agility: user.agility + (agilityGain || 0),
+        gold: newGold,
       });
       
       res.json(updatedUser);
