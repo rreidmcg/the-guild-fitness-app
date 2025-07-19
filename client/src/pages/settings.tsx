@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Avatar2D } from "@/components/ui/avatar-2d";
+import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -84,7 +85,9 @@ export default function Settings() {
                 <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Joined today</p>
               </div>
-              <Button variant="outline">Edit Profile</Button>
+              <ProfileEditDialog>
+                <Button variant="outline">Edit Profile</Button>
+              </ProfileEditDialog>
             </div>
             
             <div className="flex items-center justify-between">

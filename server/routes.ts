@@ -249,6 +249,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user profile
+  app.patch("/api/user/profile", async (req, res) => {
+    try {
+      const { username, skinColor, hairColor } = req.body;
+      const userId = 1; // TODO: Get from session/auth
+      
+      const updates: any = {};
+      if (username) updates.username = username;
+      if (skinColor) updates.skinColor = skinColor;
+      if (hairColor) updates.hairColor = hairColor;
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user profile" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
