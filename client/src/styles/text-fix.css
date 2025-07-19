@@ -45,3 +45,16 @@ p, span, div, h1, h2, h3, h4, h5, h6 {
 button {
   font-weight: 600 !important;
 }
+
+/* Navigation menu colors override */
+nav h1 {
+  color: rgb(209, 213, 219) !important; /* text-gray-300 */
+}
+
+nav .text-gray-300 {
+  color: rgb(209, 213, 219) !important;
+}
+
+.bottom-nav-solid .text-gray-300 {
+  color: rgb(209, 213, 219) !important;
+}
