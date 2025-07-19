@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful API with JSON responses
 
 ### Database Schema
-- **Users**: Character progression with level, experience, and three-stat tracking (Strength, Stamina, Agility)
+- **Users**: Character progression with level, experience, three-stat tracking (Strength, Stamina, Agility), and gold currency
 - **Exercises**: Exercise library with multi-stat allocation system using JSON statTypes field
 - **Workouts**: Template-based workout creation with JSON exercise configuration
 - **Workout Sessions**: Completed workout tracking with sophisticated XP and stat allocation
@@ -59,6 +59,10 @@ Preferred communication style: Simple, everyday language.
   - RPE-based effort scaling (1-10 perceived effort scale)
   - Work unit calculations for resistance vs cardio exercises
   - Three-stat system: Strength, Stamina, Agility
+- **Dual Economy System**:
+  - **XP from Workouts**: Character progression, leveling up, stat increases for stronger combat
+  - **Gold from Monster Battles**: Currency for purchasing armor and equipment in shop
+- **Battle System**: E-rank dungeon with monsters levels 1-10, turn-based combat
 - Level progression with title system
 - Multi-stat exercises (e.g., power cleans award all three stats)
 - Achievement system through personal records
@@ -79,6 +83,8 @@ Preferred communication style: Simple, everyday language.
 4. **Workout Execution** → Real-time session tracking with timer and performance logging
 5. **Progress Calculation** → XP and stat gains based on workout completion
 6. **Character Progression** → Level ups and stat improvements reflected in dashboard
+7. **Battle System** → Fight monsters in E-rank dungeon to earn gold coins
+8. **Shop System** → Use gold to purchase armor and equipment (planned feature)
 
 ## External Dependencies
 
