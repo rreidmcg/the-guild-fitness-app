@@ -38,6 +38,23 @@ export default function Dashboard() {
   const recentSessions = workoutSessions?.slice(0, 3) || [];
   const topRecords = personalRecords?.slice(0, 4) || [];
 
+  // Calculate active days
+  const calculateActiveDays = () => {
+    if (!workoutSessions || workoutSessions.length === 0) return 0;
+    
+    // Get unique dates from workout sessions
+    const uniqueDates = new Set(
+      workoutSessions.map(session => {
+        const date = new Date(session.completedAt);
+        return date.toDateString(); // This gives us "Mon Oct 09 2023" format
+      })
+    );
+    
+    return uniqueDates.size;
+  };
+
+  const activeDays = calculateActiveDays();
+
   // Calculate streak (simplified)
   const streak = 7; // TODO: Calculate actual streak
   const totalVolumeThisMonth = 45280; // TODO: Calculate actual volume
@@ -202,7 +219,7 @@ export default function Dashboard() {
                   <h3 className="text-2xl font-bold text-white mb-2">Fitness Warrior</h3>
                   <div className="flex items-center justify-center space-x-4 text-sm text-gray-300">
                     <span><Star className="w-3 h-3 text-game-warning mr-1 inline" />Level {currentLevel}</span>
-                    <span><Target className="w-3 h-3 mr-1 inline" />45 days active</span>
+                    <span><Target className="w-3 h-3 mr-1 inline" />{activeDays} days active</span>
                   </div>
                 </div>
 

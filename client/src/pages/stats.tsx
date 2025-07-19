@@ -38,8 +38,72 @@ export default function Stats() {
   const topRecords = personalRecords?.slice(0, 4) || [];
 
   // Calculate stats
-  const streak = 0; // No workouts logged yet
-  const totalVolumeThisMonth = 45280; // TODO: Calculate actual volume
+  const calculateActiveDays = () => {
+    if (!workoutSessions || workoutSessions.length === 0) return 0;
+    
+    // Get unique dates from workout sessions
+    const uniqueDates = new Set(
+      workoutSessions.map(session => {
+        const date = new Date(session.completedAt);
+        return date.toDateString(); // This gives us "Mon Oct 09 2023" format
+      })
+    );
+    
+    return uniqueDates.size;
+  };
+
+  const calculateStreak = () => {
+    if (!workoutSessions || workoutSessions.length === 0) return 0;
+    
+    // Sort sessions by date (newest first)
+    const sortedSessions = [...workoutSessions].sort((a, b) => 
+      new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
+    );
+    
+    // Get unique workout dates
+    const workoutDates = Array.from(new Set(
+      sortedSessions.map(session => {
+        const date = new Date(session.completedAt);
+        return date.toDateString();
+      })
+    )).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    
+    if (workoutDates.length === 0) return 0;
+    
+    // Check if there was a workout today or yesterday
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    const todayStr = today.toDateString();
+    const yesterdayStr = yesterday.toDateString();
+    
+    // If no workout today or yesterday, streak is 0
+    if (workoutDates[0] !== todayStr && workoutDates[0] !== yesterdayStr) {
+      return 0;
+    }
+    
+    // Count consecutive days
+    let streak = 0;
+    let currentDate = new Date(workoutDates[0]);
+    
+    for (const workoutDateStr of workoutDates) {
+      const workoutDate = new Date(workoutDateStr);
+      
+      if (workoutDate.toDateString() === currentDate.toDateString()) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    
+    return streak;
+  };
+
+  const activeDays = calculateActiveDays();
+  const streak = calculateStreak();
+  const totalVolumeThisMonth = workoutSessions?.reduce((total, session) => total + (session.totalVolume || 0), 0) || 0;
   const currentXP = userStats?.experience || 0;
   const currentLevel = userStats?.level || 1;
   const xpForNextLevel = currentLevel * 1000;
@@ -97,7 +161,7 @@ export default function Stats() {
                   </span>
                   <span className="flex items-center">
                     <Calendar className="w-4 h-4 text-blue-600 mr-1" />
-                    45 days active
+                    {activeDays} days active
                   </span>
                 </div>
               </div>
