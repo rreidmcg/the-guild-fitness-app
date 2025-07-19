@@ -25,13 +25,11 @@ export function BottomNav() {
                 key={item.path}
                 variant="ghost"
                 onClick={() => setLocation(item.path)}
-                style={!isActive ? { color: 'rgb(209, 213, 219)' } : {}}
-                className={`flex flex-col items-center space-y-1 py-3 px-4 min-w-0 hover:text-gray-100 ${
-                  isActive ? "text-game-primary" : ""
-                }`}
+                style={{ color: isActive ? 'hsl(243, 75%, 59%)' : 'rgb(209, 213, 219)' }}
+                className="flex flex-col items-center space-y-1 py-3 px-4 min-w-0 hover:text-gray-100"
               >
-                <Icon className={`w-5 h-5`} style={!isActive ? { color: 'rgb(209, 213, 219)' } : {}} />
-                <span className="text-xs font-medium" style={!isActive ? { color: 'rgb(209, 213, 219)' } : {}}>{item.label}</span>
+                <Icon className="w-5 h-5" style={{ color: isActive ? 'hsl(243, 75%, 59%)' : 'rgb(209, 213, 219)' }} />
+                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(243, 75%, 59%)' : 'rgb(209, 213, 219)' }}>{item.label}</span>
               </Button>
             );
           })}
