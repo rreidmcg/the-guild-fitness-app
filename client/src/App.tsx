@@ -32,7 +32,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen bg-game-dark text-white">
+        <div className="min-h-screen bg-background text-foreground">
           <Toaster />
           <Router />
           <BottomNav />

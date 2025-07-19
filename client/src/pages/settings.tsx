@@ -20,18 +20,18 @@ import {
 
 export default function Settings() {
   return (
-    <div className="min-h-screen bg-game-dark text-white pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+      <div className="bg-card border-b border-border px-4 py-6">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-white">Settings</h1>
-          <p className="text-gray-300 mt-1">Customize your FitQuest experience</p>
+          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground mt-1">Customize your FitQuest experience</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Profile Section */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <User className="w-5 h-5" />
@@ -44,9 +44,9 @@ export default function Settings() {
                 <Avatar2D size="sm" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white">Fitness Warrior</h3>
-                <p className="text-gray-300">Level 1 • 0 XP</p>
-                <p className="text-sm text-gray-400">Joined today</p>
+                <h3 className="text-lg font-semibold text-foreground">Fitness Warrior</h3>
+                <p className="text-muted-foreground">Level 1 • 0 XP</p>
+                <p className="text-sm text-muted-foreground">Joined today</p>
               </div>
               <Button variant="outline">Edit Profile</Button>
             </div>
@@ -54,7 +54,7 @@ export default function Settings() {
         </Card>
 
         {/* Notifications */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Bell className="w-5 h-5" />
@@ -65,7 +65,7 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="workout-reminders" className="text-base">Workout Reminders</Label>
-                <p className="text-sm text-gray-300">Get notified about scheduled workouts</p>
+                <p className="text-sm text-muted-foreground">Get notified about scheduled workouts</p>
               </div>
               <Switch id="workout-reminders" defaultChecked />
             </div>
@@ -73,7 +73,7 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="achievement-alerts" className="text-base">Achievement Alerts</Label>
-                <p className="text-sm text-gray-400">Celebrate when you level up or set PRs</p>
+                <p className="text-sm text-muted-foreground">Celebrate when you level up or set PRs</p>
               </div>
               <Switch id="achievement-alerts" defaultChecked />
             </div>
@@ -81,7 +81,7 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="streak-warnings" className="text-base">Streak Warnings</Label>
-                <p className="text-sm text-gray-400">Get reminded when your streak is at risk</p>
+                <p className="text-sm text-muted-foreground">Get reminded when your streak is at risk</p>
               </div>
               <Switch id="streak-warnings" defaultChecked />
             </div>
@@ -89,7 +89,7 @@ export default function Settings() {
         </Card>
 
         {/* Appearance */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Palette className="w-5 h-5" />
@@ -99,16 +99,8 @@ export default function Settings() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="dark-mode" className="text-base">Dark Mode</Label>
-                <p className="text-sm text-gray-400">Gaming theme with dark colors</p>
-              </div>
-              <Switch id="dark-mode" defaultChecked disabled />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
                 <Label htmlFor="animations" className="text-base">Animations</Label>
-                <p className="text-sm text-gray-400">Enable smooth transitions and effects</p>
+                <p className="text-sm text-muted-foreground">Enable smooth transitions and effects</p>
               </div>
               <Switch id="animations" defaultChecked />
             </div>
@@ -116,7 +108,7 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="sound-effects" className="text-base">Sound Effects</Label>
-                <p className="text-sm text-gray-400">Play sounds for actions and achievements</p>
+                <p className="text-sm text-muted-foreground">Play sounds for actions and achievements</p>
               </div>
               <Switch id="sound-effects" />
             </div>
@@ -124,7 +116,7 @@ export default function Settings() {
         </Card>
 
         {/* Privacy & Security */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Shield className="w-5 h-5" />
@@ -135,7 +127,7 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="data-sharing" className="text-base">Anonymous Analytics</Label>
-                <p className="text-sm text-gray-400">Help improve the app with anonymous usage data</p>
+                <p className="text-sm text-muted-foreground">Help improve the app with anonymous usage data</p>
               </div>
               <Switch id="data-sharing" defaultChecked />
             </div>
@@ -143,7 +135,7 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="workout-privacy" className="text-base">Private Workouts</Label>
-                <p className="text-sm text-gray-400">Keep your workout data private</p>
+                <p className="text-sm text-muted-foreground">Keep your workout data private</p>
               </div>
               <Switch id="workout-privacy" defaultChecked />
             </div>
@@ -156,7 +148,7 @@ export default function Settings() {
         </Card>
 
         {/* Data Management */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Download className="w-5 h-5" />
@@ -181,7 +173,7 @@ export default function Settings() {
         </Card>
 
         {/* Support */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <HelpCircle className="w-5 h-5" />
@@ -200,9 +192,9 @@ export default function Settings() {
               </Button>
             </div>
             
-            <div className="text-center py-4 border-t border-gray-600">
-              <p className="text-sm text-gray-400 mb-2">FitQuest v1.0.0</p>
-              <p className="text-xs text-gray-500">
+            <div className="text-center py-4 border-t border-border">
+              <p className="text-sm text-muted-foreground mb-2">FitQuest v1.0.0</p>
+              <p className="text-xs text-muted-foreground">
                 Made with ❤️ for fitness enthusiasts
               </p>
             </div>
@@ -210,7 +202,7 @@ export default function Settings() {
         </Card>
 
         {/* Sign Out */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardContent className="p-6">
             <Button variant="destructive" className="w-full">
               <LogOut className="w-4 h-4 mr-2" />
