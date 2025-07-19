@@ -48,23 +48,31 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: any) => {
+      console.log("Mutation received updates:", updates);
+      console.log("Current userStats:", userStats);
+      
       // Split updates into profile and gender updates
       const { gender, ...profileUpdates } = updates;
       
+      console.log("Profile updates:", profileUpdates);
+      console.log("Gender update:", gender, "vs current:", userStats?.gender);
+      
       // Update profile first
       if (Object.keys(profileUpdates).length > 0) {
-        await apiRequest("/api/user/profile", {
+        const profileResult = await apiRequest("/api/user/profile", {
           method: "PATCH",
           body: profileUpdates,
         });
+        console.log("Profile update result:", profileResult);
       }
       
       // Update gender if changed
       if (gender !== userStats?.gender) {
-        await apiRequest("/api/user/gender", {
+        const genderResult = await apiRequest("/api/user/gender", {
           method: "PATCH",
           body: { gender },
         });
+        console.log("Gender update result:", genderResult);
       }
       
       return updates;
@@ -88,6 +96,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submitting form data:", formData);
     updateProfileMutation.mutate(formData);
   };
 
