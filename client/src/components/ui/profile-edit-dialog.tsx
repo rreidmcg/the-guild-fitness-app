@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -28,17 +28,46 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
   });
 
   const [formData, setFormData] = useState({
-    username: userStats?.username || "",
-    skinColor: userStats?.skinColor || "#F5C6A0",
-    hairColor: userStats?.hairColor || "#8B4513",
+    username: "",
+    skinColor: "#F5C6A0",
+    hairColor: "#8B4513",
+    gender: "male",
   });
+
+  // Update form data when user stats change
+  useEffect(() => {
+    if (userStats) {
+      setFormData({
+        username: userStats.username || "",
+        skinColor: userStats.skinColor || "#F5C6A0",
+        hairColor: userStats.hairColor || "#8B4513",
+        gender: userStats.gender || "male",
+      });
+    }
+  }, [userStats]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: any) => {
-      return await apiRequest("/api/user/profile", {
-        method: "PATCH",
-        body: updates,
-      });
+      // Split updates into profile and gender updates
+      const { gender, ...profileUpdates } = updates;
+      
+      // Update profile first
+      if (Object.keys(profileUpdates).length > 0) {
+        await apiRequest("/api/user/profile", {
+          method: "PATCH",
+          body: profileUpdates,
+        });
+      }
+      
+      // Update gender if changed
+      if (gender !== userStats?.gender) {
+        await apiRequest("/api/user/gender", {
+          method: "PATCH",
+          body: { gender },
+        });
+      }
+      
+      return updates;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
@@ -78,7 +107,30 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Preview */}
           <div className="flex justify-center">
-            <Avatar2D user={userStats} size="sm" />
+            <Avatar2D user={{...userStats, ...formData}} size="sm" />
+          </div>
+
+          {/* Gender Selection */}
+          <div className="space-y-2">
+            <Label>Avatar Gender</Label>
+            <div className="flex space-x-2">
+              <Button
+                type="button"
+                variant={formData.gender === "male" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFormData({ ...formData, gender: "male" })}
+              >
+                Male
+              </Button>
+              <Button
+                type="button"
+                variant={formData.gender === "female" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFormData({ ...formData, gender: "female" })}
+              >
+                Female
+              </Button>
+            </div>
           </div>
 
           {/* Username */}

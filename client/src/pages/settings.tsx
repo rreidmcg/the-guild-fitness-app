@@ -29,32 +29,7 @@ export default function Settings() {
     queryKey: ["/api/user/stats"],
   });
 
-  const updateGenderMutation = useMutation({
-    mutationFn: async (gender: "male" | "female") => {
-      return await apiRequest("/api/user/gender", {
-        method: "PATCH",
-        body: { gender },
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      toast({
-        title: "Avatar Updated",
-        description: "Your character gender has been changed successfully!",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update avatar gender. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
 
-  const handleGenderChange = (gender: "male" | "female") => {
-    updateGenderMutation.mutate(gender);
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
@@ -81,38 +56,13 @@ export default function Settings() {
                 <Avatar2D size="sm" user={userStats} />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-foreground">Fitness Warrior</h3>
+                <h3 className="text-lg font-semibold text-foreground">{userStats?.username || 'Fitness Warrior'}</h3>
                 <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
-                <p className="text-sm text-muted-foreground">Joined today</p>
+                <p className="text-sm text-muted-foreground">Avatar: {userStats?.gender === 'female' ? 'Female' : 'Male'}</p>
               </div>
               <ProfileEditDialog>
                 <Button variant="outline">Edit Profile</Button>
               </ProfileEditDialog>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="avatar-gender" className="text-base">Avatar Gender</Label>
-                <p className="text-sm text-muted-foreground">Choose your character appearance</p>
-              </div>
-              <div className="flex space-x-2">
-                <Button 
-                  variant={userStats?.gender === "male" ? "default" : "outline"} 
-                  size="sm"
-                  onClick={() => handleGenderChange("male")}
-                  disabled={updateGenderMutation.isPending}
-                >
-                  Male
-                </Button>
-                <Button 
-                  variant={userStats?.gender === "female" ? "default" : "outline"} 
-                  size="sm"
-                  onClick={() => handleGenderChange("female")}
-                  disabled={updateGenderMutation.isPending}
-                >
-                  Female
-                </Button>
-              </div>
             </div>
           </CardContent>
         </Card>
