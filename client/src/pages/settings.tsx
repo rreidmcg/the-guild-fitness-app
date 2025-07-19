@@ -45,9 +45,14 @@ export default function Settings() {
         {/* Profile Section */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <User className="w-5 h-5" />
-              <span>Profile</span>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <User className="w-5 h-5" />
+                <span>Profile</span>
+              </div>
+              <ProfileEditDialog>
+                <Button variant="outline" size="sm">Edit Profile</Button>
+              </ProfileEditDialog>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -60,9 +65,6 @@ export default function Settings() {
                 <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Avatar: {userStats?.gender === 'female' ? 'Female' : 'Male'}</p>
               </div>
-              <ProfileEditDialog>
-                <Button variant="outline">Edit Profile</Button>
-              </ProfileEditDialog>
             </div>
           </CardContent>
         </Card>
