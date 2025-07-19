@@ -20,6 +20,7 @@ export const users = pgTable("users", {
   equippedShoes: text("equipped_shoes"),
   skinColor: text("skin_color").default("#F5C6A0"),
   hairColor: text("hair_color").default("#8B4513"),
+  gender: text("gender").default("male"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

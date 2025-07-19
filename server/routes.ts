@@ -232,6 +232,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user gender
+  app.patch("/api/user/gender", async (req, res) => {
+    try {
+      const { gender } = req.body;
+      const userId = 1; // TODO: Get from session/auth
+      
+      if (!gender || !["male", "female"].includes(gender)) {
+        return res.status(400).json({ error: "Invalid gender value" });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, { gender });
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user gender" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

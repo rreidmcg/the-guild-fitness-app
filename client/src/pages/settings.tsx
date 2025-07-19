@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Avatar2D } from "@/components/ui/avatar-2d";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { 
   User, 
   Bell, 
@@ -19,6 +22,39 @@ import {
 } from "lucide-react";
 
 export default function Settings() {
+  const { toast } = useToast();
+  
+  const { data: userStats } = useQuery({
+    queryKey: ["/api/user/stats"],
+  });
+
+  const updateGenderMutation = useMutation({
+    mutationFn: async (gender: "male" | "female") => {
+      return await apiRequest("/api/user/gender", {
+        method: "PATCH",
+        body: { gender },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      toast({
+        title: "Avatar Updated",
+        description: "Your character gender has been changed successfully!",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update avatar gender. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleGenderChange = (gender: "male" | "female") => {
+    updateGenderMutation.mutate(gender);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
@@ -41,14 +77,39 @@ export default function Settings() {
           <CardContent className="space-y-6">
             <div className="flex items-center space-x-6">
               <div className="flex-shrink-0">
-                <Avatar2D size="sm" />
+                <Avatar2D size="sm" user={userStats} />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground">Fitness Warrior</h3>
-                <p className="text-muted-foreground">Level 1 • 0 XP</p>
+                <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Joined today</p>
               </div>
               <Button variant="outline">Edit Profile</Button>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="avatar-gender" className="text-base">Avatar Gender</Label>
+                <p className="text-sm text-muted-foreground">Choose your character appearance</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button 
+                  variant={userStats?.gender === "male" ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => handleGenderChange("male")}
+                  disabled={updateGenderMutation.isPending}
+                >
+                  Male
+                </Button>
+                <Button 
+                  variant={userStats?.gender === "female" ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => handleGenderChange("female")}
+                  disabled={updateGenderMutation.isPending}
+                >
+                  Female
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
