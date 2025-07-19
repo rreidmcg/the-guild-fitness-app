@@ -38,7 +38,7 @@ export default function Stats() {
   const topRecords = personalRecords?.slice(0, 4) || [];
 
   // Calculate stats
-  const streak = 7; // TODO: Calculate actual streak
+  const streak = 0; // No workouts logged yet
   const totalVolumeThisMonth = 45280; // TODO: Calculate actual volume
   const currentXP = userStats?.experience || 0;
   const currentLevel = userStats?.level || 1;
