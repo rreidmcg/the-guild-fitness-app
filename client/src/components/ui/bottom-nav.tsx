@@ -28,7 +28,7 @@ export function BottomNav() {
                 className={`flex flex-col items-center space-y-1 py-3 px-4 min-w-0 ${
                   isActive 
                     ? "text-game-primary" 
-                    : "text-gray-400 hover:text-white"
+                    : "text-gray-300 hover:text-gray-100"
                 }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? "text-game-primary" : ""}`} />
