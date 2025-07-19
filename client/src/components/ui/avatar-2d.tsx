@@ -1,5 +1,5 @@
 import { User } from "@shared/schema";
-import avatarImage from "@assets/ChatGPT Image Jul 18, 2025, 02_29_02 PM_1752863551284.png";
+import avatarImage from "@assets/A4BC9DED-ED3B-4E46-9964-3A41A15D2B38_1752965718128.png";
 
 interface Avatar2DProps {
   user?: User;
@@ -36,9 +36,10 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
         <img 
           src={avatarImage}
           alt="Character Avatar"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           style={{
-            filter: `brightness(${0.9 + overallFitness * 0.3}) contrast(${1 + muscleDefinition * 0.2})`
+            filter: `brightness(${0.9 + overallFitness * 0.3}) contrast(${1 + muscleDefinition * 0.2})`,
+            imageRendering: 'pixelated'
           }}
         />
         
