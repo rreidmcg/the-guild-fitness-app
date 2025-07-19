@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { StatBar } from "@/components/ui/stat-bar";
 import { 
@@ -17,6 +19,8 @@ import {
 } from "lucide-react";
 
 export default function Stats() {
+  const [, setLocation] = useLocation();
+  
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
   });
@@ -213,17 +217,43 @@ export default function Stats() {
           </CardContent>
         </Card>
 
-        {/* Progress Chart Placeholder */}
+        {/* Battle Arena */}
         <Card className="bg-game-slate border-gray-700">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-white">Progress Chart</CardTitle>
+            <CardTitle className="text-xl font-bold text-white flex items-center">
+              <Dumbbell className="w-5 h-5 mr-2" />
+              Battle Arena
+            </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="text-center text-gray-300">
-              <ChartLine className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold mb-2 text-white">Progress Visualization</h3>
-              <p>Track your fitness journey over time</p>
-              <p className="text-sm mt-2">Charts coming soon!</p>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 mb-4">
+                <h3 className="text-lg font-semibold mb-2 text-white flex items-center justify-center">
+                  <Target className="w-5 h-5 mr-2 text-red-400" />
+                  Fight Monsters
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  Test your strength against fierce creatures and gain experience points!
+                </p>
+                <div className="flex items-center justify-center space-x-4 text-sm text-gray-300">
+                  <div className="flex items-center">
+                    <Heart className="w-4 h-4 mr-1 text-red-400" />
+                    HP: {(userStats?.stamina || 10) * 2}
+                  </div>
+                  <div className="flex items-center">
+                    <Dumbbell className="w-4 h-4 mr-1 text-orange-400" />
+                    ATK: {Math.max(1, Math.floor((userStats?.strength || 5) / 2))}
+                  </div>
+                </div>
+              </div>
+              
+              <Button 
+                onClick={() => setLocation('/battle')}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2"
+              >
+                <Target className="w-4 h-4 mr-2" />
+                Enter Battle Arena
+              </Button>
             </div>
           </CardContent>
         </Card>

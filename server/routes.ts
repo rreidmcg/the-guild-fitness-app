@@ -158,6 +158,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user stats (for battle rewards)
+  app.patch("/api/user/stats", async (req, res) => {
+    try {
+      const { experienceGain, strengthGain, staminaGain, agilityGain } = req.body;
+      const userId = 1; // TODO: Get from session/auth
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const newXP = user.experience + (experienceGain || 0);
+      const newLevel = calculateLevel(newXP);
+      
+      const updatedUser = await storage.updateUser(userId, {
+        experience: newXP,
+        level: newLevel,
+        strength: user.strength + (strengthGain || 0),
+        stamina: user.stamina + (staminaGain || 0),
+        agility: user.agility + (agilityGain || 0),
+      });
+      
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user stats" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
