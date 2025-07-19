@@ -62,6 +62,10 @@ Preferred communication style: Simple, everyday language.
 - **Dual Economy System**:
   - **XP from Workouts**: Character progression, leveling up, stat increases for stronger combat
   - **Gold from Monster Battles**: Currency for purchasing armor and equipment in shop
+- **Combat System**: Advanced stat-based combat mechanics:
+  - **Strength**: Modifies damage (base 3 + strength/2 + 1-3 random)
+  - **Stamina**: Determines HP (10 base + stamina * 3)
+  - **Agility**: Determines evasion (5% per agility point, max 90%)
 - **Battle System**: E-rank dungeon with monsters levels 1-10, turn-based combat
 - Level progression with title system
 - Multi-stat exercises (e.g., power cleans award all three stats)

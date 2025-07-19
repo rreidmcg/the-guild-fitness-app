@@ -67,7 +67,8 @@ export default function Battle() {
   const [battleState, setBattleState] = useState<BattleState | null>(null);
 
   const startBattle = (monster: Monster) => {
-    const playerMaxHp = Math.max(10, (userStats?.stamina || 10) * 2);
+    // Stamina determines HP (10 base HP + 3 HP per stamina point)
+    const playerMaxHp = Math.max(10, 10 + (userStats?.stamina || 10) * 3);
     const battleMonster = { ...monster, currentHp: monster.maxHp };
     
     setBattleState({
@@ -84,7 +85,7 @@ export default function Battle() {
   // Update player HP when stats load
   useEffect(() => {
     if (userStats && battleState && battleState.battleResult === 'ongoing') {
-      const newMaxHp = Math.max(10, userStats.stamina * 2);
+      const newMaxHp = Math.max(10, 10 + userStats.stamina * 3);
       setBattleState(prev => {
         if (!prev) return prev;
         return {
@@ -116,8 +117,9 @@ export default function Battle() {
   const playerAttack = () => {
     if (!battleState || !battleState.isPlayerTurn || battleState.battleResult !== 'ongoing') return;
 
+    // Strength modifies damage (base 3 damage + strength bonus)
     const playerStrength = userStats?.strength || 5;
-    const baseDamage = Math.max(1, Math.floor(playerStrength / 2));
+    const baseDamage = 3 + Math.floor(playerStrength / 2);
     const damage = baseDamage + Math.floor(Math.random() * 3); // 1-3 random bonus
 
     const newMonsterHp = Math.max(0, battleState.monster.currentHp - damage);
@@ -158,6 +160,23 @@ export default function Battle() {
 
   const monsterAttack = () => {
     if (!battleState || battleState.battleResult !== 'ongoing') return;
+
+    // Agility determines evasion chance (5% per agility point, max 90%)
+    const playerAgility = userStats?.agility || 5;
+    const evasionChance = Math.min(0.9, (playerAgility * 0.05));
+    const isEvaded = Math.random() < evasionChance;
+
+    if (isEvaded) {
+      setBattleState(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          battleLog: [...prev.battleLog, `You dodge the ${prev.monster.name}'s attack!`],
+          isPlayerTurn: true
+        };
+      });
+      return;
+    }
 
     const damage = battleState.monster.attack;
     const newPlayerHp = Math.max(0, battleState.playerHp - damage);
@@ -221,7 +240,39 @@ export default function Battle() {
         </div>
 
         <div className="max-w-4xl mx-auto p-6">
-          {/* E-rank Dungeon */}
+          {/* Combat Stats Info */}
+          <Card className="bg-blue-900/20 border-blue-700 mb-6">
+            <CardHeader>
+              <CardTitle className="text-blue-300">Combat Mechanics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Sword className="w-4 h-4 text-red-400" />
+                    <span className="font-semibold text-red-300">Strength</span>
+                  </div>
+                  <p className="text-gray-300">Increases your damage output. Higher strength means stronger attacks against monsters.</p>
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Heart className="w-4 h-4 text-green-400" />
+                    <span className="font-semibold text-green-300">Stamina</span>
+                  </div>
+                  <p className="text-gray-300">Determines your health points. More stamina means you can take more damage in battle.</p>
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Zap className="w-4 h-4 text-purple-400" />
+                    <span className="font-semibold text-purple-300">Agility</span>
+                  </div>
+                  <p className="text-gray-300">Affects evasion chance. Higher agility helps you dodge monster attacks.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+        {/* E-rank Dungeon */}
           <Card className="bg-game-slate border-gray-700">
             <CardHeader>
               <CardTitle 
@@ -347,14 +398,27 @@ export default function Battle() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center space-x-2">
-                  <Sword className="w-4 h-4 text-orange-400" />
-                  <span>STR: {userStats?.strength || 5}</span>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Sword className="w-4 h-4 text-red-400" />
+                    <span>Strength: {userStats?.strength || 5}</span>
+                  </div>
+                  <span className="text-gray-400">Damage: {3 + Math.floor((userStats?.strength || 5) / 2)}-{3 + Math.floor((userStats?.strength || 5) / 2) + 2}</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Zap className="w-4 h-4 text-blue-400" />
-                  <span>STA: {userStats?.stamina || 10}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Heart className="w-4 h-4 text-green-400" />
+                    <span>Stamina: {userStats?.stamina || 10}</span>
+                  </div>
+                  <span className="text-gray-400">Max HP: {Math.max(10, 10 + (userStats?.stamina || 10) * 3)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-purple-400" />
+                    <span>Agility: {userStats?.agility || 5}</span>
+                  </div>
+                  <span className="text-gray-400">Evasion: {Math.min(90, (userStats?.agility || 5) * 5)}%</span>
                 </div>
               </div>
             </CardContent>
