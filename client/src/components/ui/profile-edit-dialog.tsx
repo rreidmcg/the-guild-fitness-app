@@ -59,11 +59,16 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
       
       // Update profile first
       if (Object.keys(profileUpdates).length > 0) {
-        const profileResult = await apiRequest("/api/user/profile", {
-          method: "PATCH",
-          body: profileUpdates,
-        });
-        console.log("Profile update result:", profileResult);
+        try {
+          const profileResult = await apiRequest("/api/user/profile", {
+            method: "PATCH",
+            body: profileUpdates,
+          });
+          console.log("Profile update result:", profileResult);
+        } catch (error) {
+          console.error("Profile update error:", error);
+          throw error;
+        }
       }
       
       // Update gender if changed
@@ -85,7 +90,8 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
         description: "Your profile has been updated successfully!",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Update profile mutation error:", error);
       toast({
         title: "Error",
         description: "Failed to update profile. Please try again.",
