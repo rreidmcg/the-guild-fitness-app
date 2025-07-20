@@ -321,14 +321,14 @@ export default function Stats() {
             <CardContent className="p-6">
               <div className="text-center">
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6 mb-4">
-                  <h3 className="text-lg font-semibold mb-2 text-white flex items-center justify-center">
+                  <h3 className="text-lg font-semibold mb-2 text-foreground flex items-center justify-center">
                     <Target className="w-5 h-5 mr-2 text-red-400" />
                     Fight Monsters
                   </h3>
-                  <p className="text-gray-300 mb-4">
+                  <p className="text-muted-foreground mb-4">
                     Battle creatures to earn gold for purchasing wardrobe items!
                   </p>
-                  <div className="flex items-center justify-center space-x-4 text-sm text-gray-300">
+                  <div className="flex items-center justify-center space-x-4 text-sm text-foreground">
                     <div className="flex items-center">
                       <Heart className="w-4 h-4 mr-1 text-red-400" />
                       HP: {(userStats?.stamina || 10) * 2}
