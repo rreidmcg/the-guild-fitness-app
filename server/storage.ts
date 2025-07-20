@@ -69,10 +69,34 @@ export class DatabaseStorage implements IStorage {
 
   private async ensureInitialized() {
     if (!this.initialized) {
+      await this.initializeDefaultUser();
       await this.initializeDefaultExercises();
       await this.initializeDefaultWardrobeItems();
       this.initialized = true;
     }
+  }
+
+  private async initializeDefaultUser() {
+    // Check if default user exists
+    const existingUser = await db.select().from(users).where(eq(users.id, 1)).limit(1);
+    if (existingUser.length > 0) return;
+
+    // Create default user
+    await db.insert(users).values({
+      id: 1,
+      username: "Player",
+      experience: 0,
+      level: 1,
+      strength: 10,
+      stamina: 10,
+      agility: 10,
+      gold: 100,
+      gender: "male",
+      skinColor: "#F5C6A0",
+      hairColor: "#8B4513",
+      currentTier: "E",
+      currentTitle: "Recruit"
+    });
   }
 
   private async initializeDefaultExercises() {
