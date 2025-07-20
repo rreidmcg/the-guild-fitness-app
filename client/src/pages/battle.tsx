@@ -459,7 +459,7 @@ export default function Battle() {
         </div>
 
         {/* Battle Actions */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle>Combat Actions</CardTitle>
           </CardHeader>
@@ -522,14 +522,14 @@ export default function Battle() {
         </Card>
 
         {/* Battle Log */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle>Battle Log</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {battleState.battleLog.map((log, index) => (
-                <div key={index} className="text-sm text-gray-300 p-2 bg-gray-800 rounded">
+                <div key={index} className="text-sm text-muted-foreground p-2 bg-secondary rounded">
                   {log}
                 </div>
               ))}
