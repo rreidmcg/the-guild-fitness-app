@@ -242,7 +242,7 @@ export default function Wardrobe() {
                 <TabsContent key={category.id} value={category.id} className="mt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {getFilteredItems(category.id).map((item: WardrobeItemWithOwned) => (
-                      <Card key={item.id} className="bg-secondary border-border relative">
+                      <Card key={item.id} className="bg-card border-border relative">
                         <CardContent className="p-4">
                           {/* Rarity Badge */}
                           <Badge className={`absolute top-2 right-2 ${rarityColors[item.rarity as keyof typeof rarityColors]} text-white`}>

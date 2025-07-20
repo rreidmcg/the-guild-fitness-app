@@ -282,7 +282,7 @@ export default function Battle() {
                 <div className="flex items-center space-x-2">
                   <Skull className="w-6 h-6 text-red-400" />
                   <span>E-rank Dungeon</span>
-                  <span className="text-sm text-gray-400">(Levels 1-10)</span>
+                  <span className="text-sm text-muted-foreground">(Levels 1-10)</span>
                 </div>
                 {isMonsterListOpen ? (
                   <ChevronDown className="w-5 h-5" />
@@ -297,17 +297,17 @@ export default function Battle() {
                   {ERANK_MONSTERS.map((monster) => (
                     <Card 
                       key={monster.id}
-                      className="bg-game-dark border-gray-600 hover:border-game-primary transition-colors cursor-pointer"
+                      className="bg-card border-border hover:border-primary transition-colors cursor-pointer"
                       onClick={() => startBattle(monster)}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-bold text-white">{monster.name}</h3>
+                          <h3 className="font-bold text-foreground">{monster.name}</h3>
                           <span className="text-sm bg-red-700 text-white px-2 py-1 rounded">
                             Lv.{monster.level}
                           </span>
                         </div>
-                        <p className="text-gray-400 text-sm mb-3">{monster.description}</p>
+                        <p className="text-muted-foreground text-sm mb-3">{monster.description}</p>
                         <div className="grid grid-cols-3 gap-2 text-xs">
                           <div className="flex items-center space-x-1">
                             <Heart className="w-3 h-3 text-red-400" />
@@ -339,9 +339,9 @@ export default function Battle() {
 
   // Battle View
   return (
-    <div className="min-h-screen bg-game-dark text-white pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+      <div className="bg-card border-b border-border px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
