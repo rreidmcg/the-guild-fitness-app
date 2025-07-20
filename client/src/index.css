@@ -4,34 +4,35 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 8%, 25%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 5%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 5%);
+  /* Dark Navy Theme with Purple Outlines and Glowing Blue Text */
+  --background: hsl(221, 83%, 8%);  /* Dark navy background */
+  --foreground: hsl(197, 100%, 70%); /* Bright glowing blue text */
+  --muted: hsl(221, 55%, 20%); /* Muted navy */
+  --muted-foreground: hsl(197, 80%, 50%); /* Dimmer blue for muted text */
+  --popover: hsl(221, 73%, 12%);
+  --popover-foreground: hsl(197, 100%, 70%);
+  --card: hsl(221, 73%, 12%); /* Slightly lighter navy for cards */
+  --card-foreground: hsl(197, 100%, 70%); /* Bright glowing blue text */
+  --border: hsl(271, 70%, 35%); /* Purple borders */
+  --input: hsl(221, 55%, 15%); /* Dark navy inputs */
+  --primary: hsl(197, 100%, 60%); /* Bright blue for primary elements */
+  --primary-foreground: hsl(221, 83%, 8%); /* Dark navy text on bright blue */
+  --secondary: hsl(271, 81%, 45%); /* Purple for secondary elements */
+  --secondary-foreground: hsl(197, 100%, 85%); /* Light blue text on purple */
+  --accent: hsl(271, 81%, 45%); /* Purple accent */
+  --accent-foreground: hsl(197, 100%, 85%); /* Light blue on purple */
   --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(271, 81%, 55%); /* Purple focus rings */
   --radius: 0.5rem;
   
-  /* Gaming theme colors - light theme */
-  --game-primary: hsl(243, 75%, 59%);
-  --game-secondary: hsl(258, 70%, 60%);
+  /* Gaming theme colors - updated for new theme */
+  --game-primary: hsl(197, 100%, 60%); /* Bright blue */
+  --game-secondary: hsl(271, 81%, 55%); /* Purple */
   --game-success: hsl(158, 64%, 52%);
   --game-warning: hsl(43, 96%, 56%);
-  --game-dark: hsl(210, 20%, 98%);
-  --game-slate: hsl(0, 0%, 100%);
+  --game-dark: hsl(221, 83%, 8%); /* Dark navy */
+  --game-slate: hsl(221, 73%, 12%); /* Lighter navy */
 }
 
 
@@ -43,8 +44,8 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    background-color: hsl(210, 20%, 98%);
-    color: hsl(222, 47%, 5%);
+    background-color: hsl(221, 83%, 8%); /* Dark navy background */
+    color: hsl(197, 100%, 70%); /* Bright glowing blue text */
     font-weight: 500;
   }
 }
@@ -63,7 +64,7 @@
   }
   
   .card-glow:hover {
-    box-shadow: 0 0 30px hsl(243, 75%, 59%, 0.3);
+    box-shadow: 0 0 30px hsl(197, 100%, 60%, 0.4); /* Blue glow effect */
   }
   
   .progress-ring {
@@ -71,7 +72,8 @@
   }
   
   .bottom-nav-solid {
-    background-color: hsl(0, 0%, 100%) !important;
+    background-color: hsl(221, 73%, 12%) !important; /* Dark navy card color */
+    border-top: 1px solid hsl(271, 70%, 35%) !important; /* Purple border */
     opacity: 1 !important;
     backdrop-filter: none !important;
   }
