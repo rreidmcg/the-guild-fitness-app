@@ -209,9 +209,9 @@ export default function Battle() {
   // Monster Selection View
   if (!battleState) {
     return (
-      <div className="min-h-screen bg-game-dark text-white pb-20">
+      <div className="min-h-screen bg-background text-foreground pb-20">
         {/* Header */}
-        <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+        <div className="bg-card border-b border-border px-4 py-6">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -219,18 +219,18 @@ export default function Battle() {
                   variant="ghost" 
                   size="sm"
                   onClick={() => setLocation("/")}
-                  className="text-gray-300 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Stats
                 </Button>
                 <div>
-                  <h1 className="text-3xl font-bold text-white">Battle Arena</h1>
-                  <p className="text-gray-300 mt-1">Choose your opponent and fight for gold coins</p>
+                  <h1 className="text-3xl font-bold text-foreground">Battle Arena</h1>
+                  <p className="text-muted-foreground mt-1">Choose your opponent and fight for gold coins</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="flex items-center space-x-2 text-yellow-400">
+                <div className="flex items-center space-x-2 text-yellow-500">
                   <Coins className="w-5 h-5" />
                   <span className="font-bold">{userStats?.gold || 0} Gold</span>
                 </div>
@@ -241,9 +241,9 @@ export default function Battle() {
 
         <div className="max-w-4xl mx-auto p-6">
           {/* Combat Stats Info */}
-          <Card className="bg-blue-900/20 border-blue-700 mb-6">
+          <Card className="bg-card border-border mb-6">
             <CardHeader>
-              <CardTitle className="text-blue-300">Combat Mechanics</CardTitle>
+              <CardTitle className="text-foreground">Combat Mechanics</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -252,28 +252,28 @@ export default function Battle() {
                     <Sword className="w-4 h-4 text-red-400" />
                     <span className="font-semibold text-red-300">Strength</span>
                   </div>
-                  <p className="text-gray-300">Increases your damage output. Higher strength means stronger attacks against monsters.</p>
+                  <p className="text-muted-foreground">Increases your damage output. Higher strength means stronger attacks against monsters.</p>
                 </div>
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
                     <Heart className="w-4 h-4 text-green-400" />
                     <span className="font-semibold text-green-300">Stamina</span>
                   </div>
-                  <p className="text-gray-300">Determines your health points. More stamina means you can take more damage in battle.</p>
+                  <p className="text-muted-foreground">Determines your health points. More stamina means you can take more damage in battle.</p>
                 </div>
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
                     <Zap className="w-4 h-4 text-purple-400" />
                     <span className="font-semibold text-purple-300">Agility</span>
                   </div>
-                  <p className="text-gray-300">Affects evasion chance. Higher agility helps you dodge monster attacks.</p>
+                  <p className="text-muted-foreground">Affects evasion chance. Higher agility helps you dodge monster attacks.</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
         {/* E-rank Dungeon */}
-          <Card className="bg-game-slate border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle 
                 className="flex items-center justify-between cursor-pointer"

@@ -4,33 +4,33 @@
 @tailwind utilities;
 
 :root {
-  /* Professional Dark Gaming Theme */
+  /* Bright Gaming Theme with Glowing Text */
   --background: hsl(215, 28%, 8%);  /* Dark slate background */
-  --foreground: hsl(0, 0%, 95%); /* Clean white text */
+  --foreground: hsl(197, 100%, 90%); /* Bright blue-white text */
   --muted: hsl(215, 20%, 12%); /* Slightly lighter background */
-  --muted-foreground: hsl(215, 15%, 65%); /* Muted light gray text */
+  --muted-foreground: hsl(197, 80%, 75%); /* Bright muted blue text */
   --popover: hsl(215, 25%, 10%);
-  --popover-foreground: hsl(0, 0%, 95%);
+  --popover-foreground: hsl(197, 100%, 90%);
   --card: hsl(215, 25%, 12%); /* Dark slate for cards */
-  --card-foreground: hsl(0, 0%, 95%); /* Clean white text */
+  --card-foreground: hsl(197, 100%, 90%); /* Bright blue-white text */
   --border: hsl(215, 20%, 20%); /* Subtle borders */
   --input: hsl(215, 20%, 15%); /* Dark inputs */
-  --primary: hsl(220, 70%, 55%); /* Professional blue for primary elements */
-  --primary-foreground: hsl(0, 0%, 98%); /* White text on blue */
+  --primary: hsl(197, 100%, 60%); /* Bright cyan for primary elements */
+  --primary-foreground: hsl(215, 28%, 8%); /* Dark text on bright blue */
   --secondary: hsl(215, 20%, 16%); /* Dark secondary background */
-  --secondary-foreground: hsl(0, 0%, 90%); /* Light text */
-  --accent: hsl(220, 70%, 55%); /* Blue accent */
-  --accent-foreground: hsl(0, 0%, 98%); /* White text on accent */
+  --secondary-foreground: hsl(197, 100%, 85%); /* Bright blue text */
+  --accent: hsl(197, 100%, 60%); /* Bright cyan accent */
+  --accent-foreground: hsl(215, 28%, 8%); /* Dark text on accent */
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(220, 70%, 55%); /* Blue focus rings */
+  --ring: hsl(197, 100%, 60%); /* Bright cyan focus rings */
   --radius: 0.5rem;
   
-  /* Professional gaming theme colors */
-  --game-primary: hsl(220, 70%, 55%); /* Professional blue */
+  /* Bright gaming theme colors */
+  --game-primary: hsl(197, 100%, 60%); /* Bright cyan */
   --game-secondary: hsl(215, 20%, 16%); /* Dark secondary */
-  --game-success: hsl(142, 71%, 45%);
-  --game-warning: hsl(38, 92%, 50%);
+  --game-success: hsl(142, 71%, 55%);
+  --game-warning: hsl(38, 92%, 60%);
   --game-dark: hsl(215, 28%, 8%); /* Dark slate */
   --game-slate: hsl(215, 25%, 12%); /* Card background */
 }
@@ -45,9 +45,10 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     background-color: hsl(215, 28%, 8%) !important; /* Dark slate background */
-    color: hsl(0, 0%, 95%); /* Clean white text */
+    color: hsl(197, 100%, 90%); /* Bright blue-white text */
     font-weight: 400;
     line-height: 1.5;
+    text-shadow: 0 0 10px rgba(107, 185, 230, 0.3); /* Subtle glow effect */
   }
 }
 
@@ -110,21 +111,45 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
-  /* Enhanced text readability */
+  /* Enhanced glowing text */
   h1, h2, h3, h4, h5, h6 {
-    color: hsl(0, 0%, 98%) !important;
+    color: hsl(197, 100%, 92%) !important;
     font-weight: 600;
+    text-shadow: 0 0 15px rgba(107, 185, 230, 0.4);
   }
 
-  /* Button improvements */
+  /* Glowing text for primary content */
+  .text-foreground {
+    color: hsl(197, 100%, 90%) !important;
+    text-shadow: 0 0 8px rgba(107, 185, 230, 0.25);
+  }
+
+  .text-muted-foreground {
+    color: hsl(197, 80%, 75%) !important;
+    text-shadow: 0 0 6px rgba(107, 185, 230, 0.2);
+  }
+
+  /* Button improvements with glow */
   .btn-primary {
-    background-color: hsl(220, 70%, 55%);
-    border-color: hsl(220, 70%, 55%);
-    color: hsl(0, 0%, 98%);
+    background-color: hsl(197, 100%, 60%);
+    border-color: hsl(197, 100%, 60%);
+    color: hsl(215, 28%, 8%);
+    box-shadow: 0 0 15px rgba(107, 185, 230, 0.3);
   }
 
   .btn-primary:hover {
-    background-color: hsl(220, 70%, 50%);
-    border-color: hsl(220, 70%, 50%);
+    background-color: hsl(197, 100%, 55%);
+    border-color: hsl(197, 100%, 55%);
+    box-shadow: 0 0 20px rgba(107, 185, 230, 0.4);
+  }
+
+  /* Glowing effect for interactive elements */
+  a, button {
+    text-shadow: 0 0 5px rgba(107, 185, 230, 0.2);
+  }
+
+  /* Enhanced card glow */
+  .card-glow:hover {
+    box-shadow: 0 0 30px rgba(107, 185, 230, 0.4);
   }
 }

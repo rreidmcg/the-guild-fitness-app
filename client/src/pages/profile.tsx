@@ -101,7 +101,7 @@ export default function Profile() {
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
               <div className="mb-2">
-                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                <Badge variant="secondary" className="bg-green-900/20 text-green-300 border-green-700">
                   &lt;{getLevelTitle(userStats?.level || 1)}&gt;
                 </Badge>
               </div>
@@ -125,7 +125,7 @@ export default function Profile() {
 
             {/* Current Title */}
             <div className="text-center mb-6">
-              <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-lg px-4 py-2">
+              <Badge className="bg-purple-900/20 text-purple-300 border-purple-700 text-lg px-4 py-2">
                 {userStats?.currentTitle || "Recruit"}
               </Badge>
             </div>
