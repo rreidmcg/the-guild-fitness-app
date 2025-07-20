@@ -349,18 +349,18 @@ export default function Battle() {
                 variant="ghost" 
                 size="sm"
                 onClick={returnToMonsterList}
-                className="text-gray-300 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Monster List
               </Button>
               <div>
-                <h1 className="text-3xl font-bold text-white">Battle: {battleState.monster.name}</h1>
-                <p className="text-gray-300 mt-1">Level {battleState.monster.level} Monster</p>
+                <h1 className="text-3xl font-bold text-foreground">Battle: {battleState.monster.name}</h1>
+                <p className="text-muted-foreground mt-1">Level {battleState.monster.level} Monster</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="flex items-center space-x-2 text-yellow-400">
+              <div className="flex items-center space-x-2 text-yellow-500">
                 <Coins className="w-5 h-5" />
                 <span className="font-bold">{userStats?.gold || 0} Gold</span>
               </div>
@@ -373,12 +373,12 @@ export default function Battle() {
         {/* Battle Area */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Player Status */}
-          <Card className="bg-game-slate border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Shield className="w-5 h-5 text-blue-400" />
                 <span>{userStats?.username || 'Player'}</span>
-                <span className="text-sm text-gray-400">Level {userStats?.level || 1}</span>
+                <span className="text-sm text-muted-foreground">Level {userStats?.level || 1}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -404,33 +404,33 @@ export default function Battle() {
                     <Sword className="w-4 h-4 text-red-400" />
                     <span>Strength: {userStats?.strength || 5}</span>
                   </div>
-                  <span className="text-gray-400">Damage: {3 + Math.floor((userStats?.strength || 5) / 2)}-{3 + Math.floor((userStats?.strength || 5) / 2) + 2}</span>
+                  <span className="text-muted-foreground">Damage: {3 + Math.floor((userStats?.strength || 5) / 2)}-{3 + Math.floor((userStats?.strength || 5) / 2) + 2}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Heart className="w-4 h-4 text-green-400" />
                     <span>Stamina: {userStats?.stamina || 10}</span>
                   </div>
-                  <span className="text-gray-400">Max HP: {Math.max(10, 10 + (userStats?.stamina || 10) * 3)}</span>
+                  <span className="text-muted-foreground">Max HP: {Math.max(10, 10 + (userStats?.stamina || 10) * 3)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Zap className="w-4 h-4 text-purple-400" />
                     <span>Agility: {userStats?.agility || 5}</span>
                   </div>
-                  <span className="text-gray-400">Evasion: {Math.min(90, (userStats?.agility || 5) * 5)}%</span>
+                  <span className="text-muted-foreground">Evasion: {Math.min(90, (userStats?.agility || 5) * 5)}%</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Monster Status */}
-          <Card className="bg-game-slate border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-5 h-5 text-red-400" />
                 <span>{battleState.monster.name}</span>
-                <span className="text-sm text-gray-400">Level {battleState.monster.level}</span>
+                <span className="text-sm text-muted-foreground">Level {battleState.monster.level}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -450,7 +450,7 @@ export default function Battle() {
                 </div>
               </div>
               
-              <p className="text-sm text-gray-300">{battleState.monster.description}</p>
+              <p className="text-sm text-muted-foreground">{battleState.monster.description}</p>
               <div className="text-sm">
                 <span className="text-orange-400">Attack:</span> {battleState.monster.attack}
               </div>

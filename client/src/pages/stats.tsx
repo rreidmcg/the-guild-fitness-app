@@ -137,11 +137,11 @@ export default function Stats() {
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
               <div className="mb-2">
-                <span className="text-sm text-green-600 font-semibold px-3 py-1 bg-green-100 rounded-full border border-green-200">
+                <span className="text-sm text-green-300 font-semibold px-3 py-1 bg-green-900/20 rounded-full border border-green-700">
                   &lt;{getLevelTitle(currentLevel)}&gt;
                 </span>
               </div>
-              <h3 className="text-2xl font-bold mb-6" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{userStats?.username || 'Player'}</h3>
+              <h3 className="text-2xl font-bold mb-6 text-foreground">{userStats?.username || 'Player'}</h3>
             </div>
 
             {/* 2D Avatar Display */}
@@ -150,7 +150,7 @@ export default function Stats() {
               
               {/* Character Stats Below Avatar */}
               <div className="text-center mt-6">
-                <div className="flex items-center justify-center space-x-6 text-sm font-semibold" style={{ color: 'rgb(60, 60, 60)' }}>
+                <div className="flex items-center justify-center space-x-6 text-sm font-semibold text-foreground">
                   <span className="flex items-center">
                     <Star className="w-4 h-4 text-yellow-600 mr-1" />
                     Level {currentLevel}
@@ -170,31 +170,31 @@ export default function Stats() {
             {/* XP Progress */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-semibold" style={{ color: 'rgb(60, 60, 60)' }}>Experience Points</h4>
-                <span className="text-sm font-semibold" style={{ color: 'rgb(80, 80, 80)' }}>{currentXP} / {xpForNextLevel} XP</span>
+                <h4 className="text-sm font-semibold text-foreground">Experience Points</h4>
+                <span className="text-sm font-semibold text-muted-foreground">{currentXP} / {xpForNextLevel} XP</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
+              <div className="w-full bg-gray-700 rounded-full h-3">
                 <div className="h-3 rounded-full transition-all duration-300 bg-gradient-to-r from-green-500 to-green-600" style={{ width: `${xpProgress}%` }}></div>
               </div>
-              <p className="text-xs font-semibold mt-1" style={{ color: 'rgb(100, 100, 100)' }}>{xpForNextLevel - currentXP} XP to Level {currentLevel + 1}</p>
+              <p className="text-xs font-semibold mt-1 text-muted-foreground">{xpForNextLevel - currentXP} XP to Level {currentLevel + 1}</p>
             </div>
 
             {/* Character Stats - Numerical Display */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-                <Dumbbell className="w-6 h-6 text-red-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-red-700">{userStats?.strength || 0}</div>
-                <div className="text-sm font-semibold text-red-600">Strength</div>
+              <div className="text-center p-4 bg-red-900/20 rounded-lg border border-red-700">
+                <Dumbbell className="w-6 h-6 text-red-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-red-300">{userStats?.strength || 0}</div>
+                <div className="text-sm font-semibold text-red-400">Strength</div>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <Heart className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-700">{userStats?.stamina || 0}</div>
-                <div className="text-sm font-semibold text-green-600">Stamina</div>
+              <div className="text-center p-4 bg-green-900/20 rounded-lg border border-green-700">
+                <Heart className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-300">{userStats?.stamina || 0}</div>
+                <div className="text-sm font-semibold text-green-400">Stamina</div>
               </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <Wind className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-700">{userStats?.agility || 0}</div>
-                <div className="text-sm font-semibold text-purple-600">Agility</div>
+              <div className="text-center p-4 bg-purple-900/20 rounded-lg border border-purple-700">
+                <Wind className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-purple-300">{userStats?.agility || 0}</div>
+                <div className="text-sm font-semibold text-purple-400">Agility</div>
               </div>
             </div>
           </CardContent>
@@ -207,8 +207,8 @@ export default function Stats() {
               <div className="flex items-center justify-center mb-2">
                 <Coins className="w-6 h-6 text-yellow-600" />
               </div>
-              <div className="text-2xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{userStats?.gold || 0}</div>
-              <div className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Gold Coins</div>
+              <div className="text-2xl font-bold text-foreground">{userStats?.gold || 0}</div>
+              <div className="text-xs font-semibold text-muted-foreground">Gold Coins</div>
             </CardContent>
           </Card>
           
@@ -217,8 +217,8 @@ export default function Stats() {
               <div className="flex items-center justify-center mb-2">
                 <Trophy className="w-5 h-5 text-yellow-600" />
               </div>
-              <div className="text-2xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{currentLevel}</div>
-              <p className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Current Level</p>
+              <div className="text-2xl font-bold text-foreground">{currentLevel}</div>
+              <p className="text-xs font-semibold text-muted-foreground">Current Level</p>
             </CardContent>
           </Card>
 
@@ -227,8 +227,8 @@ export default function Stats() {
               <div className="flex items-center justify-center mb-2">
                 <Flame className="w-5 h-5 text-orange-600" />
               </div>
-              <div className="text-2xl font-bold text-orange-700">{streak}</div>
-              <p className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Day Streak</p>
+              <div className="text-2xl font-bold text-orange-400">{streak}</div>
+              <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
             </CardContent>
           </Card>
 
@@ -237,38 +237,38 @@ export default function Stats() {
               <div className="flex items-center justify-center mb-2">
                 <ChartLine className="w-5 h-5 text-green-600" />
               </div>
-              <div className="text-2xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>{currentXP}</div>
-              <p className="text-xs font-semibold" style={{ color: 'rgb(100, 100, 100)' }}>Total XP</p>
+              <div className="text-2xl font-bold text-foreground">{currentXP}</div>
+              <p className="text-xs font-semibold text-muted-foreground">Total XP</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Personal Records */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-white">Personal Records</CardTitle>
-              <TrendingUp className="w-5 h-5 text-game-primary" />
+              <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
+              <TrendingUp className="w-5 h-5 text-primary" />
             </div>
           </CardHeader>
           <CardContent>
             {topRecords.length === 0 ? (
-              <div className="text-center py-8 text-gray-300">
+              <div className="text-center py-8 text-muted-foreground">
                 <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No personal records yet. Complete workouts to set PRs!</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {topRecords.map((record) => (
-                  <Card key={record.id} className="bg-gray-800 border-gray-600">
+                  <Card key={record.id} className="bg-secondary border-border">
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-3 mb-2">
-                        <Trophy className="w-4 h-4 text-game-warning" />
-                        <h3 className="font-semibold text-white">Exercise #{record.exerciseId}</h3>
+                        <Trophy className="w-4 h-4 text-yellow-500" />
+                        <h3 className="font-semibold text-foreground">Exercise #{record.exerciseId}</h3>
                       </div>
-                      <div className="text-2xl font-bold text-game-primary">{record.value}</div>
-                      <p className="text-sm text-gray-300">{record.recordType}</p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <div className="text-2xl font-bold text-primary">{record.value}</div>
+                      <p className="text-sm text-muted-foreground">{record.recordType}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         {record.achievedAt ? new Date(record.achievedAt).toLocaleDateString() : 'N/A'}
                       </p>
                     </CardContent>
