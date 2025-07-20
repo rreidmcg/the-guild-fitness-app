@@ -202,45 +202,37 @@ export default function Stats() {
 
         {/* Quick Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Coins className="w-6 h-6 text-yellow-600" />
-              </div>
-              <div className="text-2xl font-bold text-foreground">{userStats?.gold || 0}</div>
-              <div className="text-xs font-semibold text-muted-foreground">Gold Coins</div>
-            </CardContent>
-          </Card>
+          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center justify-center mb-2">
+              <Coins className="w-6 h-6 text-yellow-400" />
+            </div>
+            <div className="text-2xl font-bold text-primary">{userStats?.gold || 0}</div>
+            <div className="text-xs font-semibold text-muted-foreground">Gold Coins</div>
+          </div>
           
-          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Trophy className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div className="text-2xl font-bold text-foreground">{currentLevel}</div>
-              <p className="text-xs font-semibold text-muted-foreground">Current Level</p>
-            </CardContent>
-          </Card>
+          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center justify-center mb-2">
+              <Trophy className="w-5 h-5 text-yellow-400" />
+            </div>
+            <div className="text-2xl font-bold text-primary">{currentLevel}</div>
+            <p className="text-xs font-semibold text-muted-foreground">Current Level</p>
+          </div>
 
-          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <Flame className="w-5 h-5 text-orange-600" />
-              </div>
-              <div className="text-2xl font-bold text-orange-400">{streak}</div>
-              <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
-            </CardContent>
-          </Card>
+          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center justify-center mb-2">
+              <Flame className="w-5 h-5 text-orange-400" />
+            </div>
+            <div className="text-2xl font-bold text-orange-400">{streak}</div>
+            <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
+          </div>
 
-          <Card className="bg-card border-border transition-all duration-300 hover:shadow-lg">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <ChartLine className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="text-2xl font-bold text-foreground">{currentXP}</div>
-              <p className="text-xs font-semibold text-muted-foreground">Total XP</p>
-            </CardContent>
-          </Card>
+          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
+            <div className="flex items-center justify-center mb-2">
+              <ChartLine className="w-5 h-5 text-green-400" />
+            </div>
+            <div className="text-2xl font-bold text-primary">{currentXP}</div>
+            <p className="text-xs font-semibold text-muted-foreground">Total XP</p>
+          </div>
         </div>
 
         {/* Personal Records */}
@@ -282,9 +274,9 @@ export default function Stats() {
         {/* Character Customization & Battle */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Character Wardrobe */}
-          <Card className="bg-game-slate border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-white flex items-center">
+              <CardTitle className="text-xl font-bold text-foreground flex items-center">
                 <Star className="w-5 h-5 mr-2" />
                 Character Wardrobe
               </CardTitle>
@@ -292,14 +284,14 @@ export default function Stats() {
             <CardContent className="p-6">
               <div className="text-center">
                 <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-6 mb-4">
-                  <h3 className="text-lg font-semibold mb-2 text-white flex items-center justify-center">
+                  <h3 className="text-lg font-semibold mb-2 text-foreground flex items-center justify-center">
                     <Star className="w-5 h-5 mr-2 text-purple-400" />
                     Customize Appearance
                   </h3>
-                  <p className="text-gray-300 mb-4">
+                  <p className="text-muted-foreground mb-4">
                     Purchase and equip new clothing items for your character!
                   </p>
-                  <div className="flex items-center justify-center space-x-4 text-sm text-gray-300">
+                  <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
                     <div className="flex items-center">
                       <Coins className="w-4 h-4 mr-1 text-yellow-400" />
                       Gold: {userStats?.gold || 0}
@@ -319,9 +311,9 @@ export default function Stats() {
           </Card>
 
           {/* Battle Arena */}
-          <Card className="bg-game-slate border-gray-700">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-white flex items-center">
+              <CardTitle className="text-xl font-bold text-foreground flex items-center">
                 <Dumbbell className="w-5 h-5 mr-2" />
                 Battle Arena
               </CardTitle>
