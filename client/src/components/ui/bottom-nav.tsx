@@ -1,15 +1,16 @@
 import { useLocation } from "wouter";
 import { Button } from "./button";
-import { Dumbbell, BarChart3, Settings, Sword } from "lucide-react";
+import { Dumbbell, BarChart3, Sword, ShoppingBag, User } from "lucide-react";
 
 export function BottomNav() {
   const [location, setLocation] = useLocation();
 
   const navItems = [
-    { path: "/workouts", label: "Workouts", icon: Dumbbell },
     { path: "/", label: "Stats", icon: BarChart3 },
+    { path: "/workouts", label: "Workouts", icon: Dumbbell },
     { path: "/battle", label: "Battle", icon: Sword },
-    { path: "/settings", label: "Settings", icon: Settings },
+    { path: "/shop", label: "Shop", icon: ShoppingBag },
+    { path: "/profile", label: "Profile", icon: User },
   ];
 
   return (
@@ -25,11 +26,12 @@ export function BottomNav() {
                 key={item.path}
                 variant="ghost"
                 onClick={() => setLocation(item.path)}
-                style={{ color: isActive ? 'hsl(243, 75%, 59%)' : 'rgb(107, 114, 128)' }}
-                className="flex flex-col items-center space-y-1 py-3 px-4 min-w-0 hover:text-gray-900"
+                className={`flex flex-col items-center space-y-1 py-3 px-4 min-w-0 ${
+                  isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+                }`}
               >
-                <Icon className="w-5 h-5" style={{ color: isActive ? 'hsl(243, 75%, 59%)' : 'rgb(107, 114, 128)' }} />
-                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(243, 75%, 59%)' : 'rgb(107, 114, 128)' }}>{item.label}</span>
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{item.label}</span>
               </Button>
             );
           })}

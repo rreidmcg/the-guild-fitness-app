@@ -11,6 +11,8 @@ import WorkoutBuilder from "@/pages/workout-builder";
 import WorkoutSession from "@/pages/workout-session";
 import Battle from "@/pages/battle";
 import Wardrobe from "@/pages/wardrobe";
+import Shop from "@/pages/shop";
+import Profile from "@/pages/profile";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/workout-session/:id" component={WorkoutSession} />
       <Route path="/battle" component={Battle} />
       <Route path="/wardrobe" component={Wardrobe} />
+      <Route path="/shop" component={Shop} />
+      <Route path="/profile" component={Profile} />
       <Route component={NotFound} />
     </Switch>
   );

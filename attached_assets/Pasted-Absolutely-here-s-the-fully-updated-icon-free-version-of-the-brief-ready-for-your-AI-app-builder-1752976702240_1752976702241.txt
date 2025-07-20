@@ -1,0 +1,206 @@
+Absolutely — here’s the fully updated, icon-free version of the brief, ready for your AI app builder:
+
+⸻
+
+RPG Fitness App Development Brief
+
+App Title (Working):
+
+The Forge: RPG Fitness Tracker
+
+⸻
+
+Core Concept:
+
+A free-to-play RPG-themed fitness tracking app where users earn XP and level up by doing real workouts. Every workout contributes experience points that improve both the player’s character level and individual stat levels (Strength, Stamina, Agility). Players can battle monsters, equip gear, earn loot, unlock abilities, and challenge other players in PvP — all based on their real-world training.
+
+⸻
+
+User Account System:
+	•	Secure sign-up with email/password or social login (Google, Apple, etc.)
+	•	Unique usernames
+	•	User profiles displaying avatar, stat levels, XP progress, gear, titles, and achievements
+
+⸻
+
+Leveling and Stat Progression:
+	1.	Player Leveling System:
+
+	•	Workouts provide XP that increases the player’s character level
+	•	The XP curve increases with each level to slow progress over time
+	•	Goal: reaching level 50 should take about one year with an average of 5 workouts per week
+	•	No level cap currently, but scalable backend required
+
+	2.	Stat Progression:
+
+	•	Stats include Strength, Stamina, and Agility
+	•	Each stat has its own XP bar and levels up independently
+	•	Exercises award XP to different stats depending on type (e.g., lifting increases Strength, running increases Stamina)
+	•	Stats level up using a curve similar to player levels to avoid inflated numbers
+	•	Stat levels affect battle performance (e.g., Strength increases damage)
+
+⸻
+
+Fitness Tracking Features:
+	•	Custom workout logging (sets, reps, RPE, time, tags)
+	•	Tag exercises to auto-assign XP to stats (already programmed)
+	•	Track weekly volume and historical progress
+	•	Automatically track personal records (1RMs, best times, etc.)
+	•	Graphs for progress over time
+	•	Achievements for workout streaks, PRs, volume milestones, and challenge completions
+
+⸻
+
+Monster Progression and Player Tiers:
+	1.	Monster Tier Structure:
+
+	•	Tiers: E, D, C, B, A, S
+	•	Each tier includes 30 to 35 monsters
+	•	Every 10th monster is a boss or mini-boss with increased HP, attack, or evasion
+	•	Bosses serve as skill checks for stat development and consistency
+	•	Defeating the final boss of each tier unlocks the next tier
+
+	2.	Player Tiers:
+
+	•	Players are ranked by the highest tier of monsters they have completed
+	•	Tier progression ranks:
+	•	Recruit: Tier E
+	•	Fighter: Tier D
+	•	Warrior: Tier C
+	•	Champion: Tier B
+	•	Hero: Tier A
+	•	Legend: Tier S
+
+	3.	Boss Rewards:
+
+	•	Bosses drop enhanced loot and award titles
+	•	Titles are cosmetic and can be displayed on the profile
+	•	Examples: “Breaker of Beasts,” “Ash-Bound Warrior,” “Champion of Tier C”
+
+⸻
+
+Combat System and Abilities:
+	1.	Battle System:
+
+	•	Turn-based combat
+	•	Players choose actions each turn: attack, defend, use ability
+	•	Enemy stats scale with tier
+	•	Avatar performance is determined by stat levels and equipped gear
+
+	2.	Skill Progression:
+
+	•	Players start with a basic attack
+	•	New abilities unlock as players progress through tiers
+	•	Ability examples:
+	•	Defense Boost: reduce damage taken for multiple turns
+	•	Attack Boost: increase damage for a few turns
+	•	Evasion Boost: increase dodge rate temporarily
+	•	Healing: restore a percentage of HP
+	•	Players can equip a limited number of active skills per battle (e.g., 3 to 4)
+
+	3.	Ultimate Ability:
+
+	•	Players charge a combo meter by logging workouts or taking turns in battle
+	•	Once full, they can unleash a powerful skill
+	•	Ultimate examples:
+	•	High-damage attack
+	•	Teamwide stat buff
+	•	Full-heal or dodge-all effect
+	•	Ultimate unlocks at high player rank (Tier A or higher)
+
+⸻
+
+Player Versus Player (PvP):
+	•	Players can challenge others based on stat levels and recent workout activity
+	•	Auto-battle system compares stat levels and equipped abilities
+	•	PvP matchmaking uses player tier and power level
+	•	PvP leaderboards can reset monthly or quarterly
+	•	PvP rewards include cosmetic gear, badges, and titles
+
+⸻
+
+Loot, Inventory, and Gear:
+	•	Defeating monsters grants loot (gold, gear)
+	•	Players can equip weapons and armor to improve stats in battle
+	•	Cosmetic gear does not affect stats but changes avatar appearance
+	•	Gear can be dropped from battles, earned from bosses, or purchased from the shop
+
+⸻
+
+Shop and Monetization:
+	•	In-app purchases:
+	•	Premium workout plans
+	•	Cosmetic gear
+	•	Gold bundles
+	•	XP or combo charge boosters
+	•	In-game gold used to purchase:
+	•	Weapons and armor
+	•	Cosmetic items
+	•	Training scrolls or ability unlocks
+
+⸻
+
+Core Tabs and User Interface:
+	1.	Home:
+
+	•	Today’s workout summary
+	•	XP progress bars
+	•	Avatar display
+
+	2.	Workout:
+
+	•	Log custom workouts
+	•	View workout plans
+	•	Progress tracking (volume, frequency, PRs)
+
+	3.	Stats:
+
+	•	View character level and stat levels
+	•	XP bars for Strength, Stamina, and Agility
+	•	Stat history and charts
+
+	4.	Battle:
+
+	•	Enter monster battles or PvP matches
+	•	Select enemies or opponents
+	•	Manage skill loadout and gear
+
+	5.	Inventory:
+
+	•	Equip gear and view cosmetic items
+	•	Manage loot, titles, and gear effects
+
+	6.	Shop:
+
+	•	Purchase cosmetic items, gold, and workout plans
+	•	Redeem earned currency for items
+
+	7.	Profile:
+
+	•	Customize avatar
+	•	View account settings
+	•	Display titles, achievements, and player tier
+
+⸻
+
+Technical Requirements:
+	•	Cloud database to store workouts, XP, stats, gear, and progress
+	•	Secure authentication and user accounts
+	•	Modular XP and stat engine for players and abilities
+	•	Turn-based battle engine for PvE and PvP
+	•	Data visualization for tracking workout and stat growth
+	•	Scalable backend with anti-cheat measures
+
+⸻
+
+Optional Future Features:
+	•	Daily and weekly quests
+	•	Seasonal raids or boss events
+	•	Guilds or clans with shared goals
+	•	Apple Health and Google Fit integration
+	•	Notifications and streak reminders
+	•	Skill tree system with class specialization
+
+⸻
+
+Let me know if you want this formatted as a downloadable document, turned into a dev ticket system, or if you’d like visual mockups for UI or flow.

@@ -13,6 +13,10 @@ export const users = pgTable("users", {
   stamina: integer("stamina").default(0),
   agility: integer("agility").default(0),
   gold: integer("gold").default(0),
+  // Player tier and progression
+  currentTier: text("current_tier").default("E"), // E, D, C, B, A, S
+  highestTierCompleted: text("highest_tier_completed").default(""),
+  currentTitle: text("current_title").default("Recruit"),
   // Character customization
   equippedHat: text("equipped_hat"),
   equippedShirt: text("equipped_shirt"),
@@ -148,6 +152,67 @@ export const userWardrobe = pgTable("user_wardrobe", {
   userItemUnique: uniqueIndex("user_wardrobe_user_item_idx").on(table.userId, table.wardrobeItemId),
 }));
 
+// Monsters for the battle system
+export const monsters = pgTable("monsters", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  tier: text("tier").notNull(), // E, D, C, B, A, S
+  level: integer("level").notNull(),
+  maxHp: integer("max_hp").notNull(),
+  attack: integer("attack").notNull(),
+  goldReward: integer("gold_reward").default(0),
+  description: text("description"),
+  isBoss: boolean("is_boss").default(false),
+});
+
+// User achievements
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // workout_streak, pr, volume, tier_clear, etc.
+  requirement: integer("requirement").notNull(), // threshold to unlock
+  goldReward: integer("gold_reward").default(0),
+  title: text("title"), // optional title unlock
+});
+
+// User's unlocked achievements
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  achievementId: integer("achievement_id").references(() => achievements.id, { onDelete: "cascade" }),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+}, (table) => ({
+  userAchievementUnique: uniqueIndex("user_achievement_idx").on(table.userId, table.achievementId),
+}));
+
+// Player abilities/skills
+export const abilities = pgTable("abilities", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  type: text("type").notNull(), // attack, defense, heal, buff
+  unlockTier: text("unlock_tier").notNull(), // E, D, C, B, A, S
+  cooldown: integer("cooldown").default(0),
+  effect: json("effect").$type<{
+    damage?: number;
+    healing?: number;
+    buffType?: string;
+    buffAmount?: number;
+    duration?: number;
+  }>().notNull(),
+});
+
+// User's unlocked abilities
+export const userAbilities = pgTable("user_abilities", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  abilityId: integer("ability_id").references(() => abilities.id, { onDelete: "cascade" }),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+}, (table) => ({
+  userAbilityUnique: uniqueIndex("user_ability_idx").on(table.userId, table.abilityId),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -174,6 +239,28 @@ export const insertWardrobeItemSchema = createInsertSchema(wardrobeItems).omit({
 });
 
 export const insertUserWardrobeSchema = createInsertSchema(userWardrobe).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export const insertMonsterSchema = createInsertSchema(monsters).omit({
+  id: true,
+});
+
+export const insertAchievementSchema = createInsertSchema(achievements).omit({
+  id: true,
+});
+
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export const insertAbilitySchema = createInsertSchema(abilities).omit({
+  id: true,
+});
+
+export const insertUserAbilitySchema = createInsertSchema(userAbilities).omit({
   id: true,
   unlockedAt: true,
 });
@@ -217,3 +304,13 @@ export type WardrobeItem = typeof wardrobeItems.$inferSelect;
 export type InsertWardrobeItem = z.infer<typeof insertWardrobeItemSchema>;
 export type UserWardrobe = typeof userWardrobe.$inferSelect;
 export type InsertUserWardrobe = z.infer<typeof insertUserWardrobeSchema>;
+export type Monster = typeof monsters.$inferSelect;
+export type InsertMonster = z.infer<typeof insertMonsterSchema>;
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type Ability = typeof abilities.$inferSelect;
+export type InsertAbility = z.infer<typeof insertAbilitySchema>;
+export type UserAbility = typeof userAbilities.$inferSelect;
+export type InsertUserAbility = z.infer<typeof insertUserAbilitySchema>;

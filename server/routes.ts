@@ -267,6 +267,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Shop routes
+  app.get("/api/shop/items", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const shopItems = await storage.getShopItems(userId);
+      res.json(shopItems);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch shop items" });
+    }
+  });
+
+  app.post("/api/shop/purchase", async (req, res) => {
+    try {
+      const { itemId } = req.body;
+      const userId = 1; // TODO: Get from session/auth
+      
+      const result = await storage.purchaseShopItem(userId, itemId);
+      res.json(result);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || "Purchase failed" });
+    }
+  });
+
+  // Achievements routes
+  app.get("/api/user/achievements", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const achievements = await storage.getUserAchievements(userId);
+      res.json(achievements);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

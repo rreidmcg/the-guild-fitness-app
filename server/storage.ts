@@ -55,6 +55,13 @@ export interface IStorage {
   purchaseWardrobeItem(userId: number, itemId: number): Promise<any>;
   equipWardrobeItem(userId: number, itemId: number, category: string): Promise<void>;
   unequipWardrobeItem(userId: number, category: string): Promise<void>;
+
+  // Shop operations (using wardrobe items as shop items)
+  getShopItems(userId: number): Promise<any[]>;
+  purchaseShopItem(userId: number, itemId: number): Promise<any>;
+
+  // Achievement operations
+  getUserAchievements(userId: number): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -392,6 +399,22 @@ export class DatabaseStorage implements IStorage {
 
     // Remove equipped item
     await this.updateUser(userId, { [field]: null });
+  }
+
+  // Shop operations (reusing wardrobe items as shop items)
+  async getShopItems(userId: number): Promise<any[]> {
+    return await this.getWardrobeItemsWithOwnership(userId);
+  }
+
+  async purchaseShopItem(userId: number, itemId: number): Promise<any> {
+    return await this.purchaseWardrobeItem(userId, itemId);
+  }
+
+  // Achievement operations
+  async getUserAchievements(userId: number): Promise<any[]> {
+    // For now, return empty array since achievements table is new
+    // In the future, this would query the userAchievements table
+    return [];
   }
 }
 
