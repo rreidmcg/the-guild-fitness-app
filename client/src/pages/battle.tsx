@@ -17,7 +17,7 @@ import {
   ChevronRight,
   Coins
 } from "lucide-react";
-import greenSlimeImage from "@assets/E411AC73-DD9A-4E21-A550-8BC4020515A1_1753054064391.jpeg";
+import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import { queryClient } from "@/lib/queryClient";
 
 interface Monster {
