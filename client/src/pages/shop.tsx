@@ -38,15 +38,19 @@ const rarityColors = {
 };
 
 const categoryIcons = {
-  hat: Crown,
-  shirt: Shirt,
-  pants: Zap,
-  shoes: Footprints
+  head: Crown,
+  shoulders: Shirt,
+  neck: Zap,
+  chest: Shirt,
+  hands: Footprints,
+  waist: Crown,
+  legs: Zap,
+  feet: Footprints
 };
 
 export default function Shop() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("hat");
+  const [activeTab, setActiveTab] = useState("head");
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -116,10 +120,14 @@ export default function Shop() {
   };
 
   const categories = [
-    { id: "hat", name: "Hats", icon: Crown },
-    { id: "shirt", name: "Shirts", icon: Shirt },
-    { id: "pants", name: "Pants", icon: Zap },
-    { id: "shoes", name: "Shoes", icon: Footprints },
+    { id: "head", name: "Head", icon: Crown },
+    { id: "shoulders", name: "Shoulders", icon: Shirt },
+    { id: "neck", name: "Neck", icon: Zap },
+    { id: "chest", name: "Chest", icon: Shirt },
+    { id: "hands", name: "Hands", icon: Footprints },
+    { id: "waist", name: "Waist", icon: Crown },
+    { id: "legs", name: "Legs", icon: Zap },
+    { id: "feet", name: "Feet", icon: Footprints },
   ];
 
   return (
@@ -142,13 +150,13 @@ export default function Shop() {
 
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-6">
             {categories.map((category) => {
               const Icon = category.icon;
               return (
-                <TabsTrigger key={category.id} value={category.id} className="flex items-center space-x-2">
+                <TabsTrigger key={category.id} value={category.id} className="flex flex-col items-center space-y-1 p-2">
                   <Icon className="w-4 h-4" />
-                  <span>{category.name}</span>
+                  <span className="text-xs">{category.name}</span>
                 </TabsTrigger>
               );
             })}

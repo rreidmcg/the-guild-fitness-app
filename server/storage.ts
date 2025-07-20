@@ -108,29 +108,45 @@ export class DatabaseStorage implements IStorage {
     if (existingItems.length > 0) return;
 
     const defaultWardrobeItems = [
-      // Hats
-      { name: "Red Cap", category: "hat", rarity: "common", price: 5, unlockLevel: 1, color: "#FF0000", description: "A basic red cap" },
-      { name: "Blue Beanie", category: "hat", rarity: "common", price: 8, unlockLevel: 2, color: "#0000FF", description: "A cozy blue beanie" },
-      { name: "Knight Helmet", category: "hat", rarity: "rare", price: 25, unlockLevel: 5, color: "#C0C0C0", description: "A sturdy knight's helmet" },
-      { name: "Crown of Champions", category: "hat", rarity: "legendary", price: 100, unlockLevel: 10, color: "#FFD700", description: "Only for the mightiest warriors" },
-
-      // Shirts
-      { name: "White T-Shirt", category: "shirt", rarity: "common", price: 3, unlockLevel: 1, color: "#FFFFFF", description: "A simple white t-shirt" },
-      { name: "Green Tank Top", category: "shirt", rarity: "common", price: 6, unlockLevel: 2, color: "#00FF00", description: "Perfect for workouts" },
-      { name: "Armor Vest", category: "shirt", rarity: "rare", price: 30, unlockLevel: 6, color: "#8B4513", description: "Protective leather armor" },
-      { name: "Hero's Tunic", category: "shirt", rarity: "epic", price: 60, unlockLevel: 8, color: "#800080", description: "Worn by legendary heroes" },
-
-      // Pants
-      { name: "Blue Jeans", category: "pants", rarity: "common", price: 4, unlockLevel: 1, color: "#000080", description: "Classic blue jeans" },
-      { name: "Black Shorts", category: "pants", rarity: "common", price: 7, unlockLevel: 2, color: "#000000", description: "Comfortable workout shorts" },
-      { name: "Battle Pants", category: "pants", rarity: "rare", price: 20, unlockLevel: 4, color: "#654321", description: "Reinforced combat trousers" },
-      { name: "Golden Leggings", category: "pants", rarity: "legendary", price: 80, unlockLevel: 9, color: "#FFD700", description: "Shimmering golden pants" },
-
-      // Shoes
-      { name: "White Sneakers", category: "shoes", rarity: "common", price: 6, unlockLevel: 1, color: "#FFFFFF", description: "Basic white sneakers" },
-      { name: "Red Running Shoes", category: "shoes", rarity: "common", price: 9, unlockLevel: 2, color: "#FF0000", description: "Made for speed" },
-      { name: "Combat Boots", category: "shoes", rarity: "rare", price: 15, unlockLevel: 3, color: "#000000", description: "Heavy-duty boots" },
-      { name: "Winged Sandals", category: "shoes", rarity: "epic", price: 50, unlockLevel: 7, color: "#FFD700", description: "Swift as the wind" },
+      // Head armor
+      { name: "Leather Helm", category: "head", rarity: "common", price: 15, unlockLevel: 1, color: "#8B4513", description: "Basic leather protection", statBonus: { stamina: 1 } },
+      { name: "Iron Helmet", category: "head", rarity: "rare", price: 75, unlockLevel: 8, color: "#696969", description: "Sturdy metal helmet", statBonus: { stamina: 3, strength: 1 } },
+      { name: "Crown of Power", category: "head", rarity: "legendary", price: 500, unlockLevel: 25, color: "#FFD700", description: "Majestic crown that enhances all abilities", statBonus: { strength: 2, stamina: 2, agility: 2 } },
+      
+      // Shoulders
+      { name: "Cloth Shoulders", category: "shoulders", rarity: "common", price: 12, unlockLevel: 1, color: "#8FBC8F", description: "Basic cloth shoulder guards", statBonus: { agility: 1 } },
+      { name: "Steel Pauldrons", category: "shoulders", rarity: "rare", price: 60, unlockLevel: 6, color: "#778899", description: "Heavy shoulder armor", statBonus: { strength: 2, stamina: 1 } },
+      { name: "Dragon Shoulders", category: "shoulders", rarity: "epic", price: 200, unlockLevel: 18, color: "#DC143C", description: "Shoulder guards made from dragon hide", statBonus: { strength: 3, stamina: 2 } },
+      
+      // Neck
+      { name: "Simple Necklace", category: "neck", rarity: "common", price: 8, unlockLevel: 1, color: "#C0C0C0", description: "Basic silver necklace", statBonus: { agility: 1 } },
+      { name: "Amulet of Strength", category: "neck", rarity: "rare", price: 80, unlockLevel: 10, color: "#8B0000", description: "Enhances physical power", statBonus: { strength: 3 } },
+      { name: "Pendant of Wisdom", category: "neck", rarity: "epic", price: 180, unlockLevel: 15, color: "#4169E1", description: "Increases all stats moderately", statBonus: { strength: 2, stamina: 2, agility: 2 } },
+      
+      // Chest armor
+      { name: "Cloth Tunic", category: "chest", rarity: "common", price: 20, unlockLevel: 1, color: "#8FBC8F", description: "Basic cloth chest piece", statBonus: { stamina: 2 } },
+      { name: "Chainmail Hauberk", category: "chest", rarity: "rare", price: 100, unlockLevel: 12, color: "#708090", description: "Flexible metal protection", statBonus: { stamina: 5, strength: 1 } },
+      { name: "Dragonscale Chestplate", category: "chest", rarity: "legendary", price: 400, unlockLevel: 22, color: "#800080", description: "Ultimate chest protection", statBonus: { strength: 3, stamina: 5, agility: 1 } },
+      
+      // Hands
+      { name: "Cloth Gloves", category: "hands", rarity: "common", price: 6, unlockLevel: 1, color: "#8FBC8F", description: "Basic hand protection", statBonus: { agility: 1 } },
+      { name: "Iron Gauntlets", category: "hands", rarity: "rare", price: 45, unlockLevel: 7, color: "#696969", description: "Heavy metal gloves", statBonus: { strength: 2, stamina: 1 } },
+      { name: "Gloves of Dexterity", category: "hands", rarity: "epic", price: 120, unlockLevel: 14, color: "#32CD32", description: "Enhances hand coordination", statBonus: { agility: 4, strength: 1 } },
+      
+      // Waist
+      { name: "Rope Belt", category: "waist", rarity: "common", price: 5, unlockLevel: 1, color: "#8B4513", description: "Simple rope belt", statBonus: { agility: 1 } },
+      { name: "Leather Belt", category: "waist", rarity: "rare", price: 35, unlockLevel: 5, color: "#654321", description: "Sturdy leather belt with pouches", statBonus: { stamina: 2, agility: 1 } },
+      { name: "Champion's Girdle", category: "waist", rarity: "epic", price: 150, unlockLevel: 16, color: "#DAA520", description: "Belt of a true champion", statBonus: { strength: 2, stamina: 2, agility: 2 } },
+      
+      // Legs
+      { name: "Cloth Pants", category: "legs", rarity: "common", price: 15, unlockLevel: 1, color: "#8B4513", description: "Basic cloth leg protection", statBonus: { stamina: 1 } },
+      { name: "Mail Leggings", category: "legs", rarity: "rare", price: 65, unlockLevel: 9, color: "#778899", description: "Flexible leg armor", statBonus: { stamina: 3, agility: 1 } },
+      { name: "Plate Legguards", category: "legs", rarity: "epic", price: 170, unlockLevel: 17, color: "#2F4F4F", description: "Heavy plate leg armor", statBonus: { strength: 2, stamina: 4 } },
+      
+      // Feet
+      { name: "Cloth Shoes", category: "feet", rarity: "common", price: 10, unlockLevel: 1, color: "#654321", description: "Basic footwear", statBonus: { agility: 1 } },
+      { name: "Iron Boots", category: "feet", rarity: "rare", price: 50, unlockLevel: 8, color: "#696969", description: "Heavy metal boots", statBonus: { strength: 1, stamina: 2 } },
+      { name: "Boots of Speed", category: "feet", rarity: "legendary", price: 280, unlockLevel: 20, color: "#87CEEB", description: "Boots that greatly enhance movement", statBonus: { agility: 5, stamina: 1 } },
     ];
 
     try {
@@ -156,16 +172,6 @@ export class DatabaseStorage implements IStorage {
       .insert(users)
       .values(insertUser)
       .returning();
-    return user;
-  }
-
-  async updateUser(id: number, updates: Partial<User>): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set(updates)
-      .where(eq(users.id, id))
-      .returning();
-    if (!user) throw new Error("User not found");
     return user;
   }
 
@@ -314,10 +320,14 @@ export class DatabaseStorage implements IStorage {
       ...item,
       isOwned: ownedItems.some(owned => owned.wardrobeItemId === item.id),
       isEquipped: (
-        (item.category === 'hat' && user?.equippedHat === item.name) ||
-        (item.category === 'shirt' && user?.equippedShirt === item.name) ||  
-        (item.category === 'pants' && user?.equippedPants === item.name) ||
-        (item.category === 'shoes' && user?.equippedShoes === item.name)
+        (item.category === 'head' && user?.equippedHead === item.name) ||
+        (item.category === 'shoulders' && user?.equippedShoulders === item.name) ||
+        (item.category === 'neck' && user?.equippedNeck === item.name) ||
+        (item.category === 'chest' && user?.equippedChest === item.name) ||
+        (item.category === 'hands' && user?.equippedHands === item.name) ||
+        (item.category === 'waist' && user?.equippedWaist === item.name) ||
+        (item.category === 'legs' && user?.equippedLegs === item.name) ||
+        (item.category === 'feet' && user?.equippedFeet === item.name)
       )
     }));
   }
@@ -373,10 +383,14 @@ export class DatabaseStorage implements IStorage {
 
     // Map category to user field
     const fieldMap: Record<string, string> = {
-      hat: 'equippedHat',
-      shirt: 'equippedShirt', 
-      pants: 'equippedPants',
-      shoes: 'equippedShoes'
+      head: 'equippedHead',
+      shoulders: 'equippedShoulders',
+      neck: 'equippedNeck',
+      chest: 'equippedChest',
+      hands: 'equippedHands',
+      waist: 'equippedWaist',
+      legs: 'equippedLegs',
+      feet: 'equippedFeet'
     };
 
     const field = fieldMap[category];
@@ -388,10 +402,14 @@ export class DatabaseStorage implements IStorage {
 
   async unequipWardrobeItem(userId: number, category: string): Promise<void> {
     const fieldMap: Record<string, string> = {
-      hat: 'equippedHat',
-      shirt: 'equippedShirt',
-      pants: 'equippedPants', 
-      shoes: 'equippedShoes'
+      head: 'equippedHead',
+      shoulders: 'equippedShoulders',
+      neck: 'equippedNeck',
+      chest: 'equippedChest',
+      hands: 'equippedHands',
+      waist: 'equippedWaist',
+      legs: 'equippedLegs',
+      feet: 'equippedFeet'
     };
 
     const field = fieldMap[category];

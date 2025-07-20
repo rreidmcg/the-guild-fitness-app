@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EquipmentSlots } from "@/components/ui/equipment-slots";
 import { 
   ArrowLeft, 
   ShirtIcon as Shirt,
@@ -43,16 +44,20 @@ const rarityColors = {
 };
 
 const categoryIcons = {
-  hat: Crown,
-  shirt: Shirt,
-  pants: Zap,
-  shoes: Footprints
+  head: Crown,
+  shoulders: Shirt,
+  neck: Zap,
+  chest: Shirt,
+  hands: Footprints,
+  waist: Crown,
+  legs: Zap,
+  feet: Footprints
 };
 
 export default function Wardrobe() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("hat");
+  const [activeTab, setActiveTab] = useState("head");
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -61,6 +66,17 @@ export default function Wardrobe() {
   const { data: wardrobeItems } = useQuery({
     queryKey: ["/api/wardrobe/items"],
   });
+
+  const categories = [
+    { id: "head", name: "Head", icon: Crown },
+    { id: "shoulders", name: "Shoulders", icon: Shirt },
+    { id: "neck", name: "Neck", icon: Zap },
+    { id: "chest", name: "Chest", icon: Shirt },
+    { id: "hands", name: "Hands", icon: Footprints },
+    { id: "waist", name: "Waist", icon: Crown },
+    { id: "legs", name: "Legs", icon: Zap },
+    { id: "feet", name: "Feet", icon: Footprints },
+  ];
 
   const purchaseItemMutation = useMutation({
     mutationFn: async (itemId: number) => {
@@ -189,23 +205,17 @@ export default function Wardrobe() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Character Preview */}
+      <div className="max-w-6xl mx-auto p-6 space-y-8">
+        {/* Equipment Slots with Avatar */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Palette className="w-5 h-5" />
-              <span>Character Preview</span>
+              <span>Character Equipment</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex justify-center">
-              <Avatar2D user={userStats} size="xl" />
-            </div>
-            <div className="text-center mt-4">
-              <h3 className="text-xl font-bold">{userStats?.username || 'Player'}</h3>
-              <p className="text-muted-foreground">Level {userStats?.level || 1}</p>
-            </div>
+            <EquipmentSlots userStats={userStats} wardrobeItems={wardrobeItems || []} />
           </CardContent>
         </Card>
 
@@ -216,29 +226,22 @@ export default function Wardrobe() {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="hat" className="flex items-center space-x-2">
-                  <Crown className="w-4 h-4" />
-                  <span>Hats</span>
-                </TabsTrigger>
-                <TabsTrigger value="shirt" className="flex items-center space-x-2">
-                  <Shirt className="w-4 h-4" />
-                  <span>Shirts</span>
-                </TabsTrigger>
-                <TabsTrigger value="pants" className="flex items-center space-x-2">
-                  <Zap className="w-4 h-4" />
-                  <span>Pants</span>
-                </TabsTrigger>
-                <TabsTrigger value="shoes" className="flex items-center space-x-2">
-                  <Footprints className="w-4 h-4" />
-                  <span>Shoes</span>
-                </TabsTrigger>
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+                {categories.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <TabsTrigger key={category.id} value={category.id} className="flex flex-col items-center space-y-1 p-2">
+                      <Icon className="w-4 h-4" />
+                      <span className="text-xs">{category.name}</span>
+                    </TabsTrigger>
+                  );
+                })}
               </TabsList>
 
-              {["hat", "shirt", "pants", "shoes"].map((category) => (
-                <TabsContent key={category} value={category} className="mt-6">
+              {categories.map((category) => (
+                <TabsContent key={category.id} value={category.id} className="mt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {getFilteredItems(category).map((item: WardrobeItemWithOwned) => (
+                    {getFilteredItems(category.id).map((item: WardrobeItemWithOwned) => (
                       <Card key={item.id} className="bg-secondary border-border relative">
                         <CardContent className="p-4">
                           {/* Rarity Badge */}

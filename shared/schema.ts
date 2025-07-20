@@ -17,11 +17,15 @@ export const users = pgTable("users", {
   currentTier: text("current_tier").default("E"), // E, D, C, B, A, S
   highestTierCompleted: text("highest_tier_completed").default(""),
   currentTitle: text("current_title").default("Recruit"),
-  // Character customization
-  equippedHat: text("equipped_hat"),
-  equippedShirt: text("equipped_shirt"),
-  equippedPants: text("equipped_pants"),
-  equippedShoes: text("equipped_shoes"),
+  // Character customization - New armor slot system
+  equippedHead: text("equipped_head"),
+  equippedShoulders: text("equipped_shoulders"),
+  equippedNeck: text("equipped_neck"),
+  equippedChest: text("equipped_chest"),
+  equippedHands: text("equipped_hands"),
+  equippedWaist: text("equipped_waist"),
+  equippedLegs: text("equipped_legs"),
+  equippedFeet: text("equipped_feet"),
   skinColor: text("skin_color").default("#F5C6A0"),
   hairColor: text("hair_color").default("#8B4513"),
   gender: text("gender").default("male"),
@@ -133,12 +137,17 @@ export const programWorkouts = pgTable("program_workouts", {
 export const wardrobeItems = pgTable("wardrobe_items", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  category: text("category").notNull(), // 'hat', 'shirt', 'pants', 'shoes'
+  category: text("category").notNull(), // 'head', 'shoulders', 'neck', 'chest', 'hands', 'waist', 'legs', 'feet'
   rarity: text("rarity").default("common"), // 'common', 'rare', 'epic', 'legendary'
   price: integer("price").default(0), // Gold cost
   unlockLevel: integer("unlock_level").default(1), // Level required to unlock
   color: text("color").notNull(), // Hex color for the item
   description: text("description"),
+  statBonus: json("stat_bonus").$type<{
+    strength?: number;
+    stamina?: number;
+    agility?: number;
+  }>().default({}), // Stat bonuses for equipment
   createdAt: timestamp("created_at").defaultNow(),
 });
 
