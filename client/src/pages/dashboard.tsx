@@ -66,70 +66,70 @@ export default function Dashboard() {
   const xpProgress = (currentXP % 1000) / 1000 * 100;
 
   return (
-    <div className="min-h-screen bg-game-dark text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <NavBar />
       
       <div className="max-w-7xl mx-auto p-6">
         {/* Quick Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {/* XP Progress */}
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-300">Experience</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Experience</h3>
                 <ChartLine className="w-4 h-4 text-game-success" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-baseline space-x-2">
-                  <span className="text-2xl font-bold text-white">{currentXP}</span>
-                  <span className="text-sm text-gray-400">/ {xpForNextLevel} XP</span>
+                  <span className="text-2xl font-bold text-foreground">{currentXP}</span>
+                  <span className="text-sm text-muted-foreground">/ {xpForNextLevel} XP</span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-muted rounded-full h-2">
                   <div className="xp-bar h-2 rounded-full" style={{ width: `${xpProgress}%` }}></div>
                 </div>
-                <p className="text-xs text-gray-400">{xpForNextLevel - currentXP} XP to Level {currentLevel + 1}</p>
+                <p className="text-xs text-muted-foreground">{xpForNextLevel - currentXP} XP to Level {currentLevel + 1}</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Current Level */}
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-300">Current Level</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Current Level</h3>
                 <Trophy className="w-4 h-4 text-game-warning" />
               </div>
               <div className="space-y-2">
-                <span className="text-4xl font-bold text-white">{currentLevel}</span>
-                <p className="text-xs text-gray-400">Warrior Rank</p>
+                <span className="text-4xl font-bold text-foreground">{currentLevel}</span>
+                <p className="text-xs text-muted-foreground">Warrior Rank</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Workout Streak */}
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-300">Streak</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Streak</h3>
                 <Flame className="w-4 h-4 text-orange-500" />
               </div>
               <div className="space-y-2">
                 <span className="text-4xl font-bold text-orange-400">{streak}</span>
-                <p className="text-xs text-gray-400">Days in a row</p>
+                <p className="text-xs text-muted-foreground">Days in a row</p>
               </div>
             </CardContent>
           </Card>
 
           {/* Total Volume */}
-          <Card className="bg-game-slate border-gray-700 card-glow transition-all duration-300 hover:shadow-lg">
+          <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-300">Total Volume</h3>
+                <h3 className="text-sm font-medium text-muted-foreground">Total Volume</h3>
                 <Weight className="w-4 h-4 text-game-primary" />
               </div>
               <div className="space-y-2">
-                <span className="text-2xl font-bold text-white">{totalVolumeThisMonth.toLocaleString()}</span>
-                <p className="text-xs text-gray-400">lbs lifted this month</p>
+                <span className="text-2xl font-bold text-foreground">{totalVolumeThisMonth.toLocaleString()}</span>
+                <p className="text-xs text-muted-foreground">lbs lifted this month</p>
               </div>
             </CardContent>
           </Card>
@@ -140,10 +140,10 @@ export default function Dashboard() {
           {/* Left Column: Workouts & Stats */}
           <div className="lg:col-span-2 space-y-8">
             {/* Recent Workouts */}
-            <Card className="bg-game-slate border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-bold text-white">Recent Workouts</CardTitle>
+                  <CardTitle className="text-xl font-bold text-foreground">Recent Workouts</CardTitle>
                   <Button 
                     onClick={() => setLocation("/workouts")}
                     className="bg-game-primary hover:bg-blue-600"
@@ -155,7 +155,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {recentSessions.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Dumbbell className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>No workouts yet. Start your fitness journey!</p>
                   </div>
@@ -168,10 +168,10 @@ export default function Dashboard() {
             </Card>
 
             {/* Personal Records */}
-            <Card className="bg-game-slate border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl font-bold text-white">Personal Records</CardTitle>
+                  <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
                   <Button variant="ghost" className="text-game-primary hover:text-blue-400">
                     <ChartLine className="w-4 h-4 mr-2" />
                     View All
@@ -180,21 +180,21 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 {topRecords.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>No personal records yet. Complete workouts to set PRs!</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {topRecords.map((record) => (
-                      <Card key={record.id} className="bg-gray-800 border-gray-600">
+                      <Card key={record.id} className="bg-muted border-border">
                         <CardContent className="p-4">
                           <div className="flex items-center space-x-3 mb-2">
                             <Trophy className="w-4 h-4 text-game-warning" />
-                            <h3 className="font-semibold text-white">Exercise #{record.exerciseId}</h3>
+                            <h3 className="font-semibold text-foreground">Exercise #{record.exerciseId}</h3>
                           </div>
                           <div className="text-2xl font-bold text-game-primary">{record.value}</div>
-                          <p className="text-sm text-gray-400">{record.recordType}</p>
+                          <p className="text-sm text-muted-foreground">{record.recordType}</p>
                         </CardContent>
                       </Card>
                     ))}

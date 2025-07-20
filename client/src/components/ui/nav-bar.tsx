@@ -15,7 +15,7 @@ export function NavBar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Dumbbell className="text-game-primary text-2xl" />
-          <h1 className="text-xl font-bold cursor-pointer" style={{ color: 'rgb(107, 114, 128)' }} onClick={() => setLocation("/")}>
+          <h1 className="text-xl font-bold cursor-pointer text-foreground" onClick={() => setLocation("/")}>
             FitQuest
           </h1>
         </div>
@@ -24,8 +24,7 @@ export function NavBar() {
           <Button 
             variant="ghost" 
             onClick={() => setLocation("/workout-builder")}
-            style={{ color: 'rgb(107, 114, 128)' }}
-            className="hover:text-gray-900"
+            className="text-foreground hover:text-primary"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Workout
@@ -33,7 +32,7 @@ export function NavBar() {
           
           <div className="flex items-center space-x-2">
             <Star className="w-4 h-4 text-game-warning" />
-            <span className="text-sm font-medium" style={{ color: 'rgb(107, 114, 128)' }}>Level {userStats?.level || 1}</span>
+            <span className="text-sm font-medium text-foreground">Level {userStats?.level || 1}</span>
           </div>
           
           <div className="w-8 h-8 bg-game-primary rounded-full flex items-center justify-center">

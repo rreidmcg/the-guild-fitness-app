@@ -121,12 +121,12 @@ export default function Stats() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20" style={{ color: 'rgb(30, 30, 30)', fontWeight: 600 }}>
+    <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-6">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold" style={{ color: 'rgb(30, 30, 30)', fontWeight: 800 }}>Character Stats</h1>
-          <p className="mt-1" style={{ color: 'rgb(60, 60, 60)', fontWeight: 600 }}>Your fitness progression journey</p>
+          <h1 className="text-3xl font-bold text-foreground">Character Stats</h1>
+          <p className="mt-1 text-muted-foreground">Your fitness progression journey</p>
         </div>
       </div>
 
