@@ -310,7 +310,8 @@ export default function Battle() {
                               <img 
                                 src={monster.image} 
                                 alt={monster.name}
-                                className="w-16 h-16 object-cover rounded-lg border border-border"
+                                className="w-16 h-16 object-contain rounded-lg border border-border bg-transparent"
+                                style={{ backgroundColor: 'transparent' }}
                               />
                             </div>
                           )}
@@ -458,7 +459,8 @@ export default function Battle() {
                   <img 
                     src={battleState.monster.image} 
                     alt={battleState.monster.name}
-                    className="w-24 h-24 object-cover rounded-lg border border-border"
+                    className="w-24 h-24 object-contain rounded-lg border border-border bg-transparent"
+                    style={{ backgroundColor: 'transparent' }}
                   />
                 </div>
               )}
