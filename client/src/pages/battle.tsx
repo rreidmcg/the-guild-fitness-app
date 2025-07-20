@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Coins
 } from "lucide-react";
+import greenSlimeImage from "@assets/E411AC73-DD9A-4E21-A550-8BC4020515A1_1753054064391.jpeg";
 import { queryClient } from "@/lib/queryClient";
 
 interface Monster {
@@ -28,6 +29,7 @@ interface Monster {
   attack: number;
   goldReward: number;
   description: string;
+  image?: string;
 }
 
 interface BattleState {
@@ -41,7 +43,7 @@ interface BattleState {
 
 // E-rank dungeon monsters (levels 1-10)
 const ERANK_MONSTERS: Monster[] = [
-  { id: 1, name: "Green Slime", level: 1, maxHp: 12, currentHp: 12, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly" },
+  { id: 1, name: "Green Slime", level: 1, maxHp: 12, currentHp: 12, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
   { id: 2, name: "Cave Rat", level: 2, maxHp: 18, currentHp: 18, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth" },
   { id: 3, name: "Wild Goblin", level: 3, maxHp: 25, currentHp: 25, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger" },
   { id: 4, name: "Forest Spider", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs" },
@@ -301,25 +303,41 @@ export default function Battle() {
                       onClick={() => startBattle(monster)}
                     >
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-bold text-foreground">{monster.name}</h3>
-                          <span className="text-sm bg-red-700 text-white px-2 py-1 rounded">
-                            Lv.{monster.level}
-                          </span>
-                        </div>
-                        <p className="text-muted-foreground text-sm mb-3">{monster.description}</p>
-                        <div className="grid grid-cols-3 gap-2 text-xs">
-                          <div className="flex items-center space-x-1">
-                            <Heart className="w-3 h-3 text-red-400" />
-                            <span>{monster.maxHp}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Sword className="w-3 h-3 text-orange-400" />
-                            <span>{monster.attack}</span>
-                          </div>
-                          <div className="flex items-center space-x-1 text-yellow-400">
-                            <Coins className="w-3 h-3" />
-                            <span>{monster.goldReward}</span>
+                        <div className="flex items-start space-x-4">
+                          {/* Monster Image */}
+                          {monster.image && (
+                            <div className="flex-shrink-0">
+                              <img 
+                                src={monster.image} 
+                                alt={monster.name}
+                                className="w-16 h-16 object-cover rounded-lg border border-border"
+                              />
+                            </div>
+                          )}
+                          
+                          {/* Monster Info */}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="font-bold text-foreground">{monster.name}</h3>
+                              <span className="text-sm bg-red-700 text-white px-2 py-1 rounded">
+                                Lv.{monster.level}
+                              </span>
+                            </div>
+                            <p className="text-muted-foreground text-sm mb-3">{monster.description}</p>
+                            <div className="grid grid-cols-3 gap-2 text-xs">
+                              <div className="flex items-center space-x-1">
+                                <Heart className="w-3 h-3 text-red-400" />
+                                <span>{monster.maxHp}</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Sword className="w-3 h-3 text-orange-400" />
+                                <span>{monster.attack}</span>
+                              </div>
+                              <div className="flex items-center space-x-1 text-yellow-400">
+                                <Coins className="w-3 h-3" />
+                                <span>{monster.goldReward}</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
@@ -434,6 +452,17 @@ export default function Battle() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Monster Image in Battle */}
+              {battleState.monster.image && (
+                <div className="flex justify-center">
+                  <img 
+                    src={battleState.monster.image} 
+                    alt={battleState.monster.name}
+                    className="w-24 h-24 object-cover rounded-lg border border-border"
+                  />
+                </div>
+              )}
+              
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium flex items-center">
