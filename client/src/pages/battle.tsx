@@ -120,13 +120,11 @@ export default function Battle() {
   }, [userStats, battleState]);
 
   const updateStatsMutation = useMutation({
-    mutationFn: async (goldGain: number) => {
+    mutationFn: async (params: { goldGain: number; battleWon?: boolean }) => {
       const response = await fetch('/api/user/stats', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          goldGain: goldGain 
-        })
+        body: JSON.stringify(params)
       });
       if (!response.ok) throw new Error('Failed to update stats');
       return response.json();
@@ -175,7 +173,10 @@ export default function Battle() {
           };
         });
         
-        updateStatsMutation.mutate(battleState.monster.goldReward);
+        updateStatsMutation.mutate({ 
+          goldGain: battleState.monster.goldReward, 
+          battleWon: true 
+        });
         
         toast({
           title: "Victory!",

@@ -76,18 +76,10 @@ export default function Stats() {
   const topRecords = personalRecords?.slice(0, 4) || [];
 
   // Calculate stats
-  const calculateActiveDays = () => {
-    if (!workoutSessions || workoutSessions.length === 0) return 0;
-    
-    // Get unique dates from workout sessions
-    const uniqueDates = new Set(
-      workoutSessions.map(session => {
-        const date = new Date(session.completedAt);
-        return date.toDateString(); // This gives us "Mon Oct 09 2023" format
-      })
-    );
-    
-    return uniqueDates.size;
+  const calculateTotalBattles = () => {
+    // For now, we'll use the user's battle count from stats
+    // This will be updated when we have battle history
+    return userStats?.battlesWon || 0;
   };
 
   const calculateStreak = () => {
@@ -139,7 +131,7 @@ export default function Stats() {
     return streak;
   };
 
-  const activeDays = calculateActiveDays();
+  const totalBattles = calculateTotalBattles();
   const streak = calculateStreak();
   const totalVolumeThisMonth = workoutSessions?.reduce((total, session) => total + (session.totalVolume || 0), 0) || 0;
   const currentXP = userStats?.experience || 0;
@@ -206,8 +198,8 @@ export default function Stats() {
                     {streak} day streak
                   </span>
                   <span className="flex items-center">
-                    <Calendar className="w-4 h-4 text-blue-600 mr-1" />
-                    {activeDays} days active
+                    <Target className="w-4 h-4 text-red-600 mr-1" />
+                    {totalBattles} battles won
                   </span>
                 </div>
               </div>

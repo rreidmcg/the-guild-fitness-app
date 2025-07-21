@@ -13,6 +13,7 @@ export const users = pgTable("users", {
   stamina: integer("stamina").default(0),
   agility: integer("agility").default(0),
   gold: integer("gold").default(0),
+  battlesWon: integer("battles_won").default(0),
   // Health system
   currentHp: integer("current_hp").default(40), // Default HP for starting character
   lastHpUpdateAt: timestamp("last_hp_update_at").defaultNow(),
