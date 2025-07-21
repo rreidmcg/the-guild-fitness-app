@@ -20,6 +20,7 @@ import {
   Clock
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
+import caveRatImage from "@assets/F7233D9C-D42A-4EE8-BB26-7DBE9776370B_1753136552381.png";
 import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
@@ -49,7 +50,7 @@ interface BattleState {
 // E-rank dungeon monsters (levels 1-10) - HP increased by 5%
 const ERANK_MONSTERS: Monster[] = [
   { id: 1, name: "Green Slime", level: 1, maxHp: 13, currentHp: 13, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
-  { id: 2, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth" },
+  { id: 2, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth", image: caveRatImage },
   { id: 3, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger" },
   { id: 4, name: "Forest Spider", level: 4, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs" },
   { id: 5, name: "Skeleton Warrior", level: 5, maxHp: 42, currentHp: 42, attack: 7, goldReward: 6, description: "Animated bones wielding ancient weapons" },
