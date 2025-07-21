@@ -16,7 +16,8 @@ import {
   ChevronDown,
   ChevronRight,
   Coins,
-  X
+  X,
+  Clock
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
@@ -33,6 +34,7 @@ interface Monster {
   goldReward: number;
   description: string;
   image?: string;
+  lastDefeatedAt?: number; // Timestamp when monster was last defeated
 }
 
 interface BattleState {
@@ -63,6 +65,7 @@ export default function Battle() {
   const { toast } = useToast();
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [isMonsterListOpen, setIsMonsterListOpen] = useState(true);
+  const [monsterCooldowns, setMonsterCooldowns] = useState<{[key: number]: number}>({});
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -72,6 +75,20 @@ export default function Battle() {
   const [battleState, setBattleState] = useState<BattleState | null>(null);
 
   const startBattle = (monster: Monster) => {
+    // Check if monster is on cooldown
+    const currentTime = Date.now();
+    const cooldownTime = monsterCooldowns[monster.id];
+    
+    if (cooldownTime && currentTime < cooldownTime) {
+      const remainingMinutes = Math.ceil((cooldownTime - currentTime) / (1000 * 60));
+      toast({
+        title: "Monster on Cooldown",
+        description: `${monster.name} is resting. Try again in ${remainingMinutes} minute(s).`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Stamina determines HP (10 base HP + 3 HP per stamina point)
     const playerMaxHp = Math.max(10, 10 + (userStats?.stamina || 10) * 3);
     const battleMonster = { ...monster, currentHp: monster.maxHp };
@@ -142,6 +159,13 @@ export default function Battle() {
     });
 
     if (isMonsterDefeated) {
+      // Set 10-minute cooldown for defeated monster
+      const cooldownEndTime = Date.now() + (10 * 60 * 1000); // 10 minutes
+      setMonsterCooldowns(prev => ({
+        ...prev,
+        [battleState.monster.id]: cooldownEndTime
+      }));
+
       setTimeout(() => {
         setBattleState(prev => {
           if (!prev) return prev;
@@ -210,6 +234,44 @@ export default function Battle() {
   const returnToMonsterList = () => {
     setBattleState(null);
   };
+
+  // Helper function to check if monster is on cooldown
+  const isMonsterOnCooldown = (monsterId: number) => {
+    const cooldownTime = monsterCooldowns[monsterId];
+    return cooldownTime && Date.now() < cooldownTime;
+  };
+
+  // Helper function to get remaining cooldown time in minutes
+  const getRemainingCooldown = (monsterId: number) => {
+    const cooldownTime = monsterCooldowns[monsterId];
+    if (!cooldownTime) return 0;
+    const remaining = cooldownTime - Date.now();
+    return Math.max(0, Math.ceil(remaining / (1000 * 60)));
+  };
+
+  // Update cooldown display every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMonsterCooldowns(prev => {
+        const now = Date.now();
+        const updated = { ...prev };
+        let hasChanges = false;
+        
+        // Remove expired cooldowns
+        Object.keys(updated).forEach(key => {
+          const monsterId = parseInt(key);
+          if (updated[monsterId] && now >= updated[monsterId]) {
+            delete updated[monsterId];
+            hasChanges = true;
+          }
+        });
+        
+        return hasChanges ? updated : prev;
+      });
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Monster Selection View
   if (!battleState) {
@@ -299,54 +361,85 @@ export default function Battle() {
             {isMonsterListOpen && (
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {ERANK_MONSTERS.map((monster) => (
-                    <Card 
-                      key={monster.id}
-                      className="bg-card border-border hover:border-primary transition-colors cursor-pointer"
-                      onClick={() => startBattle(monster)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start space-x-4">
-                          {/* Monster Image */}
-                          {monster.image && (
-                            <div className="flex-shrink-0">
-                              <img 
-                                src={monster.image} 
-                                alt={monster.name}
-                                className="w-16 h-16 object-contain rounded-lg border border-border bg-transparent"
-                                style={{ backgroundColor: 'transparent' }}
-                              />
-                            </div>
-                          )}
-                          
-                          {/* Monster Info */}
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className="font-bold text-foreground">{monster.name}</h3>
-                              <span className="text-sm bg-red-700 text-white px-2 py-1 rounded">
-                                Lv.{monster.level}
-                              </span>
-                            </div>
-                            <p className="text-muted-foreground text-sm mb-3">{monster.description}</p>
-                            <div className="grid grid-cols-3 gap-2 text-xs">
-                              <div className="flex items-center space-x-1">
-                                <Heart className="w-3 h-3 text-red-400" />
-                                <span>{monster.maxHp}</span>
+                  {ERANK_MONSTERS.map((monster) => {
+                    const onCooldown = isMonsterOnCooldown(monster.id);
+                    const remainingTime = getRemainingCooldown(monster.id);
+                    
+                    return (
+                      <Card 
+                        key={monster.id}
+                        className={`bg-card border-border transition-colors ${
+                          onCooldown 
+                            ? 'opacity-60 cursor-not-allowed border-gray-500' 
+                            : 'hover:border-primary cursor-pointer'
+                        }`}
+                        onClick={() => !onCooldown && startBattle(monster)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start space-x-4">
+                            {/* Monster Image */}
+                            {monster.image && (
+                              <div className="flex-shrink-0 relative">
+                                <img 
+                                  src={monster.image} 
+                                  alt={monster.name}
+                                  className={`w-16 h-16 object-contain rounded-lg border border-border bg-transparent ${
+                                    onCooldown ? 'grayscale' : ''
+                                  }`}
+                                  style={{ backgroundColor: 'transparent' }}
+                                />
+                                {onCooldown && (
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <Clock className="w-6 h-6 text-gray-400" />
+                                  </div>
+                                )}
                               </div>
-                              <div className="flex items-center space-x-1">
-                                <Sword className="w-3 h-3 text-orange-400" />
-                                <span>{monster.attack}</span>
+                            )}
+                            
+                            {/* Monster Info */}
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between mb-2">
+                                <h3 className={`font-bold ${onCooldown ? 'text-gray-400' : 'text-foreground'}`}>
+                                  {monster.name}
+                                </h3>
+                                <span className={`text-sm px-2 py-1 rounded ${
+                                  onCooldown 
+                                    ? 'bg-gray-600 text-gray-300' 
+                                    : 'bg-red-700 text-white'
+                                }`}>
+                                  Lv.{monster.level}
+                                </span>
                               </div>
-                              <div className="flex items-center space-x-1 text-yellow-400">
-                                <Coins className="w-3 h-3" />
-                                <span>{monster.goldReward}</span>
+                              
+                              {onCooldown ? (
+                                <div className="text-orange-400 text-sm mb-3 flex items-center">
+                                  <Clock className="w-4 h-4 mr-1" />
+                                  Resting for {remainingTime} minute(s)
+                                </div>
+                              ) : (
+                                <p className="text-muted-foreground text-sm mb-3">{monster.description}</p>
+                              )}
+                              
+                              <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div className="flex items-center space-x-1">
+                                  <Heart className={`w-3 h-3 ${onCooldown ? 'text-gray-400' : 'text-red-400'}`} />
+                                  <span className={onCooldown ? 'text-gray-400' : ''}>{monster.maxHp}</span>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  <Sword className={`w-3 h-3 ${onCooldown ? 'text-gray-400' : 'text-orange-400'}`} />
+                                  <span className={onCooldown ? 'text-gray-400' : ''}>{monster.attack}</span>
+                                </div>
+                                <div className={`flex items-center space-x-1 ${onCooldown ? 'text-gray-400' : 'text-yellow-400'}`}>
+                                  <Coins className="w-3 h-3" />
+                                  <span>{monster.goldReward}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </CardContent>
             )}
