@@ -502,8 +502,13 @@ export default function Battle() {
                 <img 
                   src={battleState.monster.image} 
                   alt={battleState.monster.name}
-                  className="w-20 h-20 object-contain bg-transparent"
-                  style={{ backgroundColor: 'transparent' }}
+                  className={`w-20 h-20 object-contain bg-transparent ${
+                    battleState.monster.name === 'Cave Rat' ? 'cave-rat-transparent' : ''
+                  }`}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    imageRendering: 'pixelated'
+                  }}
                 />
               ) : (
                 <Skull className="w-16 h-16 text-red-600" />
