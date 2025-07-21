@@ -223,10 +223,10 @@ export default function Stats() {
             <div className="mb-6 p-4 bg-red-900/20 rounded-lg border border-red-700">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <Heart className="w-5 h-5 text-red-400" />
-                  <span className="font-semibold text-red-400">Health</span>
+                  <Heart className="w-5 h-5 text-foreground" />
+                  <span className="font-semibold text-foreground">Health</span>
                 </div>
-                <span className="text-sm text-red-300">
+                <span className="text-sm text-foreground">
                   {userStats?.currentHp || 0} / {userStats?.maxHp || 40}
                 </span>
               </div>
@@ -238,7 +238,7 @@ export default function Stats() {
                   }}
                 />
               </div>
-              <div className="text-xs text-red-300 mt-2 opacity-80">
+              <div className="text-xs text-foreground mt-2 opacity-80">
                 Regenerates 1% of max HP per minute when not in combat
               </div>
               
