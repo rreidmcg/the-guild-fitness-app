@@ -223,10 +223,10 @@ export default function Stats() {
             <div className="mb-6 p-4 bg-red-900/20 rounded-lg border border-red-700">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <Heart className="w-5 h-5 text-foreground" />
-                  <span className="font-semibold text-foreground">Health</span>
+                  <Heart className="w-5 h-5 text-red-400" />
+                  <span className="font-semibold text-red-400">Health</span>
                 </div>
-                <span className="text-sm text-foreground">
+                <span className="text-sm text-red-300">
                   {userStats?.currentHp || 0} / {userStats?.maxHp || 40}
                 </span>
               </div>
@@ -238,7 +238,7 @@ export default function Stats() {
                   }}
                 />
               </div>
-              <div className="text-xs text-foreground mt-2 opacity-80">
+              <div className="text-xs text-red-300 mt-2 opacity-80">
                 Regenerates 1% of max HP per minute when not in combat
               </div>
               
@@ -277,19 +277,19 @@ export default function Stats() {
             {/* Character Stats - Numerical Display */}
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-4 bg-red-900/20 rounded-lg border border-red-700">
-                <Dumbbell className="w-6 h-6 text-foreground mx-auto mb-2" />
-                <div className="text-2xl font-bold text-foreground">{userStats?.strength || 0}</div>
-                <div className="text-sm font-semibold text-foreground">Strength</div>
+                <Dumbbell className="w-6 h-6 text-red-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-red-300">{userStats?.strength || 0}</div>
+                <div className="text-sm font-semibold text-red-400">Strength</div>
               </div>
               <div className="text-center p-4 bg-green-900/20 rounded-lg border border-green-700">
-                <Heart className="w-6 h-6 text-foreground mx-auto mb-2" />
-                <div className="text-2xl font-bold text-foreground">{userStats?.stamina || 0}</div>
-                <div className="text-sm font-semibold text-foreground">Stamina</div>
+                <Heart className="w-6 h-6 text-green-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-green-300">{userStats?.stamina || 0}</div>
+                <div className="text-sm font-semibold text-green-400">Stamina</div>
               </div>
               <div className="text-center p-4 bg-purple-900/20 rounded-lg border border-purple-700">
-                <Wind className="w-6 h-6 text-foreground mx-auto mb-2" />
-                <div className="text-2xl font-bold text-foreground">{userStats?.agility || 0}</div>
-                <div className="text-sm font-semibold text-foreground">Agility</div>
+                <Wind className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-purple-300">{userStats?.agility || 0}</div>
+                <div className="text-sm font-semibold text-purple-400">Agility</div>
               </div>
             </div>
           </CardContent>
