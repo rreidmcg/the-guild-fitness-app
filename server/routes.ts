@@ -188,23 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // User stats route
-  app.get("/api/user/stats", async (req, res) => {
-    try {
-      const userId = 1; // TODO: Get from session/auth
-      const user = await storage.getUser(userId);
-      if (!user) {
-        // Create default user if none exists
-        const defaultUser = await storage.createUser({ username: "player", password: "password" });
-        return res.json(defaultUser);
-      }
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch user stats" });
-    }
-  });
-
-  // Get user stats with HP regeneration
+  // Get user stats with HP and MP regeneration
   app.get("/api/user/stats", async (req, res) => {
     try {
       const userId = 1; // TODO: Get from session/auth
@@ -214,42 +198,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Calculate max HP and apply regeneration
+      // Calculate max HP and MP
       const maxHp = Math.max(10, 10 + user.stamina * 3);
+      const maxMp = (user.stamina * 2) + (user.agility * 1); // MP Formula: (Stamina × 2) + (Agility × 1)
       let currentHp = maxHp; // Default to max HP if no HP tracking yet
+      let currentMp = maxMp; // Default to max MP if no MP tracking yet
       
       try {
-        // Try to get current HP from database (may not exist yet)
-        const [userWithHp] = await db
+        // Try to get current HP and MP from database (may not exist yet)
+        const [userWithStats] = await db
           .select()
           .from(users)
           .where(eq(users.id, userId));
           
-        if (userWithHp && userWithHp.currentHp !== null) {
-          currentHp = userWithHp.currentHp;
+        if (userWithStats && userWithStats.currentHp !== null) {
+          currentHp = userWithStats.currentHp;
+          currentMp = userWithStats.currentMp || maxMp;
+          
+          const currentTime = Date.now();
           
           // Apply HP regeneration if not at max HP
-          const lastUpdateTime = userWithHp.lastHpUpdateAt ? new Date(userWithHp.lastHpUpdateAt).getTime() : Date.now();
-          const currentTime = Date.now();
-          const minutesElapsed = Math.floor((currentTime - lastUpdateTime) / (1000 * 60));
+          const lastHpUpdateTime = userWithStats.lastHpUpdateAt ? new Date(userWithStats.lastHpUpdateAt).getTime() : Date.now();
+          const hpMinutesElapsed = Math.floor((currentTime - lastHpUpdateTime) / (1000 * 60));
           
-          if (currentHp < maxHp && minutesElapsed > 0) {
-            const regenAmount = Math.floor(maxHp * 0.01) * minutesElapsed; // 1% per minute
-            currentHp = Math.min(maxHp, currentHp + regenAmount);
-            
-            // Update HP in database if it changed
-            if (regenAmount > 0) {
-              await db.update(users)
-                .set({ 
-                  currentHp,
-                  lastHpUpdateAt: new Date()
-                })
-                .where(eq(users.id, userId));
+          let hpChanged = false;
+          if (currentHp < maxHp && hpMinutesElapsed > 0) {
+            const hpRegenAmount = Math.floor(maxHp * 0.01) * hpMinutesElapsed; // 1% per minute
+            currentHp = Math.min(maxHp, currentHp + hpRegenAmount);
+            hpChanged = hpRegenAmount > 0;
+          }
+          
+          // Apply MP regeneration if not at max MP
+          const lastMpUpdateTime = userWithStats.lastMpUpdateAt ? new Date(userWithStats.lastMpUpdateAt).getTime() : Date.now();
+          const mpMinutesElapsed = Math.floor((currentTime - lastMpUpdateTime) / (1000 * 60));
+          
+          let mpChanged = false;
+          if (currentMp < maxMp && mpMinutesElapsed > 0) {
+            // MP Regen = (Agility ÷ 2)% of Max MP per minute
+            const mpRegenRate = Math.max(0.01, (user.agility / 2) / 100); // At least 1% regen
+            const mpRegenAmount = Math.floor(maxMp * mpRegenRate) * mpMinutesElapsed;
+            currentMp = Math.min(maxMp, currentMp + mpRegenAmount);
+            mpChanged = mpRegenAmount > 0;
+          }
+          
+          // Update HP and/or MP in database if they changed
+          if (hpChanged || mpChanged) {
+            const updateData: any = {};
+            if (hpChanged) {
+              updateData.currentHp = currentHp;
+              updateData.lastHpUpdateAt = new Date();
             }
+            if (mpChanged) {
+              updateData.currentMp = currentMp;
+              updateData.lastMpUpdateAt = new Date();
+            }
+            
+            await db.update(users)
+              .set(updateData)
+              .where(eq(users.id, userId));
           }
         }
       } catch (error) {
-        console.log("HP columns may not exist yet, defaulting to max HP");
+        console.log("HP/MP columns may not exist yet, defaulting to max values");
       }
 
       res.json({
@@ -262,7 +272,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentTier: user.currentTier,
         currentTitle: user.currentTitle,
         currentHp,
-        maxHp
+        maxHp,
+        currentMp,
+        maxMp
       });
     } catch (error) {
       console.error("Error fetching user stats:", error);

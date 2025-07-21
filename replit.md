@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful API with JSON responses
 
 ### Database Schema
-- **Users**: Character progression with level, experience, three-stat tracking (Strength, Stamina, Agility), and gold currency
+- **Users**: Character progression with level, experience, three-stat tracking (Strength, Stamina, Agility), gold currency, HP system, and new MP system
 - **Exercises**: Exercise library with multi-stat allocation system using JSON statTypes field
 - **Workouts**: Template-based workout creation with JSON exercise configuration
 - **Workout Sessions**: Completed workout tracking with sophisticated XP and stat allocation
@@ -59,13 +59,16 @@ Preferred communication style: Simple, everyday language.
   - RPE-based effort scaling (1-10 perceived effort scale)
   - Work unit calculations for resistance vs cardio exercises
   - Three-stat system: Strength, Stamina, Agility
+- **Dual Resource System**:
+  - **HP (Health Points)**: Base 10 + (Stamina × 3), regenerates 1% per minute
+  - **MP (Magic Points)**: (Stamina × 2) + (Agility × 1), regenerates (Agility ÷ 2)% per minute
 - **Dual Economy System**:
   - **XP from Workouts**: Character progression, leveling up, stat increases for stronger combat
   - **Gold from Monster Battles**: Currency for purchasing armor and equipment in shop
 - **Combat System**: Advanced stat-based combat mechanics:
   - **Strength**: Modifies damage (base 3 + strength/2 + 1-3 random)
-  - **Stamina**: Determines HP (10 base + stamina * 3)
-  - **Agility**: Determines evasion (5% per agility point, max 90%)
+  - **Stamina**: Determines HP (10 base + stamina * 3) and MP pool (primary contributor)
+  - **Agility**: Determines evasion (5% per agility point, max 90%) and MP regeneration rate
 - **Battle System**: E-rank dungeon with monsters levels 1-10, turn-based combat
 - Level progression with title system
 - Multi-stat exercises (e.g., power cleans award all three stats)

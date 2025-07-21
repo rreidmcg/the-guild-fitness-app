@@ -16,6 +16,9 @@ export const users = pgTable("users", {
   // Health system
   currentHp: integer("current_hp").default(40), // Default HP for starting character
   lastHpUpdateAt: timestamp("last_hp_update_at").defaultNow(),
+  // Magic Points system
+  currentMp: integer("current_mp").default(20), // Default MP for starting character
+  lastMpUpdateAt: timestamp("last_mp_update_at").defaultNow(),
   // Player tier and progression
   currentTier: text("current_tier").default("E"), // E, D, C, B, A, S
   highestTierCompleted: text("highest_tier_completed").default(""),
