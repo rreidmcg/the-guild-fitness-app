@@ -40,6 +40,7 @@ export const users = pgTable("users", {
   height: integer("height_cm"), // Height in centimeters
   weight: integer("weight_kg"), // Weight in kilograms
   fitnessGoal: text("fitness_goal"), // "lose_weight", "gain_muscle", "improve_endurance", "general_fitness"
+  measurementUnit: text("measurement_unit").default("metric"), // "metric" or "imperial"
   createdAt: timestamp("created_at").defaultNow(),
 });
 

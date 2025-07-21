@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -13,13 +12,13 @@ import {
   User, 
   Target, 
   Award,
-  Calendar,
-  TrendingUp,
   Settings,
   Activity,
   Trophy,
   Dumbbell,
-  Heart,
+  Scale,
+  TrendingUp,
+  Ruler,
   Save,
   Edit3
 } from "lucide-react";
@@ -31,7 +30,8 @@ export default function Profile() {
     username: "",
     height: "",
     weight: "",
-    fitnessGoal: ""
+    fitnessGoal: "",
+    measurementUnit: "metric"
   });
 
   const { data: userStats } = useQuery({
@@ -53,7 +53,8 @@ export default function Profile() {
         username: userStats.username || "",
         height: userStats.height?.toString() || "",
         weight: userStats.weight?.toString() || "",
-        fitnessGoal: userStats.fitnessGoal || ""
+        fitnessGoal: userStats.fitnessGoal || "",
+        measurementUnit: userStats.measurementUnit || "metric"
       });
     }
   }, [userStats]);
@@ -68,15 +69,15 @@ export default function Profile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been saved successfully.",
+        title: "Settings Updated",
+        description: "Your settings have been saved successfully.",
       });
       setIsEditing(false);
     },
     onError: (error: any) => {
       toast({
         title: "Update Failed",
-        description: error.message || "Failed to update profile",
+        description: error.message || "Failed to update settings",
         variant: "destructive",
       });
     },
@@ -92,6 +93,7 @@ export default function Profile() {
     if (formData.height && formData.height !== userStats?.height) updates.height = parseInt(formData.height);
     if (formData.weight && formData.weight !== userStats?.weight) updates.weight = parseInt(formData.weight);
     if (formData.fitnessGoal !== userStats?.fitnessGoal) updates.fitnessGoal = formData.fitnessGoal;
+    if (formData.measurementUnit !== userStats?.measurementUnit) updates.measurementUnit = formData.measurementUnit;
     
     if (Object.keys(updates).length > 0) {
       updateProfileMutation.mutate(updates);
@@ -100,17 +102,24 @@ export default function Profile() {
     }
   };
 
-  const formatHeight = (heightCm: number) => {
+  const formatHeight = (heightCm: number, unit: string) => {
     if (!heightCm) return "Not set";
-    const feet = Math.floor(heightCm / 30.48);
-    const inches = Math.round((heightCm / 2.54) % 12);
-    return `${heightCm} cm (${feet}'${inches}")`;
+    if (unit === "imperial") {
+      const totalInches = heightCm / 2.54;
+      const feet = Math.floor(totalInches / 12);
+      const inches = Math.round(totalInches % 12);
+      return `${feet}'${inches}" (${heightCm} cm)`;
+    }
+    return `${heightCm} cm`;
   };
 
-  const formatWeight = (weightKg: number) => {
+  const formatWeight = (weightKg: number, unit: string) => {
     if (!weightKg) return "Not set";
-    const pounds = Math.round(weightKg * 2.205);
-    return `${weightKg} kg (${pounds} lbs)`;
+    if (unit === "imperial") {
+      const pounds = Math.round(weightKg * 2.205);
+      return `${pounds} lbs (${weightKg} kg)`;
+    }
+    return `${weightKg} kg`;
   };
 
   const getFitnessGoalLabel = (goal: string) => {
@@ -133,6 +142,14 @@ export default function Profile() {
     return titles[titleIndex];
   };
 
+  // Mock weight progress data for the graph
+  const weightData = [
+    { date: '2025-01-01', weight: userStats?.weight || 70 },
+    { date: '2025-01-08', weight: (userStats?.weight || 70) - 0.5 },
+    { date: '2025-01-15', weight: (userStats?.weight || 70) - 1 },
+    { date: '2025-01-22', weight: (userStats?.weight || 70) - 0.8 }
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
@@ -140,8 +157,8 @@ export default function Profile() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Profile & Settings</h1>
-              <p className="mt-0.5 text-sm text-muted-foreground">Manage your personal information and goals</p>
+              <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">Manage your profile and app preferences</p>
             </div>
             <Button
               onClick={() => isEditing ? handleSave() : setIsEditing(true)}
@@ -191,37 +208,39 @@ export default function Profile() {
               </div>
 
               <div>
+                <Label htmlFor="measurementUnit">Measurement System</Label>
+                {isEditing ? (
+                  <Select value={formData.measurementUnit} onValueChange={(value) => setFormData(prev => ({ ...prev, measurementUnit: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select measurement system" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="metric">Metric (kg, cm)</SelectItem>
+                      <SelectItem value="imperial">Imperial (lbs, ft/in)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="mt-1 p-2 bg-muted rounded-md text-foreground flex items-center">
+                    <Ruler className="w-4 h-4 mr-2 text-blue-500" />
+                    {formData.measurementUnit === "metric" ? "Metric (kg, cm)" : "Imperial (lbs, ft/in)"}
+                  </div>
+                )}
+              </div>
+
+              <div>
                 <Label htmlFor="height">Height</Label>
                 {isEditing ? (
                   <Input
                     id="height"
                     type="number"
-                    placeholder="Height in cm"
+                    placeholder={formData.measurementUnit === "metric" ? "Height in cm" : "Height in inches"}
                     value={formData.height}
                     onChange={(e) => setFormData(prev => ({ ...prev, height: e.target.value }))}
                     className="mt-1"
                   />
                 ) : (
                   <div className="mt-1 p-2 bg-muted rounded-md text-foreground">
-                    {formatHeight(userStats?.height)}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="weight">Weight</Label>
-                {isEditing ? (
-                  <Input
-                    id="weight"
-                    type="number"
-                    placeholder="Weight in kg"
-                    value={formData.weight}
-                    onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
-                    className="mt-1"
-                  />
-                ) : (
-                  <div className="mt-1 p-2 bg-muted rounded-md text-foreground">
-                    {formatWeight(userStats?.weight)}
+                    {formatHeight(userStats?.height, formData.measurementUnit)}
                   </div>
                 )}
               </div>
@@ -245,6 +264,67 @@ export default function Profile() {
                     {getFitnessGoalLabel(userStats?.fitnessGoal)}
                   </div>
                 )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Weight Tracking */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-foreground flex items-center">
+              <Scale className="w-5 h-5 mr-2" />
+              Weight Tracking
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="weight">Current Weight</Label>
+                {isEditing ? (
+                  <Input
+                    id="weight"
+                    type="number"
+                    placeholder={formData.measurementUnit === "metric" ? "Weight in kg" : "Weight in lbs"}
+                    value={formData.weight}
+                    onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+                    className="mt-1"
+                  />
+                ) : (
+                  <div className="mt-1 p-3 bg-muted rounded-md text-foreground">
+                    <div className="text-2xl font-bold text-blue-400">
+                      {formatWeight(userStats?.weight, formData.measurementUnit)}
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <Label>Weight Progress</Label>
+                <div className="mt-1 p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg border border-blue-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <TrendingUp className="w-5 h-5 text-green-400" />
+                    <span className="text-sm text-green-400 font-medium">On Track</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Start Weight</span>
+                      <span className="text-foreground">{formatWeight((userStats?.weight || 70) + 2, formData.measurementUnit)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Current</span>
+                      <span className="text-blue-400 font-semibold">{formatWeight(userStats?.weight || 70, formData.measurementUnit)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Target</span>
+                      <span className="text-green-400">{formatWeight((userStats?.weight || 70) - 3, formData.measurementUnit)}</span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2 mt-3">
+                      <div className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full" style={{ width: '40%' }}></div>
+                    </div>
+                    <div className="text-xs text-muted-foreground text-center">40% to goal</div>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
