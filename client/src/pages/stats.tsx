@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { StatBar } from "@/components/ui/stat-bar";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Dumbbell, 
   Trophy, 
@@ -16,11 +18,13 @@ import {
   TrendingUp,
   Calendar,
   Wind,
-  Coins
+  Coins,
+  Plus
 } from "lucide-react";
 
 export default function Stats() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -32,6 +36,34 @@ export default function Stats() {
 
   const { data: personalRecords } = useQuery({
     queryKey: ["/api/personal-records"],
+  });
+
+  const { data: inventory } = useQuery({
+    queryKey: ["/api/inventory"],
+  });
+
+  const usePotionMutation = useMutation({
+    mutationFn: async (potionType: string) => {
+      return apiRequest("/api/use-potion", {
+        method: "POST",
+        body: JSON.stringify({ potionType })
+      });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      toast({
+        title: "Potion Used",
+        description: `Healed ${data.healedAmount} HP!`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Cannot Use Potion",
+        description: error.message || "You don't have this potion or are already at full health",
+        variant: "destructive",
+      });
+    },
   });
 
   const recentSessions = workoutSessions?.slice(0, 3) || [];
@@ -185,6 +217,61 @@ export default function Stats() {
                 <div className="h-3 rounded-full transition-all duration-300 bg-gradient-to-r from-green-500 to-green-600" style={{ width: `${xpProgress}%` }}></div>
               </div>
               <p className="text-xs font-semibold mt-1 text-muted-foreground">{xpForNextLevel - currentXP} XP to Level {currentLevel + 1}</p>
+            </div>
+
+            {/* Health Bar */}
+            <div className="mb-6 p-4 bg-red-900/20 rounded-lg border border-red-700">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  <Heart className="w-5 h-5 text-red-400" />
+                  <span className="font-semibold text-red-400">Health</span>
+                </div>
+                <span className="text-sm text-red-300">
+                  {userStats?.currentHp || 0} / {userStats?.maxHp || 40}
+                </span>
+              </div>
+              <div className="w-full bg-red-900/40 rounded-full h-3">
+                <div 
+                  className="bg-gradient-to-r from-red-500 to-red-400 h-3 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${Math.max(0, Math.min(100, ((userStats?.currentHp || 0) / (userStats?.maxHp || 1)) * 100))}%`
+                  }}
+                />
+              </div>
+              <div className="text-xs text-red-300 mt-2 opacity-80">
+                Regenerates 1% of max HP per minute when not in combat
+              </div>
+              
+              {/* Healing Potions */}
+              <div className="mt-3 flex space-x-2">
+                {['minor_healing', 'major_healing', 'full_healing'].map((potionType) => {
+                  const potionNames = {
+                    minor_healing: 'Minor',
+                    major_healing: 'Major', 
+                    full_healing: 'Full'
+                  };
+                  const quantity = inventory?.find((item: any) => 
+                    item.itemName === potionType && item.itemType === 'potion'
+                  )?.quantity || 0;
+                  
+                  return quantity > 0 ? (
+                    <Button
+                      key={potionType}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => usePotionMutation.mutate(potionType)}
+                      disabled={usePotionMutation.isPending}
+                      className="text-xs border-red-500 text-red-300 hover:bg-red-900/30"
+                    >
+                      <Heart className="w-3 h-3 mr-1" />
+                      {potionNames[potionType as keyof typeof potionNames]} ({quantity})
+                    </Button>
+                  ) : null;
+                })}
+                {(!inventory || inventory.filter((item: any) => item.itemType === 'potion').length === 0) && (
+                  <p className="text-xs text-muted-foreground">Visit the shop to buy healing potions</p>
+                )}
+              </div>
             </div>
 
             {/* Character Stats - Numerical Display */}

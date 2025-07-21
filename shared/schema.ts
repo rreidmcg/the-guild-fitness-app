@@ -13,6 +13,9 @@ export const users = pgTable("users", {
   stamina: integer("stamina").default(0),
   agility: integer("agility").default(0),
   gold: integer("gold").default(0),
+  // Health system
+  currentHp: integer("current_hp").default(40), // Default HP for starting character
+  lastHpUpdateAt: timestamp("last_hp_update_at").defaultNow(),
   // Player tier and progression
   currentTier: text("current_tier").default("E"), // E, D, C, B, A, S
   highestTierCompleted: text("highest_tier_completed").default(""),
@@ -103,6 +106,17 @@ export const personalRecords = pgTable("personal_records", {
   value: integer("value").notNull(),
   achievedAt: timestamp("achieved_at").defaultNow(),
 });
+
+// Player inventory for consumable items
+export const playerInventory = pgTable("player_inventory", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  itemType: text("item_type").notNull(), // "potion"
+  itemName: text("item_name").notNull(), // "minor_healing", "major_healing", "full_healing"
+  quantity: integer("quantity").default(0),
+}, (table) => ({
+  userItemIdx: uniqueIndex("user_item_idx").on(table.userId, table.itemType, table.itemName),
+}));
 
 // Workout programs (structured fitness plans)
 export const workoutPrograms = pgTable("workout_programs", {
@@ -274,6 +288,10 @@ export const insertUserAbilitySchema = createInsertSchema(userAbilities).omit({
   unlockedAt: true,
 });
 
+export const insertPlayerInventorySchema = createInsertSchema(playerInventory).omit({
+  id: true,
+});
+
 export const insertExercisePerformanceSchema = createInsertSchema(exercisePerformances).omit({
   id: true,
 });
@@ -323,3 +341,5 @@ export type Ability = typeof abilities.$inferSelect;
 export type InsertAbility = z.infer<typeof insertAbilitySchema>;
 export type UserAbility = typeof userAbilities.$inferSelect;
 export type InsertUserAbility = z.infer<typeof insertUserAbilitySchema>;
+export type PlayerInventory = typeof playerInventory.$inferSelect;
+export type InsertPlayerInventory = z.infer<typeof insertPlayerInventorySchema>;

@@ -13,7 +13,9 @@ import {
   Footprints,
   Star,
   Sparkles,
-  Lock
+  Lock,
+  Heart,
+  Plus
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -50,7 +52,7 @@ const categoryIcons = {
 
 export default function Shop() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("head");
+  const [activeTab, setActiveTab] = useState("potions");
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -58,6 +60,10 @@ export default function Shop() {
 
   const { data: shopItems } = useQuery({
     queryKey: ["/api/shop/items"],
+  });
+
+  const { data: inventory } = useQuery({
+    queryKey: ["/api/inventory"],
   });
 
   const purchaseItemMutation = useMutation({
@@ -79,6 +85,30 @@ export default function Shop() {
       toast({
         title: "Purchase Failed",
         description: error.message || "Not enough gold or item already owned",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const purchasePotionMutation = useMutation({
+    mutationFn: async ({ potionType, quantity }: { potionType: string; quantity: number }) => {
+      return apiRequest("/api/shop/buy-potion", {
+        method: "POST",
+        body: JSON.stringify({ potionType, quantity })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      toast({
+        title: "Purchase Successful",
+        description: "Potion added to your inventory!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Not enough gold",
         variant: "destructive",
       });
     },
@@ -115,6 +145,23 @@ export default function Shop() {
     purchaseItemMutation.mutate(item.id);
   };
 
+  const handleBuyPotion = (potionType: string, price: number) => {
+    if ((userStats?.gold || 0) < price) {
+      toast({
+        title: "Insufficient Gold",
+        description: `You need ${price - (userStats?.gold || 0)} more gold!`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    purchasePotionMutation.mutate({ potionType, quantity: 1 });
+  };
+
+  const getInventoryQuantity = (itemName: string) => {
+    return inventory?.find((item: any) => item.itemName === itemName)?.quantity || 0;
+  };
+
   const filterItemsByCategory = (category: string) => {
     return shopItems?.filter((item: ShopItem) => item.category === category) || [];
   };
@@ -128,6 +175,33 @@ export default function Shop() {
     { id: "waist", name: "Waist", icon: Crown },
     { id: "legs", name: "Legs", icon: Zap },
     { id: "feet", name: "Feet", icon: Footprints },
+  ];
+
+  const potions = [
+    {
+      id: "minor_healing",
+      name: "Minor Healing Potion",
+      description: "Restores 25% of maximum HP",
+      price: 10,
+      healing: "25%",
+      color: "from-red-500 to-red-600"
+    },
+    {
+      id: "major_healing", 
+      name: "Major Healing Potion",
+      description: "Restores 50% of maximum HP",
+      price: 25,
+      healing: "50%",
+      color: "from-red-600 to-red-700"
+    },
+    {
+      id: "full_healing",
+      name: "Full Healing Potion",
+      description: "Restores 100% of maximum HP",
+      price: 50,
+      healing: "100%",
+      color: "from-red-700 to-red-800"
+    }
   ];
 
   return (
@@ -150,7 +224,7 @@ export default function Shop() {
 
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-6">
+          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9 mb-6">
             {categories.map((category) => {
               const Icon = category.icon;
               return (
@@ -160,6 +234,10 @@ export default function Shop() {
                 </TabsTrigger>
               );
             })}
+            <TabsTrigger value="potions" className="flex flex-col items-center space-y-1 p-2">
+              <Heart className="w-4 h-4" />
+              <span className="text-xs">Potions</span>
+            </TabsTrigger>
           </TabsList>
 
           {categories.map((category) => (
@@ -257,6 +335,67 @@ export default function Shop() {
               )}
             </TabsContent>
           ))}
+
+          {/* Potions Tab */}
+          <TabsContent value="potions">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {potions.map((potion) => (
+                <Card key={potion.id} className="bg-card border-border relative overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg font-bold text-foreground flex items-center">
+                      <Heart className="w-5 h-5 text-red-500 mr-2" />
+                      {potion.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Potion Visual */}
+                    <div className={`w-full h-32 rounded-lg mb-4 flex items-center justify-center border border-border bg-gradient-to-br ${potion.color}`}>
+                      <div className="text-white text-4xl">🧪</div>
+                    </div>
+
+                    {/* Potion Info */}
+                    <div className="space-y-2 mb-4">
+                      <p className="text-sm text-muted-foreground">{potion.description}</p>
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center space-x-1">
+                          <Heart className="w-4 h-4 text-red-400" />
+                          <span className="font-medium text-green-400">{potion.healing} HP</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Coins className="w-4 h-4 text-yellow-500" />
+                          <span className="font-medium text-foreground">{potion.price}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Inventory Count */}
+                      {getInventoryQuantity(potion.id) > 0 && (
+                        <div className="flex items-center space-x-1 text-blue-400 text-sm">
+                          <span>You have: {getInventoryQuantity(potion.id)}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Purchase Button */}
+                    {(userStats?.gold || 0) < potion.price ? (
+                      <Button variant="destructive" className="w-full" disabled>
+                        <Coins className="w-4 h-4 mr-2" />
+                        Not Enough Gold
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => handleBuyPotion(potion.id, potion.price)}
+                        disabled={purchasePotionMutation.isPending}
+                        className="w-full bg-red-600 hover:bg-red-700"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Buy for {potion.price} Gold
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </div>

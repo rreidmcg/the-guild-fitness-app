@@ -1,7 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema } from "@shared/schema";
+import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, users, playerInventory } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Exercise routes
@@ -202,6 +204,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user stats with HP regeneration
+  app.get("/api/user/stats", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Calculate max HP and apply regeneration
+      const maxHp = Math.max(10, 10 + user.stamina * 3);
+      let currentHp = maxHp; // Default to max HP if no HP tracking yet
+      
+      try {
+        // Try to get current HP from database (may not exist yet)
+        const [userWithHp] = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, userId));
+          
+        if (userWithHp && userWithHp.currentHp !== null) {
+          currentHp = userWithHp.currentHp;
+          
+          // Apply HP regeneration if not at max HP
+          const lastUpdateTime = userWithHp.lastHpUpdateAt ? new Date(userWithHp.lastHpUpdateAt).getTime() : Date.now();
+          const currentTime = Date.now();
+          const minutesElapsed = Math.floor((currentTime - lastUpdateTime) / (1000 * 60));
+          
+          if (currentHp < maxHp && minutesElapsed > 0) {
+            const regenAmount = Math.floor(maxHp * 0.01) * minutesElapsed; // 1% per minute
+            currentHp = Math.min(maxHp, currentHp + regenAmount);
+            
+            // Update HP in database if it changed
+            if (regenAmount > 0) {
+              await db.update(users)
+                .set({ 
+                  currentHp,
+                  lastHpUpdateAt: new Date()
+                })
+                .where(eq(users.id, userId));
+            }
+          }
+        }
+      } catch (error) {
+        console.log("HP columns may not exist yet, defaulting to max HP");
+      }
+
+      res.json({
+        level: user.level,
+        experience: user.experience,
+        strength: user.strength,
+        stamina: user.stamina,
+        agility: user.agility,
+        gold: user.gold,
+        currentTier: user.currentTier,
+        currentTitle: user.currentTitle,
+        currentHp,
+        maxHp
+      });
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      res.status(500).json({ error: "Failed to fetch user stats" });
+    }
+  });
+
   // Update user stats (for battle rewards and workouts)
   app.patch("/api/user/stats", async (req, res) => {
     try {
@@ -345,6 +413,196 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(achievements);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
+  // Inventory endpoints
+  app.get("/api/inventory", async (req, res) => {
+    const userId = 1; // Hardcoded for now
+    
+    try {
+      const inventory = await db
+        .select()
+        .from(playerInventory)
+        .where(eq(playerInventory.userId, userId));
+      
+      res.json(inventory);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+      res.status(500).json({ error: "Failed to fetch inventory" });
+    }
+  });
+
+  // Use potion endpoint
+  app.post("/api/use-potion", async (req, res) => {
+    const userId = 1; // Hardcoded for now
+    const { potionType } = req.body;
+    
+    if (!potionType || !["minor_healing", "major_healing", "full_healing"].includes(potionType)) {
+      return res.status(400).json({ error: "Invalid potion type" });
+    }
+    
+    try {
+      // Check if user has the potion
+      const [inventoryItem] = await db
+        .select()
+        .from(playerInventory)
+        .where(
+          and(
+            eq(playerInventory.userId, userId),
+            eq(playerInventory.itemType, "potion"),
+            eq(playerInventory.itemName, potionType)
+          )
+        );
+      
+      if (!inventoryItem || inventoryItem.quantity <= 0) {
+        return res.status(400).json({ error: "You don't have this potion" });
+      }
+      
+      // Get user stats to calculate max HP and current HP
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+        
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Calculate max HP (10 base HP + 3 HP per stamina point)
+      const maxHp = Math.max(10, 10 + user.stamina * 3);
+      
+      // Calculate healing amount based on potion type
+      let healAmount = 0;
+      switch (potionType) {
+        case "minor_healing":
+          healAmount = Math.ceil(maxHp * 0.25); // 25% of max HP
+          break;
+        case "major_healing":
+          healAmount = Math.ceil(maxHp * 0.50); // 50% of max HP
+          break;
+        case "full_healing":
+          healAmount = maxHp; // Full HP
+          break;
+      }
+      
+      // Calculate new HP (can't exceed max HP)
+      const newHp = Math.min(maxHp, (user.currentHp || maxHp) + healAmount);
+      const actualHealing = newHp - (user.currentHp || maxHp);
+      
+      if (actualHealing <= 0) {
+        return res.status(400).json({ error: "You are already at full health" });
+      }
+      
+      // Update user HP and potion quantity in a transaction
+      await db.transaction(async (tx) => {
+        // Update user HP
+        await tx
+          .update(users)
+          .set({ 
+            currentHp: newHp,
+            lastHpUpdateAt: new Date()
+          })
+          .where(eq(users.id, userId));
+        
+        // Decrease potion quantity
+        if (inventoryItem.quantity > 1) {
+          await tx
+            .update(playerInventory)
+            .set({ quantity: inventoryItem.quantity - 1 })
+            .where(eq(playerInventory.id, inventoryItem.id));
+        } else {
+          await tx
+            .delete(playerInventory)
+            .where(eq(playerInventory.id, inventoryItem.id));
+        }
+      });
+      
+      res.json({ 
+        success: true, 
+        healedAmount: actualHealing,
+        newHp,
+        maxHp
+      });
+    } catch (error) {
+      console.error("Error using potion:", error);
+      res.status(500).json({ error: "Failed to use potion" });
+    }
+  });
+
+  // Purchase potion endpoint
+  app.post("/api/shop/buy-potion", async (req, res) => {
+    const userId = 1; // Hardcoded for now
+    const { potionType, quantity = 1 } = req.body;
+    
+    const potionPrices = {
+      minor_healing: 10,
+      major_healing: 25,
+      full_healing: 50
+    };
+    
+    if (!potionType || !potionPrices[potionType as keyof typeof potionPrices]) {
+      return res.status(400).json({ error: "Invalid potion type" });
+    }
+    
+    const totalCost = potionPrices[potionType as keyof typeof potionPrices] * quantity;
+    
+    try {
+      // Get user's current gold
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
+        
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      if (user.gold < totalCost) {
+        return res.status(400).json({ error: "Not enough gold" });
+      }
+      
+      // Update gold and inventory in a transaction
+      await db.transaction(async (tx) => {
+        // Deduct gold
+        await tx
+          .update(users)
+          .set({ gold: user.gold - totalCost })
+          .where(eq(users.id, userId));
+        
+        // Add or update inventory
+        const [existingItem] = await tx
+          .select()
+          .from(playerInventory)
+          .where(
+            and(
+              eq(playerInventory.userId, userId),
+              eq(playerInventory.itemType, "potion"),
+              eq(playerInventory.itemName, potionType)
+            )
+          );
+        
+        if (existingItem) {
+          await tx
+            .update(playerInventory)
+            .set({ quantity: existingItem.quantity + quantity })
+            .where(eq(playerInventory.id, existingItem.id));
+        } else {
+          await tx
+            .insert(playerInventory)
+            .values({
+              userId,
+              itemType: "potion",
+              itemName: potionType,
+              quantity
+            });
+        }
+      });
+      
+      res.json({ success: true, goldSpent: totalCost });
+    } catch (error) {
+      console.error("Error purchasing potion:", error);
+      res.status(500).json({ error: "Failed to purchase potion" });
     }
   });
 
