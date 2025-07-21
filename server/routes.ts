@@ -6,6 +6,64 @@ import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth routes
+  app.post("/api/auth/signup", async (req, res) => {
+    try {
+      const { email, username, password, height, weight, fitnessGoal, measurementUnit, gender } = req.body;
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ error: "Username already taken" });
+      }
+
+      // Create user with profile data
+      const newUser = await storage.createUser({
+        username,
+        password, // In production, hash this password
+        email,
+        height,
+        weight,
+        fitnessGoal,
+        measurementUnit,
+        gender,
+        experience: 0,
+        level: 1,
+        strength: 10,
+        stamina: 10,
+        agility: 10,
+        gold: 100,
+        currentHp: 40, // Base 10 + (stamina * 3)
+        currentMp: 30, // (stamina * 2) + (agility * 1)
+        skinColor: "#F5C6A0",
+        hairColor: "#8B4513",
+        currentTier: "E",
+        currentTitle: "Recruit"
+      } as any);
+
+      res.json({ user: newUser, message: "Account created successfully" });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Failed to create account" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      const user = await storage.getUserByUsername(username);
+      if (!user || user.password !== password) { // In production, compare hashed passwords
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      res.json({ user, message: "Login successful" });
+    } catch (error) {
+      console.error("Error during login:", error);
+      res.status(500).json({ error: "Failed to login" });
+    }
+  });
+
   // Exercise routes
   app.get("/api/exercises", async (req, res) => {
     try {

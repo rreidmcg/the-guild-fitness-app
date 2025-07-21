@@ -203,13 +203,7 @@ export default function Profile() {
                 )}
               </div>
               
-              <div>
-                <Label htmlFor="level">Character Level</Label>
-                <div className="mt-1 p-2 bg-muted rounded-md text-foreground flex items-center">
-                  <Trophy className="w-4 h-4 mr-2 text-yellow-500" />
-                  Level {(userStats as any)?.level || 1} - {getLevelTitle((userStats as any)?.level || 1)}
-                </div>
-              </div>
+
 
               <div>
                 <Label htmlFor="measurementUnit">Measurement System</Label>

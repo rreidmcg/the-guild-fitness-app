@@ -16,6 +16,8 @@ import Battle from "@/pages/battle";
 import Wardrobe from "@/pages/wardrobe";
 import Shop from "@/pages/shop";
 import Profile from "@/pages/profile";
+import SignupPage from "@/pages/signup";
+import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -30,6 +32,8 @@ function Router() {
       <Route path="/wardrobe" component={Wardrobe} />
       <Route path="/shop" component={Shop} />
       <Route path="/profile" component={Profile} />
+      <Route path="/signup" component={SignupPage} />
+      <Route path="/login" component={LoginPage} />
       <Route component={NotFound} />
     </Switch>
   );

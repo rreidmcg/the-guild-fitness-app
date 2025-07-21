@@ -1,0 +1,137 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+
+const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
+
+export default function LoginPage() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const form = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginForm) => {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Login successful!",
+        description: "Welcome back to FitQuest!",
+      });
+      setLocation("/");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid username or password.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: LoginForm) => {
+    loginMutation.mutate(data);
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-card border-border">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-foreground">
+            Welcome Back
+          </CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Sign in to your FitQuest account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter your username" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter your password" 
+                        type="password"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? "Signing in..." : "Sign In"}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <button 
+                onClick={() => setLocation("/signup")}
+                className="text-primary hover:underline font-medium"
+              >
+                Sign up
+              </button>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
