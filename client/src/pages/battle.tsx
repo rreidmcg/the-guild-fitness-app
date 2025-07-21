@@ -377,18 +377,20 @@ export default function Battle() {
       {/* Main Battle Area */}
       <div className="flex-1 flex flex-col">
         {/* Combatants Area */}
-        <div className="flex-1 flex items-center justify-between px-8 py-12">
+        <div className="flex-1 flex items-center justify-between px-4 py-6">
           {/* Player Avatar (Left) */}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-48 h-48 bg-blue-100 rounded-lg border-4 border-blue-600 flex items-center justify-center overflow-hidden">
-              <Avatar2D user={userStats} size="sm" />
+          <div className="flex flex-col items-center space-y-3">
+            <div className="w-32 h-32 bg-blue-100 rounded-lg border-3 border-blue-600 flex items-center justify-center overflow-hidden">
+              <div className="scale-75">
+                <Avatar2D user={userStats} size="sm" />
+              </div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-lg">{userStats?.username || 'Player'}</div>
-              <div className="text-sm text-gray-600">Level {userStats?.level || 1}</div>
-              <div className="mt-2 w-32">
+              <div className="font-bold text-base">{userStats?.username || 'Player'}</div>
+              <div className="text-xs text-gray-600">Level {userStats?.level || 1}</div>
+              <div className="mt-2 w-24">
                 <div className="text-xs text-gray-600 mb-1">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
-                <div className="w-full bg-gray-300 rounded-full h-3 border border-gray-400">
+                <div className="w-full bg-gray-300 rounded-full h-2 border border-gray-400">
                   <div 
                     className="bg-green-500 h-full rounded-full transition-all duration-300" 
                     style={{ width: `${playerHpPercentage}%` }}
@@ -399,28 +401,28 @@ export default function Battle() {
           </div>
 
           {/* VS Indicator */}
-          <div className="text-4xl font-bold text-gray-400">VS</div>
+          <div className="text-2xl font-bold text-gray-400">VS</div>
 
           {/* Monster (Right) */}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-48 h-48 bg-red-100 rounded-lg border-4 border-red-600 flex items-center justify-center overflow-hidden">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="w-32 h-32 bg-red-100 rounded-lg border-3 border-red-600 flex items-center justify-center overflow-hidden">
               {battleState.monster.image ? (
                 <img 
                   src={battleState.monster.image} 
                   alt={battleState.monster.name}
-                  className="w-32 h-32 object-contain bg-transparent"
+                  className="w-20 h-20 object-contain bg-transparent"
                   style={{ backgroundColor: 'transparent' }}
                 />
               ) : (
-                <Skull className="w-24 h-24 text-red-600" />
+                <Skull className="w-16 h-16 text-red-600" />
               )}
             </div>
             <div className="text-center">
-              <div className="font-bold text-lg">{battleState.monster.name}</div>
-              <div className="text-sm text-gray-600">Level {battleState.monster.level}</div>
-              <div className="mt-2 w-32">
+              <div className="font-bold text-base">{battleState.monster.name}</div>
+              <div className="text-xs text-gray-600">Level {battleState.monster.level}</div>
+              <div className="mt-2 w-24">
                 <div className="text-xs text-gray-600 mb-1">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
-                <div className="w-full bg-gray-300 rounded-full h-3 border border-gray-400">
+                <div className="w-full bg-gray-300 rounded-full h-2 border border-gray-400">
                   <div 
                     className="bg-red-500 h-full rounded-full transition-all duration-300" 
                     style={{ width: `${monsterHpPercentage}%` }}
@@ -432,8 +434,8 @@ export default function Battle() {
         </div>
 
         {/* Battle Log Area */}
-        <div className="bg-gray-100 border-t-2 border-gray-300 p-4 min-h-[120px] max-h-[120px] overflow-y-auto">
-          <div className="text-sm text-gray-700">
+        <div className="bg-gray-100 border-t-2 border-gray-300 p-3 min-h-[80px] max-h-[80px] overflow-y-auto">
+          <div className="text-xs text-gray-700">
             {battleState.battleLog.length === 0 ? (
               <div className="text-gray-500 italic">Battle begins...</div>
             ) : (
@@ -447,59 +449,59 @@ export default function Battle() {
         </div>
 
         {/* Classic RPG Action Menu */}
-        <div className="bg-blue-900 text-white p-6 border-t-4 border-blue-700">
+        <div className="bg-blue-900 text-white p-4 border-t-4 border-blue-700">
           <div className="max-w-4xl mx-auto">
             {battleState.battleResult === 'ongoing' && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <Button
                   onClick={playerAttack}
                   disabled={!battleState.isPlayerTurn}
-                  className="bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white border-2 border-red-500 p-4 text-lg font-bold"
+                  className="bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white border-2 border-red-500 p-3 text-base font-bold"
                 >
-                  <Sword className="w-6 h-6 mr-2" />
+                  <Sword className="w-5 h-5 mr-2" />
                   ATTACK
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-4 text-lg font-bold cursor-not-allowed"
+                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-3 text-base font-bold cursor-not-allowed"
                 >
-                  <Shield className="w-6 h-6 mr-2" />
+                  <Shield className="w-5 h-5 mr-2" />
                   DEFEND
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-4 text-lg font-bold cursor-not-allowed"
+                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-3 text-base font-bold cursor-not-allowed"
                 >
-                  <Zap className="w-6 h-6 mr-2" />
+                  <Zap className="w-5 h-5 mr-2" />
                   MAGIC
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-4 text-lg font-bold cursor-not-allowed"
+                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-3 text-base font-bold cursor-not-allowed"
                 >
-                  <Heart className="w-6 h-6 mr-2" />
+                  <Heart className="w-5 h-5 mr-2" />
                   ITEMS
                 </Button>
               </div>
             )}
 
             {battleState.battleResult === 'victory' && (
-              <div className="text-center space-y-4">
-                <div className="text-2xl font-bold text-yellow-400 mb-4">
-                  <Trophy className="w-8 h-8 inline mr-2" />
+              <div className="text-center space-y-3">
+                <div className="text-xl font-bold text-yellow-400 mb-3">
+                  <Trophy className="w-6 h-6 inline mr-2" />
                   VICTORY!
                 </div>
-                <div className="text-lg text-yellow-300 mb-4">
+                <div className="text-base text-yellow-300 mb-3">
                   You earned {battleState.monster.goldReward} gold!
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Button onClick={returnToMonsterList} className="bg-green-700 hover:bg-green-600 text-white border-2 border-green-500 p-4 text-lg font-bold">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button onClick={returnToMonsterList} className="bg-green-700 hover:bg-green-600 text-white border-2 border-green-500 p-3 text-base font-bold">
                     FIGHT AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border-2 border-blue-500 p-4 text-lg font-bold">
+                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border-2 border-blue-500 p-3 text-base font-bold">
                     RETURN HOME
                   </Button>
                 </div>
@@ -507,19 +509,19 @@ export default function Battle() {
             )}
 
             {battleState.battleResult === 'defeat' && (
-              <div className="text-center space-y-4">
-                <div className="text-2xl font-bold text-red-400 mb-4">
-                  <Skull className="w-8 h-8 inline mr-2" />
+              <div className="text-center space-y-3">
+                <div className="text-xl font-bold text-red-400 mb-3">
+                  <Skull className="w-6 h-6 inline mr-2" />
                   DEFEAT!
                 </div>
-                <div className="text-lg text-red-300 mb-4">
+                <div className="text-base text-red-300 mb-3">
                   You were defeated by {battleState.monster.name}...
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Button onClick={returnToMonsterList} className="bg-red-700 hover:bg-red-600 text-white border-2 border-red-500 p-4 text-lg font-bold">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button onClick={returnToMonsterList} className="bg-red-700 hover:bg-red-600 text-white border-2 border-red-500 p-3 text-base font-bold">
                     TRY AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border-2 border-blue-500 p-4 text-lg font-bold">
+                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border-2 border-blue-500 p-3 text-base font-bold">
                     RETURN HOME
                   </Button>
                 </div>
