@@ -18,6 +18,7 @@ import {
   Coins
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
+import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
 
@@ -381,9 +382,15 @@ export default function Battle() {
           {/* Player Avatar (Left) */}
           <div className="flex flex-col items-center space-y-3">
             <div className="w-32 h-32 bg-blue-100 rounded-lg border-3 border-blue-600 flex items-center justify-center overflow-hidden">
-              <div className="scale-75">
-                <Avatar2D user={userStats} size="sm" />
-              </div>
+              <img 
+                src={battlePlayerImage} 
+                alt="Player Character"
+                className="w-28 h-28 object-contain bg-transparent"
+                style={{ 
+                  backgroundColor: 'transparent',
+                  imageRendering: 'pixelated'
+                }}
+              />
             </div>
             <div className="text-center">
               <div className="font-bold text-base">{userStats?.username || 'Player'}</div>
