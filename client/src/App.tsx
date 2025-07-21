@@ -4,6 +4,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/ui/bottom-nav";
+import { useBackgroundMusic } from "@/hooks/use-background-music";
+import { Button } from "@/components/ui/button";
+import { Volume2, VolumeX } from "lucide-react";
 import Stats from "@/pages/stats";
 import Workouts from "@/pages/workouts";
 import Settings from "@/pages/settings";
@@ -33,11 +36,48 @@ function Router() {
 }
 
 function App() {
+  const { isPlaying, isMuted, toggleMusic, startMusic } = useBackgroundMusic();
+
+  // Auto-start music on first user interaction
+  const handleFirstInteraction = () => {
+    if (isMuted && !isPlaying) {
+      startMusic();
+    }
+    // Remove event listeners after first interaction
+    document.removeEventListener('click', handleFirstInteraction);
+    document.removeEventListener('keydown', handleFirstInteraction);
+    document.removeEventListener('touchstart', handleFirstInteraction);
+  };
+
+  // Add event listeners for first user interaction
+  if (typeof window !== 'undefined') {
+    document.addEventListener('click', handleFirstInteraction, { once: true });
+    document.addEventListener('keydown', handleFirstInteraction, { once: true });
+    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background text-foreground">
           <Toaster />
+          
+          {/* Music Control Button */}
+          <div className="fixed top-4 right-4 z-50">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleMusic}
+              className="bg-card border-border hover:bg-accent"
+            >
+              {isMuted || !isPlaying ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+          
           <Router />
           <BottomNav />
         </div>
