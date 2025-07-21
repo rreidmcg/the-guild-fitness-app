@@ -79,7 +79,7 @@ export function useBackgroundMusic() {
         audio.removeEventListener('play', handlePlay);
         audio.removeEventListener('pause', handlePause);
         audio.removeEventListener('error', handleError);
-        document.removeEventListener('visibilitychange', handleVisibilitychange);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
         if (audioRef.current) {
           audioRef.current.pause();
           audioRef.current.src = '';
