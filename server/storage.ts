@@ -10,7 +10,7 @@ import {
   type UserWardrobe, type InsertUserWardrobe
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -83,8 +83,8 @@ export class DatabaseStorage implements IStorage {
 
     // Create default user
     await db.insert(users).values({
-      id: 1,
       username: "Player",
+      password: "defaultpassword",
       experience: 0,
       level: 1,
       strength: 10,
@@ -120,7 +120,9 @@ export class DatabaseStorage implements IStorage {
     ];
 
     try {
-      await db.insert(exercises).values(defaultExercises);
+      for (const exercise of defaultExercises) {
+        await db.insert(exercises).values(exercise);
+      }
     } catch (error) {
       console.log("Default exercises already exist or error inserting:", error);
     }
@@ -174,7 +176,9 @@ export class DatabaseStorage implements IStorage {
     ];
 
     try {
-      await db.insert(wardrobeItems).values(defaultWardrobeItems);
+      for (const item of defaultWardrobeItems) {
+        await db.insert(wardrobeItems).values(item);
+      }
     } catch (error) {
       console.log("Default wardrobe items already exist or error inserting:", error);
     }
@@ -223,7 +227,7 @@ export class DatabaseStorage implements IStorage {
   async createExercise(insertExercise: InsertExercise): Promise<Exercise> {
     const [exercise] = await db
       .insert(exercises)
-      .values(insertExercise)
+      .values(insertExercise as any)
       .returning();
     return exercise;
   }
@@ -241,7 +245,7 @@ export class DatabaseStorage implements IStorage {
   async createWorkout(insertWorkout: InsertWorkout): Promise<Workout> {
     const [workout] = await db
       .insert(workouts)
-      .values(insertWorkout)
+      .values(insertWorkout as any)
       .returning();
     return workout;
   }
@@ -275,7 +279,7 @@ export class DatabaseStorage implements IStorage {
   async createWorkoutSession(insertSession: InsertWorkoutSession): Promise<WorkoutSession> {
     const [session] = await db
       .insert(workoutSessions)
-      .values(insertSession)
+      .values(insertSession as any)
       .returning();
     return session;
   }
@@ -288,7 +292,7 @@ export class DatabaseStorage implements IStorage {
   async createExercisePerformance(insertPerformance: InsertExercisePerformance): Promise<ExercisePerformance> {
     const [performance] = await db
       .insert(exercisePerformances)
-      .values(insertPerformance)
+      .values(insertPerformance as any)
       .returning();
     return performance;
   }
@@ -364,19 +368,21 @@ export class DatabaseStorage implements IStorage {
     if (!item) throw new Error("Item not found");
 
     // Check if user can afford it
-    if (user.gold < item.price) {
+    if ((user.gold || 0) < (item.price || 0)) {
       throw new Error("Not enough gold");
     }
 
     // Check level requirement
-    if (user.level < item.unlockLevel) {
+    if ((user.level || 0) < (item.unlockLevel || 0)) {
       throw new Error(`Level ${item.unlockLevel} required`);
     }
 
     // Check if already owned
     const [existingOwnership] = await db.select().from(userWardrobe)
-      .where(eq(userWardrobe.userId, userId))
-      .where(eq(userWardrobe.wardrobeItemId, itemId));
+      .where(and(
+        eq(userWardrobe.userId, userId),
+        eq(userWardrobe.wardrobeItemId, itemId)
+      ));
     
     if (existingOwnership) {
       throw new Error("Item already owned");
@@ -389,7 +395,7 @@ export class DatabaseStorage implements IStorage {
     });
 
     // Deduct gold
-    await this.updateUser(userId, { gold: user.gold - item.price });
+    await this.updateUser(userId, { gold: (user.gold || 0) - (item.price || 0) });
 
     return { item, goldSpent: item.price };
   }
@@ -397,8 +403,10 @@ export class DatabaseStorage implements IStorage {
   async equipWardrobeItem(userId: number, itemId: number, category: string): Promise<void> {
     // Verify ownership
     const [ownership] = await db.select().from(userWardrobe)
-      .where(eq(userWardrobe.userId, userId))
-      .where(eq(userWardrobe.wardrobeItemId, itemId));
+      .where(and(
+        eq(userWardrobe.userId, userId),
+        eq(userWardrobe.wardrobeItemId, itemId)
+      ));
     
     if (!ownership) throw new Error("Item not owned");
 

@@ -84,15 +84,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update user stats
       const user = await storage.getUser(userId);
       if (user) {
-        const newExperience = user.experience + xpEarned;
+        const newExperience = (user.experience || 0) + xpEarned;
         const newLevel = calculateLevel(newExperience);
         
         await storage.updateUser(userId, {
           experience: newExperience,
           level: newLevel,
-          strength: user.strength + (statsEarned.strength || 0),
-          stamina: user.stamina + (statsEarned.stamina || 0),
-          agility: user.agility + (statsEarned.agility || 0),
+          strength: (user.strength || 0) + (statsEarned.strength || 0),
+          stamina: (user.stamina || 0) + (statsEarned.stamina || 0),
+          agility: (user.agility || 0) + (statsEarned.agility || 0),
         });
       }
       
@@ -142,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.purchaseWardrobeItem(userId, itemId);
       res.json(result);
     } catch (error) {
-      res.status(400).json({ error: error.message || "Failed to purchase item" });
+      res.status(400).json({ error: (error as Error).message || "Failed to purchase item" });
     }
   });
 
@@ -153,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.equipWardrobeItem(userId, itemId, category);
       res.json({ success: true });
     } catch (error) {
-      res.status(400).json({ error: error.message || "Failed to equip item" });
+      res.status(400).json({ error: (error as Error).message || "Failed to equip item" });
     }
   });
 
@@ -164,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.unequipWardrobeItem(userId, category);
       res.json({ success: true });
     } catch (error) {
-      res.status(400).json({ error: error.message || "Failed to unequip item" });
+      res.status(400).json({ error: (error as Error).message || "Failed to unequip item" });
     }
   });
 
@@ -199,8 +199,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Calculate max HP and MP
-      const maxHp = Math.max(10, 10 + user.stamina * 3);
-      const maxMp = (user.stamina * 2) + (user.agility * 1); // MP Formula: (Stamina × 2) + (Agility × 1)
+      const maxHp = Math.max(10, 10 + (user.stamina || 0) * 3);
+      const maxMp = ((user.stamina || 0) * 2) + ((user.agility || 0) * 1); // MP Formula: (Stamina × 2) + (Agility × 1)
       let currentHp = maxHp; // Default to max HP if no HP tracking yet
       let currentMp = maxMp; // Default to max MP if no MP tracking yet
       
@@ -235,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let mpChanged = false;
           if (currentMp < maxMp && mpMinutesElapsed > 0) {
             // MP Regen = (Agility ÷ 2)% of Max MP per minute
-            const mpRegenRate = Math.max(0.01, (user.agility / 2) / 100); // At least 1% regen
+            const mpRegenRate = Math.max(0.01, ((user.agility || 0) / 2) / 100); // At least 1% regen
             const mpRegenAmount = Math.floor(maxMp * mpRegenRate) * mpMinutesElapsed;
             currentMp = Math.min(maxMp, currentMp + mpRegenAmount);
             mpChanged = mpRegenAmount > 0;
@@ -482,7 +482,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           )
         );
       
-      if (!inventoryItem || inventoryItem.quantity <= 0) {
+      if (!inventoryItem || (inventoryItem.quantity || 0) <= 0) {
         return res.status(400).json({ error: "You don't have this potion" });
       }
       
@@ -505,7 +505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (isHealingPotion) {
         // Calculate max HP (10 base HP + 3 HP per stamina point)
-        const maxHp = Math.max(10, 10 + user.stamina * 3);
+        const maxHp = Math.max(10, 10 + (user.stamina || 0) * 3);
         
         // Calculate healing amount based on potion type
         let healAmount = 0;
@@ -536,7 +536,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         result.maxHp = maxHp;
       } else if (isManaPotion) {
         // Calculate max MP: (Stamina × 2) + (Agility × 1)
-        const maxMp = (user.stamina * 2) + (user.agility * 1);
+        const maxMp = ((user.stamina || 0) * 2) + ((user.agility || 0) * 1);
         
         // Calculate mana restoration amount based on potion type
         let manaAmount = 0;
@@ -577,10 +577,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .where(eq(users.id, userId));
         
         // Decrease potion quantity
-        if (inventoryItem.quantity > 1) {
+        if ((inventoryItem.quantity || 0) > 1) {
           await tx
             .update(playerInventory)
-            .set({ quantity: inventoryItem.quantity - 1 })
+            .set({ quantity: (inventoryItem.quantity || 0) - 1 })
             .where(eq(playerInventory.id, inventoryItem.id));
         } else {
           await tx
@@ -627,7 +627,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
       
-      if (user.gold < totalCost) {
+      if ((user.gold || 0) < totalCost) {
         return res.status(400).json({ error: "Not enough gold" });
       }
       
@@ -636,7 +636,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Deduct gold
         await tx
           .update(users)
-          .set({ gold: user.gold - totalCost })
+          .set({ gold: (user.gold || 0) - totalCost })
           .where(eq(users.id, userId));
         
         // Add or update inventory
@@ -654,7 +654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (existingItem) {
           await tx
             .update(playerInventory)
-            .set({ quantity: existingItem.quantity + quantity })
+            .set({ quantity: (existingItem.quantity || 0) + quantity })
             .where(eq(playerInventory.id, existingItem.id));
         } else {
           await tx

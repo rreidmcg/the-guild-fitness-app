@@ -50,21 +50,25 @@ export default function Profile() {
   useEffect(() => {
     if (userStats) {
       setFormData({
-        username: userStats.username || "",
-        height: userStats.height?.toString() || "",
-        weight: userStats.weight?.toString() || "",
-        fitnessGoal: userStats.fitnessGoal || "",
-        measurementUnit: userStats.measurementUnit || "metric"
+        username: (userStats as any).username || "",
+        height: (userStats as any).height?.toString() || "",
+        weight: (userStats as any).weight?.toString() || "",
+        fitnessGoal: (userStats as any).fitnessGoal || "",
+        measurementUnit: (userStats as any).measurementUnit || "metric"
       });
     }
   }, [userStats]);
 
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: any) => {
-      return apiRequest("/api/user/profile", {
+      const response = await fetch("/api/user/profile", {
         method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(updates)
       });
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
@@ -83,17 +87,17 @@ export default function Profile() {
     },
   });
 
-  const totalWorkouts = workoutSessions?.length || 0;
-  const totalRecords = personalRecords?.length || 0;
-  const totalBattles = userStats?.battlesWon || 0;
+  const totalWorkouts = (workoutSessions as any)?.length || 0;
+  const totalRecords = (personalRecords as any)?.length || 0;
+  const totalBattles = (userStats as any)?.battlesWon || 0;
 
   const handleSave = () => {
     const updates: any = {};
-    if (formData.username !== userStats?.username) updates.username = formData.username;
-    if (formData.height && formData.height !== userStats?.height) updates.height = parseInt(formData.height);
-    if (formData.weight && formData.weight !== userStats?.weight) updates.weight = parseInt(formData.weight);
-    if (formData.fitnessGoal !== userStats?.fitnessGoal) updates.fitnessGoal = formData.fitnessGoal;
-    if (formData.measurementUnit !== userStats?.measurementUnit) updates.measurementUnit = formData.measurementUnit;
+    if (formData.username !== (userStats as any)?.username) updates.username = formData.username;
+    if (formData.height && formData.height !== (userStats as any)?.height) updates.height = parseInt(formData.height);
+    if (formData.weight && formData.weight !== (userStats as any)?.weight) updates.weight = parseInt(formData.weight);
+    if (formData.fitnessGoal !== (userStats as any)?.fitnessGoal) updates.fitnessGoal = formData.fitnessGoal;
+    if (formData.measurementUnit !== (userStats as any)?.measurementUnit) updates.measurementUnit = formData.measurementUnit;
     
     if (Object.keys(updates).length > 0) {
       updateProfileMutation.mutate(updates);
@@ -144,10 +148,10 @@ export default function Profile() {
 
   // Mock weight progress data for the graph
   const weightData = [
-    { date: '2025-01-01', weight: userStats?.weight || 70 },
-    { date: '2025-01-08', weight: (userStats?.weight || 70) - 0.5 },
-    { date: '2025-01-15', weight: (userStats?.weight || 70) - 1 },
-    { date: '2025-01-22', weight: (userStats?.weight || 70) - 0.8 }
+    { date: '2025-01-01', weight: (userStats as any)?.weight || 70 },
+    { date: '2025-01-08', weight: ((userStats as any)?.weight || 70) - 0.5 },
+    { date: '2025-01-15', weight: ((userStats as any)?.weight || 70) - 1 },
+    { date: '2025-01-22', weight: ((userStats as any)?.weight || 70) - 0.8 }
   ];
 
   return (
@@ -194,7 +198,7 @@ export default function Profile() {
                   />
                 ) : (
                   <div className="mt-1 p-2 bg-muted rounded-md text-foreground">
-                    {userStats?.username || "Not set"}
+                    {(userStats as any)?.username || "Not set"}
                   </div>
                 )}
               </div>
@@ -203,7 +207,7 @@ export default function Profile() {
                 <Label htmlFor="level">Character Level</Label>
                 <div className="mt-1 p-2 bg-muted rounded-md text-foreground flex items-center">
                   <Trophy className="w-4 h-4 mr-2 text-yellow-500" />
-                  Level {userStats?.level || 1} - {getLevelTitle(userStats?.level || 1)}
+                  Level {(userStats as any)?.level || 1} - {getLevelTitle((userStats as any)?.level || 1)}
                 </div>
               </div>
 
@@ -240,7 +244,7 @@ export default function Profile() {
                   />
                 ) : (
                   <div className="mt-1 p-2 bg-muted rounded-md text-foreground">
-                    {formatHeight(userStats?.height, formData.measurementUnit)}
+                    {formatHeight((userStats as any)?.height, formData.measurementUnit)}
                   </div>
                 )}
               </div>
@@ -261,7 +265,7 @@ export default function Profile() {
                   </Select>
                 ) : (
                   <div className="mt-1 p-2 bg-muted rounded-md text-foreground">
-                    {getFitnessGoalLabel(userStats?.fitnessGoal)}
+                    {getFitnessGoalLabel((userStats as any)?.fitnessGoal)}
                   </div>
                 )}
               </div>
@@ -293,7 +297,7 @@ export default function Profile() {
                 ) : (
                   <div className="mt-1 p-3 bg-muted rounded-md text-foreground">
                     <div className="text-2xl font-bold text-blue-400">
-                      {formatWeight(userStats?.weight, formData.measurementUnit)}
+                      {formatWeight((userStats as any)?.weight, formData.measurementUnit)}
                     </div>
                   </div>
                 )}
@@ -309,15 +313,15 @@ export default function Profile() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Start Weight</span>
-                      <span className="text-foreground">{formatWeight((userStats?.weight || 70) + 2, formData.measurementUnit)}</span>
+                      <span className="text-foreground">{formatWeight(((userStats as any)?.weight || 70) + 2, formData.measurementUnit)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Current</span>
-                      <span className="text-blue-400 font-semibold">{formatWeight(userStats?.weight || 70, formData.measurementUnit)}</span>
+                      <span className="text-blue-400 font-semibold">{formatWeight((userStats as any)?.weight || 70, formData.measurementUnit)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Target</span>
-                      <span className="text-green-400">{formatWeight((userStats?.weight || 70) - 3, formData.measurementUnit)}</span>
+                      <span className="text-green-400">{formatWeight(((userStats as any)?.weight || 70) - 3, formData.measurementUnit)}</span>
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-2 mt-3">
                       <div className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full" style={{ width: '40%' }}></div>
@@ -360,7 +364,7 @@ export default function Profile() {
               
               <div className="text-center p-4 bg-purple-900/20 rounded-lg border border-purple-700">
                 <Award className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-300">{userStats?.experience || 0}</div>
+                <div className="text-2xl font-bold text-purple-300">{(userStats as any)?.experience || 0}</div>
                 <div className="text-sm font-semibold text-purple-400">Total XP</div>
               </div>
             </div>
