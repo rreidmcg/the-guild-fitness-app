@@ -275,7 +275,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentHp,
         maxHp,
         currentMp,
-        maxMp
+        maxMp,
+        username: user.username,
+        height: user.height,
+        weight: user.weight,
+        fitnessGoal: user.fitnessGoal,
+        skinColor: user.skinColor,
+        hairColor: user.hairColor,
+        gender: user.gender
       });
     } catch (error) {
       console.error("Error fetching user stats:", error);
@@ -335,13 +342,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile
   app.patch("/api/user/profile", async (req, res) => {
     try {
-      const { username, skinColor, hairColor } = req.body;
+      const { username, skinColor, hairColor, height, weight, fitnessGoal } = req.body;
       const userId = 1; // TODO: Get from session/auth
       
       const updates: any = {};
       if (username) updates.username = username;
       if (skinColor) updates.skinColor = skinColor;
       if (hairColor) updates.hairColor = hairColor;
+      if (height !== undefined) updates.height = height;
+      if (weight !== undefined) updates.weight = weight;
+      if (fitnessGoal) updates.fitnessGoal = fitnessGoal;
       
       const updatedUser = await storage.updateUser(userId, updates);
       res.json(updatedUser);
