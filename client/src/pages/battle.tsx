@@ -356,217 +356,176 @@ export default function Battle() {
   const playerHpPercentage = (battleState.playerHp / battleState.playerMaxHp) * 100;
   const monsterHpPercentage = (battleState.monster.currentHp / battleState.monster.maxHp) * 100;
 
-  // Battle View
+  // Battle View - Classic RPG Style
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-screen bg-white text-black flex flex-col">
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={returnToMonsterList}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Monster List
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Battle: {battleState.monster.name}</h1>
-                <p className="text-muted-foreground mt-1">Level {battleState.monster.level} Monster</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="flex items-center space-x-2 text-yellow-500">
-                <Coins className="w-5 h-5" />
-                <span className="font-bold">{userStats?.gold || 0} Gold</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="bg-gray-800 text-white px-4 py-3 flex items-center justify-between">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={returnToMonsterList}
+          className="text-gray-300 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dungeon
+        </Button>
+        <div className="text-lg font-bold">Battle Arena</div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {/* Battle Area */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Player Status */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Shield className="w-5 h-5 text-blue-400" />
-                <span>{userStats?.username || 'Player'}</span>
-                <span className="text-sm text-muted-foreground">Level {userStats?.level || 1}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium flex items-center">
-                    <Heart className="w-4 h-4 text-red-400 mr-1" />
-                    HP
-                  </span>
-                  <span className="text-sm">{battleState.playerHp}/{battleState.playerMaxHp}</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-3">
+      {/* Main Battle Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Combatants Area */}
+        <div className="flex-1 flex items-center justify-between px-8 py-12">
+          {/* Player Avatar (Left) */}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-32 h-32 bg-blue-200 rounded-full border-4 border-blue-600 flex items-center justify-center">
+              <Shield className="w-16 h-16 text-blue-600" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-lg">{userStats?.username || 'Player'}</div>
+              <div className="text-sm text-gray-600">Level {userStats?.level || 1}</div>
+              <div className="mt-2 w-24">
+                <div className="text-xs text-gray-600 mb-1">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
                   <div 
-                    className="bg-red-500 h-3 rounded-full transition-all duration-300" 
+                    className="bg-green-500 h-2 rounded-full transition-all duration-300" 
                     style={{ width: `${playerHpPercentage}%` }}
                   />
                 </div>
               </div>
-              
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Sword className="w-4 h-4 text-red-400" />
-                    <span>Strength: {userStats?.strength || 5}</span>
-                  </div>
-                  <span className="text-muted-foreground">Damage: {3 + Math.floor((userStats?.strength || 5) / 2)}-{3 + Math.floor((userStats?.strength || 5) / 2) + 2}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Heart className="w-4 h-4 text-green-400" />
-                    <span>Stamina: {userStats?.stamina || 10}</span>
-                  </div>
-                  <span className="text-muted-foreground">Max HP: {Math.max(10, 10 + (userStats?.stamina || 10) * 3)}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Zap className="w-4 h-4 text-purple-400" />
-                    <span>Agility: {userStats?.agility || 5}</span>
-                  </div>
-                  <span className="text-muted-foreground">Evasion: {Math.min(90, (userStats?.agility || 5) * 5)}%</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Monster Status */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-5 h-5 text-red-400" />
-                <span>{battleState.monster.name}</span>
-                <span className="text-sm text-muted-foreground">Level {battleState.monster.level}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Monster Image in Battle */}
-              {battleState.monster.image && (
-                <div className="flex justify-center">
-                  <img 
-                    src={battleState.monster.image} 
-                    alt={battleState.monster.name}
-                    className="w-24 h-24 object-contain rounded-lg border border-border bg-transparent"
-                    style={{ backgroundColor: 'transparent' }}
-                  />
-                </div>
+          {/* VS Indicator */}
+          <div className="text-4xl font-bold text-gray-400">VS</div>
+
+          {/* Monster (Right) */}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-32 h-32 bg-red-200 rounded-full border-4 border-red-600 flex items-center justify-center overflow-hidden">
+              {battleState.monster.image ? (
+                <img 
+                  src={battleState.monster.image} 
+                  alt={battleState.monster.name}
+                  className="w-24 h-24 object-contain bg-transparent"
+                  style={{ backgroundColor: 'transparent' }}
+                />
+              ) : (
+                <Skull className="w-16 h-16 text-red-600" />
               )}
-              
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium flex items-center">
-                    <Heart className="w-4 h-4 text-red-400 mr-1" />
-                    HP
-                  </span>
-                  <span className="text-sm">{battleState.monster.currentHp}/{battleState.monster.maxHp}</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-3">
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-lg">{battleState.monster.name}</div>
+              <div className="text-sm text-gray-600">Level {battleState.monster.level}</div>
+              <div className="mt-2 w-24">
+                <div className="text-xs text-gray-600 mb-1">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
                   <div 
-                    className="bg-red-500 h-3 rounded-full transition-all duration-300" 
+                    className="bg-red-500 h-2 rounded-full transition-all duration-300" 
                     style={{ width: `${monsterHpPercentage}%` }}
                   />
                 </div>
               </div>
-              
-              <p className="text-sm text-muted-foreground">{battleState.monster.description}</p>
-              <div className="text-sm">
-                <span className="text-orange-400">Attack:</span> {battleState.monster.attack}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Battle Actions */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle>Combat Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Battle Log Area */}
+        <div className="bg-gray-100 border-t-2 border-gray-300 p-4 min-h-[120px] max-h-[120px] overflow-y-auto">
+          <div className="text-sm text-gray-700">
+            {battleState.battleLog.length === 0 ? (
+              <div className="text-gray-500 italic">Battle begins...</div>
+            ) : (
+              battleState.battleLog.map((log, index) => (
+                <div key={index} className="mb-1">
+                  {log}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Classic RPG Action Menu */}
+        <div className="bg-blue-900 text-white p-6 border-t-4 border-blue-700">
+          <div className="max-w-4xl mx-auto">
             {battleState.battleResult === 'ongoing' && (
-              <div className="flex space-x-4">
+              <div className="grid grid-cols-2 gap-4">
                 <Button
                   onClick={playerAttack}
                   disabled={!battleState.isPlayerTurn}
-                  className="bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                  className="bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white border-2 border-red-500 p-4 text-lg font-bold"
                 >
-                  <Sword className="w-4 h-4 mr-2" />
-                  Attack
+                  <Sword className="w-6 h-6 mr-2" />
+                  ATTACK
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="opacity-50"
+                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-4 text-lg font-bold cursor-not-allowed"
                 >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Defend (Coming Soon)
+                  <Shield className="w-6 h-6 mr-2" />
+                  DEFEND
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled
+                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-4 text-lg font-bold cursor-not-allowed"
+                >
+                  <Zap className="w-6 h-6 mr-2" />
+                  MAGIC
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled
+                  className="bg-gray-600 text-gray-400 border-2 border-gray-500 p-4 text-lg font-bold cursor-not-allowed"
+                >
+                  <Heart className="w-6 h-6 mr-2" />
+                  ITEMS
                 </Button>
               </div>
             )}
 
             {battleState.battleResult === 'victory' && (
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 text-green-400">
-                  <Trophy className="w-5 h-5" />
-                  <span className="font-semibold">Victory!</span>
+              <div className="text-center space-y-4">
+                <div className="text-2xl font-bold text-yellow-400 mb-4">
+                  <Trophy className="w-8 h-8 inline mr-2" />
+                  VICTORY!
                 </div>
-                <div className="flex space-x-4">
-                  <Button onClick={returnToMonsterList} className="bg-green-600 hover:bg-green-700">
-                    Choose Another Monster
+                <div className="text-lg text-yellow-300 mb-4">
+                  You earned {battleState.monster.goldReward} gold!
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button onClick={returnToMonsterList} className="bg-green-700 hover:bg-green-600 text-white border-2 border-green-500 p-4 text-lg font-bold">
+                    FIGHT AGAIN
                   </Button>
-                  <Button variant="outline" onClick={() => setLocation("/")}>
-                    Return to Stats
+                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border-2 border-blue-500 p-4 text-lg font-bold">
+                    RETURN HOME
                   </Button>
                 </div>
               </div>
             )}
 
             {battleState.battleResult === 'defeat' && (
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2 text-red-400">
-                  <Skull className="w-5 h-5" />
-                  <span className="font-semibold">Defeat!</span>
+              <div className="text-center space-y-4">
+                <div className="text-2xl font-bold text-red-400 mb-4">
+                  <Skull className="w-8 h-8 inline mr-2" />
+                  DEFEAT!
                 </div>
-                <div className="flex space-x-4">
-                  <Button onClick={returnToMonsterList} className="bg-red-600 hover:bg-red-700">
-                    Choose Different Monster
+                <div className="text-lg text-red-300 mb-4">
+                  You were defeated by {battleState.monster.name}...
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button onClick={returnToMonsterList} className="bg-red-700 hover:bg-red-600 text-white border-2 border-red-500 p-4 text-lg font-bold">
+                    TRY AGAIN
                   </Button>
-                  <Button variant="outline" onClick={() => setLocation("/")}>
-                    Return to Stats
+                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border-2 border-blue-500 p-4 text-lg font-bold">
+                    RETURN HOME
                   </Button>
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Battle Log */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle>Battle Log</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
-              {battleState.battleLog.map((log, index) => (
-                <div key={index} className="text-sm text-muted-foreground p-2 bg-secondary rounded">
-                  {log}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
