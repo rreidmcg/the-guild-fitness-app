@@ -18,6 +18,7 @@ import {
   Coins
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
+import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
 
 interface Monster {
@@ -379,17 +380,17 @@ export default function Battle() {
         <div className="flex-1 flex items-center justify-between px-8 py-12">
           {/* Player Avatar (Left) */}
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-32 h-32 bg-blue-200 rounded-full border-4 border-blue-600 flex items-center justify-center">
-              <Shield className="w-16 h-16 text-blue-600" />
+            <div className="w-48 h-48 bg-blue-100 rounded-lg border-4 border-blue-600 flex items-center justify-center overflow-hidden">
+              <Avatar2D user={userStats} size="sm" />
             </div>
             <div className="text-center">
               <div className="font-bold text-lg">{userStats?.username || 'Player'}</div>
               <div className="text-sm text-gray-600">Level {userStats?.level || 1}</div>
-              <div className="mt-2 w-24">
+              <div className="mt-2 w-32">
                 <div className="text-xs text-gray-600 mb-1">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
-                <div className="w-full bg-gray-300 rounded-full h-2">
+                <div className="w-full bg-gray-300 rounded-full h-3 border border-gray-400">
                   <div 
-                    className="bg-green-500 h-2 rounded-full transition-all duration-300" 
+                    className="bg-green-500 h-full rounded-full transition-all duration-300" 
                     style={{ width: `${playerHpPercentage}%` }}
                   />
                 </div>
@@ -402,26 +403,26 @@ export default function Battle() {
 
           {/* Monster (Right) */}
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-32 h-32 bg-red-200 rounded-full border-4 border-red-600 flex items-center justify-center overflow-hidden">
+            <div className="w-48 h-48 bg-red-100 rounded-lg border-4 border-red-600 flex items-center justify-center overflow-hidden">
               {battleState.monster.image ? (
                 <img 
                   src={battleState.monster.image} 
                   alt={battleState.monster.name}
-                  className="w-24 h-24 object-contain bg-transparent"
+                  className="w-32 h-32 object-contain bg-transparent"
                   style={{ backgroundColor: 'transparent' }}
                 />
               ) : (
-                <Skull className="w-16 h-16 text-red-600" />
+                <Skull className="w-24 h-24 text-red-600" />
               )}
             </div>
             <div className="text-center">
               <div className="font-bold text-lg">{battleState.monster.name}</div>
               <div className="text-sm text-gray-600">Level {battleState.monster.level}</div>
-              <div className="mt-2 w-24">
+              <div className="mt-2 w-32">
                 <div className="text-xs text-gray-600 mb-1">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
-                <div className="w-full bg-gray-300 rounded-full h-2">
+                <div className="w-full bg-gray-300 rounded-full h-3 border border-gray-400">
                   <div 
-                    className="bg-red-500 h-2 rounded-full transition-all duration-300" 
+                    className="bg-red-500 h-full rounded-full transition-all duration-300" 
                     style={{ width: `${monsterHpPercentage}%` }}
                   />
                 </div>
