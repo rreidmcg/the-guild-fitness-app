@@ -281,20 +281,9 @@ export default function Battle() {
         <div className="bg-card border-b border-border px-4 py-6">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setLocation("/")}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Stats
-                </Button>
-                <div>
-                  <h1 className="text-3xl font-bold text-foreground">Battle Arena</h1>
-                  <p className="text-muted-foreground mt-1">Choose your opponent and fight for gold coins</p>
-                </div>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Battle Arena</h1>
+                <p className="text-muted-foreground mt-1">Choose your opponent and fight for gold coins</p>
               </div>
               <div className="text-right">
                 <div className="flex items-center space-x-2 text-yellow-500">
