@@ -46,18 +46,18 @@ interface BattleState {
   battleResult: 'ongoing' | 'victory' | 'defeat';
 }
 
-// E-rank dungeon monsters (levels 1-10)
+// E-rank dungeon monsters (levels 1-10) - HP increased by 5%
 const ERANK_MONSTERS: Monster[] = [
-  { id: 1, name: "Green Slime", level: 1, maxHp: 12, currentHp: 12, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
-  { id: 2, name: "Cave Rat", level: 2, maxHp: 18, currentHp: 18, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth" },
-  { id: 3, name: "Wild Goblin", level: 3, maxHp: 25, currentHp: 25, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger" },
-  { id: 4, name: "Forest Spider", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs" },
-  { id: 5, name: "Skeleton Warrior", level: 5, maxHp: 40, currentHp: 40, attack: 7, goldReward: 6, description: "Animated bones wielding ancient weapons" },
-  { id: 6, name: "Stone Golem", level: 6, maxHp: 55, currentHp: 55, attack: 8, goldReward: 7, description: "A sturdy construct of animated rock" },
-  { id: 7, name: "Shadow Wolf", level: 7, maxHp: 48, currentHp: 48, attack: 10, goldReward: 8, description: "A spectral predator that hunts in darkness" },
-  { id: 8, name: "Fire Elemental", level: 8, maxHp: 60, currentHp: 60, attack: 12, goldReward: 9, description: "A being of pure flame and fury" },
-  { id: 9, name: "Orc Berserker", level: 9, maxHp: 75, currentHp: 75, attack: 14, goldReward: 10, description: "A brutal warrior lost to bloodlust" },
-  { id: 10, name: "Lesser Dragon", level: 10, maxHp: 100, currentHp: 100, attack: 18, goldReward: 10, description: "A young but fierce draconic beast" },
+  { id: 1, name: "Green Slime", level: 1, maxHp: 13, currentHp: 13, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
+  { id: 2, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth" },
+  { id: 3, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger" },
+  { id: 4, name: "Forest Spider", level: 4, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs" },
+  { id: 5, name: "Skeleton Warrior", level: 5, maxHp: 42, currentHp: 42, attack: 7, goldReward: 6, description: "Animated bones wielding ancient weapons" },
+  { id: 6, name: "Stone Golem", level: 6, maxHp: 58, currentHp: 58, attack: 8, goldReward: 7, description: "A sturdy construct of animated rock" },
+  { id: 7, name: "Shadow Wolf", level: 7, maxHp: 50, currentHp: 50, attack: 10, goldReward: 8, description: "A spectral predator that hunts in darkness" },
+  { id: 8, name: "Fire Elemental", level: 8, maxHp: 63, currentHp: 63, attack: 12, goldReward: 9, description: "A being of pure flame and fury" },
+  { id: 9, name: "Orc Berserker", level: 9, maxHp: 79, currentHp: 79, attack: 14, goldReward: 10, description: "A brutal warrior lost to bloodlust" },
+  { id: 10, name: "Lesser Dragon", level: 10, maxHp: 105, currentHp: 105, attack: 18, goldReward: 10, description: "A young but fierce draconic beast" },
 ];
 
 export default function Battle() {
