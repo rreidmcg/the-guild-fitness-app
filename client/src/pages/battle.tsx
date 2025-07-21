@@ -288,7 +288,6 @@ export default function Battle() {
               <div className="text-right">
                 <div className="flex items-center space-x-2 text-yellow-500">
                   <Coins className="w-5 h-5" />
-                  <span className="font-bold">{userStats?.gold || 0} Gold</span>
                 </div>
               </div>
             </div>
