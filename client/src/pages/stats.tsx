@@ -52,15 +52,21 @@ export default function Stats() {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      
+      const isHealing = data.healedAmount !== undefined;
+      const isMana = data.restoredAmount !== undefined;
+      
       toast({
         title: "Potion Used",
-        description: `Healed ${data.healedAmount} HP!`,
+        description: isHealing 
+          ? `Healed ${data.healedAmount} HP!`
+          : `Restored ${data.restoredAmount} MP!`,
       });
     },
     onError: (error: any) => {
       toast({
         title: "Cannot Use Potion",
-        description: error.message || "You don't have this potion or are already at full health",
+        description: error.message || "You don't have this potion or are already at full capacity",
         variant: "destructive",
       });
     },
@@ -294,7 +300,40 @@ export default function Stats() {
                 />
               </div>
               <div className="text-xs text-blue-300 mt-2 opacity-80">
-                Formula: (Stamina × 2) + (Agility × 1) | Regenerates {Math.max(1, Math.floor((userStats?.agility || 0) / 2))}% per minute
+                Regenerates 4% per minute when not in combat
+              </div>
+              
+              {/* Mana Potions */}
+              <div className="mt-3 flex space-x-2">
+                {['minor_mana', 'major_mana', 'full_mana'].map((potionType) => {
+                  const potionNames = {
+                    minor_mana: 'Minor',
+                    major_mana: 'Major',
+                    full_mana: 'Full'
+                  };
+                  const quantity = inventory?.find((item: any) => 
+                    item.itemName === potionType && item.itemType === 'potion'
+                  )?.quantity || 0;
+                  
+                  return quantity > 0 ? (
+                    <Button
+                      key={potionType}
+                      size="sm"
+                      variant="outline"
+                      onClick={() => usePotionMutation.mutate(potionType)}
+                      disabled={usePotionMutation.isPending}
+                      className="text-xs border-blue-500 text-blue-300 hover:bg-blue-900/30"
+                    >
+                      <Zap className="w-3 h-3 mr-1" />
+                      {potionNames[potionType as keyof typeof potionNames]} ({quantity})
+                    </Button>
+                  ) : null;
+                })}
+                {(!inventory || inventory.filter((item: any) => 
+                  item.itemType === 'potion' && item.itemName.includes('mana')
+                ).length === 0) && (
+                  <p className="text-xs text-muted-foreground">Visit the shop to buy mana potions</p>
+                )}
               </div>
             </div>
 

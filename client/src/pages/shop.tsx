@@ -184,7 +184,8 @@ export default function Shop() {
       description: "Restores 25% of maximum HP",
       price: 10,
       healing: "25%",
-      color: "from-red-500 to-red-600"
+      color: "from-red-500 to-red-600",
+      type: "healing"
     },
     {
       id: "major_healing", 
@@ -192,7 +193,8 @@ export default function Shop() {
       description: "Restores 50% of maximum HP",
       price: 25,
       healing: "50%",
-      color: "from-red-600 to-red-700"
+      color: "from-red-600 to-red-700",
+      type: "healing"
     },
     {
       id: "full_healing",
@@ -200,7 +202,35 @@ export default function Shop() {
       description: "Restores 100% of maximum HP",
       price: 50,
       healing: "100%",
-      color: "from-red-700 to-red-800"
+      color: "from-red-700 to-red-800",
+      type: "healing"
+    },
+    {
+      id: "minor_mana",
+      name: "Minor Mana Potion",
+      description: "Restores 25% of maximum MP",
+      price: 8,
+      healing: "25%",
+      color: "from-blue-500 to-blue-600",
+      type: "mana"
+    },
+    {
+      id: "major_mana", 
+      name: "Major Mana Potion",
+      description: "Restores 50% of maximum MP",
+      price: 20,
+      healing: "50%",
+      color: "from-blue-600 to-blue-700",
+      type: "mana"
+    },
+    {
+      id: "full_mana",
+      name: "Full Mana Potion",
+      description: "Restores 100% of maximum MP",
+      price: 40,
+      healing: "100%",
+      color: "from-blue-700 to-blue-800",
+      type: "mana"
     }
   ];
 
@@ -343,7 +373,11 @@ export default function Shop() {
                 <Card key={potion.id} className="bg-card border-border relative overflow-hidden">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg font-bold text-foreground flex items-center">
-                      <Heart className="w-5 h-5 text-red-500 mr-2" />
+                      {potion.type === 'healing' ? (
+                        <Heart className="w-5 h-5 text-red-500 mr-2" />
+                      ) : (
+                        <Zap className="w-5 h-5 text-blue-500 mr-2" />
+                      )}
                       {potion.name}
                     </CardTitle>
                   </CardHeader>
@@ -358,8 +392,17 @@ export default function Shop() {
                       <p className="text-sm text-muted-foreground">{potion.description}</p>
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center space-x-1">
-                          <Heart className="w-4 h-4 text-red-400" />
-                          <span className="font-medium text-green-400">{potion.healing} HP</span>
+                          {potion.type === 'healing' ? (
+                            <>
+                              <Heart className="w-4 h-4 text-red-400" />
+                              <span className="font-medium text-green-400">{potion.healing} HP</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-4 h-4 text-blue-400" />
+                              <span className="font-medium text-blue-400">{potion.healing} MP</span>
+                            </>
+                          )}
                         </div>
                         <div className="flex items-center space-x-1">
                           <Coins className="w-4 h-4 text-yellow-500" />
@@ -385,7 +428,7 @@ export default function Shop() {
                       <Button 
                         onClick={() => handleBuyPotion(potion.id, potion.price)}
                         disabled={purchasePotionMutation.isPending}
-                        className="w-full bg-red-600 hover:bg-red-700"
+                        className={`w-full ${potion.type === 'healing' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                       >
                         <Plus className="w-4 h-4 mr-2" />
                         Buy for {potion.price} Gold

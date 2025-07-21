@@ -450,7 +450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userId = 1; // Hardcoded for now
     const { potionType } = req.body;
     
-    if (!potionType || !["minor_healing", "major_healing", "full_healing"].includes(potionType)) {
+    if (!potionType || !["minor_healing", "major_healing", "full_healing", "minor_mana", "major_mana", "full_mana"].includes(potionType)) {
       return res.status(400).json({ error: "Invalid potion type" });
     }
     
@@ -481,40 +481,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
       
-      // Calculate max HP (10 base HP + 3 HP per stamina point)
-      const maxHp = Math.max(10, 10 + user.stamina * 3);
+      // Determine if this is a healing or mana potion
+      const isHealingPotion = potionType.includes("healing");
+      const isManaPotion = potionType.includes("mana");
       
-      // Calculate healing amount based on potion type
-      let healAmount = 0;
-      switch (potionType) {
-        case "minor_healing":
-          healAmount = Math.ceil(maxHp * 0.25); // 25% of max HP
-          break;
-        case "major_healing":
-          healAmount = Math.ceil(maxHp * 0.50); // 50% of max HP
-          break;
-        case "full_healing":
-          healAmount = maxHp; // Full HP
-          break;
+      let result: any = { success: true };
+      let updateData: any = {};
+      
+      if (isHealingPotion) {
+        // Calculate max HP (10 base HP + 3 HP per stamina point)
+        const maxHp = Math.max(10, 10 + user.stamina * 3);
+        
+        // Calculate healing amount based on potion type
+        let healAmount = 0;
+        switch (potionType) {
+          case "minor_healing":
+            healAmount = Math.ceil(maxHp * 0.25); // 25% of max HP
+            break;
+          case "major_healing":
+            healAmount = Math.ceil(maxHp * 0.50); // 50% of max HP
+            break;
+          case "full_healing":
+            healAmount = maxHp; // Full HP
+            break;
+        }
+        
+        // Calculate new HP (can't exceed max HP)
+        const newHp = Math.min(maxHp, (user.currentHp || maxHp) + healAmount);
+        const actualHealing = newHp - (user.currentHp || maxHp);
+        
+        if (actualHealing <= 0) {
+          return res.status(400).json({ error: "You are already at full health" });
+        }
+        
+        updateData.currentHp = newHp;
+        updateData.lastHpUpdateAt = new Date();
+        result.healedAmount = actualHealing;
+        result.newHp = newHp;
+        result.maxHp = maxHp;
+      } else if (isManaPotion) {
+        // Calculate max MP: (Stamina × 2) + (Agility × 1)
+        const maxMp = (user.stamina * 2) + (user.agility * 1);
+        
+        // Calculate mana restoration amount based on potion type
+        let manaAmount = 0;
+        switch (potionType) {
+          case "minor_mana":
+            manaAmount = Math.ceil(maxMp * 0.25); // 25% of max MP
+            break;
+          case "major_mana":
+            manaAmount = Math.ceil(maxMp * 0.50); // 50% of max MP
+            break;
+          case "full_mana":
+            manaAmount = maxMp; // Full MP
+            break;
+        }
+        
+        // Calculate new MP (can't exceed max MP)
+        const currentMp = user.currentMp || maxMp;
+        const newMp = Math.min(maxMp, currentMp + manaAmount);
+        const actualRestoration = newMp - currentMp;
+        
+        if (actualRestoration <= 0) {
+          return res.status(400).json({ error: "You are already at full mana" });
+        }
+        
+        updateData.currentMp = newMp;
+        updateData.lastMpUpdateAt = new Date();
+        result.restoredAmount = actualRestoration;
+        result.newMp = newMp;
+        result.maxMp = maxMp;
       }
       
-      // Calculate new HP (can't exceed max HP)
-      const newHp = Math.min(maxHp, (user.currentHp || maxHp) + healAmount);
-      const actualHealing = newHp - (user.currentHp || maxHp);
-      
-      if (actualHealing <= 0) {
-        return res.status(400).json({ error: "You are already at full health" });
-      }
-      
-      // Update user HP and potion quantity in a transaction
+      // Update user stats and potion quantity in a transaction
       await db.transaction(async (tx) => {
-        // Update user HP
+        // Update user stats
         await tx
           .update(users)
-          .set({ 
-            currentHp: newHp,
-            lastHpUpdateAt: new Date()
-          })
+          .set(updateData)
           .where(eq(users.id, userId));
         
         // Decrease potion quantity
@@ -530,12 +574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      res.json({ 
-        success: true, 
-        healedAmount: actualHealing,
-        newHp,
-        maxHp
-      });
+      res.json(result);
     } catch (error) {
       console.error("Error using potion:", error);
       res.status(500).json({ error: "Failed to use potion" });
@@ -550,7 +589,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const potionPrices = {
       minor_healing: 10,
       major_healing: 25,
-      full_healing: 50
+      full_healing: 50,
+      minor_mana: 8,
+      major_mana: 20,
+      full_mana: 40
     };
     
     if (!potionType || !potionPrices[potionType as keyof typeof potionPrices]) {
