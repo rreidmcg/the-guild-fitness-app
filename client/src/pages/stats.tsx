@@ -278,8 +278,8 @@ export default function Stats() {
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-4 bg-red-900/20 rounded-lg border border-red-700">
                 <Dumbbell className="w-6 h-6 text-red-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-red-300">{userStats?.strength || 0}</div>
-                <div className="text-sm font-semibold text-red-400">Strength</div>
+                <div className="text-2xl font-bold text-foreground">{userStats?.strength || 0}</div>
+                <div className="text-sm font-semibold text-foreground">Strength</div>
               </div>
               <div className="text-center p-4 bg-green-900/20 rounded-lg border border-green-700">
                 <Heart className="w-6 h-6 text-green-400 mx-auto mb-2" />
