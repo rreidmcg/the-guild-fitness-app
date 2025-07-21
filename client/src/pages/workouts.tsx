@@ -48,18 +48,19 @@ export default function Workouts() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-6">
+      <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Workouts</h1>
-              <p className="text-muted-foreground mt-1">Track your fitness journey</p>
+              <h1 className="text-2xl font-bold text-foreground">Workouts</h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">Track your fitness journey</p>
             </div>
             <Button 
               onClick={() => setLocation("/workout-builder")}
+              size="sm"
               className="bg-game-primary hover:bg-blue-600"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 mr-1" />
               New Workout
             </Button>
           </div>

@@ -133,16 +133,16 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-6">
+      <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Shop</h1>
-              <p className="text-muted-foreground mt-1">Purchase gear and cosmetics</p>
+              <h1 className="text-2xl font-bold text-foreground">Shop</h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
-            <div className="flex items-center space-x-2 bg-muted px-4 py-2 rounded-lg">
-              <Coins className="w-5 h-5 text-yellow-500" />
-              <span className="font-bold text-foreground">{userStats?.gold || 0}</span>
+            <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
+              <Coins className="w-4 h-4 text-yellow-500" />
+              <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
             </div>
           </div>
         </div>
