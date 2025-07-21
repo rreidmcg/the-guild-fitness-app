@@ -15,7 +15,8 @@ import {
   Skull,
   ChevronDown,
   ChevronRight,
-  Coins
+  Coins,
+  X
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
@@ -373,6 +374,14 @@ export default function Battle() {
           Back to Dungeon
         </Button>
         <div className="text-lg font-bold">Battle Arena</div>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => setLocation("/")}
+          className="text-gray-300 hover:text-white"
+        >
+          <X className="w-4 h-4" />
+        </Button>
       </div>
 
       {/* Main Battle Area */}
