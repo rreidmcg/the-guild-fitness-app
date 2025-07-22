@@ -516,24 +516,31 @@ export default function Battle() {
               <div className="text-xs text-yellow-200 bg-black/90 px-2 py-1 rounded mb-1 border border-yellow-400/30">
                 Level {userStats?.level || 1}
               </div>
-              <div className="w-24 space-y-1">
-                <div className="text-xs text-green-200 bg-black/90 px-2 py-1 rounded">
-                  HP: {battleState.playerHp}/{battleState.playerMaxHp}
+              <div className="w-24 space-y-2">
+                {/* HP Bar with Text Inside */}
+                <div className="relative">
+                  <div className="w-full bg-gray-800 rounded-full h-5 border border-gray-400 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-green-600 to-green-500 h-full rounded-full transition-all duration-300 flex items-center justify-center" 
+                      style={{ width: `${playerHpPercentage}%` }}
+                    />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
+                    HP: {battleState.playerHp}/{battleState.playerMaxHp}
+                  </div>
                 </div>
-                <div className="w-full bg-gray-600 rounded-full h-2 border border-gray-400">
-                  <div 
-                    className="bg-green-500 h-full rounded-full transition-all duration-300" 
-                    style={{ width: `${playerHpPercentage}%` }}
-                  />
-                </div>
-                <div className="text-xs text-blue-200 bg-black/90 px-2 py-1 rounded">
-                  MP: {battleState.playerMp}/{battleState.playerMaxMp}
-                </div>
-                <div className="w-full bg-gray-600 rounded-full h-2 border border-gray-400">
-                  <div 
-                    className="bg-blue-500 h-full rounded-full transition-all duration-300" 
-                    style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
-                  />
+                
+                {/* MP Bar with Text Inside */}
+                <div className="relative">
+                  <div className="w-full bg-gray-800 rounded-full h-5 border border-gray-400 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-blue-600 to-blue-500 h-full rounded-full transition-all duration-300 flex items-center justify-center" 
+                      style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
+                    />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
+                    MP: {battleState.playerMp}/{battleState.playerMaxMp}
+                  </div>
                 </div>
               </div>
             </div>
@@ -575,15 +582,18 @@ export default function Battle() {
               <div className="text-xs text-red-200 bg-black/90 px-2 py-1 rounded mb-1 border border-red-400/30">
                 Level {battleState.monster.level}
               </div>
-              <div className="w-24 space-y-1">
-                <div className="text-xs text-red-200 bg-black/90 px-2 py-1 rounded">
-                  HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}
-                </div>
-                <div className="w-full bg-gray-600 rounded-full h-2 border border-gray-400">
-                  <div 
-                    className="bg-red-500 h-full rounded-full transition-all duration-300" 
-                    style={{ width: `${monsterHpPercentage}%` }}
-                  />
+              <div className="w-24 space-y-2">
+                {/* HP Bar with Text Inside */}
+                <div className="relative">
+                  <div className="w-full bg-gray-800 rounded-full h-5 border border-gray-400 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300 flex items-center justify-center" 
+                      style={{ width: `${monsterHpPercentage}%` }}
+                    />
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
+                    HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}
+                  </div>
                 </div>
               </div>
             </div>
