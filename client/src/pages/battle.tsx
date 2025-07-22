@@ -592,7 +592,7 @@ export default function Battle() {
 
 
           {/* Monster (Right) */}
-          <div className="flex flex-col items-center" style={{ marginTop: '20px', marginLeft: '-30px' }}>
+          <div className="flex flex-col items-center" style={{ marginTop: '20px', marginLeft: '-60px' }}>
             <div className="w-36 h-36 flex items-end justify-center">
               {battleState.monster.image ? (
                 <img 
