@@ -31,6 +31,31 @@ import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
 import { useBackgroundMusic } from "@/hooks/use-background-music";
 
+// User stats type to match the API response
+interface UserStats {
+  level: number;
+  experience: number;
+  strength: number;
+  stamina: number;
+  agility: number;
+  gold: number;
+  battlesWon: number;
+  currentTier: string;
+  currentTitle: string;
+  currentHp: number;
+  maxHp: number;
+  currentMp: number;
+  maxMp: number;
+  username: string;
+  height?: number;
+  weight?: number;
+  fitnessGoal?: string;
+  skinColor?: string;
+  hairColor?: string;
+  gender?: string;
+  measurementUnit?: string;
+}
+
 interface Monster {
   id: number;
   name: string;
@@ -79,7 +104,7 @@ export default function Battle() {
   // Background music
   const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
 
-  const { data: userStats } = useQuery({
+  const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],
   });
 
