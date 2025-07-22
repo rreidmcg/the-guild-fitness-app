@@ -17,7 +17,9 @@ import {
   ChevronRight,
   Coins,
   X,
-  Clock
+  Clock,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import caveRatImage from "@assets/IMG_3670_1753151064629.png";
@@ -26,6 +28,7 @@ import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
+import { useBackgroundMusic } from "@/hooks/use-background-music";
 
 interface Monster {
   id: number;
@@ -71,6 +74,9 @@ export default function Battle() {
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [isMonsterListOpen, setIsMonsterListOpen] = useState(true);
   const [monsterCooldowns, setMonsterCooldowns] = useState<{[key: number]: number}>({});
+  
+  // Background music
+  const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
