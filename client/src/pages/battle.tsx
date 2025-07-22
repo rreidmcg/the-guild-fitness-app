@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import caveRatImage from "@assets/IMG_3670_1753151064629.png";
+import wildGoblinImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_1753151490494.png";
 import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
@@ -51,7 +52,7 @@ interface BattleState {
 const ERANK_MONSTERS: Monster[] = [
   { id: 1, name: "Green Slime", level: 1, maxHp: 13, currentHp: 13, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
   { id: 2, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth", image: caveRatImage },
-  { id: 3, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger" },
+  { id: 3, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger", image: wildGoblinImage },
   { id: 4, name: "Forest Spider", level: 4, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs" },
   { id: 5, name: "Skeleton Warrior", level: 5, maxHp: 42, currentHp: 42, attack: 7, goldReward: 6, description: "Animated bones wielding ancient weapons" },
   { id: 6, name: "Stone Golem", level: 6, maxHp: 58, currentHp: 58, attack: 8, goldReward: 7, description: "A sturdy construct of animated rock" },
