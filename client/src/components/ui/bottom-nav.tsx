@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Button } from "./button";
-import { Dumbbell, BarChart3, Sword, ShoppingBag, Settings } from "lucide-react";
+import { Dumbbell, BarChart3, Sword, ShoppingBag, Package } from "lucide-react";
 
 export function BottomNav() {
   const [location, setLocation] = useLocation();
@@ -10,7 +10,7 @@ export function BottomNav() {
     { path: "/workouts", label: "Workouts", icon: Dumbbell },
     { path: "/battle", label: "Battle", icon: Sword },
     { path: "/shop", label: "Shop", icon: ShoppingBag },
-    { path: "/profile", label: "Settings", icon: Settings },
+    { path: "/inventory", label: "Items", icon: Package },
   ];
 
   return (

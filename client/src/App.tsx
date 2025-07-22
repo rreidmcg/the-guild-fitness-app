@@ -16,6 +16,7 @@ import Battle from "@/pages/battle";
 import Wardrobe from "@/pages/wardrobe";
 import Shop from "@/pages/shop";
 import Profile from "@/pages/profile";
+import Inventory from "@/pages/inventory";
 import SignupPage from "@/pages/signup";
 import LoginPage from "@/pages/login";
 import NotFound from "@/pages/not-found";
@@ -25,6 +26,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Stats} />
       <Route path="/workouts" component={Workouts} />
+      <Route path="/inventory" component={Inventory} />
       <Route path="/settings" component={Settings} />
       <Route path="/workout-builder" component={WorkoutBuilder} />
       <Route path="/workout-session/:id" component={WorkoutSession} />
@@ -66,22 +68,7 @@ function App() {
         <div className="min-h-screen bg-background text-foreground">
           <Toaster />
           
-          {/* Music Control Button */}
-          <div className="fixed top-4 right-4 z-50">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleMusic}
-              className="bg-card border-border hover:bg-accent"
-              title={isMuted ? "Turn on music" : "Turn off music"}
-            >
-              {isMuted ? (
-                <VolumeX className="w-4 h-4" />
-              ) : (
-                <Volume2 className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
+
           
           <Router />
           <BottomNav />

@@ -481,18 +481,7 @@ export default function Battle() {
           Back to Dungeon
         </Button>
         <div className="text-lg font-bold">Battle Arena</div>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={toggleMusic}
-          className="text-gray-300 hover:text-white"
-        >
-          {isMuted || !isPlaying ? (
-            <VolumeX className="w-4 h-4" />
-          ) : (
-            <Volume2 className="w-4 h-4" />
-          )}
-        </Button>
+
       </div>
 
       {/* Main Battle Area */}

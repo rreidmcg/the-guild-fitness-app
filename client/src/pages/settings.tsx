@@ -17,13 +17,16 @@ import {
   HelpCircle,
   LogOut,
   Volume2,
+  VolumeX,
   Vibrate,
   Moon,
   Smartphone
 } from "lucide-react";
+import { useBackgroundMusic } from "@/hooks/use-background-music";
 
 export default function Settings() {
   const { toast } = useToast();
+  const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -64,6 +67,41 @@ export default function Settings() {
                 <h3 className="text-lg font-semibold text-foreground">{userStats?.username || 'Fitness Warrior'}</h3>
                 <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Avatar: {userStats?.gender === 'female' ? 'Female' : 'Male'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Audio Settings */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Volume2 className="w-5 h-5" />
+              <span>Audio</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base">Background Music</Label>
+                <div className="text-sm text-muted-foreground">
+                  Play background music during battles and gameplay
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleMusic}
+                  className="flex items-center space-x-2"
+                >
+                  {isMuted ? (
+                    <VolumeX className="w-4 h-4" />
+                  ) : (
+                    <Volume2 className="w-4 h-4" />
+                  )}
+                  <span>{isMuted ? "Off" : "On"}</span>
+                </Button>
               </div>
             </div>
           </CardContent>
