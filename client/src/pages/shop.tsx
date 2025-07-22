@@ -500,7 +500,7 @@ export default function Shop() {
                   </CardHeader>
                   <CardContent className="p-3">
                     {/* Potion Visual */}
-                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border ${potion.id === 'minor_healing' ? 'bg-black' : `bg-gradient-to-br ${potion.color}`}`}>
+                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border ${potion.id === 'minor_healing' ? 'bg-card' : `bg-gradient-to-br ${potion.color}`}`}>
                       {potion.id === 'minor_healing' ? (
                         <img 
                           src={minorHealingPotionImage} 
