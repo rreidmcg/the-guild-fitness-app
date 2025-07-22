@@ -503,8 +503,7 @@ export default function Battle() {
           onClick={returnToMonsterList}
           className="text-gray-300 hover:text-white absolute left-4"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dungeon
+          <ArrowLeft className="w-4 h-4" />
         </Button>
         <div className="text-lg font-bold">Battle Arena</div>
       </div>
@@ -567,7 +566,7 @@ export default function Battle() {
         </div>
 
         {/* Combatants Area */}
-        <div className="flex-1 flex items-center justify-between px-8" style={{ paddingTop: '10%' }}>
+        <div className="flex-1 flex items-center justify-between px-8" style={{ paddingTop: '20%' }}>
           {/* Player Avatar (Left) */}
           <div className="flex flex-col items-center">
             <div className="w-32 h-32 flex items-end justify-center">
