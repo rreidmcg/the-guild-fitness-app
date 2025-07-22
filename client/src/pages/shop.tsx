@@ -275,19 +275,9 @@ export default function Shop() {
               <h1 className="text-2xl font-bold text-foreground">Shop</h1>
               <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
-                <Coins className="w-4 h-4 text-yellow-500" />
-                <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
-              </div>
-              <Button 
-                onClick={() => setActiveTab("gold")}
-                size="sm"
-                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Buy Gold
-              </Button>
+            <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
+              <Coins className="w-4 h-4 text-yellow-500" />
+              <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
             </div>
           </div>
         </div>
