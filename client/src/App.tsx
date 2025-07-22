@@ -73,9 +73,9 @@ function App() {
               size="sm"
               onClick={toggleMusic}
               className="bg-card border-border hover:bg-accent"
-              title={isMuted || !isPlaying ? "Turn on music" : "Turn off music"}
+              title={isMuted ? "Turn on music" : "Turn off music"}
             >
-              {isMuted || !isPlaying ? (
+              {isMuted ? (
                 <VolumeX className="w-4 h-4" />
               ) : (
                 <Volume2 className="w-4 h-4" />

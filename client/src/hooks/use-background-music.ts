@@ -102,15 +102,17 @@ export function useBackgroundMusic() {
   const toggleMusic = () => {
     if (!audioRef.current || !canPlayAudio()) return;
     
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsMuted(true);
-    } else {
+    if (isMuted) {
+      // User wants to turn music on
       setIsMuted(false);
       audioRef.current.play().catch(() => {
         console.warn('Could not play background music - autoplay blocked or audio unavailable');
-        setIsPlaying(false);
+        setIsMuted(true); // Keep it muted if playback fails
       });
+    } else {
+      // User wants to turn music off
+      audioRef.current.pause();
+      setIsMuted(true);
     }
   };
 
