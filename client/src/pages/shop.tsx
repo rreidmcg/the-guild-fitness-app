@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ShoppingCart, 
   Coins, 
@@ -19,7 +20,8 @@ import {
   CreditCard,
   Wallet,
   Check,
-  Settings
+  Settings,
+  ChevronDown
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -90,7 +92,8 @@ const categoryIcons = {
 export default function Shop() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("potions");
+  const [activeTab, setActiveTab] = useState("armor");
+  const [selectedCategory, setSelectedCategory] = useState("head");
   const [showGoldPurchase, setShowGoldPurchase] = useState(false);
 
   const { data: userStats } = useQuery<UserStats>({
@@ -325,164 +328,160 @@ export default function Shop() {
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-8">
-            <div className="grid grid-cols-5 gap-2 mb-2">
-              {/* First row - 5 tabs */}
-              {categories.slice(0, 5).map((category) => {
-                const Icon = category.icon;
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => setActiveTab(category.id)}
-                    className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
-                      activeTab === category.id 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-xs">{category.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-            
-            <div className="grid grid-cols-5 gap-2">
-              {/* Second row - remaining tabs */}
-              {categories.slice(5).map((category) => {
-                const Icon = category.icon;
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => setActiveTab(category.id)}
-                    className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
-                      activeTab === category.id 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-xs">{category.name}</span>
-                  </button>
-                );
-              })}
-              
-              <button
-                onClick={() => setActiveTab("potions")}
-                className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
-                  activeTab === "potions" 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                }`}
-              >
-                <Heart className="w-4 h-4" />
-                <span className="text-xs">Potions</span>
-              </button>
-              
-              <button
-                onClick={() => setActiveTab("gold")}
-                className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
-                  activeTab === "gold" 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                }`}
-              >
-                <Wallet className="w-4 h-4" />
-                <span className="text-xs">Gold</span>
-              </button>
-              
-              {/* Empty cell to maintain grid */}
-              <div></div>
+            <div className="flex items-center justify-between gap-4">
+              {/* Main Category Tabs */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveTab("armor")}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    activeTab === "armor" 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                  }`}
+                >
+                  <Crown className="w-4 h-4" />
+                  <span className="text-sm font-medium">Armor</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab("potions")}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    activeTab === "potions" 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                  }`}
+                >
+                  <Heart className="w-4 h-4" />
+                  <span className="text-sm font-medium">Potions</span>
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab("gold")}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    activeTab === "gold" 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                  }`}
+                >
+                  <Wallet className="w-4 h-4" />
+                  <span className="text-sm font-medium">Gold</span>
+                </button>
+              </div>
+
+              {/* Category Dropdown - Only show when armor tab is active */}
+              {activeTab === "armor" && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-muted-foreground">Category:</span>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => {
+                        const Icon = category.icon;
+                        return (
+                          <SelectItem key={category.id} value={category.id}>
+                            <div className="flex items-center space-x-2">
+                              <Icon className="w-4 h-4" />
+                              <span>{category.name}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           </div>
 
-          {categories.map((category) => (
-            <TabsContent key={category.id} value={category.id}>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                {filterItemsByCategory(category.id).map((item: ShopItem) => (
-                  <Card key={item.id} className="bg-card border-border relative overflow-hidden">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-sm font-bold text-foreground truncate">{item.name}</CardTitle>
-                        <Badge className={`${rarityColors[item.rarity as keyof typeof rarityColors]} text-white text-xs`}>
-                          {item.rarity[0].toUpperCase()}
-                        </Badge>
+          {/* Armor Tab Content */}
+          <TabsContent value="armor">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+              {filterItemsByCategory(selectedCategory).map((item: ShopItem) => (
+                <Card key={item.id} className="bg-card border-border relative overflow-hidden">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-bold text-foreground truncate">{item.name}</CardTitle>
+                      <Badge className={`${rarityColors[item.rarity as keyof typeof rarityColors]} text-white text-xs`}>
+                        {item.rarity[0].toUpperCase()}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-3">
+                    {/* Item Preview */}
+                    <div className="w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border" 
+                         style={{ backgroundColor: item.color }}>
+                      <div className="text-white text-lg font-bold opacity-80">
+                        {item.name[0]}
                       </div>
-                    </CardHeader>
-                    <CardContent className="p-3">
-                      {/* Item Preview */}
-                      <div className="w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border" 
-                           style={{ backgroundColor: item.color }}>
-                        <div className="text-white text-lg font-bold opacity-80">
-                          {item.name[0]}
-                        </div>
-                      </div>
+                    </div>
 
-                      {/* Item Info */}
-                      <div className="space-y-2 mb-3">
-                        <div className="flex items-center justify-between text-xs">
+                    {/* Item Info */}
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center space-x-1">
+                          <Coins className="w-3 h-3 text-yellow-500" />
+                          <span className="font-medium text-foreground">{item.price}</span>
+                        </div>
+                        
+                        {item.unlockLevel > 1 && (
                           <div className="flex items-center space-x-1">
-                            <Coins className="w-3 h-3 text-yellow-500" />
-                            <span className="font-medium text-foreground">{item.price}</span>
+                            <Star className="w-3 h-3 text-blue-400" />
+                            <span className="text-muted-foreground">Lv.{item.unlockLevel}</span>
                           </div>
-                          
-                          {item.unlockLevel > 1 && (
-                            <div className="flex items-center space-x-1">
-                              <Star className="w-3 h-3 text-blue-400" />
-                              <span className="text-muted-foreground">Lv.{item.unlockLevel}</span>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
+                    </div>
 
-                      {/* Purchase Button */}
-                      {item.isOwned ? (
-                        <Button variant="secondary" className="w-full text-xs h-8" disabled>
-                          ✓ Owned
-                        </Button>
-                      ) : (userStats?.level || 1) < item.unlockLevel ? (
-                        <Button variant="secondary" className="w-full text-xs h-8" disabled>
-                          <Lock className="w-3 h-3 mr-1" />
-                          Lv.{item.unlockLevel}
-                        </Button>
-                      ) : (userStats?.gold || 0) < item.price ? (
-                        <Button variant="destructive" className="w-full text-xs h-8" disabled>
-                          Need Gold
-                        </Button>
-                      ) : (
-                        <Button 
-                          onClick={() => handlePurchase(item)}
-                          disabled={purchaseItemMutation.isPending}
-                          className="w-full bg-game-primary hover:bg-blue-600 text-xs h-8"
-                        >
-                          Buy {item.price}g
-                        </Button>
-                      )}
-                    </CardContent>
+                    {/* Purchase Button */}
+                    {item.isOwned ? (
+                      <Button variant="secondary" className="w-full text-xs h-8" disabled>
+                        ✓ Owned
+                      </Button>
+                    ) : (userStats?.level || 1) < item.unlockLevel ? (
+                      <Button variant="secondary" className="w-full text-xs h-8" disabled>
+                        <Lock className="w-3 h-3 mr-1" />
+                        Lv.{item.unlockLevel}
+                      </Button>
+                    ) : (userStats?.gold || 0) < item.price ? (
+                      <Button variant="destructive" className="w-full text-xs h-8" disabled>
+                        Need Gold
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => handlePurchase(item)}
+                        disabled={purchaseItemMutation.isPending}
+                        className="w-full bg-game-primary hover:bg-blue-600 text-xs h-8"
+                      >
+                        Buy {item.price}g
+                      </Button>
+                    )}
+                  </CardContent>
 
-                    {/* Rarity Glow Effect */}
-                    {item.rarity === 'legendary' && (
-                      <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 animate-pulse" />
-                      </div>
-                    )}
-                    {item.rarity === 'epic' && (
-                      <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-pink-400/10 animate-pulse" />
-                      </div>
-                    )}
-                  </Card>
-                ))}
+                  {/* Rarity Glow Effect */}
+                  {item.rarity === 'legendary' && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 animate-pulse" />
+                    </div>
+                  )}
+                  {item.rarity === 'epic' && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-pink-400/10 animate-pulse" />
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </div>
+
+            {filterItemsByCategory(selectedCategory).length === 0 && (
+              <div className="text-center py-12">
+                <ShoppingCart className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">No Items Available</h3>
+                <p className="text-muted-foreground">Check back later for new {categories.find(c => c.id === selectedCategory)?.name.toLowerCase()}!</p>
               </div>
-
-              {filterItemsByCategory(category.id).length === 0 && (
-                <div className="text-center py-12">
-                  <ShoppingCart className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                  <h3 className="text-lg font-semibold text-foreground mb-2">No Items Available</h3>
-                  <p className="text-muted-foreground">Check back later for new {category.name.toLowerCase()}!</p>
-                </div>
-              )}
-            </TabsContent>
-          ))}
+            )}
+          </TabsContent>
 
           {/* Potions Tab */}
           <TabsContent value="potions">
