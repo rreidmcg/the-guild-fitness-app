@@ -25,7 +25,7 @@ import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import caveRatImage from "@assets/IMG_3670_1753151064629.png";
 import wildGoblinImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_1753151490494.png";
 import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753196270170.png";
-import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
+import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
