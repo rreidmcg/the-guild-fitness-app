@@ -352,14 +352,14 @@ export default function Battle() {
                     return (
                       <Card 
                         key={monster.id}
-                        className={`bg-card border-border transition-colors ${
+                        className={`transition-all duration-200 ${
                           onCooldown 
-                            ? 'opacity-60 cursor-not-allowed border-gray-500' 
-                            : 'hover:border-primary cursor-pointer'
+                            ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-700 border-gray-400 dark:border-gray-500 shadow-none' 
+                            : 'bg-card border-border hover:border-primary hover:shadow-lg hover:scale-105 cursor-pointer'
                         }`}
                         onClick={() => !onCooldown && startBattle(monster)}
                       >
-                        <CardContent className="p-4">
+                        <CardContent className={`p-4 ${onCooldown ? 'bg-gray-50 dark:bg-gray-800' : ''}`}>
                           <div className="flex items-start space-x-4">
                             {/* Monster Image */}
                             {monster.image && (
@@ -388,7 +388,7 @@ export default function Battle() {
                                 </h3>
                                 <span className={`text-sm px-2 py-1 rounded ${
                                   onCooldown 
-                                    ? 'bg-gray-600 text-gray-300' 
+                                    ? 'bg-gray-500 text-gray-300 border border-gray-400' 
                                     : 'bg-red-700 text-white'
                                 }`}>
                                   Lv.{monster.level}
