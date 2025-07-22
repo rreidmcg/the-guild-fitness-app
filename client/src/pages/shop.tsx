@@ -295,25 +295,27 @@ export default function Shop() {
 
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11 mb-6">
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <TabsTrigger key={category.id} value={category.id} className="flex flex-col items-center space-y-1 p-2">
-                  <Icon className="w-4 h-4" />
-                  <span className="text-xs">{category.name}</span>
-                </TabsTrigger>
-              );
-            })}
-            <TabsTrigger value="potions" className="flex flex-col items-center space-y-1 p-2">
-              <Heart className="w-4 h-4" />
-              <span className="text-xs">Potions</span>
-            </TabsTrigger>
-            <TabsTrigger value="gold" className="flex flex-col items-center space-y-1 p-2">
-              <Wallet className="w-4 h-4" />
-              <span className="text-xs">Gold</span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-2">
+            <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <TabsTrigger key={category.id} value={category.id} className="flex flex-col items-center space-y-1 p-2">
+                    <Icon className="w-4 h-4" />
+                    <span className="text-xs">{category.name}</span>
+                  </TabsTrigger>
+                );
+              })}
+              <TabsTrigger value="potions" className="flex flex-col items-center space-y-1 p-2">
+                <Heart className="w-4 h-4" />
+                <span className="text-xs">Potions</span>
+              </TabsTrigger>
+              <TabsTrigger value="gold" className="flex flex-col items-center space-y-1 p-2">
+                <Wallet className="w-4 h-4" />
+                <span className="text-xs">Gold</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {categories.map((category) => (
             <TabsContent key={category.id} value={category.id}>
