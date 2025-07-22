@@ -545,7 +545,7 @@ export default function Battle() {
         </div>
 
         {/* VS Indicator - Center Top */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10" style={{ marginLeft: '-15px' }}>
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10" style={{ marginLeft: '-10px' }}>
           <div className="text-xl font-bold text-yellow-200 bg-black/90 px-3 py-1 rounded-full border-2 border-yellow-400/50 shadow-lg">
             VS
           </div>
