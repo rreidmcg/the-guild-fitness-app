@@ -92,7 +92,7 @@ const categoryIcons = {
 export default function Shop() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("armor");
+  const [activeTab, setActiveTab] = useState("equipment");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showGoldPurchase, setShowGoldPurchase] = useState(false);
 
@@ -335,50 +335,39 @@ export default function Shop() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-8">
             <div className="flex items-center gap-4">
-              {/* Main Category Tabs */}
-              <div className="flex gap-2">
-                <div className="flex items-center">
-                  <button
-                    onClick={() => setActiveTab("armor")}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-l-lg transition-colors ${
-                      activeTab === "armor" 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                    }`}
-                  >
-                    <Crown className="w-4 h-4" />
-                    <span className="text-sm font-medium">Armor</span>
-                  </button>
-                  
-                  {/* Category Dropdown integrated with armor tab */}
-                  {activeTab === "armor" && (
-                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                      <SelectTrigger className="w-32 h-10 rounded-l-none rounded-r-lg border-l-0 bg-primary text-primary-foreground border-primary hover:bg-primary/90">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">
-                          <div className="flex items-center space-x-2">
-                            <Star className="w-4 h-4" />
-                            <span>All</span>
-                          </div>
-                        </SelectItem>
-                        {categories.map((category) => {
-                          const Icon = category.icon;
-                          return (
-                            <SelectItem key={category.id} value={category.id}>
-                              <div className="flex items-center space-x-2">
-                                <Icon className="w-4 h-4" />
-                                <span>{category.name}</span>
-                              </div>
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                  )}
+              {/* Equipment Section */}
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground mb-1">Equipment</span>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-40 h-10 bg-primary text-primary-foreground border-primary hover:bg-primary/90">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">
+                        <div className="flex items-center space-x-2">
+                          <Star className="w-4 h-4" />
+                          <span>All</span>
+                        </div>
+                      </SelectItem>
+                      {categories.map((category) => {
+                        const Icon = category.icon;
+                        return (
+                          <SelectItem key={category.id} value={category.id}>
+                            <div className="flex items-center space-x-2">
+                              <Icon className="w-4 h-4" />
+                              <span>{category.name}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
                 </div>
-                
+              </div>
+
+              {/* Other Category Tabs */}
+              <div className="flex gap-2">
                 <button
                   onClick={() => setActiveTab("potions")}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
@@ -406,8 +395,8 @@ export default function Shop() {
             </div>
           </div>
 
-          {/* Armor Tab Content */}
-          <TabsContent value="armor">
+          {/* Equipment Tab Content */}
+          <TabsContent value="equipment">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {filterItemsByCategory(selectedCategory).map((item: ShopItem) => (
                 <Card key={item.id} className="bg-card border-border relative overflow-hidden">
