@@ -20,7 +20,7 @@ import {
   Clock
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
-import caveRatImage from "@assets/F7233D9C-D42A-4EE8-BB26-7DBE9776370B_1753136552381.png";
+import caveRatImage from "@assets/IMG_3670_1753151064629.png";
 import battlePlayerImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
@@ -502,9 +502,7 @@ export default function Battle() {
                 <img 
                   src={battleState.monster.image} 
                   alt={battleState.monster.name}
-                  className={`w-20 h-20 object-contain bg-transparent ${
-                    battleState.monster.name === 'Cave Rat' ? 'cave-rat-transparent' : ''
-                  }`}
+                  className="w-20 h-20 object-contain bg-transparent"
                   style={{ 
                     backgroundColor: 'transparent',
                     imageRendering: 'pixelated'
