@@ -25,6 +25,7 @@ import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import minorHealingPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753214477623.png";
+import majorHealingPotionImage from "@assets/1860C3F1-AEFB-419D-BAB2-306C00CA6321_1753215117108.png";
 
 interface ShopItem {
   id: number;
@@ -500,11 +501,21 @@ export default function Shop() {
                   </CardHeader>
                   <CardContent className="p-3">
                     {/* Potion Visual */}
-                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border ${potion.id === 'minor_healing' ? 'bg-card' : `bg-gradient-to-br ${potion.color}`}`}>
+                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border ${(potion.id === 'minor_healing' || potion.id === 'major_healing') ? 'bg-card' : `bg-gradient-to-br ${potion.color}`}`}>
                       {potion.id === 'minor_healing' ? (
                         <img 
                           src={minorHealingPotionImage} 
                           alt="Minor Healing Potion"
+                          className="w-16 h-16 object-contain"
+                          style={{ 
+                            imageRendering: 'pixelated',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                          }}
+                        />
+                      ) : potion.id === 'major_healing' ? (
+                        <img 
+                          src={majorHealingPotionImage} 
+                          alt="Major Healing Potion"
                           className="w-16 h-16 object-contain"
                           style={{ 
                             imageRendering: 'pixelated',
