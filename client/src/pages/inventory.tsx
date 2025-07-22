@@ -158,10 +158,7 @@ export default function Inventory() {
                 Manage your items and equipment • {inventory?.length || 0}/{totalSlots} slots used
               </p>
             </div>
-            <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
-              <Coins className="w-4 h-4 text-yellow-500" />
-              <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
-            </div>
+
           </div>
         </div>
       </div>

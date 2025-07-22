@@ -160,10 +160,7 @@ export default function Stats() {
               <h1 className="text-2xl font-bold text-foreground">Character Stats</h1>
               <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
             </div>
-            <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
-              <Coins className="w-4 h-4 text-yellow-500" />
-              <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
-            </div>
+
           </div>
         </div>
       </div>
