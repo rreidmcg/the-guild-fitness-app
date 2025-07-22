@@ -93,7 +93,7 @@ export default function Shop() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("armor");
-  const [selectedCategory, setSelectedCategory] = useState("head");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [showGoldPurchase, setShowGoldPurchase] = useState(false);
 
   const { data: userStats } = useQuery<UserStats>({
@@ -226,6 +226,12 @@ export default function Shop() {
   };
 
   const filterItemsByCategory = (category: string) => {
+    if (category === "all") {
+      // Show all armor items (exclude potions and other non-armor items)
+      return shopItems?.filter((item: ShopItem) => 
+        categories.some(cat => cat.id === item.category)
+      ) || [];
+    }
     return shopItems?.filter((item: ShopItem) => item.category === category) || [];
   };
 
@@ -328,20 +334,50 @@ export default function Shop() {
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-8">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
               {/* Main Category Tabs */}
               <div className="flex gap-2">
-                <button
-                  onClick={() => setActiveTab("armor")}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                    activeTab === "armor" 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                  }`}
-                >
-                  <Crown className="w-4 h-4" />
-                  <span className="text-sm font-medium">Armor</span>
-                </button>
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setActiveTab("armor")}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-l-lg transition-colors ${
+                      activeTab === "armor" 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                    }`}
+                  >
+                    <Crown className="w-4 h-4" />
+                    <span className="text-sm font-medium">Armor</span>
+                  </button>
+                  
+                  {/* Category Dropdown integrated with armor tab */}
+                  {activeTab === "armor" && (
+                    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                      <SelectTrigger className="w-32 h-10 rounded-l-none rounded-r-lg border-l-0 bg-primary text-primary-foreground border-primary hover:bg-primary/90">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">
+                          <div className="flex items-center space-x-2">
+                            <Star className="w-4 h-4" />
+                            <span>All</span>
+                          </div>
+                        </SelectItem>
+                        {categories.map((category) => {
+                          const Icon = category.icon;
+                          return (
+                            <SelectItem key={category.id} value={category.id}>
+                              <div className="flex items-center space-x-2">
+                                <Icon className="w-4 h-4" />
+                                <span>{category.name}</span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
                 
                 <button
                   onClick={() => setActiveTab("potions")}
@@ -352,7 +388,7 @@ export default function Shop() {
                   }`}
                 >
                   <Heart className="w-4 h-4" />
-                  <span className="text-sm font-medium">Potions</span>
+                  <span className="text-sm font-medium">Consumables</span>
                 </button>
                 
                 <button
@@ -367,31 +403,6 @@ export default function Shop() {
                   <span className="text-sm font-medium">Gold</span>
                 </button>
               </div>
-
-              {/* Category Dropdown - Only show when armor tab is active */}
-              {activeTab === "armor" && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">Category:</span>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => {
-                        const Icon = category.icon;
-                        return (
-                          <SelectItem key={category.id} value={category.id}>
-                            <div className="flex items-center space-x-2">
-                              <Icon className="w-4 h-4" />
-                              <span>{category.name}</span>
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
             </div>
           </div>
 
