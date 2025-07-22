@@ -566,7 +566,7 @@ export default function Battle() {
         </div>
 
         {/* Combatants Area */}
-        <div className="flex-1 flex items-center justify-between px-2" style={{ paddingTop: '30%' }}>
+        <div className="flex-1 flex items-center justify-between px-4" style={{ paddingTop: '30%' }}>
           {/* Player Avatar (Left) */}
           <div className="flex flex-col items-center">
             <div className="w-44 h-44 flex items-end justify-center">
