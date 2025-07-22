@@ -15,7 +15,10 @@ import {
   Sparkles,
   Lock,
   Heart,
-  Plus
+  Plus,
+  CreditCard,
+  Wallet,
+  Check
 } from "lucide-react";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -53,6 +56,7 @@ const categoryIcons = {
 export default function Shop() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("potions");
+  const [showGoldPurchase, setShowGoldPurchase] = useState(false);
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -85,6 +89,33 @@ export default function Shop() {
       toast({
         title: "Purchase Failed",
         description: error.message || "Not enough gold or item already owned",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const purchaseGoldMutation = useMutation({
+    mutationFn: async (goldPackage: { amount: number; price: number }) => {
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          amount: goldPackage.price,
+          goldAmount: goldPackage.amount,
+          description: `${goldPackage.amount} Gold Coins`
+        })
+      });
+      if (!response.ok) throw new Error('Failed to create payment');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Redirect to Stripe checkout
+      window.location.href = `/checkout?client_secret=${data.clientSecret}&gold=${data.goldAmount}`;
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Payment Failed",
+        description: error.message || "Failed to initiate payment",
         variant: "destructive",
       });
     },
@@ -244,9 +275,19 @@ export default function Shop() {
               <h1 className="text-2xl font-bold text-foreground">Shop</h1>
               <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
-            <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
-              <Coins className="w-4 h-4 text-yellow-500" />
-              <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
+                <Coins className="w-4 h-4 text-yellow-500" />
+                <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
+              </div>
+              <Button 
+                onClick={() => setActiveTab("gold")}
+                size="sm"
+                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Buy Gold
+              </Button>
             </div>
           </div>
         </div>
@@ -254,7 +295,7 @@ export default function Shop() {
 
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9 mb-6">
+          <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11 mb-6">
             {categories.map((category) => {
               const Icon = category.icon;
               return (
@@ -268,46 +309,46 @@ export default function Shop() {
               <Heart className="w-4 h-4" />
               <span className="text-xs">Potions</span>
             </TabsTrigger>
+            <TabsTrigger value="gold" className="flex flex-col items-center space-y-1 p-2">
+              <Wallet className="w-4 h-4" />
+              <span className="text-xs">Gold</span>
+            </TabsTrigger>
           </TabsList>
 
           {categories.map((category) => (
             <TabsContent key={category.id} value={category.id}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {filterItemsByCategory(category.id).map((item: ShopItem) => (
                   <Card key={item.id} className="bg-card border-border relative overflow-hidden">
-                    <CardHeader className="pb-3">
+                    <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg font-bold text-foreground">{item.name}</CardTitle>
-                        <Badge className={`${rarityColors[item.rarity as keyof typeof rarityColors]} text-white`}>
-                          {item.rarity}
+                        <CardTitle className="text-sm font-bold text-foreground truncate">{item.name}</CardTitle>
+                        <Badge className={`${rarityColors[item.rarity as keyof typeof rarityColors]} text-white text-xs`}>
+                          {item.rarity[0].toUpperCase()}
                         </Badge>
                       </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-3">
                       {/* Item Preview */}
-                      <div className="w-full h-32 rounded-lg mb-4 flex items-center justify-center border border-border" 
+                      <div className="w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border" 
                            style={{ backgroundColor: item.color }}>
-                        <div className="text-white text-2xl font-bold opacity-80">
+                        <div className="text-white text-lg font-bold opacity-80">
                           {item.name[0]}
                         </div>
                       </div>
 
                       {/* Item Info */}
-                      <div className="space-y-2 mb-4">
-                        {item.description && (
-                          <p className="text-sm text-muted-foreground">{item.description}</p>
-                        )}
-                        
-                        <div className="flex items-center space-x-3 text-sm">
+                      <div className="space-y-2 mb-3">
+                        <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center space-x-1">
-                            <Coins className="w-4 h-4 text-yellow-500" />
+                            <Coins className="w-3 h-3 text-yellow-500" />
                             <span className="font-medium text-foreground">{item.price}</span>
                           </div>
                           
                           {item.unlockLevel > 1 && (
                             <div className="flex items-center space-x-1">
-                              <Star className="w-4 h-4 text-blue-400" />
-                              <span className="text-muted-foreground">Lv. {item.unlockLevel}</span>
+                              <Star className="w-3 h-3 text-blue-400" />
+                              <span className="text-muted-foreground">Lv.{item.unlockLevel}</span>
                             </div>
                           )}
                         </div>
@@ -315,28 +356,25 @@ export default function Shop() {
 
                       {/* Purchase Button */}
                       {item.isOwned ? (
-                        <Button variant="secondary" className="w-full" disabled>
-                          <Check className="w-4 h-4 mr-2" />
-                          Owned
+                        <Button variant="secondary" className="w-full text-xs h-8" disabled>
+                          ✓ Owned
                         </Button>
                       ) : (userStats?.level || 1) < item.unlockLevel ? (
-                        <Button variant="secondary" className="w-full" disabled>
-                          <Lock className="w-4 h-4 mr-2" />
-                          Level {item.unlockLevel} Required
+                        <Button variant="secondary" className="w-full text-xs h-8" disabled>
+                          <Lock className="w-3 h-3 mr-1" />
+                          Lv.{item.unlockLevel}
                         </Button>
                       ) : (userStats?.gold || 0) < item.price ? (
-                        <Button variant="destructive" className="w-full" disabled>
-                          <Coins className="w-4 h-4 mr-2" />
-                          Not Enough Gold
+                        <Button variant="destructive" className="w-full text-xs h-8" disabled>
+                          Need Gold
                         </Button>
                       ) : (
                         <Button 
                           onClick={() => handlePurchase(item)}
                           disabled={purchaseItemMutation.isPending}
-                          className="w-full bg-game-primary hover:bg-blue-600"
+                          className="w-full bg-game-primary hover:bg-blue-600 text-xs h-8"
                         >
-                          <ShoppingCart className="w-4 h-4 mr-2" />
-                          Buy for {item.price} Gold
+                          Buy {item.price}g
                         </Button>
                       )}
                     </CardContent>
@@ -368,75 +406,149 @@ export default function Shop() {
 
           {/* Potions Tab */}
           <TabsContent value="potions">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {potions.map((potion) => (
                 <Card key={potion.id} className="bg-card border-border relative overflow-hidden">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg font-bold text-foreground flex items-center">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-bold text-foreground flex items-center truncate">
                       {potion.type === 'healing' ? (
-                        <Heart className="w-5 h-5 text-red-500 mr-2" />
+                        <Heart className="w-4 h-4 text-red-500 mr-1" />
                       ) : (
-                        <Zap className="w-5 h-5 text-blue-500 mr-2" />
+                        <Zap className="w-4 h-4 text-blue-500 mr-1" />
                       )}
-                      {potion.name}
+                      {potion.name.replace(' Potion', '')}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-3">
                     {/* Potion Visual */}
-                    <div className={`w-full h-32 rounded-lg mb-4 flex items-center justify-center border border-border bg-gradient-to-br ${potion.color}`}>
-                      <div className="text-white text-4xl">🧪</div>
+                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border bg-gradient-to-br ${potion.color}`}>
+                      <div className="text-white text-2xl">🧪</div>
                     </div>
 
                     {/* Potion Info */}
-                    <div className="space-y-2 mb-4">
-                      <p className="text-sm text-muted-foreground">{potion.description}</p>
-                      <div className="flex items-center justify-between text-sm">
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center space-x-1">
                           {potion.type === 'healing' ? (
                             <>
-                              <Heart className="w-4 h-4 text-red-400" />
-                              <span className="font-medium text-green-400">{potion.healing} HP</span>
+                              <Heart className="w-3 h-3 text-red-400" />
+                              <span className="font-medium text-green-400">{potion.healing}</span>
                             </>
                           ) : (
                             <>
-                              <Zap className="w-4 h-4 text-blue-400" />
-                              <span className="font-medium text-blue-400">{potion.healing} MP</span>
+                              <Zap className="w-3 h-3 text-blue-400" />
+                              <span className="font-medium text-blue-400">{potion.healing}</span>
                             </>
                           )}
                         </div>
                         <div className="flex items-center space-x-1">
-                          <Coins className="w-4 h-4 text-yellow-500" />
+                          <Coins className="w-3 h-3 text-yellow-500" />
                           <span className="font-medium text-foreground">{potion.price}</span>
                         </div>
                       </div>
                       
                       {/* Inventory Count */}
                       {getInventoryQuantity(potion.id) > 0 && (
-                        <div className="flex items-center space-x-1 text-blue-400 text-sm">
-                          <span>You have: {getInventoryQuantity(potion.id)}</span>
+                        <div className="text-blue-400 text-xs">
+                          Own: {getInventoryQuantity(potion.id)}
                         </div>
                       )}
                     </div>
 
                     {/* Purchase Button */}
                     {(userStats?.gold || 0) < potion.price ? (
-                      <Button variant="destructive" className="w-full" disabled>
-                        <Coins className="w-4 h-4 mr-2" />
-                        Not Enough Gold
+                      <Button variant="destructive" className="w-full text-xs h-8" disabled>
+                        Need Gold
                       </Button>
                     ) : (
                       <Button 
                         onClick={() => handleBuyPotion(potion.id, potion.price)}
                         disabled={purchasePotionMutation.isPending}
-                        className={`w-full ${potion.type === 'healing' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                        className={`w-full text-xs h-8 ${potion.type === 'healing' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                       >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Buy for {potion.price} Gold
+                        Buy {potion.price}g
                       </Button>
                     )}
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </TabsContent>
+
+          {/* Gold Purchase Tab */}
+          <TabsContent value="gold">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Purchase Gold Coins</h2>
+              <p className="text-muted-foreground">Get more gold coins to purchase items and potions</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+              {[
+                { amount: 100, price: 0.99, bonus: 0, popular: false },
+                { amount: 500, price: 4.99, bonus: 50, popular: true },
+                { amount: 1000, price: 9.99, bonus: 150, popular: false },
+                { amount: 2500, price: 19.99, bonus: 500, popular: false },
+                { amount: 5000, price: 39.99, bonus: 1000, popular: false },
+                { amount: 10000, price: 79.99, bonus: 2500, popular: false }
+              ].map((goldPackage) => (
+                <Card key={goldPackage.amount} className={`bg-card border-border relative overflow-hidden ${goldPackage.popular ? 'ring-2 ring-yellow-500' : ''}`}>
+                  {goldPackage.popular && (
+                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-center py-1 text-xs font-bold">
+                      MOST POPULAR
+                    </div>
+                  )}
+                  
+                  <CardHeader className={goldPackage.popular ? "pt-8" : ""}>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center mb-2">
+                        <Coins className="w-8 h-8 text-yellow-500" />
+                      </div>
+                      <CardTitle className="text-xl font-bold text-foreground">
+                        {goldPackage.amount.toLocaleString()} Gold
+                      </CardTitle>
+                      {goldPackage.bonus > 0 && (
+                        <div className="text-green-500 text-sm font-medium">
+                          +{goldPackage.bonus} Bonus Gold
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="text-center">
+                    <div className="mb-4">
+                      <div className="text-3xl font-bold text-foreground">
+                        ${goldPackage.price}
+                      </div>
+                      <div className="text-muted-foreground text-sm">
+                        ${(goldPackage.price / goldPackage.amount).toFixed(4)} per gold
+                      </div>
+                    </div>
+
+                    <Button 
+                      onClick={() => purchaseGoldMutation.mutate(goldPackage)}
+                      disabled={purchaseGoldMutation.isPending}
+                      className={`w-full ${goldPackage.popular 
+                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' 
+                        : 'bg-game-primary hover:bg-blue-600'
+                      } text-white`}
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Purchase
+                    </Button>
+                  </CardContent>
+
+                  {goldPackage.popular && (
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-orange-400/5 animate-pulse" />
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </div>
+
+            <div className="mt-8 text-center text-sm text-muted-foreground">
+              <p>💳 Secure payment processing by Stripe</p>
+              <p>✨ Gold coins are added to your account instantly after payment</p>
             </div>
           </TabsContent>
         </Tabs>
