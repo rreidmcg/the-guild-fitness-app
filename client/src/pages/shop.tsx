@@ -295,26 +295,75 @@ export default function Shop() {
 
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-2">
-            <TabsList className="grid w-full grid-cols-6 lg:grid-cols-11">
-              {categories.map((category) => {
+          <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-8">
+            <div className="grid grid-cols-5 gap-2 mb-2">
+              {/* First row - 5 tabs */}
+              {categories.slice(0, 5).map((category) => {
                 const Icon = category.icon;
                 return (
-                  <TabsTrigger key={category.id} value={category.id} className="flex flex-col items-center space-y-1 p-2">
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveTab(category.id)}
+                    className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
+                      activeTab === category.id 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                    }`}
+                  >
                     <Icon className="w-4 h-4" />
                     <span className="text-xs">{category.name}</span>
-                  </TabsTrigger>
+                  </button>
                 );
               })}
-              <TabsTrigger value="potions" className="flex flex-col items-center space-y-1 p-2">
+            </div>
+            
+            <div className="grid grid-cols-5 gap-2">
+              {/* Second row - remaining tabs */}
+              {categories.slice(5).map((category) => {
+                const Icon = category.icon;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveTab(category.id)}
+                    className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
+                      activeTab === category.id 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-xs">{category.name}</span>
+                  </button>
+                );
+              })}
+              
+              <button
+                onClick={() => setActiveTab("potions")}
+                className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
+                  activeTab === "potions" 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                }`}
+              >
                 <Heart className="w-4 h-4" />
                 <span className="text-xs">Potions</span>
-              </TabsTrigger>
-              <TabsTrigger value="gold" className="flex flex-col items-center space-y-1 p-2">
+              </button>
+              
+              <button
+                onClick={() => setActiveTab("gold")}
+                className={`flex flex-col items-center space-y-1 p-3 rounded-lg transition-colors ${
+                  activeTab === "gold" 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                }`}
+              >
                 <Wallet className="w-4 h-4" />
                 <span className="text-xs">Gold</span>
-              </TabsTrigger>
-            </TabsList>
+              </button>
+              
+              {/* Empty cell to maintain grid */}
+              <div></div>
+            </div>
           </div>
 
           {categories.map((category) => (
