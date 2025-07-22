@@ -21,7 +21,9 @@ import {
   Wallet,
   Check,
   Settings,
-  ChevronDown
+  ChevronDown,
+  Coffee,
+  Beef
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -92,8 +94,9 @@ const categoryIcons = {
 export default function Shop() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState("equipment");
+  const [activeTab, setActiveTab] = useState("consumables");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedConsumableCategory, setSelectedConsumableCategory] = useState("all");
   const [showGoldPurchase, setShowGoldPurchase] = useState(false);
 
   const { data: userStats } = useQuery<UserStats>({
@@ -235,6 +238,20 @@ export default function Shop() {
     return shopItems?.filter((item: ShopItem) => item.category === category) || [];
   };
 
+  const filterPotionsByCategory = (category: string) => {
+    if (category === "all") {
+      return potions;
+    }
+    if (category === "health") {
+      return potions.filter((potion) => potion.type === "healing");
+    }
+    if (category === "mana") {
+      return potions.filter((potion) => potion.type === "mana");
+    }
+    // For now, food and drink return empty arrays since we don't have those items yet
+    return [];
+  };
+
   const categories = [
     { id: "head", name: "Head", icon: Crown },
     { id: "shoulders", name: "Shoulders", icon: Shirt },
@@ -244,6 +261,13 @@ export default function Shop() {
     { id: "waist", name: "Waist", icon: Crown },
     { id: "legs", name: "Legs", icon: Zap },
     { id: "feet", name: "Feet", icon: Footprints },
+  ];
+
+  const consumableCategories = [
+    { id: "health", name: "Health Potions", icon: Heart },
+    { id: "mana", name: "Mana Potions", icon: Sparkles },
+    { id: "food", name: "Food", icon: Beef },
+    { id: "drink", name: "Drink", icon: Coffee },
   ];
 
   const potions = [
@@ -366,20 +390,39 @@ export default function Shop() {
                 </div>
               </div>
 
+              {/* Consumables Section */}
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col">
+                  <span className="text-xs text-muted-foreground mb-1">Consumables</span>
+                  <Select value={selectedConsumableCategory} onValueChange={setSelectedConsumableCategory}>
+                    <SelectTrigger className="w-40 h-10 bg-primary text-primary-foreground border-primary hover:bg-primary/90">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">
+                        <div className="flex items-center space-x-2">
+                          <Star className="w-4 h-4" />
+                          <span>All</span>
+                        </div>
+                      </SelectItem>
+                      {consumableCategories.map((category) => {
+                        const Icon = category.icon;
+                        return (
+                          <SelectItem key={category.id} value={category.id}>
+                            <div className="flex items-center space-x-2">
+                              <Icon className="w-4 h-4" />
+                              <span>{category.name}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               {/* Other Category Tabs */}
               <div className="flex gap-2">
-                <button
-                  onClick={() => setActiveTab("potions")}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                    activeTab === "potions" 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                  }`}
-                >
-                  <Heart className="w-4 h-4" />
-                  <span className="text-sm font-medium">Consumables</span>
-                </button>
-                
                 <button
                   onClick={() => setActiveTab("gold")}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
@@ -483,10 +526,10 @@ export default function Shop() {
             )}
           </TabsContent>
 
-          {/* Potions Tab */}
-          <TabsContent value="potions">
+          {/* Consumables Tab */}
+          <TabsContent value="consumables">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {potions.map((potion) => (
+              {filterPotionsByCategory(selectedConsumableCategory).map((potion) => (
                 <Card key={potion.id} className="bg-card border-border relative overflow-hidden">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-bold text-foreground flex items-center truncate">
