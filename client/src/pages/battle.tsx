@@ -501,11 +501,11 @@ export default function Battle() {
           variant="ghost" 
           size="sm"
           onClick={returnToMonsterList}
-          className="text-gray-300 hover:text-white absolute left-4"
+          className="text-white hover:text-yellow-200 absolute left-4"
         >
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <div className="text-lg font-bold">Battle Arena</div>
+        <div className="text-lg font-bold text-white">Battle Arena</div>
       </div>
 
       {/* Main Battle Area */}
