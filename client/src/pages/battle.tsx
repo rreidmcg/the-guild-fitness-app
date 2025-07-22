@@ -544,6 +544,13 @@ export default function Battle() {
           </div>
         </div>
 
+        {/* VS Indicator - Center Top */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="text-xl font-bold text-yellow-200 bg-black/90 px-3 py-1 rounded-full border-2 border-yellow-400/50 shadow-lg">
+            VS
+          </div>
+        </div>
+
         {/* Monster Info - Top Right Corner on Battle Screen */}
         <div className="absolute top-4 right-4 z-10">
           <div className="font-bold text-sm text-red-200 bg-black/90 px-2 py-1 rounded mb-1 border border-red-400/50 shadow-lg text-right">
@@ -582,10 +589,7 @@ export default function Battle() {
             </div>
           </div>
 
-          {/* VS Indicator */}
-          <div className="text-2xl font-bold text-yellow-200 bg-black/90 px-3 py-1 rounded-full border-2 border-yellow-400/50 shadow-lg">
-            VS
-          </div>
+
 
           {/* Monster (Right) */}
           <div className="flex flex-col items-center">
