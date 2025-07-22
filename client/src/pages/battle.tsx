@@ -566,14 +566,14 @@ export default function Battle() {
         </div>
 
         {/* Combatants Area */}
-        <div className="flex-1 flex items-center justify-between px-8" style={{ paddingTop: '20%' }}>
+        <div className="flex-1 flex items-center justify-between px-8" style={{ paddingTop: '30%' }}>
           {/* Player Avatar (Left) */}
           <div className="flex flex-col items-center">
-            <div className="w-32 h-32 flex items-end justify-center">
+            <div className="w-36 h-36 flex items-end justify-center">
               <img 
                 src={battlePlayerImage} 
                 alt="Player Character"
-                className="w-28 h-28 object-contain"
+                className="w-32 h-32 object-contain"
                 style={{ 
                   imageRendering: 'pixelated',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
@@ -589,19 +589,19 @@ export default function Battle() {
 
           {/* Monster (Right) */}
           <div className="flex flex-col items-center">
-            <div className="w-32 h-32 flex items-end justify-center">
+            <div className="w-36 h-36 flex items-end justify-center">
               {battleState.monster.image ? (
                 <img 
                   src={battleState.monster.image} 
                   alt={battleState.monster.name}
-                  className="w-28 h-28 object-contain"
+                  className="w-32 h-32 object-contain"
                   style={{ 
                     imageRendering: 'pixelated',
                     filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
                   }}
                 />
               ) : (
-                <Skull className="w-20 h-20 text-red-600" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }} />
+                <Skull className="w-23 h-23 text-red-600" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }} />
               )}
             </div>
           </div>
