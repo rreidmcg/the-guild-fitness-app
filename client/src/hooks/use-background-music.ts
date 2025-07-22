@@ -6,20 +6,10 @@ import battleMusicFile from '@assets/Whispers of Aht Urghan ext v2_1753065927311
 export function useBackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Start muted to respect autoplay policies
+  const [isMuted, setIsMuted] = useState(true);
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [location] = useLocation();
-
-  // Simple check for device audio capabilities
-  const canPlayAudio = () => {
-    try {
-      // Basic check if audio is supported
-      const testAudio = new Audio();
-      return testAudio.canPlayType && testAudio.canPlayType('audio/mpeg') !== '';
-    } catch {
-      return false;
-    }
-  };
+  const wasPlayingBeforeHidden = useRef(false);
 
   // Determine which music track to use based on current page
   const getMusicTrack = () => {
@@ -29,102 +19,108 @@ export function useBackgroundMusic() {
     return defaultMusicFile;
   };
 
+  // Initialize or change audio track
   useEffect(() => {
     const requiredTrack = getMusicTrack();
     
-    // If track needs to change, update it
-    if (currentTrack !== requiredTrack) {
-      // Stop current audio if playing
+    if (currentTrack !== requiredTrack || !audioRef.current) {
+      const wasCurrentlyPlaying = isPlaying && !isMuted;
+      
+      // Clean up old audio
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = '';
+        audioRef.current = null;
       }
 
-      // Create new audio element with the correct track
+      // Create new audio element
       const audio = new Audio(requiredTrack);
       audio.loop = true;
-      audio.volume = 0.3; // Set to 30% volume to not be overwhelming
+      audio.volume = 0.3;
+      audio.preload = 'auto';
       audioRef.current = audio;
       setCurrentTrack(requiredTrack);
 
-      // Handle visibility change to pause/resume music when app goes to background/foreground
-      const handleVisibilityChange = () => {
-        if (document.hidden) {
-          // App went to background
-          if (audioRef.current && !audioRef.current.paused) {
-            audioRef.current.pause();
-          }
-        } else {
-          // App came to foreground
-          if (audioRef.current && !isMuted && canPlayAudio()) {
-            audioRef.current.play().catch(() => {
-              // Handle autoplay restrictions - user needs to interact first
-              setIsPlaying(false);
-            });
-          }
-        }
-      };
-
-      // Handle audio events
+      // Set up event listeners
       const handlePlay = () => setIsPlaying(true);
       const handlePause = () => setIsPlaying(false);
+      const handleEnded = () => setIsPlaying(false);
       const handleError = () => {
-        console.warn('Background music failed to load or play');
         setIsPlaying(false);
+        console.warn('Background music failed to load');
       };
 
       audio.addEventListener('play', handlePlay);
       audio.addEventListener('pause', handlePause);
+      audio.addEventListener('ended', handleEnded);
       audio.addEventListener('error', handleError);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
 
-      // Try to start playing if not muted (will likely fail due to autoplay restrictions)
-      if (!isMuted && canPlayAudio()) {
+      // Resume playing if it was playing before track change
+      if (wasCurrentlyPlaying) {
         audio.play().catch(() => {
-          // Autoplay blocked - user needs to interact first
           setIsPlaying(false);
         });
       }
-
-      return () => {
-        audio.removeEventListener('play', handlePlay);
-        audio.removeEventListener('pause', handlePause);
-        audio.removeEventListener('error', handleError);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.src = '';
-        }
-      };
     }
-  }, [isMuted, location]);
+  }, [location]);
+
+  // Handle visibility changes to prevent music from stopping when switching tabs
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!audioRef.current) return;
+
+      if (document.hidden) {
+        // Store playing state before hiding
+        wasPlayingBeforeHidden.current = !audioRef.current.paused;
+        // Don't pause the audio - let it continue playing in background
+      } else {
+        // Tab became visible again
+        if (wasPlayingBeforeHidden.current && !isMuted && audioRef.current.paused) {
+          // Resume if it was playing before and user hasn't muted it
+          audioRef.current.play().catch(() => {
+            setIsPlaying(false);
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isMuted]);
 
   const toggleMusic = () => {
-    if (!audioRef.current || !canPlayAudio()) return;
+    if (!audioRef.current) return;
     
-    if (isMuted) {
-      // User wants to turn music on
+    if (isMuted || audioRef.current.paused) {
+      // Turn music on
       setIsMuted(false);
-      audioRef.current.play().catch(() => {
-        console.warn('Could not play background music - autoplay blocked or audio unavailable');
-        setIsMuted(true); // Keep it muted if playback fails
+      audioRef.current.play().catch((error) => {
+        console.warn('Could not play background music:', error.message);
+        setIsPlaying(false);
       });
     } else {
-      // User wants to turn music off
+      // Turn music off
       audioRef.current.pause();
       setIsMuted(true);
+      setIsPlaying(false);
     }
   };
 
   const startMusic = () => {
-    if (!audioRef.current || !isMuted || !canPlayAudio()) return;
-    
-    setIsMuted(false);
-    audioRef.current.play().catch(() => {
-      console.warn('Could not play background music - autoplay blocked or audio unavailable');
-      setIsPlaying(false);
-    });
+    if (!audioRef.current || !isMuted) return;
+    toggleMusic();
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   return {
     isPlaying,
