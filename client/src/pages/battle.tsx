@@ -573,9 +573,9 @@ export default function Battle() {
         </div>
 
         {/* Combatants Area */}
-        <div className="flex-1 flex items-center justify-between px-1" style={{ paddingTop: '30%', marginLeft: '-10px' }}>
+        <div className="flex-1 relative px-1" style={{ paddingTop: '30%', marginLeft: '-10px' }}>
           {/* Player Avatar (Left) */}
-          <div className="flex flex-col items-center">
+          <div className="absolute left-8 top-0 flex flex-col items-center">
             <div className="w-44 h-44 flex items-end justify-center">
               <img 
                 src={battlePlayerImage} 
@@ -589,10 +589,8 @@ export default function Battle() {
             </div>
           </div>
 
-
-
           {/* Monster (Right) */}
-          <div className="flex flex-col items-center" style={{ marginTop: '20px', marginLeft: '-60px' }}>
+          <div className="absolute right-8 top-5 flex flex-col items-center" style={{ transform: 'translateX(-60px)' }}>
             <div className="w-36 h-36 flex items-end justify-center">
               {battleState.monster.image ? (
                 <img 
