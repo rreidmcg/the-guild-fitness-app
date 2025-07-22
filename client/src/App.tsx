@@ -40,7 +40,7 @@ function Router() {
 }
 
 function App() {
-  const { isPlaying, isMuted, toggleMusic, startMusic } = useBackgroundMusic();
+  const { isPlaying, isMuted, deviceMuted, toggleMusic, startMusic } = useBackgroundMusic();
 
   // Auto-start music on first user interaction
   const handleFirstInteraction = () => {
@@ -73,8 +73,12 @@ function App() {
               size="sm"
               onClick={toggleMusic}
               className="bg-card border-border hover:bg-accent"
+              disabled={deviceMuted}
+              title={deviceMuted ? "Device audio is muted" : isMuted || !isPlaying ? "Turn on music" : "Turn off music"}
             >
-              {isMuted || !isPlaying ? (
+              {deviceMuted ? (
+                <VolumeX className="w-4 h-4 text-gray-400" />
+              ) : isMuted || !isPlaying ? (
                 <VolumeX className="w-4 h-4" />
               ) : (
                 <Volume2 className="w-4 h-4" />
