@@ -24,6 +24,7 @@ import {
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import minorHealingPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753214477623.png";
 
 interface ShopItem {
   id: number;
@@ -35,6 +36,36 @@ interface ShopItem {
   color: string;
   description: string | null;
   isOwned: boolean;
+}
+
+interface UserStats {
+  level: number;
+  experience: number;
+  strength: number;
+  stamina: number;
+  agility: number;
+  gold: number;
+  battlesWon: number;
+  currentTier: string;
+  currentTitle: string;
+  currentHp: number;
+  maxHp: number;
+  currentMp: number;
+  maxMp: number;
+  username: string;
+  height?: number;
+  weight?: number;
+  fitnessGoal?: string;
+  skinColor?: string;
+  hairColor?: string;
+  gender?: string;
+  measurementUnit?: string;
+}
+
+interface InventoryItem {
+  itemName: string;
+  itemType: string;
+  quantity: number;
 }
 
 const rarityColors = {
@@ -61,24 +92,21 @@ export default function Shop() {
   const [activeTab, setActiveTab] = useState("potions");
   const [showGoldPurchase, setShowGoldPurchase] = useState(false);
 
-  const { data: userStats } = useQuery({
+  const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],
   });
 
-  const { data: shopItems } = useQuery({
+  const { data: shopItems } = useQuery<ShopItem[]>({
     queryKey: ["/api/shop/items"],
   });
 
-  const { data: inventory } = useQuery({
+  const { data: inventory } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
   });
 
   const purchaseItemMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      return apiRequest("/api/shop/purchase", {
-        method: "POST",
-        body: JSON.stringify({ itemId })
-      });
+      return apiRequest("POST", "/api/shop/purchase", { itemId });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/shop/items"] });
@@ -126,10 +154,7 @@ export default function Shop() {
 
   const purchasePotionMutation = useMutation({
     mutationFn: async ({ potionType, quantity }: { potionType: string; quantity: number }) => {
-      return apiRequest("/api/shop/buy-potion", {
-        method: "POST",
-        body: JSON.stringify({ potionType, quantity })
-      });
+      return apiRequest("POST", "/api/shop/buy-potion", { potionType, quantity });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
@@ -475,8 +500,20 @@ export default function Shop() {
                   </CardHeader>
                   <CardContent className="p-3">
                     {/* Potion Visual */}
-                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border bg-gradient-to-br ${potion.color}`}>
-                      <div className="text-white text-2xl">🧪</div>
+                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border ${potion.id === 'minor_healing' ? 'bg-black' : `bg-gradient-to-br ${potion.color}`}`}>
+                      {potion.id === 'minor_healing' ? (
+                        <img 
+                          src={minorHealingPotionImage} 
+                          alt="Minor Healing Potion"
+                          className="w-16 h-16 object-contain"
+                          style={{ 
+                            imageRendering: 'pixelated',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                          }}
+                        />
+                      ) : (
+                        <div className="text-white text-2xl">🧪</div>
+                      )}
                     </div>
 
                     {/* Potion Info */}
