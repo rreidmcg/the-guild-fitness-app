@@ -595,27 +595,31 @@ export default function Battle() {
 
         {/* Monster Info - Top Right Corner on Battle Screen */}
         {battleState.totalMonsters > 1 ? (
-          // Multiple monsters - show separate name plates
-          <div className="absolute top-4 right-2 z-10 flex flex-col items-end space-y-1">
-            {/* First Slime Name Plate */}
-            <div className={`font-bold text-sm bg-black/90 px-2 py-1 rounded border shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis ${
-              battleState.currentMonsterIndex === 0 ? 'text-red-200 border-red-400/50' : 'text-gray-400 border-gray-500/50'
-            }`}>
-              Green Slime #1 (Lv.1)
-              {battleState.currentMonsterIndex === 0 && (
-                <span className="text-xs ml-1 text-yellow-200">[ACTIVE]</span>
-              )}
+          // Multiple monsters - show staggered name plates
+          <>
+            {/* First Slime Name Plate - Top Right */}
+            <div className="absolute top-4 right-2 z-10">
+              <div className={`font-bold text-sm bg-black/90 px-2 py-1 rounded border shadow-lg text-right whitespace-nowrap max-w-40 overflow-hidden text-ellipsis ${
+                battleState.currentMonsterIndex === 0 ? 'text-red-200 border-red-400/50' : 'text-gray-400 border-gray-500/50'
+              }`}>
+                Green Slime #1 (Lv.1)
+                {battleState.currentMonsterIndex === 0 && (
+                  <span className="text-xs ml-1 text-yellow-200">[ACTIVE]</span>
+                )}
+              </div>
             </div>
-            {/* Second Slime Name Plate */}
-            <div className={`font-bold text-sm bg-black/90 px-2 py-1 rounded border shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis ${
-              battleState.currentMonsterIndex === 1 ? 'text-red-200 border-red-400/50' : 'text-gray-400 border-gray-500/50'
-            }`}>
-              Green Slime #2 (Lv.1)
-              {battleState.currentMonsterIndex === 1 && (
-                <span className="text-xs ml-1 text-yellow-200">[ACTIVE]</span>
-              )}
+            {/* Second Slime Name Plate - Offset Right */}
+            <div className="absolute top-12 right-8 z-10">
+              <div className={`font-bold text-sm bg-black/90 px-2 py-1 rounded border shadow-lg text-right whitespace-nowrap max-w-40 overflow-hidden text-ellipsis ${
+                battleState.currentMonsterIndex === 1 ? 'text-red-200 border-red-400/50' : 'text-gray-400 border-gray-500/50'
+              }`}>
+                Green Slime #2 (Lv.1)
+                {battleState.currentMonsterIndex === 1 && (
+                  <span className="text-xs ml-1 text-yellow-200">[ACTIVE]</span>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         ) : (
           // Single monster - original layout
           <div className="absolute top-4 right-2 z-10 flex flex-col items-end">
@@ -661,12 +665,12 @@ export default function Battle() {
 
           {/* Monster(s) (Right) */}
           {battleState.totalMonsters > 1 ? (
-            // Multiple monsters - show two slimes side by side
-            <div className="flex items-center space-x-4" style={{ marginTop: '20px', marginLeft: '-60px' }}>
-              {/* First Slime */}
-              <div className={`flex flex-col items-center transition-opacity duration-300 ${
+            // Multiple monsters - show staggered slimes
+            <div className="relative" style={{ marginTop: '20px', marginLeft: '-60px' }}>
+              {/* First Slime - Higher position */}
+              <div className={`absolute transition-opacity duration-300 ${
                 battleState.currentMonsterIndex === 0 ? 'opacity-100' : 'opacity-50'
-              }`}>
+              }`} style={{ top: '-10px', left: '0px' }}>
                 <div className="w-30 h-30 flex items-end justify-center">
                   {battleState.monster.image ? (
                     <img 
@@ -684,10 +688,10 @@ export default function Battle() {
                 </div>
               </div>
               
-              {/* Second Slime */}
-              <div className={`flex flex-col items-center transition-opacity duration-300 ${
+              {/* Second Slime - Lower position, offset right */}
+              <div className={`absolute transition-opacity duration-300 ${
                 battleState.currentMonsterIndex === 1 ? 'opacity-100' : 'opacity-50'
-              }`}>
+              }`} style={{ top: '20px', left: '40px' }}>
                 <div className="w-30 h-30 flex items-end justify-center">
                   {battleState.monster.image ? (
                     <img 
@@ -728,13 +732,13 @@ export default function Battle() {
         </div>
 
         {/* Battle Log Area - Overlaid on bottom left */}
-        <div className="absolute bottom-32 left-2 right-2 z-10 bg-black/80 border border-gray-500 p-1 min-h-[30px] max-h-[30px] overflow-y-auto backdrop-blur-sm rounded">
-          <div className="text-xs text-white">
+        <div className="absolute bottom-24 left-2 right-2 z-10 bg-black/20 border border-gray-500/30 p-1 min-h-[25px] max-h-[25px] overflow-y-auto backdrop-blur-sm rounded">
+          <div className="text-xs text-white font-medium">
             {battleState.battleLog.length === 0 ? (
-              <div className="text-gray-300 italic">Battle begins...</div>
+              <div className="text-white/80 italic">Battle begins...</div>
             ) : (
               battleState.battleLog.map((log, index) => (
-                <div key={index} className="mb-0.5">
+                <div key={index} className="mb-0.5 text-white">
                   {log}
                 </div>
               ))
@@ -743,41 +747,41 @@ export default function Battle() {
         </div>
 
         {/* Compact RPG Action Menu - Overlaid on bottom */}
-        <div className="absolute bottom-4 left-2 right-2 z-10 bg-black/60 text-white p-2 border border-gray-400/50 backdrop-blur-sm rounded">
+        <div className="absolute bottom-2 left-2 right-2 z-10 bg-black/60 text-white p-1 border border-gray-400/50 backdrop-blur-sm rounded">
           <div className="max-w-4xl mx-auto">
             {battleState.battleResult === 'ongoing' && (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1">
                 <Button
                   onClick={playerAttack}
                   disabled={!battleState.isPlayerTurn || battleState.playerMp < 2}
-                  className="bg-blue-600/80 hover:bg-blue-500/80 disabled:opacity-50 disabled:cursor-not-allowed text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm"
+                  className="bg-blue-600/80 hover:bg-blue-500/80 disabled:opacity-50 disabled:cursor-not-allowed text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm"
                 >
-                  <Sword className="w-4 h-4 mr-1" />
-                  ATTACK
+                  <Sword className="w-3 h-3 mr-0.5" />
+                  ATK
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-2 px-3 text-sm font-bold cursor-not-allowed h-10 backdrop-blur-sm"
+                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
                 >
-                  <Shield className="w-4 h-4 mr-1" />
-                  DEFEND
+                  <Shield className="w-3 h-3 mr-0.5" />
+                  DEF
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-2 px-3 text-sm font-bold cursor-not-allowed h-10 backdrop-blur-sm"
+                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
                 >
-                  <Zap className="w-4 h-4 mr-1" />
-                  MAGIC
+                  <Zap className="w-3 h-3 mr-0.5" />
+                  MAG
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-2 px-3 text-sm font-bold cursor-not-allowed h-10 backdrop-blur-sm"
+                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
                 >
-                  <Heart className="w-4 h-4 mr-1" />
-                  ITEMS
+                  <Heart className="w-3 h-3 mr-0.5" />
+                  ITM
                 </Button>
               </div>
             )}
@@ -791,11 +795,11 @@ export default function Battle() {
                 <div className="text-sm text-yellow-300 mb-2">
                   You earned {battleState.monster.goldReward} gold!
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
+                <div className="grid grid-cols-2 gap-1">
+                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
                     FIGHT AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
+                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
                     HOME
                   </Button>
                 </div>
@@ -811,11 +815,11 @@ export default function Battle() {
                 <div className="text-sm text-red-300 mb-2">
                   You were defeated by {battleState.monster.name}...
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
+                <div className="grid grid-cols-2 gap-1">
+                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
                     TRY AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
+                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
                     HOME
                   </Button>
                 </div>
