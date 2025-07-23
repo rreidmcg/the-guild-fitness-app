@@ -511,8 +511,8 @@ export default function Battle() {
       {/* Main Battle Area */}
       <div className="flex-1 flex flex-col relative">
         {/* Player Info - Top Left Corner on Battle Screen */}
-        <div className="absolute top-4 left-4 z-10">
-          <div className="font-bold text-sm text-yellow-200 bg-black/90 px-2 py-1 rounded mb-1 border border-yellow-400/50 shadow-lg">
+        <div className="absolute top-4 left-2 z-10 flex flex-col items-start">
+          <div className="font-bold text-sm text-yellow-200 bg-black/90 px-2 py-1 rounded mb-1 border border-yellow-400/50 shadow-lg whitespace-nowrap max-w-44 overflow-hidden text-ellipsis">
             {userStats?.username || 'Player'} (Lv.{userStats?.level || 1})
           </div>
           <div className="w-32 space-y-1">
@@ -552,8 +552,8 @@ export default function Battle() {
         </div>
 
         {/* Monster Info - Top Right Corner on Battle Screen */}
-        <div className="absolute top-4 right-4 z-10">
-          <div className="font-bold text-sm text-red-200 bg-black/90 px-2 py-1 rounded mb-1 border border-red-400/50 shadow-lg text-right">
+        <div className="absolute top-4 right-2 z-10 flex flex-col items-end">
+          <div className="font-bold text-sm text-red-200 bg-black/90 px-2 py-1 rounded mb-1 border border-red-400/50 shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis">
             {battleState.monster.name} (Lv.{battleState.monster.level})
           </div>
           <div className="w-32 space-y-1">
