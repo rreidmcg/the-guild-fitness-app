@@ -612,9 +612,9 @@ export default function Battle() {
                 battleState.currentMonsterIndex === 0 ? 'opacity-100' : 'opacity-50'
               }`} style={{ top: '0px', left: '0px' }}>
                 {/* Health Bar for First Slime */}
-                <div className="w-24 mb-1">
+                <div className="w-32 mb-1">
                   <div className="relative">
-                    <div className="w-full bg-gray-800 rounded-full h-2 border border-gray-400 overflow-hidden">
+                    <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-400 overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-300 ${
                           battleState.currentMonsterIndex === 0 
@@ -642,7 +642,7 @@ export default function Battle() {
                     </div>
                   </div>
                 </div>
-                <div className="w-24 h-24 flex items-end justify-center">
+                <div className="w-32 h-24 flex items-end justify-center">
                   {battleState.currentMonsterIndex === 0 && battleState.monster.image ? (
                     <img 
                       src={battleState.monster.image} 
@@ -674,9 +674,9 @@ export default function Battle() {
                 battleState.currentMonsterIndex === 1 ? 'opacity-100' : 'opacity-50'
               }`} style={{ top: '80px', left: '60px' }}>
                 {/* Health Bar for Second Slime */}
-                <div className="w-24 mb-1">
+                <div className="w-32 mb-1">
                   <div className="relative">
-                    <div className="w-full bg-gray-800 rounded-full h-2 border border-gray-400 overflow-hidden">
+                    <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-400 overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-300 ${
                           battleState.currentMonsterIndex === 1 
@@ -698,7 +698,7 @@ export default function Battle() {
                     </div>
                   </div>
                 </div>
-                <div className="w-24 h-24 flex items-end justify-center">
+                <div className="w-32 h-24 flex items-end justify-center">
                   {battleState.monster.image ? (
                     <img 
                       src={battleState.monster.image} 
@@ -719,7 +719,7 @@ export default function Battle() {
             // Single monster - original layout
             <div className="flex flex-col items-center" style={{ marginTop: '20px', marginLeft: '-60px' }}>
               {/* Monster Health Bar - Above single monster */}
-              <div className="w-28 mb-2">
+              <div className="w-32 mb-2">
                 <div className="relative">
                   <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-400 overflow-hidden">
                     <div 
