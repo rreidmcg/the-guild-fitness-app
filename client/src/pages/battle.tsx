@@ -597,7 +597,8 @@ export default function Battle() {
                 className="w-40 h-40 object-contain"
                 style={{ 
                   imageRendering: 'pixelated',
-                  filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                  filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))',
+                  transform: 'translateY(-15px)'
                 }}
               />
             </div>
@@ -778,7 +779,8 @@ export default function Battle() {
               <Button
                 onClick={playerAttack}
                 disabled={!battleState?.isPlayerTurn || (battleState?.playerMp ?? 0) < 2}
-                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white border border-blue-400 py-1 px-2 text-xs font-bold h-7"
+                className="bg-navy-900/70 hover:bg-navy-800/70 disabled:opacity-50 disabled:cursor-not-allowed text-white border border-navy-600/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm"
+                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)' }}
               >
                 <Sword className="w-3 h-3 mr-0.5" />
                 ATK
@@ -786,7 +788,8 @@ export default function Battle() {
               <Button
                 variant="outline"
                 disabled
-                className="bg-blue-600 text-white border border-blue-400 py-1 px-2 text-xs font-bold cursor-not-allowed h-7"
+                className="text-white border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
+                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}
               >
                 <Shield className="w-3 h-3 mr-0.5" />
                 DEF
@@ -794,7 +797,8 @@ export default function Battle() {
               <Button
                 variant="outline"
                 disabled
-                className="bg-blue-600 text-white border border-blue-400 py-1 px-2 text-xs font-bold cursor-not-allowed h-7"
+                className="text-white border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
+                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}
               >
                 <Zap className="w-3 h-3 mr-0.5" />
                 MAG
@@ -802,7 +806,8 @@ export default function Battle() {
               <Button
                 variant="outline"
                 disabled
-                className="bg-blue-600 text-white border border-blue-400 py-1 px-2 text-xs font-bold cursor-not-allowed h-7"
+                className="text-white border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
+                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}
               >
                 <Heart className="w-3 h-3 mr-0.5" />
                 ITM
@@ -819,10 +824,10 @@ export default function Battle() {
                   You earned {battleState.monster.goldReward} gold!
                 </div>
                 <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
+                  <Button onClick={returnToMonsterList} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
                     FIGHT AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
+                  <Button onClick={() => setLocation("/")} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
                     HOME
                   </Button>
                 </div>
@@ -839,10 +844,10 @@ export default function Battle() {
                   You were defeated by {battleState.monster.name}...
                 </div>
                 <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
+                  <Button onClick={returnToMonsterList} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
                     TRY AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm">
+                  <Button onClick={() => setLocation("/")} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
                     HOME
                   </Button>
                 </div>
