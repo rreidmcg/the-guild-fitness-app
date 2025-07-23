@@ -605,30 +605,57 @@ export default function Battle() {
           {/* Monster(s) (Right) */}
           {battleState.totalMonsters > 1 ? (
             // Multiple monsters - show staggered slimes side by side
-            <div className="flex flex-col items-center relative" style={{ marginTop: '20px', marginLeft: '-40px', minHeight: '140px', minWidth: '140px' }}>
-              {/* Monster Health Bar - Above monsters */}
-              <div className="w-28 mb-2">
-                <div className="relative">
-                  <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-400 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300" 
-                      style={{ width: `${monsterHpPercentage}%` }}
-                    />
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
-                    HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}
-                  </div>
-                </div>
-              </div>
+            <div className="flex flex-col items-center relative" style={{ marginTop: '20px', marginLeft: '-40px', minHeight: '160px', minWidth: '140px' }}>
               
-              {/* First Slime - Top Left */}
+              {/* First Slime - Top Left with Health Bar */}
               <div className={`absolute transition-opacity duration-300 ${
                 battleState.currentMonsterIndex === 0 ? 'opacity-100' : 'opacity-50'
-              }`} style={{ top: '30px', left: '0px' }}>
+              }`} style={{ top: '0px', left: '0px' }}>
+                {/* Health Bar for First Slime */}
+                <div className="w-24 mb-1">
+                  <div className="relative">
+                    <div className="w-full bg-gray-800 rounded-full h-2 border border-gray-400 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          battleState.currentMonsterIndex === 0 
+                            ? 'bg-gradient-to-r from-red-600 to-red-500' 
+                            : battleState.remainingMonsters.length > 0 && battleState.remainingMonsters[0] 
+                              ? 'bg-gradient-to-r from-red-600 to-red-500'
+                              : 'bg-gray-600'
+                        }`}
+                        style={{ 
+                          width: battleState.currentMonsterIndex === 0 
+                            ? `${monsterHpPercentage}%` 
+                            : battleState.remainingMonsters.length > 0 && battleState.remainingMonsters[0]
+                              ? `${(battleState.remainingMonsters[0].currentHp / battleState.remainingMonsters[0].maxHp) * 100}%`
+                              : '100%'
+                        }}
+                      />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
+                      {battleState.currentMonsterIndex === 0 
+                        ? `${battleState.monster.currentHp}/${battleState.monster.maxHp}`
+                        : battleState.remainingMonsters.length > 0 && battleState.remainingMonsters[0]
+                          ? `${battleState.remainingMonsters[0].currentHp}/${battleState.remainingMonsters[0].maxHp}`
+                          : '0/13'
+                      }
+                    </div>
+                  </div>
+                </div>
                 <div className="w-24 h-24 flex items-end justify-center">
-                  {battleState.monster.image ? (
+                  {battleState.currentMonsterIndex === 0 && battleState.monster.image ? (
                     <img 
                       src={battleState.monster.image} 
+                      alt="Green Slime #1"
+                      className="w-20 h-20 object-contain"
+                      style={{ 
+                        imageRendering: 'pixelated',
+                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                      }}
+                    />
+                  ) : battleState.remainingMonsters.length > 0 && battleState.remainingMonsters[0] && battleState.remainingMonsters[0].image ? (
+                    <img 
+                      src={battleState.remainingMonsters[0].image} 
                       alt="Green Slime #1"
                       className="w-20 h-20 object-contain"
                       style={{ 
@@ -642,10 +669,35 @@ export default function Battle() {
                 </div>
               </div>
               
-              {/* Second Slime - Bottom Right */}
+              {/* Second Slime - Bottom Right with Health Bar */}
               <div className={`absolute transition-opacity duration-300 ${
                 battleState.currentMonsterIndex === 1 ? 'opacity-100' : 'opacity-50'
-              }`} style={{ top: '70px', left: '60px' }}>
+              }`} style={{ top: '80px', left: '60px' }}>
+                {/* Health Bar for Second Slime */}
+                <div className="w-24 mb-1">
+                  <div className="relative">
+                    <div className="w-full bg-gray-800 rounded-full h-2 border border-gray-400 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          battleState.currentMonsterIndex === 1 
+                            ? 'bg-gradient-to-r from-red-600 to-red-500' 
+                            : 'bg-gradient-to-r from-red-600 to-red-500'
+                        }`}
+                        style={{ 
+                          width: battleState.currentMonsterIndex === 1 
+                            ? `${monsterHpPercentage}%` 
+                            : '100%'
+                        }}
+                      />
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
+                      {battleState.currentMonsterIndex === 1 
+                        ? `${battleState.monster.currentHp}/${battleState.monster.maxHp}`
+                        : '13/13'
+                      }
+                    </div>
+                  </div>
+                </div>
                 <div className="w-24 h-24 flex items-end justify-center">
                   {battleState.monster.image ? (
                     <img 
