@@ -674,41 +674,41 @@ export default function Battle() {
         </div>
 
         {/* Compact RPG Action Menu - Overlaid on bottom */}
-        <div className="absolute bottom-2 left-2 right-2 z-10 bg-black/90 text-white p-1.5 border border-gray-600 backdrop-blur-sm rounded">
+        <div className="absolute bottom-2 left-2 right-2 z-10 bg-black/60 text-white p-2 border border-gray-400/50 backdrop-blur-sm rounded">
           <div className="max-w-4xl mx-auto">
             {battleState.battleResult === 'ongoing' && (
-              <div className="grid grid-cols-4 gap-1">
+              <div className="grid grid-cols-2 gap-2">
                 <Button
                   onClick={playerAttack}
                   disabled={!battleState.isPlayerTurn || battleState.playerMp < 2}
-                  className="bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white border border-red-500 py-0.5 px-1.5 text-xs font-bold h-6"
+                  className="bg-blue-600/80 hover:bg-blue-500/80 disabled:opacity-50 disabled:cursor-not-allowed text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm"
                 >
-                  <Sword className="w-2.5 h-2.5 mr-0.5" />
-                  ATK
+                  <Sword className="w-4 h-4 mr-1" />
+                  ATTACK
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-gray-600 text-gray-400 border border-gray-500 py-0.5 px-1.5 text-xs font-bold cursor-not-allowed h-6"
+                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-2 px-3 text-sm font-bold cursor-not-allowed h-10 backdrop-blur-sm"
                 >
-                  <Shield className="w-2.5 h-2.5 mr-0.5" />
-                  DEF
+                  <Shield className="w-4 h-4 mr-1" />
+                  DEFEND
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-gray-600 text-gray-400 border border-gray-500 py-0.5 px-1.5 text-xs font-bold cursor-not-allowed h-6"
+                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-2 px-3 text-sm font-bold cursor-not-allowed h-10 backdrop-blur-sm"
                 >
-                  <Zap className="w-2.5 h-2.5 mr-0.5" />
-                  MAG
+                  <Zap className="w-4 h-4 mr-1" />
+                  MAGIC
                 </Button>
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-gray-600 text-gray-400 border border-gray-500 py-0.5 px-1.5 text-xs font-bold cursor-not-allowed h-6"
+                  className="bg-blue-600/80 text-white/70 border border-blue-400/50 py-2 px-3 text-sm font-bold cursor-not-allowed h-10 backdrop-blur-sm"
                 >
-                  <Heart className="w-2.5 h-2.5 mr-0.5" />
-                  ITM
+                  <Heart className="w-4 h-4 mr-1" />
+                  ITEMS
                 </Button>
               </div>
             )}
@@ -722,11 +722,11 @@ export default function Battle() {
                 <div className="text-sm text-yellow-300 mb-2">
                   You earned {battleState.monster.goldReward} gold!
                 </div>
-                <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="bg-green-700 hover:bg-green-600 text-white border border-green-500 py-0.5 px-1.5 text-xs font-bold h-6">
+                <div className="grid grid-cols-2 gap-2">
+                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
                     FIGHT AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border border-blue-500 py-0.5 px-1.5 text-xs font-bold h-6">
+                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
                     HOME
                   </Button>
                 </div>
@@ -742,11 +742,11 @@ export default function Battle() {
                 <div className="text-sm text-red-300 mb-2">
                   You were defeated by {battleState.monster.name}...
                 </div>
-                <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="bg-red-700 hover:bg-red-600 text-white border border-red-500 py-0.5 px-1.5 text-xs font-bold h-6">
+                <div className="grid grid-cols-2 gap-2">
+                  <Button onClick={returnToMonsterList} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
                     TRY AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="bg-blue-700 hover:bg-blue-600 text-white border border-blue-500 py-0.5 px-1.5 text-xs font-bold h-6">
+                  <Button onClick={() => setLocation("/")} className="bg-blue-600/80 hover:bg-blue-500/80 text-white border border-blue-400/50 py-2 px-3 text-sm font-bold h-10 backdrop-blur-sm">
                     HOME
                   </Button>
                 </div>
