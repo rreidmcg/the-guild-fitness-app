@@ -779,8 +779,12 @@ export default function Battle() {
               <Button
                 onClick={playerAttack}
                 disabled={!battleState?.isPlayerTurn || (battleState?.playerMp ?? 0) < 2}
-                className="bg-navy-900/70 hover:bg-navy-800/70 disabled:opacity-50 disabled:cursor-not-allowed text-white border border-navy-600/50 py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm"
-                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)' }}
+                className="disabled:opacity-50 disabled:cursor-not-allowed text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm"
+                style={{ 
+                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
+                  borderColor: 'rgba(13, 25, 59, 0.5)',
+                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
+                }}
               >
                 <Sword className="w-3 h-3 mr-0.5" />
                 ATK
@@ -788,8 +792,12 @@ export default function Battle() {
               <Button
                 variant="outline"
                 disabled
-                className="text-white border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
-                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}
+                className="text-blue-100 border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
+                style={{ 
+                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
+                  borderColor: 'rgba(13, 25, 59, 0.5)',
+                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
+                }}
               >
                 <Shield className="w-3 h-3 mr-0.5" />
                 DEF
@@ -797,8 +805,12 @@ export default function Battle() {
               <Button
                 variant="outline"
                 disabled
-                className="text-white border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
-                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}
+                className="text-blue-100 border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
+                style={{ 
+                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
+                  borderColor: 'rgba(13, 25, 59, 0.5)',
+                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
+                }}
               >
                 <Zap className="w-3 h-3 mr-0.5" />
                 MAG
@@ -806,8 +818,12 @@ export default function Battle() {
               <Button
                 variant="outline"
                 disabled
-                className="text-white border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
-                style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}
+                className="text-blue-100 border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
+                style={{ 
+                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
+                  borderColor: 'rgba(13, 25, 59, 0.5)',
+                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
+                }}
               >
                 <Heart className="w-3 h-3 mr-0.5" />
                 ITM
@@ -824,10 +840,10 @@ export default function Battle() {
                   You earned {battleState.monster.goldReward} gold!
                 </div>
                 <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
+                  <Button onClick={returnToMonsterList} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     FIGHT AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
+                  <Button onClick={() => setLocation("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     HOME
                   </Button>
                 </div>
@@ -844,10 +860,10 @@ export default function Battle() {
                   You were defeated by {battleState.monster.name}...
                 </div>
                 <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
+                  <Button onClick={returnToMonsterList} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     TRY AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="text-white border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)' }}>
+                  <Button onClick={() => setLocation("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     HOME
                   </Button>
                 </div>
