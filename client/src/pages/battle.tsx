@@ -752,8 +752,8 @@ export default function Battle() {
           )}
         </div>
 
-        {/* Battle Log Area - Overlaid on bottom left */}
-        <div className="absolute bottom-16 left-2 right-2 z-10 bg-black/20 border border-gray-500/30 p-1 min-h-[20px] max-h-[20px] overflow-y-auto backdrop-blur-sm rounded">
+        {/* Battle Log Area - Overlaid on battle screen */}
+        <div className="absolute bottom-20 left-2 right-2 z-10 bg-black/20 border border-gray-500/30 p-1 min-h-[20px] max-h-[20px] overflow-y-auto backdrop-blur-sm rounded">
           <div className="text-xs text-white font-medium">
             {battleState.battleLog.length === 0 ? (
               <div className="text-white/80 italic">Battle begins...</div>
@@ -767,8 +767,8 @@ export default function Battle() {
           </div>
         </div>
 
-        {/* Compact RPG Action Menu - Overlaid on bottom */}
-        <div className="absolute bottom-1 left-2 right-2 z-20 bg-black/80 text-white p-1 border-2 border-blue-400/80 backdrop-blur-sm rounded">
+        {/* Compact RPG Action Menu - Overlaid on battle screen */}
+        <div className="absolute bottom-14 left-2 right-2 z-20 bg-black/80 text-white p-1 border-2 border-blue-400/80 backdrop-blur-sm rounded">
           <div className="max-w-4xl mx-auto">
             {/* Always show buttons for debugging */}
             <div className="grid grid-cols-2 gap-1">
