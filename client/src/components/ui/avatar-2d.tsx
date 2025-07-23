@@ -40,11 +40,11 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
         <img 
           src={avatarImage}
           alt="Character Avatar"
-          className={`w-full h-full ${user?.gender === "female" ? "object-cover" : "object-contain"}`}
+          className="w-full h-full object-contain"
           style={{
             filter: `brightness(${0.9 + overallFitness * 0.3}) contrast(${1 + muscleDefinition * 0.2})`,
             imageRendering: 'pixelated',
-            transform: user?.gender === "female" ? 'scaleY(1.1)' : 'none'
+            transform: user?.gender === "female" ? 'scale(0.9)' : 'none'
           }}
         />
         
