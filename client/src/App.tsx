@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/ui/bottom-nav";
 import { useBackgroundMusic } from "@/hooks/use-background-music";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX } from "lucide-react";
+import { useEffect } from "react";
 import Stats from "@/pages/stats";
 import Workouts from "@/pages/workouts";
 import Settings from "@/pages/settings";
@@ -45,22 +46,25 @@ function App() {
   const { isPlaying, isMuted, toggleMusic, startMusic } = useBackgroundMusic();
 
   // Auto-start music on first user interaction
-  const handleFirstInteraction = () => {
-    if (isMuted && !isPlaying) {
-      startMusic();
-    }
-    // Remove event listeners after first interaction
-    document.removeEventListener('click', handleFirstInteraction);
-    document.removeEventListener('keydown', handleFirstInteraction);
-    document.removeEventListener('touchstart', handleFirstInteraction);
-  };
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      if (isMuted && !isPlaying) {
+        startMusic();
+      }
+    };
 
-  // Add event listeners for first user interaction
-  if (typeof window !== 'undefined') {
+    // Add event listeners for first user interaction
     document.addEventListener('click', handleFirstInteraction, { once: true });
     document.addEventListener('keydown', handleFirstInteraction, { once: true });
     document.addEventListener('touchstart', handleFirstInteraction, { once: true });
-  }
+
+    return () => {
+      // Cleanup in case component unmounts before interaction
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('keydown', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    };
+  }, [isMuted, isPlaying, startMusic]);
 
   return (
     <QueryClientProvider client={queryClient}>

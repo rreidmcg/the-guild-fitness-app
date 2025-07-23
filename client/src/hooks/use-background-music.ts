@@ -6,10 +6,11 @@ import battleMusicFile from '@assets/battle-cry_1753222802553.mp3';
 export function useBackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false); // Start unmuted
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [location] = useLocation();
   const wasPlayingBeforeHidden = useRef(false);
+  const hasTriedAutoplay = useRef(false);
 
   // Determine which music track to use based on current page
   const getMusicTrack = () => {
@@ -55,10 +56,13 @@ export function useBackgroundMusic() {
       audio.addEventListener('ended', handleEnded);
       audio.addEventListener('error', handleError);
 
-      // Resume playing if it was playing before track change
-      if (wasCurrentlyPlaying) {
+      // Auto-start music on first load or resume if it was playing before track change
+      if (wasCurrentlyPlaying || !hasTriedAutoplay.current) {
+        hasTriedAutoplay.current = true;
         audio.play().catch(() => {
           setIsPlaying(false);
+          setIsMuted(true); // Fall back to muted if autoplay fails
+          console.warn('Background music autoplay blocked by browser');
         });
       }
     }
@@ -110,6 +114,21 @@ export function useBackgroundMusic() {
     if (!audioRef.current || !isMuted) return;
     toggleMusic();
   };
+
+  // Try to start music immediately with a small delay for better browser compatibility
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasTriedAutoplay.current && audioRef.current && !isPlaying && !isMuted) {
+        hasTriedAutoplay.current = true;
+        audioRef.current.play().catch(() => {
+          setIsMuted(true);
+          console.warn('Background music autoplay blocked by browser - will start on user interaction');
+        });
+      }
+    }, 500); // 500ms delay to allow everything to initialize
+
+    return () => clearTimeout(timer);
+  }, []); // Only run once on mount
 
   // Cleanup on unmount
   useEffect(() => {
