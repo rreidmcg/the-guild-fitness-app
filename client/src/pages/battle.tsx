@@ -78,6 +78,9 @@ interface BattleState {
   battleLog: string[];
   isPlayerTurn: boolean;
   battleResult: 'ongoing' | 'victory' | 'defeat';
+  remainingMonsters: Monster[];
+  currentMonsterIndex: number;
+  totalMonsters: number;
 }
 
 // E-rank dungeon monsters (levels 1-10) - HP increased by 5%
@@ -129,17 +132,34 @@ export default function Battle() {
     // Calculate player's max HP and MP based on stats
     const playerMaxHp = Math.max(10, 10 + (userStats?.stamina || 0) * 3);
     const playerMaxMp = Math.max(5, (userStats?.stamina || 0) * 2 + (userStats?.agility || 0) * 1);
-    const battleMonster = { ...monster, currentHp: monster.maxHp };
+    
+    // Special case for Green Slime - spawn 2 of them
+    let monsters: Monster[] = [];
+    let battleLog: string[] = [];
+    
+    if (monster.name === "Green Slime") {
+      monsters = [
+        { ...monster, currentHp: monster.maxHp, id: monster.id + 100 }, // First slime
+        { ...monster, currentHp: monster.maxHp, id: monster.id + 200 }  // Second slime
+      ];
+      battleLog = [`Two Green Slimes appear!`, `First slime bounces forward!`];
+    } else {
+      monsters = [{ ...monster, currentHp: monster.maxHp }];
+      battleLog = [`A wild ${monster.name} appears!`];
+    }
     
     setBattleState({
       playerHp: playerMaxHp,
       playerMaxHp,
       playerMp: playerMaxMp,
       playerMaxMp,
-      monster: battleMonster,
-      battleLog: [`A wild ${monster.name} appears!`],
+      monster: monsters[0],
+      battleLog,
       isPlayerTurn: true,
-      battleResult: 'ongoing'
+      battleResult: 'ongoing',
+      remainingMonsters: monsters.slice(1),
+      currentMonsterIndex: 0,
+      totalMonsters: monsters.length
     });
     setSelectedMonster(null);
   };
@@ -202,35 +222,57 @@ export default function Battle() {
         playerMp: prev.playerMp - 2, // Consume 2 MP per attack
         battleLog: [...prev.battleLog, `You strike for ${damage} damage! (-2 MP)`],
         isPlayerTurn: false,
-        battleResult: isMonsterDefeated ? 'victory' : 'ongoing'
+        battleResult: isMonsterDefeated && prev.remainingMonsters.length === 0 ? 'victory' : 'ongoing'
       };
     });
 
     if (isMonsterDefeated) {
-      // Set 10-minute cooldown for defeated monster
-      const cooldownEndTime = Date.now() + (10 * 60 * 1000); // 10 minutes
-      setMonsterCooldowns(prev => ({
-        ...prev,
-        [battleState.monster.id]: cooldownEndTime
-      }));
-
       setTimeout(() => {
         setBattleState(prev => {
           if (!prev) return prev;
-          return {
-            ...prev,
-            battleLog: [...prev.battleLog, `${prev.monster.name} is defeated!`, `You gain ${prev.monster.goldReward} gold coins!`]
-          };
-        });
-        
-        updateStatsMutation.mutate({ 
-          goldGain: battleState.monster.goldReward, 
-          battleWon: true 
-        });
-        
-        toast({
-          title: "Victory!",
-          description: `You defeated the ${battleState.monster.name} and gained ${battleState.monster.goldReward} gold!`,
+          
+          // Check if there are more monsters to fight
+          if (prev.remainingMonsters.length > 0) {
+            const nextMonster = prev.remainingMonsters[0];
+            const remainingAfterNext = prev.remainingMonsters.slice(1);
+            
+            return {
+              ...prev,
+              monster: nextMonster,
+              remainingMonsters: remainingAfterNext,
+              currentMonsterIndex: prev.currentMonsterIndex + 1,
+              battleLog: [...prev.battleLog, `${prev.monster.name} is defeated!`, `Second slime bounces forward!`],
+              isPlayerTurn: true,
+              battleResult: 'ongoing'
+            };
+          } else {
+            // All monsters defeated - battle won
+            // Set 10-minute cooldown for the original monster type
+            const originalMonsterId = prev.totalMonsters > 1 ? 1 : prev.monster.id; // Green Slime ID is 1
+            const cooldownEndTime = Date.now() + (10 * 60 * 1000);
+            setMonsterCooldowns(currentCooldowns => ({
+              ...currentCooldowns,
+              [originalMonsterId]: cooldownEndTime
+            }));
+            
+            const totalGoldReward = prev.monster.goldReward * prev.totalMonsters;
+            
+            updateStatsMutation.mutate({ 
+              goldGain: totalGoldReward, 
+              battleWon: true 
+            });
+            
+            toast({
+              title: "Victory!",
+              description: `You defeated all enemies and gained ${totalGoldReward} gold!`,
+            });
+            
+            return {
+              ...prev,
+              battleLog: [...prev.battleLog, `${prev.monster.name} is defeated!`, `All enemies defeated!`, `You gain ${totalGoldReward} gold coins!`],
+              battleResult: 'victory'
+            };
+          }
         });
       }, 1000);
     } else {
@@ -555,6 +597,11 @@ export default function Battle() {
         <div className="absolute top-4 right-2 z-10 flex flex-col items-end">
           <div className="font-bold text-sm text-red-200 bg-black/90 px-2 py-1 rounded mb-1 border border-red-400/50 shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis">
             {battleState.monster.name} (Lv.{battleState.monster.level})
+            {battleState.totalMonsters > 1 && (
+              <span className="text-xs ml-1 text-yellow-200">
+                [{battleState.currentMonsterIndex + 1}/{battleState.totalMonsters}]
+              </span>
+            )}
           </div>
           <div className="w-32 space-y-1">
             {/* HP Bar */}
