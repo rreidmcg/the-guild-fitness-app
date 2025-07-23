@@ -555,7 +555,7 @@ export default function Battle() {
 
 
         {/* Combatants Area */}
-        <div className="flex-1 flex items-center justify-between px-1" style={{ paddingTop: '15%', marginLeft: '-10px' }}>
+        <div className="flex-1 flex items-center justify-between px-1" style={{ paddingTop: 'calc(15% - 20px)', marginLeft: '-10px' }}>
           {/* Player Avatar (Left) */}
           <div className="flex flex-col items-center">
             {/* Player Health Bars - Above Character */}
@@ -768,7 +768,7 @@ export default function Battle() {
         </div>
 
         {/* Compact RPG Action Menu - Overlaid on battle screen */}
-        <div className="absolute bottom-14 left-2 right-2 z-20 bg-black/80 text-white p-1 border-2 border-blue-400/80 backdrop-blur-sm rounded">
+        <div className="absolute left-2 right-2 z-20 bg-black/80 text-white p-1 border-2 border-blue-400/80 backdrop-blur-sm rounded" style={{ bottom: 'calc(3.5rem + 20px)' }}>
           <div className="max-w-4xl mx-auto">
             {/* Always show buttons for debugging */}
             <div className="grid grid-cols-2 gap-1">
