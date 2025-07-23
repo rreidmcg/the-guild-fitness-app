@@ -607,10 +607,10 @@ export default function Battle() {
             // Multiple monsters - show staggered slimes side by side
             <div className="flex flex-col items-center relative" style={{ marginTop: '20px', marginLeft: '-40px', minHeight: '160px', minWidth: '140px' }}>
               
-              {/* First Slime - Top Left with Health Bar */}
+              {/* First Slime - Bottom Left with Health Bar */}
               <div className={`absolute transition-opacity duration-300 ${
                 battleState.currentMonsterIndex === 0 ? 'opacity-100' : 'opacity-50'
-              }`} style={{ top: '0px', left: '0px' }}>
+              }`} style={{ top: '80px', left: '0px' }}>
                 {/* Health Bar for First Slime */}
                 <div className="w-32 mb-1">
                   <div className="relative">
@@ -669,10 +669,10 @@ export default function Battle() {
                 </div>
               </div>
               
-              {/* Second Slime - Bottom Right with Health Bar */}
+              {/* Second Slime - Top Right with Health Bar */}
               <div className={`absolute transition-opacity duration-300 ${
                 battleState.currentMonsterIndex === 1 ? 'opacity-100' : 'opacity-50'
-              }`} style={{ top: '80px', left: '60px' }}>
+              }`} style={{ top: '0px', left: '60px' }}>
                 {/* Health Bar for Second Slime */}
                 <div className="w-32 mb-1">
                   <div className="relative">
