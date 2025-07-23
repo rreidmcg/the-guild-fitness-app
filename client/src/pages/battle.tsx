@@ -610,7 +610,7 @@ export default function Battle() {
               {/* First Slime - Bottom Left with Health Bar */}
               <div className={`absolute transition-opacity duration-300 ${
                 battleState.currentMonsterIndex === 0 ? 'opacity-100' : 'opacity-50'
-              }`} style={{ top: '30px', left: '-30px' }}>
+              }`} style={{ top: '45px', left: '-20px' }}>
                 {/* Health Bar for First Slime */}
                 <div className="w-32 mb-1">
                   <div className="relative">
