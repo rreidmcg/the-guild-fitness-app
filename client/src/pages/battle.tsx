@@ -649,10 +649,11 @@ export default function Battle() {
                 <div className="w-32 h-24 flex items-end justify-center relative">
                   {/* Active monster highlight marker - Red oval ring shadow */}
                   {battleState.currentMonsterIndex === 0 && (
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-6 border-2 border-red-500 rounded-full opacity-70 animate-pulse"
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-28 h-8 border-2 border-red-500 opacity-80 animate-pulse"
                          style={{ 
-                           backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                           boxShadow: '0 0 15px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.3)'
+                           backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                           borderRadius: '50%',
+                           boxShadow: '0 0 25px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4), inset 0 0 15px rgba(255, 0, 0, 0.2)'
                          }}>
                     </div>
                   )}
@@ -714,10 +715,11 @@ export default function Battle() {
                 <div className="w-32 h-24 flex items-end justify-center relative">
                   {/* Active monster highlight marker - Red oval ring shadow */}
                   {battleState.currentMonsterIndex === 1 && (
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-6 border-2 border-red-500 rounded-full opacity-70 animate-pulse"
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-28 h-8 border-2 border-red-500 opacity-80 animate-pulse"
                          style={{ 
-                           backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                           boxShadow: '0 0 15px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.3)'
+                           backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                           borderRadius: '50%',
+                           boxShadow: '0 0 25px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4), inset 0 0 15px rgba(255, 0, 0, 0.2)'
                          }}>
                     </div>
                   )}
@@ -757,10 +759,11 @@ export default function Battle() {
               
               <div className="w-36 h-36 flex items-end justify-center relative">
                 {/* Active monster highlight marker - Red oval ring shadow */}
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-24 h-8 border-2 border-red-500 rounded-full opacity-70 animate-pulse"
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-10 border-2 border-red-500 opacity-80 animate-pulse"
                      style={{ 
-                       backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                       boxShadow: '0 0 15px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.3)'
+                       backgroundColor: 'rgba(255, 0, 0, 0.15)',
+                       borderRadius: '50%',
+                       boxShadow: '0 0 25px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4), inset 0 0 15px rgba(255, 0, 0, 0.2)'
                      }}>
                 </div>
                 {battleState.monster.image ? (
