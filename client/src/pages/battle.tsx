@@ -646,7 +646,13 @@ export default function Battle() {
                     </div>
                   </div>
                 </div>
-                <div className="w-32 h-24 flex items-end justify-center">
+                <div className="w-32 h-24 flex items-end justify-center relative">
+                  {/* Active monster highlight marker */}
+                  {battleState.currentMonsterIndex === 0 && (
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full animate-pulse shadow-lg" 
+                         style={{ boxShadow: '0 0 10px rgba(255, 215, 0, 0.8)' }}>
+                    </div>
+                  )}
                   {battleState.currentMonsterIndex === 0 && battleState.monster.image ? (
                     <img 
                       src={battleState.monster.image} 
@@ -702,7 +708,13 @@ export default function Battle() {
                     </div>
                   </div>
                 </div>
-                <div className="w-32 h-24 flex items-end justify-center">
+                <div className="w-32 h-24 flex items-end justify-center relative">
+                  {/* Active monster highlight marker */}
+                  {battleState.currentMonsterIndex === 1 && (
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full animate-pulse shadow-lg" 
+                         style={{ boxShadow: '0 0 10px rgba(255, 215, 0, 0.8)' }}>
+                    </div>
+                  )}
                   {battleState.monster.image ? (
                     <img 
                       src={battleState.monster.image} 
@@ -737,7 +749,11 @@ export default function Battle() {
                 </div>
               </div>
               
-              <div className="w-36 h-36 flex items-end justify-center">
+              <div className="w-36 h-36 flex items-end justify-center relative">
+                {/* Active monster highlight marker */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full animate-pulse shadow-lg" 
+                     style={{ boxShadow: '0 0 10px rgba(255, 215, 0, 0.8)' }}>
+                </div>
                 {battleState.monster.image ? (
                   <img 
                     src={battleState.monster.image} 
