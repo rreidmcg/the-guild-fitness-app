@@ -29,7 +29,7 @@ import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
-import { useBackgroundMusic } from "@/hooks/use-background-music";
+
 
 // User stats type to match the API response
 interface UserStats {
@@ -108,8 +108,7 @@ export default function Battle() {
   const [persistentPlayerHp, setPersistentPlayerHp] = useState<number | null>(null);
   const [lastRegenTime, setLastRegenTime] = useState<number>(Date.now());
   
-  // Background music
-  const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
+
 
   const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],

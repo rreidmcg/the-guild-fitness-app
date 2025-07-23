@@ -72,8 +72,20 @@ function App() {
         <div className="min-h-screen bg-background text-foreground">
           <Toaster />
           
+          {/* Global Music Control Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleMusic}
+            className="fixed top-4 right-4 z-50 bg-black/60 hover:bg-black/80 text-white border border-white/20"
+          >
+            {isMuted ? (
+              <VolumeX className="w-4 h-4" />
+            ) : (
+              <Volume2 className="w-4 h-4" />
+            )}
+          </Button>
 
-          
           <Router />
           <BottomNav />
         </div>

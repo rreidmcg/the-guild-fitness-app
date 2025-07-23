@@ -22,11 +22,10 @@ import {
   Moon,
   Smartphone
 } from "lucide-react";
-import { useBackgroundMusic } from "@/hooks/use-background-music";
+
 
 export default function Settings() {
   const { toast } = useToast();
-  const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -72,7 +71,7 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Audio Settings */}
+        {/* Audio Settings - Moved to main app */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -85,23 +84,8 @@ export default function Settings() {
               <div className="space-y-0.5">
                 <Label className="text-base">Background Music</Label>
                 <div className="text-sm text-muted-foreground">
-                  Play background music during battles and gameplay
+                  Music controls are available in the top-right corner of the app
                 </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleMusic}
-                  className="flex items-center space-x-2"
-                >
-                  {isMuted ? (
-                    <VolumeX className="w-4 h-4" />
-                  ) : (
-                    <Volume2 className="w-4 h-4" />
-                  )}
-                  <span>{isMuted ? "Off" : "On"}</span>
-                </Button>
               </div>
             </div>
           </CardContent>
