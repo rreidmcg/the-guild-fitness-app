@@ -17,6 +17,7 @@ import {
   Plus,
   Trash2
 } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 
 interface InventoryItem {
   id: number;
@@ -148,20 +149,10 @@ export default function Inventory() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Inventory</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">
-                Manage your items and equipment • {inventory?.length || 0}/{totalSlots} slots used
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </div>
+      <PageHeader 
+        title="Inventory" 
+        subtitle={`Manage your items and equipment • ${inventory?.length || 0}/${totalSlots} slots used`}
+      />
 
       <div className="max-w-4xl mx-auto p-6">
         {/* Inventory Grid */}

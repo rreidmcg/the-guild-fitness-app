@@ -22,6 +22,7 @@ import {
   CheckCircle,
   Star
 } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import caveRatImage from "@assets/IMG_3670_1753151064629.png";
@@ -355,28 +356,20 @@ export default function Battle() {
   if (!selectedDungeon) {
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
-        {/* Header */}
-        <div className="bg-card border-b border-border px-4 py-3">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Map className="w-6 h-6 text-blue-400" />
-              <h1 className="text-xl font-bold text-foreground">Adventure Map</h1>
+        <PageHeader title="Adventure Map">
+          {/* Player HP Status */}
+          {userStats && (
+            <div className="flex items-center space-x-2 text-sm">
+              <Heart className="w-4 h-4 text-green-400" />
+              <span className="text-foreground">
+                {persistentPlayerHp || userStats.maxHp}/{userStats.maxHp} HP
+              </span>
+              {persistentPlayerHp && persistentPlayerHp < userStats.maxHp && (
+                <span className="text-green-400 text-xs">(Regenerating)</span>
+              )}
             </div>
-            
-            {/* Player HP Status */}
-            {userStats && (
-              <div className="flex items-center space-x-2 text-sm">
-                <Heart className="w-4 h-4 text-green-400" />
-                <span className="text-foreground">
-                  {persistentPlayerHp || userStats.maxHp}/{userStats.maxHp} HP
-                </span>
-                {persistentPlayerHp && persistentPlayerHp < userStats.maxHp && (
-                  <span className="text-green-400 text-xs">(Regenerating)</span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
+          )}
+        </PageHeader>
 
         <div className="max-w-6xl mx-auto p-4 space-y-6">
           {/* Rank Selection */}
@@ -500,28 +493,20 @@ export default function Battle() {
 
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
-        {/* Header */}
-        <div className="bg-card border-b border-border px-4 py-3">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" onClick={exitDungeon}>
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <Skull className="w-6 h-6 text-red-400" />
-              <h1 className="text-xl font-bold text-foreground">{selectedDungeon.name}</h1>
+        <PageHeader title={selectedDungeon.name}>
+          <Button variant="ghost" size="sm" onClick={exitDungeon}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          {/* Player HP Status */}
+          {userStats && (
+            <div className="flex items-center space-x-2 text-sm">
+              <Heart className="w-4 h-4 text-green-400" />
+              <span className="text-foreground">
+                {persistentPlayerHp || userStats.maxHp}/{userStats.maxHp} HP
+              </span>
             </div>
-            
-            {/* Player HP Status */}
-            {userStats && (
-              <div className="flex items-center space-x-2 text-sm">
-                <Heart className="w-4 h-4 text-green-400" />
-                <span className="text-foreground">
-                  {persistentPlayerHp || userStats.maxHp}/{userStats.maxHp} HP
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
+          )}
+        </PageHeader>
 
         <div className="max-w-4xl mx-auto p-4 space-y-6">
           {/* Dungeon Description */}
