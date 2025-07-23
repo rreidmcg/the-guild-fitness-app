@@ -104,6 +104,10 @@ export default function Battle() {
   const [isMonsterListOpen, setIsMonsterListOpen] = useState(true);
   const [monsterCooldowns, setMonsterCooldowns] = useState<{[key: number]: number}>({});
   
+  // Persistent health state (survives between battles)
+  const [persistentPlayerHp, setPersistentPlayerHp] = useState<number | null>(null);
+  const [lastRegenTime, setLastRegenTime] = useState<number>(Date.now());
+  
   // Background music
   const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
 
@@ -113,6 +117,42 @@ export default function Battle() {
 
   // Initialize battle state
   const [battleState, setBattleState] = useState<BattleState | null>(null);
+
+  // Health regeneration effect - 1% per minute
+  useEffect(() => {
+    if (!userStats) return;
+    
+    const playerMaxHp = Math.max(10, 10 + userStats.stamina * 3);
+    
+    // Initialize persistent HP to full if not set
+    if (persistentPlayerHp === null) {
+      setPersistentPlayerHp(playerMaxHp);
+      return;
+    }
+    
+    // Calculate regeneration
+    const currentTime = Date.now();
+    const timeDiff = currentTime - lastRegenTime;
+    const minutesPassed = Math.floor(timeDiff / (60 * 1000));
+    
+    if (minutesPassed > 0 && persistentPlayerHp < playerMaxHp) {
+      const regenAmount = Math.ceil(playerMaxHp * 0.01 * minutesPassed); // 1% per minute
+      const newHp = Math.min(playerMaxHp, persistentPlayerHp + regenAmount);
+      
+      if (newHp > persistentPlayerHp) {
+        setPersistentPlayerHp(newHp);
+        setLastRegenTime(currentTime);
+        
+        // Show regeneration message if not in battle
+        if (!battleState && newHp > persistentPlayerHp) {
+          toast({
+            title: "Health Regenerated",
+            description: `You recovered ${newHp - persistentPlayerHp} HP (${newHp}/${playerMaxHp})`,
+          });
+        }
+      }
+    }
+  }, [userStats, persistentPlayerHp, lastRegenTime, battleState]);
 
   const startBattle = (monster: Monster) => {
     // Check if monster is on cooldown
@@ -133,6 +173,9 @@ export default function Battle() {
     const playerMaxHp = Math.max(10, 10 + (userStats?.stamina || 0) * 3);
     const playerMaxMp = Math.max(5, (userStats?.stamina || 0) * 2 + (userStats?.agility || 0) * 1);
     
+    // Use persistent HP instead of resetting to full
+    const currentPlayerHp = persistentPlayerHp || playerMaxHp;
+    
     // Special case for Green Slime - spawn 2 of them
     let monsters: Monster[] = [];
     let battleLog: string[] = [];
@@ -149,7 +192,7 @@ export default function Battle() {
     }
     
     setBattleState({
-      playerHp: playerMaxHp,
+      playerHp: currentPlayerHp,
       playerMaxHp,
       playerMp: playerMaxMp,
       playerMaxMp,
@@ -311,6 +354,10 @@ export default function Battle() {
       if (!prev) return prev;
       // Player regenerates 1 MP per turn (max of playerMaxMp)
       const mpRegen = Math.min(1, prev.playerMaxMp - prev.playerMp);
+      
+      // Update persistent HP when player takes damage
+      setPersistentPlayerHp(newPlayerHp);
+      
       return {
         ...prev,
         playerHp: newPlayerHp,
@@ -331,6 +378,11 @@ export default function Battle() {
   };
 
   const returnToMonsterList = () => {
+    // Save current HP to persistent state when leaving battle
+    if (battleState) {
+      setPersistentPlayerHp(battleState.playerHp);
+      setLastRegenTime(Date.now());
+    }
     setBattleState(null);
   };
 
@@ -348,11 +400,13 @@ export default function Battle() {
     return Math.max(0, Math.ceil(remaining / (1000 * 60)));
   };
 
-  // Update cooldown display every minute
+  // Update cooldown display and health regeneration every minute
   useEffect(() => {
     const interval = setInterval(() => {
+      const now = Date.now();
+      
+      // Update monster cooldowns
       setMonsterCooldowns(prev => {
-        const now = Date.now();
         const updated = { ...prev };
         let hasChanges = false;
         
@@ -366,6 +420,17 @@ export default function Battle() {
         });
         
         return hasChanges ? updated : prev;
+      });
+      
+      // Trigger health regeneration check
+      setLastRegenTime(prev => {
+        const timeDiff = now - prev;
+        const minutesPassed = Math.floor(timeDiff / (60 * 1000));
+        
+        if (minutesPassed > 0) {
+          return now; // Update timestamp to trigger regeneration
+        }
+        return prev;
       });
     }, 60000); // Update every minute
 
@@ -387,6 +452,36 @@ export default function Battle() {
         </div>
 
         <div className="max-w-4xl mx-auto p-6">
+          {/* Player Health Status */}
+          {userStats && persistentPlayerHp !== null && (
+            <Card className="bg-card border-border mb-6">
+              <CardHeader>
+                <CardTitle className="text-foreground flex items-center space-x-2">
+                  <Heart className="w-5 h-5 text-green-400" />
+                  <span>Your Health Status</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1">
+                    <div className="relative w-full bg-gray-800 rounded-full h-6 border border-gray-400 overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-green-600 to-green-500 h-full rounded-full transition-all duration-300" 
+                        style={{ width: `${(persistentPlayerHp / Math.max(10, 10 + userStats.stamina * 3)) * 100}%` }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white drop-shadow-lg">
+                        HP: {persistentPlayerHp}/{Math.max(10, 10 + userStats.stamina * 3)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Regenerates 1% per minute
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Combat Stats Info */}
           <Card className="bg-card border-border mb-6">
             <CardHeader>
