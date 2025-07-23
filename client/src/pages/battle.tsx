@@ -594,27 +594,48 @@ export default function Battle() {
         </div>
 
         {/* Monster Info - Top Right Corner on Battle Screen */}
-        <div className="absolute top-4 right-2 z-10 flex flex-col items-end">
-          <div className="font-bold text-sm text-red-200 bg-black/90 px-2 py-1 rounded mb-1 border border-red-400/50 shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis">
-            {battleState.monster.name} (Lv.{battleState.monster.level})
-            {battleState.totalMonsters > 1 && (
-              <span className="text-xs ml-1 text-yellow-200">
-                [{battleState.currentMonsterIndex + 1}/{battleState.totalMonsters}]
-              </span>
-            )}
+        {battleState.totalMonsters > 1 ? (
+          // Multiple monsters - show separate name plates
+          <div className="absolute top-4 right-2 z-10 flex flex-col items-end space-y-1">
+            {/* First Slime Name Plate */}
+            <div className={`font-bold text-sm bg-black/90 px-2 py-1 rounded border shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis ${
+              battleState.currentMonsterIndex === 0 ? 'text-red-200 border-red-400/50' : 'text-gray-400 border-gray-500/50'
+            }`}>
+              Green Slime #1 (Lv.1)
+              {battleState.currentMonsterIndex === 0 && (
+                <span className="text-xs ml-1 text-yellow-200">[ACTIVE]</span>
+              )}
+            </div>
+            {/* Second Slime Name Plate */}
+            <div className={`font-bold text-sm bg-black/90 px-2 py-1 rounded border shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis ${
+              battleState.currentMonsterIndex === 1 ? 'text-red-200 border-red-400/50' : 'text-gray-400 border-gray-500/50'
+            }`}>
+              Green Slime #2 (Lv.1)
+              {battleState.currentMonsterIndex === 1 && (
+                <span className="text-xs ml-1 text-yellow-200">[ACTIVE]</span>
+              )}
+            </div>
           </div>
-          <div className="w-32 space-y-1">
-            {/* HP Bar */}
-            <div className="relative">
-              <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-400 overflow-hidden">
-                <div 
-                  className="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300" 
-                  style={{ width: `${monsterHpPercentage}%` }}
-                />
-              </div>
-              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
-                HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}
-              </div>
+        ) : (
+          // Single monster - original layout
+          <div className="absolute top-4 right-2 z-10 flex flex-col items-end">
+            <div className="font-bold text-sm text-red-200 bg-black/90 px-2 py-1 rounded mb-1 border border-red-400/50 shadow-lg text-right whitespace-nowrap max-w-44 overflow-hidden text-ellipsis">
+              {battleState.monster.name} (Lv.{battleState.monster.level})
+            </div>
+          </div>
+        )}
+
+        {/* HP Bar for current monster - positioned below name plates */}
+        <div className="absolute top-16 right-2 z-10 w-32">
+          <div className="relative">
+            <div className="w-full bg-gray-800 rounded-full h-3 border border-gray-400 overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-red-600 to-red-500 h-full rounded-full transition-all duration-300" 
+                style={{ width: `${monsterHpPercentage}%` }}
+              />
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg">
+              HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}
             </div>
           </div>
         </div>
@@ -638,28 +659,76 @@ export default function Battle() {
 
 
 
-          {/* Monster (Right) */}
-          <div className="flex flex-col items-center" style={{ marginTop: '20px', marginLeft: '-60px' }}>
-            <div className="w-36 h-36 flex items-end justify-center">
-              {battleState.monster.image ? (
-                <img 
-                  src={battleState.monster.image} 
-                  alt={battleState.monster.name}
-                  className="w-32 h-32 object-contain"
-                  style={{ 
-                    imageRendering: 'pixelated',
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
-                  }}
-                />
-              ) : (
-                <Skull className="w-23 h-23 text-red-600" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }} />
-              )}
+          {/* Monster(s) (Right) */}
+          {battleState.totalMonsters > 1 ? (
+            // Multiple monsters - show two slimes side by side
+            <div className="flex items-center space-x-4" style={{ marginTop: '20px', marginLeft: '-60px' }}>
+              {/* First Slime */}
+              <div className={`flex flex-col items-center transition-opacity duration-300 ${
+                battleState.currentMonsterIndex === 0 ? 'opacity-100' : 'opacity-50'
+              }`}>
+                <div className="w-30 h-30 flex items-end justify-center">
+                  {battleState.monster.image ? (
+                    <img 
+                      src={battleState.monster.image} 
+                      alt="Green Slime #1"
+                      className="w-28 h-28 object-contain"
+                      style={{ 
+                        imageRendering: 'pixelated',
+                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                      }}
+                    />
+                  ) : (
+                    <Skull className="w-28 h-28 text-red-600" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }} />
+                  )}
+                </div>
+              </div>
+              
+              {/* Second Slime */}
+              <div className={`flex flex-col items-center transition-opacity duration-300 ${
+                battleState.currentMonsterIndex === 1 ? 'opacity-100' : 'opacity-50'
+              }`}>
+                <div className="w-30 h-30 flex items-end justify-center">
+                  {battleState.monster.image ? (
+                    <img 
+                      src={battleState.monster.image} 
+                      alt="Green Slime #2"
+                      className="w-28 h-28 object-contain"
+                      style={{ 
+                        imageRendering: 'pixelated',
+                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                      }}
+                    />
+                  ) : (
+                    <Skull className="w-28 h-28 text-red-600" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }} />
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            // Single monster - original layout
+            <div className="flex flex-col items-center" style={{ marginTop: '20px', marginLeft: '-60px' }}>
+              <div className="w-36 h-36 flex items-end justify-center">
+                {battleState.monster.image ? (
+                  <img 
+                    src={battleState.monster.image} 
+                    alt={battleState.monster.name}
+                    className="w-32 h-32 object-contain"
+                    style={{ 
+                      imageRendering: 'pixelated',
+                      filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                    }}
+                  />
+                ) : (
+                  <Skull className="w-23 h-23 text-red-600" style={{ filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))' }} />
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Battle Log Area - Overlaid on bottom left */}
-        <div className="absolute bottom-20 left-2 right-2 z-10 bg-black/80 border border-gray-500 p-1 min-h-[30px] max-h-[30px] overflow-y-auto backdrop-blur-sm rounded">
+        <div className="absolute bottom-32 left-2 right-2 z-10 bg-black/80 border border-gray-500 p-1 min-h-[30px] max-h-[30px] overflow-y-auto backdrop-blur-sm rounded">
           <div className="text-xs text-white">
             {battleState.battleLog.length === 0 ? (
               <div className="text-gray-300 italic">Battle begins...</div>
@@ -674,7 +743,7 @@ export default function Battle() {
         </div>
 
         {/* Compact RPG Action Menu - Overlaid on bottom */}
-        <div className="absolute bottom-2 left-2 right-2 z-10 bg-black/60 text-white p-2 border border-gray-400/50 backdrop-blur-sm rounded">
+        <div className="absolute bottom-4 left-2 right-2 z-10 bg-black/60 text-white p-2 border border-gray-400/50 backdrop-blur-sm rounded">
           <div className="max-w-4xl mx-auto">
             {battleState.battleResult === 'ongoing' && (
               <div className="grid grid-cols-2 gap-2">
