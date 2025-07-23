@@ -168,16 +168,19 @@ export default function Battle() {
   useEffect(() => {
     if (userStats && battleState && battleState.battleResult === 'ongoing') {
       const newMaxHp = Math.max(10, 10 + userStats.stamina * 3);
-      setBattleState(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          playerMaxHp: newMaxHp,
-          playerHp: Math.min(prev.playerHp, newMaxHp)
-        };
-      });
+      // Only update if the maxHp has actually changed
+      if (battleState.playerMaxHp !== newMaxHp) {
+        setBattleState(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            playerMaxHp: newMaxHp,
+            playerHp: Math.min(prev.playerHp, newMaxHp)
+          };
+        });
+      }
     }
-  }, [userStats, battleState]);
+  }, [userStats]);
 
   const updateStatsMutation = useMutation({
     mutationFn: async (params: { goldGain: number; battleWon?: boolean }) => {
