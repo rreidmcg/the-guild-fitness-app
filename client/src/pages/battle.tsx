@@ -266,7 +266,7 @@ export default function Battle() {
         ...prev,
         monster: { ...prev.monster, currentHp: newMonsterHp },
         playerMp: prev.playerMp - 2, // Consume 2 MP per attack
-        battleLog: [...prev.battleLog, `You strike for ${damage} damage! (-2 MP)`],
+        battleLog: [...prev.battleLog, `You strike for ${damage} damage!`],
         isPlayerTurn: false,
         battleResult: isMonsterDefeated && prev.remainingMonsters.length === 0 ? 'victory' : 'ongoing'
       };
@@ -897,60 +897,44 @@ export default function Battle() {
         {/* Compact RPG Action Menu - Overlaid on battle screen */}
         <div className="absolute left-2 right-2 z-20 bg-black/80 text-white p-1 border-2 border-blue-400/80 backdrop-blur-sm rounded" style={{ bottom: 'calc(3.5rem + 20px)' }}>
           <div className="max-w-4xl mx-auto">
-            {/* Always show buttons for debugging */}
-            <div className="grid grid-cols-2 gap-1">
-              <Button
-                onClick={playerAttack}
-                disabled={!battleState?.isPlayerTurn || (battleState?.playerMp ?? 0) < 2}
-                className="disabled:opacity-50 disabled:cursor-not-allowed text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm"
-                style={{ 
-                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
-                  borderColor: 'rgba(13, 25, 59, 0.5)',
-                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
-                }}
-              >
-                <Sword className="w-3 h-3 mr-0.5" />
-                ATK
-              </Button>
-              <Button
-                variant="outline"
-                disabled
-                className="text-blue-100 border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
-                style={{ 
-                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
-                  borderColor: 'rgba(13, 25, 59, 0.5)',
-                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
-                }}
-              >
-                <Shield className="w-3 h-3 mr-0.5" />
-                DEF
-              </Button>
-              <Button
-                variant="outline"
-                disabled
-                className="text-blue-100 border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
-                style={{ 
-                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
-                  borderColor: 'rgba(13, 25, 59, 0.5)',
-                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
-                }}
-              >
-                <Zap className="w-3 h-3 mr-0.5" />
-                MAG
-              </Button>
-              <Button
-                variant="outline"
-                disabled
-                className="text-blue-100 border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm"
-                style={{ 
-                  backgroundColor: 'rgba(13, 25, 59, 0.7)', 
-                  borderColor: 'rgba(13, 25, 59, 0.5)',
-                  textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
-                }}
-              >
-                <Heart className="w-3 h-3 mr-0.5" />
-                ITM
-              </Button>
+            {/* Only show Attack and Item buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col items-center">
+                <Button
+                  onClick={playerAttack}
+                  disabled={!battleState?.isPlayerTurn || (battleState?.playerMp ?? 0) < 2}
+                  className="disabled:opacity-50 disabled:cursor-not-allowed text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm w-full"
+                  style={{ 
+                    backgroundColor: 'rgba(13, 25, 59, 0.7)', 
+                    borderColor: 'rgba(13, 25, 59, 0.5)',
+                    textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
+                  }}
+                >
+                  <Sword className="w-3 h-3 mr-0.5" />
+                  ATTACK
+                </Button>
+                <div className="text-xs text-blue-300/80 mt-0.5" style={{ textShadow: '0 0 6px rgba(173, 216, 255, 0.4)' }}>
+                  2 MP
+                </div>
+              </div>
+              <div className="flex flex-col items-center">
+                <Button
+                  variant="outline"
+                  disabled
+                  className="text-blue-100 border py-1 px-2 text-xs font-bold cursor-not-allowed h-7 backdrop-blur-sm w-full"
+                  style={{ 
+                    backgroundColor: 'rgba(13, 25, 59, 0.7)', 
+                    borderColor: 'rgba(13, 25, 59, 0.5)',
+                    textShadow: '0 0 10px rgba(173, 216, 255, 0.8)'
+                  }}
+                >
+                  <Heart className="w-3 h-3 mr-0.5" />
+                  ITEM
+                </Button>
+                <div className="text-xs text-blue-300/80 mt-0.5" style={{ textShadow: '0 0 6px rgba(173, 216, 255, 0.4)' }}>
+                  0 MP
+                </div>
+              </div>
             </div>
 
             {battleState.battleResult === 'victory' && (
