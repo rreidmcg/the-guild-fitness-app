@@ -253,9 +253,9 @@ export default function Inventory() {
                   )}
                 </div>
                 
-                {/* Quantity */}
-                {item.quantity > 1 && (
-                  <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground text-xs rounded px-1 min-w-[16px] text-center">
+                {/* Quantity - Always show if > 0 */}
+                {item.quantity > 0 && (
+                  <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs rounded px-1.5 py-0.5 min-w-[20px] text-center font-bold border border-white/20">
                     {item.quantity}
                   </div>
                 )}
@@ -413,30 +413,7 @@ export default function Inventory() {
         </div>
       </div>
 
-      {/* Potion Count Tooltip - Bottom Right */}
-      <div className="fixed bottom-24 right-4 z-50">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="bg-card border-2 border-border rounded-lg px-3 py-2 shadow-lg flex items-center space-x-2 cursor-pointer hover:bg-accent transition-colors">
-              <img 
-                src={minorPotionImage} 
-                alt="Potions"
-                className="w-6 h-6 object-contain"
-                style={{ 
-                  imageRendering: 'pixelated',
-                  filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
-                }}
-              />
-              <span className="text-sm font-medium text-foreground">{totalPotions}</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="left">
-            <div className="text-sm">
-              Total Potions in Storage
-            </div>
-          </TooltipContent>
-        </Tooltip>
-      </div>
+
     </div>
   );
 }
