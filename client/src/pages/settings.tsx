@@ -8,6 +8,7 @@ import { useBackgroundMusic } from "@/hooks/use-background-music";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import { 
   User, 
   Bell, 
@@ -28,10 +29,51 @@ import {
 export default function Settings() {
   const { toast } = useToast();
   const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
+  const [, setLocation] = useLocation();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
   });
+
+  const signOutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      // Clear any stored authentication data
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      
+      // Clear query cache
+      queryClient.clear();
+      
+      // Show success message
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of FitQuest",
+      });
+      
+      // Redirect to login page
+      setLocation('/login');
+    },
+    onError: () => {
+      // Even if logout fails on server, clear local data
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      queryClient.clear();
+      setLocation('/login');
+    },
+  });
+
+  const handleSignOut = () => {
+    signOutMutation.mutate();
+  };
 
 
 
@@ -256,7 +298,11 @@ export default function Settings() {
         {/* Sign Out */}
         <Card className="bg-card border-border">
           <CardContent className="p-6">
-            <Button variant="destructive" className="w-full">
+            <Button 
+              variant="destructive" 
+              className="w-full"
+              onClick={handleSignOut}
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
             </Button>
