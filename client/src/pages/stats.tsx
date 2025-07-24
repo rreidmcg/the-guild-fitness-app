@@ -711,7 +711,7 @@ export default function Stats() {
         </div>
 
         {/* Personal Records */}
-        <Card className="tron-border tron-corners">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
