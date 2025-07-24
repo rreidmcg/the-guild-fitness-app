@@ -118,12 +118,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/logout", async (req, res) => {
     try {
-      // In production, this would destroy the session or invalidate the token
-      // For now, just return success
+      // Clear current user session
+      currentUserId = 1; // Reset to default
       res.json({ message: "Logout successful" });
     } catch (error) {
       console.error("Error during logout:", error);
       res.status(500).json({ error: "Failed to logout" });
+    }
+  });
+
+  // Email verification route
+  app.get("/verify-email", async (req, res) => {
+    try {
+      const { token } = req.query;
+      
+      if (!token) {
+        return res.status(400).send(`
+          <html><body>
+            <h2>Invalid Verification Link</h2>
+            <p>The verification link is missing or invalid.</p>
+          </body></html>
+        `);
+      }
+
+      const user = await storage.getUserByVerificationToken(token as string);
+      if (!user) {
+        return res.status(400).send(`
+          <html><body>
+            <h2>Invalid or Expired Link</h2>
+            <p>This verification link is invalid or has expired.</p>
+          </body></html>
+        `);
+      }
+
+      // Update user to verified
+      await storage.updateUser(user.id, {
+        emailVerified: true,
+        emailVerificationToken: null
+      });
+
+      res.send(`
+        <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h2 style="color: #2563eb;">Email Verified Successfully!</h2>
+          <p>Your FitQuest account has been verified. You can now log in.</p>
+          <a href="/" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
+            Go to FitQuest
+          </a>
+        </body></html>
+      `);
+    } catch (error) {
+      console.error("Email verification error:", error);
+      res.status(500).send(`
+        <html><body>
+          <h2>Verification Error</h2>
+          <p>An error occurred during email verification.</p>
+        </body></html>
+      `);
     }
   });
 
