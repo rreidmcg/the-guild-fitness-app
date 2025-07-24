@@ -526,6 +526,11 @@ export default function Shop() {
                         Buy {item.price}g
                       </Button>
                     )}
+                    
+                    {/* Number Owned */}
+                    <div className="text-center text-xs text-muted-foreground mt-2">
+                      Owned: {item.isOwned ? 1 : 0}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -664,6 +669,11 @@ export default function Shop() {
                         Buy {potion.price}g
                       </Button>
                     )}
+                    
+                    {/* Number Owned */}
+                    <div className="text-center text-xs text-muted-foreground mt-2">
+                      Owned: {getInventoryQuantity(potion.id)}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
