@@ -474,6 +474,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user title
+  app.patch("/api/user/update-title", async (req, res) => {
+    try {
+      const { title } = req.body;
+      const userId = currentUserId; // Use the current logged-in user
+      
+      if (!title || typeof title !== 'string') {
+        return res.status(400).json({ error: "Valid title is required" });
+      }
+      
+      // Define available titles (could be enhanced with level/achievement requirements)
+      const availableTitles = [
+        "Recruit", "Novice", "Apprentice", "Journeyman", "Expert", 
+        "Master", "Champion", "Legend", "Mythic", "<G.M.>"
+      ];
+      
+      // Check if user can use this title (for now, allow all titles except G.M.)
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Only allow <G.M.> title if user already has it (prevent regular users from getting admin access)
+      if (title === "<G.M.>" && user.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "You don't have permission to use this title" });
+      }
+      
+      if (!availableTitles.includes(title)) {
+        return res.status(400).json({ error: "Invalid title selected" });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, { currentTitle: title });
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user title" });
+    }
+  });
+
   // Shop routes
   app.get("/api/shop/items", async (req, res) => {
     try {

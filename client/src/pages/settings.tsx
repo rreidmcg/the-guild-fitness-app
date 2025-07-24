@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
 import { useBackgroundMusic } from "@/hooks/use-background-music";
@@ -22,7 +23,8 @@ import {
   VolumeX,
   Vibrate,
   Moon,
-  Smartphone
+  Smartphone,
+  Crown
 } from "lucide-react";
 
 
@@ -75,6 +77,44 @@ export default function Settings() {
     signOutMutation.mutate();
   };
 
+  // Available titles based on progression and achievements
+  const availableTitles = [
+    "Recruit",
+    "Novice",
+    "Apprentice", 
+    "Journeyman",
+    "Expert",
+    "Master",
+    "Champion",
+    "Legend",
+    "Mythic",
+    ...(userStats?.currentTitle === "<G.M.>" ? ["<G.M.>"] : []) // Special admin title
+  ];
+
+  // Title update mutation
+  const updateTitleMutation = useMutation({
+    mutationFn: async (newTitle: string) => {
+      return apiRequest("/api/user/update-title", {
+        method: "PATCH",
+        body: JSON.stringify({ title: newTitle })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      toast({
+        title: "Title Updated",
+        description: "Your title has been changed successfully!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update title",
+        variant: "destructive",
+      });
+    },
+  });
+
 
 
   return (
@@ -118,6 +158,42 @@ export default function Settings() {
                 <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Avatar: {userStats?.gender === 'female' ? 'Female' : 'Male'}</p>
               </div>
+            </div>
+
+            {/* Title Selection */}
+            <div className="border-t border-border pt-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="text-base flex items-center space-x-2">
+                    <Crown className="w-4 h-4" />
+                    <span>Character Title</span>
+                  </Label>
+                  <div className="text-sm text-muted-foreground">
+                    Choose your display title
+                  </div>
+                </div>
+                <div className="w-48">
+                  <Select 
+                    value={userStats?.currentTitle || "Recruit"} 
+                    onValueChange={(value) => updateTitleMutation.mutate(value)}
+                    disabled={updateTitleMutation.isPending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select title" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableTitles.map((title) => (
+                        <SelectItem key={title} value={title}>
+                          {title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {updateTitleMutation.isPending && (
+                <p className="text-xs text-muted-foreground mt-2">Updating title...</p>
+              )}
             </div>
           </CardContent>
         </Card>
