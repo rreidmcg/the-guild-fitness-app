@@ -200,15 +200,11 @@ export default function Workouts() {
                         <p className="text-xs text-muted-foreground">Drink 8 glasses of water</p>
                       </div>
                       <div className="text-xs text-blue-500 font-medium">+5 XP</div>
-                      <div className="text-xs text-blue-500 font-medium">+5 XP</div>
                     </div>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span>+5 XP on completion</span>
-                  </div>
+                  <span>Check off when you've completed this daily quest</span>
                 </TooltipContent>
               </Tooltip>
 
@@ -229,15 +225,11 @@ export default function Workouts() {
                         <p className="text-xs text-muted-foreground">Walk 7,500 steps</p>
                       </div>
                       <div className="text-xs text-green-500 font-medium">+5 XP</div>
-                      <div className="text-xs text-green-500 font-medium">+5 XP</div>
                     </div>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span>+5 XP on completion</span>
-                  </div>
+                  <span>Check off when you've completed this daily quest</span>
                 </TooltipContent>
               </Tooltip>
 
@@ -258,15 +250,11 @@ export default function Workouts() {
                         <p className="text-xs text-muted-foreground">Hit your protein target</p>
                       </div>
                       <div className="text-xs text-orange-500 font-medium">+5 XP</div>
-                      <div className="text-xs text-orange-500 font-medium">+5 XP</div>
                     </div>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <div className="flex items-center space-x-2">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span>+5 XP on completion</span>
-                  </div>
+                  <span>Check off when you've completed this daily quest</span>
                 </TooltipContent>
               </Tooltip>
             </div>
