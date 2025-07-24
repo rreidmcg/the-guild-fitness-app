@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
+import { useBackgroundMusic } from "@/hooks/use-background-music";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +27,7 @@ import {
 
 export default function Settings() {
   const { toast } = useToast();
+  const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -71,7 +73,7 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Audio Settings - Moved to main app */}
+        {/* Audio Settings */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -82,10 +84,22 @@ export default function Settings() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-base">Background Music</Label>
+                <Label htmlFor="background-music" className="text-base">Background Music</Label>
                 <div className="text-sm text-muted-foreground">
-                  Music controls are available in the top-right corner of the app
+                  {isPlaying && !isMuted ? 'Currently playing' : 'Currently paused'}
                 </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="background-music"
+                  checked={isPlaying && !isMuted}
+                  onCheckedChange={toggleMusic}
+                />
+                {isPlaying && !isMuted ? (
+                  <Volume2 className="w-4 h-4 text-green-500" />
+                ) : (
+                  <VolumeX className="w-4 h-4 text-muted-foreground" />
+                )}
               </div>
             </div>
           </CardContent>
