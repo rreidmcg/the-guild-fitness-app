@@ -27,11 +27,11 @@ import manaPotionImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_175315
 interface InventoryItem {
   id: number;
   itemName: string;
-  category: string;
-  rarity: string;
+  itemType: string; // Changed from category to itemType to match API
   quantity: number;
   description?: string;
   color?: string;
+  rarity?: string; // Made optional since API might not always include it
 }
 
 const rarityColors = {
@@ -55,10 +55,10 @@ const categoryIcons = {
 
 // Item visual representations based on category and name
 const getItemVisual = (item: InventoryItem) => {
-  const { category, itemName, color, rarity } = item;
+  const { itemType, itemName, color, rarity } = item;
   
   // For potions, use pixel art images
-  if (category === 'potion') {
+  if (itemType === 'potion') {
     if (itemName.toLowerCase().includes('minor')) {
       return (
         <img 
@@ -130,7 +130,7 @@ const getItemVisual = (item: InventoryItem) => {
     let path = '';
     let viewBox = '0 0 24 24';
     
-    switch (category) {
+    switch (itemType) {
       case 'head':
         if (itemName.toLowerCase().includes('crown')) {
           path = 'M5 16L3 22h18l-2-6M12 2L8 6v4h8V6l-4-4zM8 10h8v2H8v-2z';
@@ -210,8 +210,8 @@ export default function Inventory() {
     }
   });
 
-  const getItemIcon = (category: string) => {
-    const IconComponent = categoryIcons[category as keyof typeof categoryIcons] || Package;
+  const getItemIcon = (itemType: string) => {
+    const IconComponent = categoryIcons[itemType as keyof typeof categoryIcons] || Package;
     return IconComponent;
   };
 
@@ -344,7 +344,7 @@ export default function Inventory() {
                   </div>
                   
                   <div className="flex space-x-2">
-                    {inventoryGrid[selectedSlot].category === 'potion' && (
+                    {inventoryGrid[selectedSlot].itemType === 'potion' && (
                       <Button size="sm" variant="outline">
                         <Heart className="w-4 h-4 mr-2" />
                         Use
@@ -375,7 +375,7 @@ export default function Inventory() {
             <CardContent className="p-4 text-center">
               <Heart className="w-6 h-6 mx-auto mb-2 text-red-500" />
               <div className="text-lg font-bold">
-                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.category === 'potion' && item.itemName.includes('Healing')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
+                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.itemType === 'potion' && item.itemName.includes('healing')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
               </div>
               <div className="text-xs text-muted-foreground">Health Potions</div>
             </CardContent>
@@ -385,7 +385,7 @@ export default function Inventory() {
             <CardContent className="p-4 text-center">
               <Zap className="w-6 h-6 mx-auto mb-2 text-blue-500" />
               <div className="text-lg font-bold">
-                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.category === 'potion' && item.itemName.includes('Mana')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
+                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.itemType === 'potion' && item.itemName.includes('mana')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
               </div>
               <div className="text-xs text-muted-foreground">Mana Potions</div>
             </CardContent>
@@ -395,7 +395,7 @@ export default function Inventory() {
             <CardContent className="p-4 text-center">
               <Crown className="w-6 h-6 mx-auto mb-2 text-yellow-500" />
               <div className="text-lg font-bold">
-                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.category !== 'potion').length}
+                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.itemType !== 'potion').length}
               </div>
               <div className="text-xs text-muted-foreground">Equipment</div>
             </CardContent>
