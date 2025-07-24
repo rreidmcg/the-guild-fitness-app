@@ -42,6 +42,10 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
     background-color: hsl(215, 28%, 8%) !important; /* Dark slate background */
@@ -71,6 +75,111 @@
   
   .progress-ring {
     transform: rotate(-90deg);
+  }
+
+  /* Smooth Page Transitions */
+  .page-transition {
+    animation: pageSlideIn 0.3s ease-out;
+  }
+
+  .page-exit {
+    animation: pageSlideOut 0.2s ease-in forwards;
+  }
+
+  @keyframes pageSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes pageSlideOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+  }
+
+  /* Smooth transitions for all interactive elements */
+  button, a, .clickable {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Enhanced bottom navigation transitions */
+  .nav-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+  }
+
+  .nav-item:hover {
+    transform: translateY(-2px);
+  }
+
+  .nav-item.active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(197, 100%, 60%, 0.3);
+  }
+
+  /* Smooth container transitions */
+  .container-transition {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced card transitions */
+  .card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(107, 185, 230, 0.15);
+  }
+
+  /* Smooth scroll behavior for all scrollable elements */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Stagger animation for lists */
+  .stagger-item {
+    animation: staggerIn 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-item:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-item:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-item:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-item:nth-child(5) { animation-delay: 0.5s; }
+
+  @keyframes staggerIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Smooth focus transitions */
+  *:focus {
+    transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  }
+
+  /* Enhanced hover effects for buttons */
+  button:hover {
+    transform: translateY(-1px);
+  }
+
+  button:active {
+    transform: translateY(0);
   }
   
   /* Cave Rat transparent background */

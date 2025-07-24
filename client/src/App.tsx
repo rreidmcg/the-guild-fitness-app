@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/ui/bottom-nav";
+import { PageTransition } from "@/components/ui/page-transition";
 import { useBackgroundMusic } from "@/hooks/use-background-music";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX } from "lucide-react";
@@ -24,21 +25,23 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Stats} />
-      <Route path="/workouts" component={Workouts} />
-      <Route path="/inventory" component={Inventory} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/workout-builder" component={WorkoutBuilder} />
-      <Route path="/workout-session/:id" component={WorkoutSession} />
-      <Route path="/battle" component={Battle} />
-      <Route path="/wardrobe" component={Wardrobe} />
-      <Route path="/shop" component={Shop} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/signup" component={SignupPage} />
-      <Route path="/login" component={LoginPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <PageTransition>
+      <Switch>
+        <Route path="/" component={Stats} />
+        <Route path="/workouts" component={Workouts} />
+        <Route path="/inventory" component={Inventory} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/workout-builder" component={WorkoutBuilder} />
+        <Route path="/workout-session/:id" component={WorkoutSession} />
+        <Route path="/battle" component={Battle} />
+        <Route path="/wardrobe" component={Wardrobe} />
+        <Route path="/shop" component={Shop} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/signup" component={SignupPage} />
+        <Route path="/login" component={LoginPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </PageTransition>
   );
 }
 

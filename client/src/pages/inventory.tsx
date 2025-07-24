@@ -169,7 +169,7 @@ export default function Inventory() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20 container-transition">
       <PageHeader 
         title="Inventory" 
         subtitle={`Manage your items and equipment • ${inventory.length}/${totalSlots} slots used`}
