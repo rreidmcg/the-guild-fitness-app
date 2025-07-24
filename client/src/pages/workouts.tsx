@@ -262,7 +262,7 @@ export default function Workouts() {
         </Card>
 
         {/* Recent Workouts */}
-        <Card className="bg-card border-border">
+        <Card className="bg-transparent border-transparent">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-foreground mb-3">Recent Sessions</CardTitle>
             <div className="flex items-center space-x-2">
@@ -274,7 +274,7 @@ export default function Workouts() {
                 <Plus className="w-4 h-4 mr-2" />
                 New Workout
               </Button>
-              <Button variant="ghost" className="text-game-primary hover:text-blue-400">
+              <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View All
               </Button>
