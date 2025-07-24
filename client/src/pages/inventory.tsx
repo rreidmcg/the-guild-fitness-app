@@ -47,6 +47,80 @@ const categoryIcons = {
   potion: Heart
 };
 
+// Item visual representations based on category and name
+const getItemVisual = (item: InventoryItem) => {
+  const { category, itemName, color, rarity } = item;
+  
+  // For potions, use emoji
+  if (category === 'potion') {
+    if (itemName.toLowerCase().includes('minor')) return '🧪';
+    if (itemName.toLowerCase().includes('major')) return '🍶';
+    if (itemName.toLowerCase().includes('full')) return '⚗️';
+    return '🧪';
+  }
+  
+  // For equipment, create SVG-based visuals
+  const createEquipmentSVG = () => {
+    let path = '';
+    let viewBox = '0 0 24 24';
+    
+    switch (category) {
+      case 'head':
+        if (itemName.toLowerCase().includes('crown')) {
+          path = 'M5 16L3 22h18l-2-6M12 2L8 6v4h8V6l-4-4zM8 10h8v2H8v-2z';
+        } else if (itemName.toLowerCase().includes('helmet')) {
+          path = 'M12 2C8 2 5 5 5 9v7h14V9c0-4-3-7-7-7zM7 14v-3h10v3H7z';
+        } else {
+          path = 'M12 2C8.69 2 6 4.69 6 8v8h12V8c0-3.31-2.69-6-6-6z';
+        }
+        break;
+      case 'chest':
+        if (itemName.toLowerCase().includes('chainmail')) {
+          path = 'M12 2L8 6v10c0 3.31 2.69 6 6 6s6-2.69 6-6V6l-4-4zM10 8h4v8h-4V8z';
+        } else if (itemName.toLowerCase().includes('dragonscale')) {
+          path = 'M12 2L6 8v8c0 3.31 2.69 6 6 6s6-2.69 6-6V8l-6-6zM8 10l4-3 4 3v6c0 2.21-1.79 4-4 4s-4-1.79-4-4v-6z';
+        } else {
+          path = 'M12 2L7 7v9c0 2.76 2.24 5 5 5s5-2.24 5-5V7l-5-5z';
+        }
+        break;
+      case 'hands':
+        path = 'M9 5v2H7V5c0-1.1.9-2 2-2s2 .9 2 2zM7 9v6c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V9H7zM17 5v2h-2V5c0-1.1.9-2 2-2s2 .9 2 2z';
+        break;
+      case 'feet':
+        path = 'M12 2C8.69 2 6 4.69 6 8v4l2 8h8l2-8V8c0-3.31-2.69-6-6-6zM8 8c0-2.21 1.79-4 4-4s4 1.79 4 4v3H8V8z';
+        break;
+      case 'neck':
+        path = 'M12 2l-2 4v4c0 2.21 1.79 4 4 4s4-1.79 4-4V6l-2-4-4 0zM10 8l2-2 2 2v2c0 1.1-.9 2-2 2s-2-.9-2-2V8z';
+        break;
+      case 'shoulders':
+        path = 'M4 8l4-4h8l4 4v6l-2 6H6l-2-6V8zM6 10v4l1 4h10l1-4v-4H6z';
+        break;
+      case 'waist':
+        path = 'M8 6l8 0c1.1 0 2 .9 2 2v8c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2zM10 8v8h4V8h-4z';
+        break;
+      case 'legs':
+        path = 'M9 2h6c1.1 0 2 .9 2 2v12l-2 6h-2l-1-6v-6l-1 6-1 6H8l-2-6V4c0-1.1.9-2 2-2h1z';
+        break;
+      default:
+        path = 'M12 2L6 8v8c0 3.31 2.69 6 6 6s6-2.69 6-6V8l-6-6z';
+    }
+    
+    return (
+      <svg 
+        viewBox={viewBox} 
+        className="w-full h-full" 
+        fill={color || '#666'}
+        stroke="currentColor" 
+        strokeWidth="1"
+      >
+        <path d={path} />
+      </svg>
+    );
+  };
+  
+  return createEquipmentSVG();
+};
+
 export default function Inventory() {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
@@ -98,16 +172,13 @@ export default function Inventory() {
             <TooltipTrigger asChild>
               <div className="w-full h-full p-1 flex flex-col items-center justify-center relative">
                 {/* Item Visual */}
-                <div 
-                  className="w-8 h-8 rounded flex items-center justify-center mb-1"
-                  style={{ backgroundColor: item.color || '#666' }}
-                >
-                  {item.category === 'potion' ? (
-                    <span className="text-lg">🧪</span>
+                <div className="w-8 h-8 rounded flex items-center justify-center mb-1 overflow-hidden">
+                  {typeof getItemVisual(item) === 'string' ? (
+                    <span className="text-lg">{getItemVisual(item)}</span>
                   ) : (
-                    <span className="text-white text-xs font-bold">
-                      {item.itemName[0]}
-                    </span>
+                    <div className="w-6 h-6">
+                      {getItemVisual(item)}
+                    </div>
                   )}
                 </div>
                 
@@ -181,16 +252,13 @@ export default function Inventory() {
               <div className="border-t border-border pt-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div 
-                      className="w-12 h-12 rounded flex items-center justify-center"
-                      style={{ backgroundColor: inventoryGrid[selectedSlot].color || '#666' }}
-                    >
-                      {inventoryGrid[selectedSlot].category === 'potion' ? (
-                        <span className="text-2xl">🧪</span>
+                    <div className="w-12 h-12 rounded flex items-center justify-center overflow-hidden">
+                      {typeof getItemVisual(inventoryGrid[selectedSlot]) === 'string' ? (
+                        <span className="text-3xl">{getItemVisual(inventoryGrid[selectedSlot])}</span>
                       ) : (
-                        <span className="text-white font-bold">
-                          {inventoryGrid[selectedSlot].itemName[0]}
-                        </span>
+                        <div className="w-10 h-10">
+                          {getItemVisual(inventoryGrid[selectedSlot])}
+                        </div>
                       )}
                     </div>
                     <div>
