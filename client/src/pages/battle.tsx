@@ -30,6 +30,7 @@ import wildGoblinImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_175315
 import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753196270170.png";
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
+import zoneMapImage from "@assets/7DCEA0C7-2CDB-488A-B077-B336CB5CE781_1753322118569.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
 
@@ -92,6 +93,16 @@ interface Rank {
   color: string;
 }
 
+interface ZoneLocation {
+  id: number;
+  name: string;
+  description: string;
+  position: { top: string; left: string };
+  monsters: Monster[];
+  isUnlocked: boolean;
+  requiredLevel: number;
+}
+
 interface BattleState {
   playerHp: number;
   playerMaxHp: number;
@@ -116,79 +127,72 @@ const RANKS: Rank[] = [
   { id: "S", name: "S-Rank", description: "Legendary challenges", requiredLevel: 25, color: "bg-yellow-600" },
 ];
 
+// Zone locations for E-rank Greenwood Valley
+const E_RANK_ZONES: ZoneLocation[] = [
+  {
+    id: 1,
+    name: "Village Outskirts",
+    description: "Peaceful village area with friendly slimes",
+    position: { top: "65%", left: "15%" }, // Bottom left - Village area
+    isUnlocked: true,
+    requiredLevel: 1,
+    monsters: [
+      { id: 1, name: "Green Slime", level: 1, maxHp: 13, currentHp: 13, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
+      { id: 2, name: "Blue Slime", level: 2, maxHp: 16, currentHp: 16, attack: 3, goldReward: 3, description: "A slightly stronger slime variant" },
+    ]
+  },
+  {
+    id: 2,
+    name: "Woodland House",
+    description: "An abandoned house with rats in the cellar",
+    position: { top: "20%", left: "20%" }, // Top left - House area
+    isUnlocked: false,
+    requiredLevel: 2,
+    monsters: [
+      { id: 3, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth", image: caveRatImage },
+      { id: 4, name: "Giant Rat", level: 3, maxHp: 22, currentHp: 22, attack: 4, goldReward: 4, description: "A massive rodent with glowing red eyes" },
+    ]
+  },
+  {
+    id: 3,
+    name: "Ancient Tower",
+    description: "A mysterious tower overrun by goblins",
+    position: { top: "15%", left: "75%" }, // Top right - Tower area
+    isUnlocked: false,
+    requiredLevel: 3,
+    monsters: [
+      { id: 5, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger", image: wildGoblinImage },
+      { id: 6, name: "Goblin Warrior", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 5, description: "A better equipped goblin fighter" },
+    ]
+  },
+  {
+    id: 4,
+    name: "Campfire Grove",
+    description: "A forest clearing where spiders have made their nest",
+    position: { top: "70%", left: "70%" }, // Bottom right - Campfire area
+    isUnlocked: false,
+    requiredLevel: 4,
+    monsters: [
+      { id: 7, name: "Forest Spider", level: 4, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs", image: forestSpiderImage },
+      { id: 8, name: "Brood Mother", level: 5, maxHp: 45, currentHp: 45, attack: 7, goldReward: 8, description: "The queen of the spider nest" },
+    ]
+  }
+];
+
 // Dungeon data organized by rank
 const DUNGEONS: Record<string, Dungeon[]> = {
   "E": [
     {
       id: 1,
-      name: "Slime Cave",
+      name: "Greenwood Valley",
       rank: "E",
       order: 1,
       isUnlocked: true,
       isCompleted: false,
       requiredLevel: 1,
-      description: "A damp cave filled with harmless slimes. Perfect for beginners.",
-      backgroundImage: forestBackgroundImage,
-      monsters: [
-        { id: 1, name: "Green Slime", level: 1, maxHp: 13, currentHp: 13, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
-        { id: 2, name: "Blue Slime", level: 2, maxHp: 16, currentHp: 16, attack: 3, goldReward: 3, description: "A slightly stronger slime variant" },
-      ]
-    },
-    {
-      id: 2,
-      name: "Rat Warren",
-      rank: "E",
-      order: 2,
-      isUnlocked: false,
-      isCompleted: false,
-      requiredLevel: 2,
-      description: "Underground tunnels infested with aggressive rats.",
-      monsters: [
-        { id: 3, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth", image: caveRatImage },
-        { id: 4, name: "Giant Rat", level: 3, maxHp: 22, currentHp: 22, attack: 4, goldReward: 4, description: "A massive rodent with glowing red eyes" },
-      ]
-    },
-    {
-      id: 3,
-      name: "Goblin Outpost",
-      rank: "E",
-      order: 3,
-      isUnlocked: false,
-      isCompleted: false,
-      requiredLevel: 3,
-      description: "A small goblin settlement on the forest edge.",
-      monsters: [
-        { id: 5, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger", image: wildGoblinImage },
-        { id: 6, name: "Goblin Warrior", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 5, description: "A better equipped goblin fighter" },
-      ]
-    },
-    {
-      id: 4,
-      name: "Spider Nest",
-      rank: "E",
-      order: 4,
-      isUnlocked: false,
-      isCompleted: false,
-      requiredLevel: 4,
-      description: "A webbed forest clearing where giant spiders dwell.",
-      monsters: [
-        { id: 7, name: "Forest Spider", level: 4, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs", image: forestSpiderImage },
-        { id: 8, name: "Brood Mother", level: 5, maxHp: 45, currentHp: 45, attack: 7, goldReward: 8, description: "The queen of the spider nest" },
-      ]
-    },
-    {
-      id: 5,
-      name: "Skeleton Crypt",
-      rank: "E",
-      order: 5,
-      isUnlocked: false,
-      isCompleted: false,
-      requiredLevel: 5,
-      description: "An ancient burial ground where the dead refuse to rest.",
-      monsters: [
-        { id: 9, name: "Skeleton Warrior", level: 5, maxHp: 42, currentHp: 42, attack: 7, goldReward: 6, description: "Animated bones wielding ancient weapons" },
-        { id: 10, name: "Skeleton Archer", level: 6, maxHp: 38, currentHp: 38, attack: 8, goldReward: 7, description: "Undead marksman with endless arrows" },
-      ]
+      description: "A peaceful valley with various monster zones to explore.",
+      backgroundImage: zoneMapImage,
+      monsters: [] // Monsters are in zones instead
     }
   ],
   "D": [
@@ -303,6 +307,24 @@ export default function Battle() {
     setSelectedDungeon(dungeon);
   };
 
+  // Enter a zone (for E-rank dungeons)
+  const enterZone = (zone: ZoneLocation) => {
+    // Create a temporary dungeon structure for the zone
+    const zoneDungeon: Dungeon = {
+      id: zone.id,
+      name: zone.name,
+      rank: "E",
+      order: zone.id,
+      isUnlocked: true,
+      isCompleted: false,
+      requiredLevel: zone.requiredLevel,
+      description: zone.description,
+      backgroundImage: zoneMapImage,
+      monsters: zone.monsters
+    };
+    setSelectedDungeon(zoneDungeon);
+  };
+
   // Exit dungeon back to map
   const exitDungeon = () => {
     setSelectedDungeon(null);
@@ -397,81 +419,177 @@ export default function Battle() {
             </CardContent>
           </Card>
 
-          {/* Dungeon Map */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <div className={`w-4 h-4 rounded ${RANKS.find(r => r.id === selectedRank)?.color || 'bg-gray-600'}`} />
-                <span>{RANKS.find(r => r.id === selectedRank)?.name} Dungeons</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {unlockedDungeons.map((dungeon) => {
-                  const isCompleted = dungeonProgress[selectedRank][dungeon.id];
-                  const isUnlocked = dungeon.isUnlocked;
-                  const canEnter = isUnlocked && (userStats?.level || 1) >= dungeon.requiredLevel;
+          {/* Zone Map for E-Rank or Regular Dungeon List */}
+          {selectedRank === "E" ? (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <div className="w-4 h-4 rounded bg-gray-600" />
+                  <span>Greenwood Valley - Zone Map</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="relative w-full max-w-2xl mx-auto">
+                  {/* Zone Map Background */}
+                  <img 
+                    src={zoneMapImage} 
+                    alt="Greenwood Valley Map" 
+                    className="w-full h-auto rounded-lg shadow-lg"
+                    style={{ aspectRatio: '1:1' }}
+                  />
+                  
+                  {/* Zone Buttons */}
+                  {E_RANK_ZONES.map((zone) => {
+                    const isUnlocked = zone.isUnlocked || (userStats?.level || 1) >= zone.requiredLevel;
+                    const canEnter = isUnlocked;
 
-                  return (
-                    <Card 
-                      key={dungeon.id}
-                      className={`transition-all duration-200 ${
-                        !canEnter
-                          ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-700 border-gray-400 dark:border-gray-500'
-                          : 'bg-card border-border hover:border-primary hover:shadow-lg hover:scale-105 cursor-pointer'
-                      }`}
-                      onClick={() => canEnter && enterDungeon(dungeon)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-muted-foreground">#{dungeon.order}</span>
-                            <h3 className={`font-bold ${!canEnter ? 'text-gray-400' : 'text-foreground'}`}>
-                              {dungeon.name}
-                            </h3>
-                          </div>
-                          
-                          {/* Status Icons */}
-                          <div className="flex items-center space-x-1">
-                            {isCompleted && <CheckCircle className="w-5 h-5 text-green-400" />}
-                            {!isUnlocked && <Lock className="w-5 h-5 text-gray-400" />}
-                            {dungeon.requiredLevel > (userStats?.level || 1) && <Star className="w-5 h-5 text-orange-400" />}
-                          </div>
+                    return (
+                      <Button
+                        key={zone.id}
+                        onClick={() => canEnter && enterZone(zone)}
+                        className={`absolute transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full ${
+                          !canEnter
+                            ? 'bg-gray-600 cursor-not-allowed opacity-50'
+                            : 'bg-primary hover:bg-primary/80 hover:scale-110 shadow-lg'
+                        } transition-all duration-200`}
+                        style={{
+                          top: zone.position.top,
+                          left: zone.position.left,
+                        }}
+                        disabled={!canEnter}
+                      >
+                        <div className="flex flex-col items-center text-xs">
+                          <span className="text-white font-bold">{zone.id}</span>
                         </div>
-                        
-                        <p className={`text-sm mb-3 ${!canEnter ? 'text-gray-400' : 'text-muted-foreground'}`}>
-                          {dungeon.description}
-                        </p>
-                        
-                        <div className="flex items-center justify-between text-xs">
-                          <span className={`px-2 py-1 rounded ${
-                            !canEnter ? 'bg-gray-500 text-gray-300' : 'bg-blue-700 text-white'
+                      </Button>
+                    );
+                  })}
+                </div>
+                
+                {/* Zone Legend */}
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {E_RANK_ZONES.map((zone) => {
+                    const isUnlocked = zone.isUnlocked || (userStats?.level || 1) >= zone.requiredLevel;
+                    
+                    return (
+                      <div 
+                        key={zone.id}
+                        className={`p-3 rounded-lg ${
+                          !isUnlocked 
+                            ? 'bg-gray-800 opacity-60' 
+                            : 'bg-card border border-border hover:border-primary transition-colors'
+                        }`}
+                      >
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            !isUnlocked ? 'bg-gray-600 text-gray-400' : 'bg-primary text-white'
                           }`}>
-                            Req. Lv.{dungeon.requiredLevel}
+                            {zone.id}
+                          </div>
+                          <h4 className={`font-medium ${!isUnlocked ? 'text-gray-400' : 'text-foreground'}`}>
+                            {zone.name}
+                          </h4>
+                        </div>
+                        <p className={`text-sm ${!isUnlocked ? 'text-gray-500' : 'text-muted-foreground'}`}>
+                          {zone.description}
+                        </p>
+                        <div className="flex items-center justify-between mt-2 text-xs">
+                          <span className={`px-2 py-1 rounded ${
+                            !isUnlocked ? 'bg-gray-600 text-gray-400' : 'bg-blue-700 text-white'
+                          }`}>
+                            Req. Lv.{zone.requiredLevel}
                           </span>
-                          <span className={`${!canEnter ? 'text-gray-400' : 'text-muted-foreground'}`}>
-                            {dungeon.monsters.length} Monster{dungeon.monsters.length > 1 ? 's' : ''}
+                          <span className={`${!isUnlocked ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                            {zone.monsters.length} Monster{zone.monsters.length > 1 ? 's' : ''}
                           </span>
                         </div>
-                        
                         {!isUnlocked && (
                           <div className="mt-2 text-xs text-orange-400">
-                            Complete previous dungeon to unlock
+                            Level {zone.requiredLevel} required
                           </div>
                         )}
-                        
-                        {dungeon.requiredLevel > (userStats?.level || 1) && (
-                          <div className="mt-2 text-xs text-orange-400">
-                            Level {dungeon.requiredLevel} required
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <div className={`w-4 h-4 rounded ${RANKS.find(r => r.id === selectedRank)?.color || 'bg-gray-600'}`} />
+                  <span>{RANKS.find(r => r.id === selectedRank)?.name} Dungeons</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {unlockedDungeons.map((dungeon) => {
+                    const isCompleted = dungeonProgress[selectedRank][dungeon.id];
+                    const isUnlocked = dungeon.isUnlocked;
+                    const canEnter = isUnlocked && (userStats?.level || 1) >= dungeon.requiredLevel;
+
+                    return (
+                      <Card 
+                        key={dungeon.id}
+                        className={`transition-all duration-200 ${
+                          !canEnter
+                            ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-700 border-gray-400 dark:border-gray-500'
+                            : 'bg-card border-border hover:border-primary hover:shadow-lg hover:scale-105 cursor-pointer'
+                        }`}
+                        onClick={() => canEnter && enterDungeon(dungeon)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm font-medium text-muted-foreground">#{dungeon.order}</span>
+                              <h3 className={`font-bold ${!canEnter ? 'text-gray-400' : 'text-foreground'}`}>
+                                {dungeon.name}
+                              </h3>
+                            </div>
+                            
+                            {/* Status Icons */}
+                            <div className="flex items-center space-x-1">
+                              {isCompleted && <CheckCircle className="w-5 h-5 text-green-400" />}
+                              {!isUnlocked && <Lock className="w-5 h-5 text-gray-400" />}
+                              {dungeon.requiredLevel > (userStats?.level || 1) && <Star className="w-5 h-5 text-orange-400" />}
+                            </div>
                           </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+                          
+                          <p className={`text-sm mb-3 ${!canEnter ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                            {dungeon.description}
+                          </p>
+                          
+                          <div className="flex items-center justify-between text-xs">
+                            <span className={`px-2 py-1 rounded ${
+                              !canEnter ? 'bg-gray-500 text-gray-300' : 'bg-blue-700 text-white'
+                            }`}>
+                              Req. Lv.{dungeon.requiredLevel}
+                            </span>
+                            <span className={`${!canEnter ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                              {dungeon.monsters.length} Monster{dungeon.monsters.length > 1 ? 's' : ''}
+                            </span>
+                          </div>
+                          
+                          {!isUnlocked && (
+                            <div className="mt-2 text-xs text-orange-400">
+                              Complete previous dungeon to unlock
+                            </div>
+                          )}
+                          
+                          {dungeon.requiredLevel > (userStats?.level || 1) && (
+                            <div className="mt-2 text-xs text-orange-400">
+                              Level {dungeon.requiredLevel} required
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     );
