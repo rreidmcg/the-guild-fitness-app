@@ -7,7 +7,7 @@ export function BottomNav() {
 
   const navItems = [
     { path: "/", label: "Stats", icon: BarChart3 },
-    { path: "/workouts", label: "Workouts", icon: Dumbbell },
+    { path: "/workouts", label: "Quests", icon: Dumbbell },
     { path: "/battle", label: "Battle", icon: Sword },
     { path: "/shop", label: "Shop", icon: ShoppingBag },
     { path: "/inventory", label: "Items", icon: Package },
