@@ -153,11 +153,6 @@ export default function Workouts() {
                 <h3 className="font-bold text-yellow-400">Daily Quest Completion Rewards</h3>
                 <div className="flex items-center justify-center space-x-4 mt-2 text-sm">
                   <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span className="text-foreground">+5 XP</span>
-                  </div>
-                  <span className="text-muted-foreground">+</span>
-                  <div className="flex items-center space-x-1">
                     <Shield className="w-4 h-4 text-blue-500" />
                     <span className="text-foreground">1 Streak Freeze</span>
                   </div>
@@ -200,10 +195,12 @@ export default function Workouts() {
                     />
                     <div className="flex items-center gap-2 flex-1">
                       <Droplets className="w-5 h-5 text-blue-500" />
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-foreground">Stay Hydrated</p>
                         <p className="text-xs text-muted-foreground">Drink 8 glasses of water</p>
                       </div>
+                      <div className="text-xs text-blue-500 font-medium">+5 XP</div>
+                      <div className="text-xs text-blue-500 font-medium">+5 XP</div>
                     </div>
                   </div>
                 </TooltipTrigger>
@@ -227,10 +224,12 @@ export default function Workouts() {
                     />
                     <div className="flex items-center gap-2 flex-1">
                       <Footprints className="w-5 h-5 text-green-500" />
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-foreground">Daily Steps</p>
                         <p className="text-xs text-muted-foreground">Walk 7,500 steps</p>
                       </div>
+                      <div className="text-xs text-green-500 font-medium">+5 XP</div>
+                      <div className="text-xs text-green-500 font-medium">+5 XP</div>
                     </div>
                   </div>
                 </TooltipTrigger>
@@ -254,10 +253,12 @@ export default function Workouts() {
                     />
                     <div className="flex items-center gap-2 flex-1">
                       <UtensilsCrossed className="w-5 h-5 text-orange-500" />
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-foreground">Protein Goal</p>
                         <p className="text-xs text-muted-foreground">Hit your protein target</p>
                       </div>
+                      <div className="text-xs text-orange-500 font-medium">+5 XP</div>
+                      <div className="text-xs text-orange-500 font-medium">+5 XP</div>
                     </div>
                   </div>
                 </TooltipTrigger>
