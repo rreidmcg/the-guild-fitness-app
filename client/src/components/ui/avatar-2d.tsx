@@ -1,6 +1,6 @@
 import { User } from "@shared/schema";
 import maleAvatarImage from "@assets/IMG_3682_1753213695174.png";
-import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753313331992.png";
+import femaleAvatarImage from "@assets/09037B89-CDBD-4EFA-966C-3794F4AC7E9D_1752966596818.png";
 
 interface Avatar2DProps {
   user?: User;
@@ -43,8 +43,7 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
           className="w-full h-full object-contain"
           style={{
             filter: `brightness(${0.9 + overallFitness * 0.3}) contrast(${1 + muscleDefinition * 0.2})`,
-            imageRendering: 'pixelated',
-            transform: user?.gender === "female" ? 'scale(0.9)' : 'none'
+            imageRendering: 'pixelated'
           }}
         />
         

@@ -1,11 +1,9 @@
 import { useLocation } from "wouter";
 import { Button } from "./button";
 import { Dumbbell, BarChart3, Sword, ShoppingBag, Package } from "lucide-react";
-import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
 
 export function BottomNav() {
   const [location, setLocation] = useLocation();
-  const { scrollToTop } = useSmoothScroll();
 
   const navItems = [
     { path: "/", label: "Stats", icon: BarChart3 },
@@ -27,14 +25,10 @@ export function BottomNav() {
               <Button
                 key={item.path}
                 variant="ghost"
-                onClick={() => {
-                  setLocation(item.path);
-                  // Smooth scroll to top when changing pages
-                  scrollToTop();
-                }}
-                className={`nav-item ${isActive ? 'active' : ''} justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-14 w-14 flex flex-col items-center justify-center space-y-1 px-3 py-2 min-w-0 ${isActive ? 'text-primary bg-accent/20' : 'text-muted-foreground'}`}
+                onClick={() => setLocation(item.path)}
+                className="justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-14 w-14 flex flex-col items-center justify-center space-y-1 px-3 py-2 min-w-0 text-primary"
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''} transition-transform duration-200`} />
+                <Icon className="w-5 h-5" />
                 <span className="text-xs font-medium">{item.label}</span>
               </Button>
             );

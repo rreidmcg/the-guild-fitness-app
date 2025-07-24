@@ -697,7 +697,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .set({ gold: (user.gold || 0) - totalCost })
           .where(eq(users.id, userId));
         
-        // Add or update inventory with 99 item stacking limit
+        // Add or update inventory
         const [existingItem] = await tx
           .select()
           .from(playerInventory)
@@ -710,23 +710,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
         
         if (existingItem) {
-          const newQuantity = Math.min(99, (existingItem.quantity || 0) + quantity);
-          if (newQuantity === (existingItem.quantity || 0)) {
-            throw new Error("Cannot exceed maximum stack size of 99 items");
-          }
           await tx
             .update(playerInventory)
-            .set({ quantity: newQuantity })
+            .set({ quantity: (existingItem.quantity || 0) + quantity })
             .where(eq(playerInventory.id, existingItem.id));
         } else {
-          const initialQuantity = Math.min(99, quantity);
           await tx
             .insert(playerInventory)
             .values({
               userId,
               itemType: "potion",
               itemName: potionType,
-              quantity: initialQuantity
+              quantity
             });
         }
       });

@@ -25,7 +25,6 @@ import {
   Coffee,
   Beef
 } from "lucide-react";
-import { PageHeader } from "@/components/ui/page-header";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -329,16 +328,32 @@ export default function Shop() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 page-content">
-      <PageHeader 
-        title="Shop" 
-        subtitle="Purchase gear and cosmetics"
-      >
-        <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
-          <Coins className="w-4 h-4 text-yellow-500" />
-          <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
+    <div className="min-h-screen bg-background text-foreground pb-20">
+      {/* Header */}
+      <div className="bg-card border-b border-border px-4 py-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Shop</h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
+                <Coins className="w-4 h-4 text-yellow-500" />
+                <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
+              </div>
+              <Button 
+                onClick={() => setLocation('/settings')}
+                size="sm"
+                variant="outline"
+                className="p-2"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
-      </PageHeader>
+      </div>
 
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

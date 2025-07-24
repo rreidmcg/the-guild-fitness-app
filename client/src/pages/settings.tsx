@@ -22,7 +22,6 @@ import {
   Moon,
   Smartphone
 } from "lucide-react";
-import { PageHeader } from "@/components/ui/page-header";
 
 
 export default function Settings() {
@@ -36,10 +35,13 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <PageHeader 
-        title="Settings" 
-        subtitle="Customize your FitQuest experience"
-      />
+      {/* Header */}
+      <div className="bg-card border-b border-border px-4 py-4">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground mt-0.5 text-sm">Customize your FitQuest experience</p>
+        </div>
+      </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         {/* Profile Section */}

@@ -21,7 +21,6 @@ import {
   Coins,
   Plus
 } from "lucide-react";
-import { PageHeader } from "@/components/ui/page-header";
 
 export default function Stats() {
   const [, setLocation] = useLocation();
@@ -152,11 +151,19 @@ export default function Stats() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 page-content">
-      <PageHeader 
-        title="Character Stats" 
-        subtitle="Your fitness progression journey"
-      />
+    <div className="min-h-screen bg-background text-foreground pb-20">
+      {/* Header */}
+      <div className="bg-card border-b border-border px-4 py-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Character Stats</h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Character Profile */}

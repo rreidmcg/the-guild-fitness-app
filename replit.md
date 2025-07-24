@@ -79,7 +79,6 @@ Preferred communication style: Simple, everyday language.
 - Mobile-responsive design with bottom navigation
 - Bottom navigation bar with Stats, Workouts, and Settings pages
 - Custom 2D avatar system with visual progression based on stats
-- Gender-specific avatar scaling (female avatar scaled to 0.9 for height consistency)
 - Real-time workout session interface
 - Dedicated pages for different app functions
 
