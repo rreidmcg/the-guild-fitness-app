@@ -288,6 +288,11 @@ export default function Inventory() {
     );
   };
 
+  // Calculate total potion count
+  const totalPotions = (inventory as InventoryItem[] || [])
+    .filter((item: InventoryItem) => item.itemType === 'potion')
+    .reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0);
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
@@ -406,6 +411,31 @@ export default function Inventory() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Potion Count Tooltip - Bottom Right */}
+      <div className="fixed bottom-24 right-4 z-50">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="bg-card border-2 border-border rounded-lg px-3 py-2 shadow-lg flex items-center space-x-2 cursor-pointer hover:bg-accent transition-colors">
+              <img 
+                src={minorPotionImage} 
+                alt="Potions"
+                className="w-6 h-6 object-contain"
+                style={{ 
+                  imageRendering: 'pixelated',
+                  filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+                }}
+              />
+              <span className="text-sm font-medium text-foreground">{totalPotions}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <div className="text-sm">
+              Total Potions in Storage
+            </div>
+          </TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
