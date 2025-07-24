@@ -7,31 +7,33 @@ interface PageTransitionProps {
 
 export function PageTransition({ children }: PageTransitionProps) {
   const [location] = useLocation();
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [displayContent, setDisplayContent] = useState(children);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Start exit animation
-    setIsTransitioning(true);
+    // Reset visibility when location changes
+    setIsVisible(false);
     
-    // After exit animation, update content and start enter animation
+    // Small delay to allow exit transition, then show new content
     const timer = setTimeout(() => {
-      setDisplayContent(children);
-      setIsTransitioning(false);
-    }, 200); // Match the pageSlideOut animation duration
+      setIsVisible(true);
+    }, 50);
 
     return () => clearTimeout(timer);
-  }, [location, children]);
+  }, [location]);
 
   return (
     <div 
-      className={`page-transition ${isTransitioning ? 'page-exit' : ''} container-transition`}
+      className={`transition-all duration-300 ease-out ${
+        isVisible 
+          ? 'opacity-100 transform translate-x-0' 
+          : 'opacity-90 transform translate-x-1'
+      }`}
       style={{ 
         minHeight: 'calc(100vh - 80px)', // Account for bottom navigation
         paddingBottom: '80px' // Space for bottom navigation
       }}
     >
-      {displayContent}
+      {children}
     </div>
   );
 }

@@ -30,7 +30,7 @@ export function BottomNav() {
                 onClick={() => {
                   setLocation(item.path);
                   // Smooth scroll to top when changing pages
-                  setTimeout(() => scrollToTop(), 100);
+                  scrollToTop();
                 }}
                 className={`nav-item ${isActive ? 'active' : ''} justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-14 w-14 flex flex-col items-center justify-center space-y-1 px-3 py-2 min-w-0 ${isActive ? 'text-primary bg-accent/20' : 'text-muted-foreground'}`}
               >

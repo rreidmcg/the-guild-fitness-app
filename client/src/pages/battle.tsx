@@ -355,7 +355,7 @@ export default function Battle() {
   // Show dungeon selection or battle based on selected dungeon
   if (!selectedDungeon) {
     return (
-      <div className="min-h-screen bg-background text-foreground pb-20 container-transition">
+      <div className="min-h-screen bg-background text-foreground pb-20 page-content">
         <PageHeader title="Adventure Map">
           {/* Player HP Status */}
           {userStats && (

@@ -47,7 +47,7 @@ export default function Workouts() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 container-transition">
+    <div className="min-h-screen bg-background text-foreground pb-20 page-content">
       <PageHeader 
         title="Workouts" 
         subtitle="Track your fitness journey"

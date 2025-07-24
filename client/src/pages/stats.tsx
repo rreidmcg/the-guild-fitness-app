@@ -152,7 +152,7 @@ export default function Stats() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20 container-transition">
+    <div className="min-h-screen bg-background text-foreground pb-20 page-content">
       <PageHeader 
         title="Character Stats" 
         subtitle="Your fitness progression journey"

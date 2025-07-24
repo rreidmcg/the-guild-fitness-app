@@ -25,7 +25,7 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <PageTransition>
+    <div className="page-container">
       <Switch>
         <Route path="/" component={Stats} />
         <Route path="/workouts" component={Workouts} />
@@ -41,7 +41,7 @@ function Router() {
         <Route path="/login" component={LoginPage} />
         <Route component={NotFound} />
       </Switch>
-    </PageTransition>
+    </div>
   );
 }
 
