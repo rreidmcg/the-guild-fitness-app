@@ -36,6 +36,10 @@ export default function Workouts() {
     queryKey: ["/api/daily-progress"],
   });
 
+  const { data: userStats } = useQuery({
+    queryKey: ["/api/user/stats"],
+  });
+
   const completeDailyQuestMutation = useMutation({
     mutationFn: async (questType: 'hydration' | 'steps' | 'protein') => {
       return apiRequest("/api/complete-daily-quest", {
@@ -47,17 +51,24 @@ export default function Workouts() {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-progress"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       
-      if (data.xpAwarded) {
-        toast({
-          title: "Daily Quests Complete!",
-          description: "You earned 5 XP for completing all daily quests!",
-        });
-      } else {
-        toast({
-          title: "Quest Completed!",
-          description: "Keep going to complete all daily quests for bonus XP!",
-        });
+      let message = "Quest Completed!";
+      let description = "Keep going to complete all daily quests for rewards!";
+      
+      if (data.xpAwarded && data.streakFreezeAwarded) {
+        message = "All Daily Quests Complete!";
+        description = "You earned 5 XP and a Streak Freeze!";
+      } else if (data.xpAwarded) {
+        message = "All Daily Quests Complete!";
+        description = "You earned 5 XP! (Already have max Streak Freezes)";
+      } else if (data.streakFreezeAwarded) {
+        message = "All Daily Quests Complete!";
+        description = "You earned a Streak Freeze!";
       }
+      
+      toast({
+        title: message,
+        description: description,
+      });
     },
     onError: () => {
       toast({
@@ -142,7 +153,7 @@ export default function Workouts() {
                   ? dailyProgress?.xpAwarded 
                     ? "Complete! +5 XP Earned"
                     : "Complete! XP Processing..."
-                  : "Complete all for +5 XP"
+                  : "Complete all for +5 XP & Streak Freeze"
                 }
               </div>
             </div>

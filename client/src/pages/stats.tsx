@@ -20,7 +20,8 @@ import {
   Wind,
   Coins,
   Plus,
-  Settings
+  Settings,
+  Shield
 } from "lucide-react";
 
 export default function Stats() {
@@ -73,6 +74,37 @@ export default function Stats() {
     },
   });
 
+  const useStreakFreezeMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("/api/use-streak-freeze", {
+        method: "POST",
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      
+      if (data.success) {
+        toast({
+          title: "Streak Freeze Used!",
+          description: `Your streak is protected today. Remaining: ${data.remainingFreezes}`,
+        });
+      } else {
+        toast({
+          title: "No Streak Freezes",
+          description: "You need to complete daily quests to earn streak freezes.",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to use streak freeze. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const recentSessions = workoutSessions?.slice(0, 3) || [];
   const topRecords = personalRecords?.slice(0, 4) || [];
 
@@ -83,57 +115,10 @@ export default function Stats() {
     return userStats?.battlesWon || 0;
   };
 
-  const calculateStreak = () => {
-    if (!workoutSessions || workoutSessions.length === 0) return 0;
-    
-    // Sort sessions by date (newest first)
-    const sortedSessions = [...workoutSessions].sort((a, b) => 
-      new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
-    );
-    
-    // Get unique workout dates
-    const workoutDates = Array.from(new Set(
-      sortedSessions.map(session => {
-        const date = new Date(session.completedAt);
-        return date.toDateString();
-      })
-    )).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
-    
-    if (workoutDates.length === 0) return 0;
-    
-    // Check if there was a workout today or yesterday
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    const todayStr = today.toDateString();
-    const yesterdayStr = yesterday.toDateString();
-    
-    // If no workout today or yesterday, streak is 0
-    if (workoutDates[0] !== todayStr && workoutDates[0] !== yesterdayStr) {
-      return 0;
-    }
-    
-    // Count consecutive days
-    let streak = 0;
-    let currentDate = new Date(workoutDates[0]);
-    
-    for (const workoutDateStr of workoutDates) {
-      const workoutDate = new Date(workoutDateStr);
-      
-      if (workoutDate.toDateString() === currentDate.toDateString()) {
-        streak++;
-        currentDate.setDate(currentDate.getDate() - 1);
-      } else {
-        break;
-      }
-    }
-    
-    return streak;
-  };
+  // Use streak from user stats instead of calculating
+  const streak = userStats?.currentStreak || 0;
 
   const totalBattles = calculateTotalBattles();
-  const streak = calculateStreak();
   const totalVolumeThisMonth = workoutSessions?.reduce((total, session) => total + (session.totalVolume || 0), 0) || 0;
   const currentXP = userStats?.experience || 0;
   const currentLevel = userStats?.level || 1;
@@ -385,6 +370,23 @@ export default function Stats() {
             </div>
             <div className="text-2xl font-bold text-orange-400">{streak}</div>
             <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
+            {(userStats?.streakFreezeCount || 0) > 0 && (
+              <div className="space-y-1 mt-2">
+                <div className="flex items-center justify-center gap-1">
+                  <Shield className="w-3 h-3 text-blue-500" />
+                  <span className="text-xs text-blue-500">{userStats?.streakFreezeCount} Freeze{userStats?.streakFreezeCount !== 1 ? 's' : ''}</span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => useStreakFreezeMutation.mutate()}
+                  disabled={useStreakFreezeMutation.isPending}
+                  className="text-xs px-2 py-1 h-6 border-blue-500 text-blue-400 hover:bg-blue-900/30"
+                >
+                  Use Freeze
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">

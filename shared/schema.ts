@@ -25,6 +25,10 @@ export const users = pgTable("users", {
   currentTier: text("current_tier").default("E"), // E, D, C, B, A, S
   highestTierCompleted: text("highest_tier_completed").default(""),
   currentTitle: text("current_title").default("Recruit"),
+  // Streak system
+  currentStreak: integer("current_streak").default(0),
+  lastStreakDate: text("last_streak_date"), // YYYY-MM-DD format
+  streakFreezeCount: integer("streak_freeze_count").default(0), // Max 2
   // Character customization - New armor slot system
   equippedHead: text("equipped_head"),
   equippedShoulders: text("equipped_shoulders"),
@@ -137,6 +141,7 @@ export const dailyProgress = pgTable("daily_progress", {
   steps: boolean("steps").default(false),
   protein: boolean("protein").default(false),
   xpAwarded: boolean("xp_awarded").default(false), // Track if 5 XP was already given
+  streakFreezeAwarded: boolean("streak_freeze_awarded").default(false), // Track if streak freeze was given
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   userDateIdx: uniqueIndex("user_date_idx").on(table.userId, table.date),

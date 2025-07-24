@@ -154,6 +154,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Update streak after completing workout
+      await storage.updateStreak(userId);
+      
       res.json(session);
     } catch (error) {
       res.status(400).json({ error: "Invalid session data" });
@@ -533,6 +536,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to complete daily quest" });
+    }
+  });
+
+  app.post("/api/use-streak-freeze", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const result = await storage.useStreakFreeze(userId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to use streak freeze" });
     }
   });
 

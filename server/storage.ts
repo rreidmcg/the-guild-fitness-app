@@ -67,7 +67,11 @@ export interface IStorage {
   // Daily quest operations
   getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined>;
   updateDailyProgress(userId: number, date: string, updates: Partial<DailyProgress>): Promise<DailyProgress>;
-  completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean }>;
+  completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }>;
+  
+  // Streak system operations
+  updateStreak(userId: number): Promise<void>;
+  useStreakFreeze(userId: number): Promise<{ success: boolean; remainingFreezes: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -513,7 +517,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean }> {
+  async completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }> {
     await this.ensureInitialized();
     
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -529,9 +533,10 @@ export class DatabaseStorage implements IStorage {
       [questType]: true
     });
     
-    // Check if all quests are completed and XP hasn't been awarded yet
+    // Check if all quests are completed
     const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein;
     let xpAwarded = false;
+    let streakFreezeAwarded = false;
     
     if (allCompleted && !updatedProgress.xpAwarded) {
       // Award 5 XP for completing all daily quests
@@ -549,7 +554,108 @@ export class DatabaseStorage implements IStorage {
       }
     }
     
-    return { completed: true, xpAwarded };
+    if (allCompleted && !updatedProgress.streakFreezeAwarded) {
+      // Award streak freeze if user has less than 2
+      const user = await this.getUser(userId);
+      if (user && user.streakFreezeCount < 2) {
+        await this.updateUser(userId, {
+          streakFreezeCount: user.streakFreezeCount + 1
+        });
+        
+        // Mark streak freeze as awarded
+        await this.updateDailyProgress(userId, today, {
+          streakFreezeAwarded: true
+        });
+        streakFreezeAwarded = true;
+      }
+    }
+    
+    // Update streak after completing quest
+    await this.updateStreak(userId);
+    
+    return { completed: true, xpAwarded, streakFreezeAwarded };
+  }
+
+  async updateStreak(userId: number): Promise<void> {
+    await this.ensureInitialized();
+    
+    const today = new Date().toISOString().split('T')[0];
+    const user = await this.getUser(userId);
+    if (!user) return;
+    
+    // Get today's progress
+    const todaysProgress = await this.getDailyProgress(userId, today);
+    
+    // Check if user has completed workout sessions today
+    const todaysWorkouts = await db.select()
+      .from(workoutSessions)
+      .where(and(
+        eq(workoutSessions.userId, userId),
+        eq(sql`DATE(${workoutSessions.completedAt})`, today)
+      ));
+    
+    // Count completed daily quests
+    const completedQuests = [
+      todaysProgress?.hydration,
+      todaysProgress?.steps, 
+      todaysProgress?.protein
+    ].filter(Boolean).length;
+    
+    // Check if streak requirements are met:
+    // - 2 of 3 daily quests completed OR at least 1 workout completed
+    const streakRequirementMet = completedQuests >= 2 || todaysWorkouts.length > 0;
+    
+    if (streakRequirementMet) {
+      // Extend or start streak
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      let newStreak = 1;
+      if (user.lastStreakDate === yesterdayStr) {
+        // Continue existing streak
+        newStreak = user.currentStreak + 1;
+      }
+      
+      await this.updateUser(userId, {
+        currentStreak: newStreak,
+        lastStreakDate: today
+      });
+    } else if (user.lastStreakDate) {
+      // Check if streak should be broken
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      // If last streak was not yesterday and today's requirements aren't met
+      if (user.lastStreakDate < yesterdayStr) {
+        // Streak is broken - reset to 0
+        await this.updateUser(userId, {
+          currentStreak: 0,
+          lastStreakDate: null
+        });
+      }
+    }
+  }
+
+  async useStreakFreeze(userId: number): Promise<{ success: boolean; remainingFreezes: number }> {
+    await this.ensureInitialized();
+    
+    const user = await this.getUser(userId);
+    if (!user || user.streakFreezeCount <= 0) {
+      return { success: false, remainingFreezes: user?.streakFreezeCount || 0 };
+    }
+    
+    // Use streak freeze - extend last streak date to today
+    const today = new Date().toISOString().split('T')[0];
+    const newFreezeCount = user.streakFreezeCount - 1;
+    
+    await this.updateUser(userId, {
+      streakFreezeCount: newFreezeCount,
+      lastStreakDate: today
+    });
+    
+    return { success: true, remainingFreezes: newFreezeCount };
   }
 }
 
