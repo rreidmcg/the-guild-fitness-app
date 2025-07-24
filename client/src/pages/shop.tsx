@@ -647,12 +647,7 @@ export default function Shop() {
                         </div>
                       </div>
                       
-                      {/* Inventory Count */}
-                      {getInventoryQuantity(potion.id) > 0 && (
-                        <div className="text-blue-400 text-xs">
-                          Own: {getInventoryQuantity(potion.id)}
-                        </div>
-                      )}
+
                     </div>
 
                     {/* Purchase Button */}
