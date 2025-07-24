@@ -32,12 +32,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         gender,
         experience: 0,
         level: 1,
-        strength: 10,
-        stamina: 10,
-        agility: 10,
-        gold: 100,
-        currentHp: 40, // Base 10 + (stamina * 3)
-        currentMp: 30, // (stamina * 2) + (agility * 1)
+        strength: 0,
+        stamina: 0,
+        agility: 0,
+        gold: 10,
+        currentHp: 10, // Base 10 + (stamina * 3)
+        currentMp: 0, // (stamina * 2) + (agility * 1)
         skinColor: "#F5C6A0",
         hairColor: "#8B4513",
         currentTier: "E",
