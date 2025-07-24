@@ -18,6 +18,12 @@ import {
   Trash2
 } from "lucide-react";
 
+// Import pixel art potion images
+import minorPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753331144145.png";
+import majorPotionImage from "@assets/E411AC73-DD9A-4E21-A550-8BC4020515A1_1753054064391.jpeg";
+import fullPotionImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
+import manaPotionImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
+
 interface InventoryItem {
   id: number;
   itemName: string;
@@ -51,12 +57,72 @@ const categoryIcons = {
 const getItemVisual = (item: InventoryItem) => {
   const { category, itemName, color, rarity } = item;
   
-  // For potions, use emoji
+  // For potions, use pixel art images
   if (category === 'potion') {
-    if (itemName.toLowerCase().includes('minor')) return '🧪';
-    if (itemName.toLowerCase().includes('major')) return '🍶';
-    if (itemName.toLowerCase().includes('full')) return '⚗️';
-    return '🧪';
+    if (itemName.toLowerCase().includes('minor')) {
+      return (
+        <img 
+          src={minorPotionImage} 
+          alt="Minor Potion"
+          className="w-full h-full object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+    if (itemName.toLowerCase().includes('major')) {
+      return (
+        <img 
+          src={majorPotionImage} 
+          alt="Major Potion"
+          className="w-full h-full object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+    if (itemName.toLowerCase().includes('full')) {
+      return (
+        <img 
+          src={fullPotionImage} 
+          alt="Full Potion"
+          className="w-full h-full object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+    if (itemName.toLowerCase().includes('mana')) {
+      return (
+        <img 
+          src={manaPotionImage} 
+          alt="Mana Potion"
+          className="w-full h-full object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+    // Default potion fallback
+    return (
+      <img 
+        src={minorPotionImage} 
+        alt="Potion"
+        className="w-full h-full object-contain"
+        style={{ 
+          imageRendering: 'pixelated',
+          filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))'
+        }}
+      />
+    );
   }
   
   // For equipment, create SVG-based visuals
@@ -138,7 +204,7 @@ export default function Inventory() {
   const inventoryGrid = Array(totalSlots).fill(null);
 
   // Fill the grid with inventory items
-  inventory?.forEach((item: InventoryItem, index: number) => {
+  (inventory as InventoryItem[] || []).forEach((item: InventoryItem, index: number) => {
     if (index < totalSlots) {
       inventoryGrid[index] = item;
     }
@@ -300,7 +366,7 @@ export default function Inventory() {
           <Card className="bg-card border-border">
             <CardContent className="p-4 text-center">
               <Package className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-              <div className="text-lg font-bold">{inventory?.length || 0}</div>
+              <div className="text-lg font-bold">{(inventory as InventoryItem[] || []).length}</div>
               <div className="text-xs text-muted-foreground">Items</div>
             </CardContent>
           </Card>
@@ -309,7 +375,7 @@ export default function Inventory() {
             <CardContent className="p-4 text-center">
               <Heart className="w-6 h-6 mx-auto mb-2 text-red-500" />
               <div className="text-lg font-bold">
-                {inventory?.filter((item: InventoryItem) => item.category === 'potion' && item.itemName.includes('Healing')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0) || 0}
+                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.category === 'potion' && item.itemName.includes('Healing')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
               </div>
               <div className="text-xs text-muted-foreground">Health Potions</div>
             </CardContent>
@@ -319,7 +385,7 @@ export default function Inventory() {
             <CardContent className="p-4 text-center">
               <Zap className="w-6 h-6 mx-auto mb-2 text-blue-500" />
               <div className="text-lg font-bold">
-                {inventory?.filter((item: InventoryItem) => item.category === 'potion' && item.itemName.includes('Mana')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0) || 0}
+                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.category === 'potion' && item.itemName.includes('Mana')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
               </div>
               <div className="text-xs text-muted-foreground">Mana Potions</div>
             </CardContent>
@@ -329,7 +395,7 @@ export default function Inventory() {
             <CardContent className="p-4 text-center">
               <Crown className="w-6 h-6 mx-auto mb-2 text-yellow-500" />
               <div className="text-lg font-bold">
-                {inventory?.filter((item: InventoryItem) => item.category !== 'potion').length || 0}
+                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.category !== 'potion').length}
               </div>
               <div className="text-xs text-muted-foreground">Equipment</div>
             </CardContent>

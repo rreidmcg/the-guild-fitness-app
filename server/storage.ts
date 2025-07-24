@@ -11,7 +11,7 @@ import {
   type DailyProgress, type InsertDailyProgress
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -139,9 +139,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   private async initializeDefaultWardrobeItems() {
-    // Check if wardrobe items already exist
-    const existingItems = await db.select().from(wardrobeItems).limit(1);
-    if (existingItems.length > 0) return;
+    // Items are now populated manually via SQL, skipping all initialization
+    return;
 
     const defaultWardrobeItems = [
       // Head armor
@@ -348,26 +347,37 @@ export class DatabaseStorage implements IStorage {
 
   // Wardrobe operations
   async getWardrobeItemsWithOwnership(userId: number): Promise<any[]> {
-    await this.ensureInitialized();
-    
-    const items = await db.select().from(wardrobeItems);
-    const ownedItems = await db.select().from(userWardrobe).where(eq(userWardrobe.userId, userId));
-    const user = await this.getUser(userId);
-    
-    return items.map(item => ({
-      ...item,
-      isOwned: ownedItems.some(owned => owned.wardrobeItemId === item.id),
-      isEquipped: (
-        (item.category === 'head' && user?.equippedHead === item.name) ||
-        (item.category === 'shoulders' && user?.equippedShoulders === item.name) ||
-        (item.category === 'neck' && user?.equippedNeck === item.name) ||
-        (item.category === 'chest' && user?.equippedChest === item.name) ||
-        (item.category === 'hands' && user?.equippedHands === item.name) ||
-        (item.category === 'waist' && user?.equippedWaist === item.name) ||
-        (item.category === 'legs' && user?.equippedLegs === item.name) ||
-        (item.category === 'feet' && user?.equippedFeet === item.name)
-      )
-    }));
+    try {
+      await this.ensureInitialized();
+      
+      console.log("Getting wardrobe items for user:", userId);
+      const items = await db.select().from(wardrobeItems);
+      console.log("Found wardrobe items:", items.length);
+      
+      const ownedItems = await db.select().from(userWardrobe).where(eq(userWardrobe.userId, userId));
+      console.log("Found user owned items:", ownedItems.length);
+      
+      const user = await this.getUser(userId);
+      console.log("Found user:", user?.id);
+      
+      return items.map(item => ({
+        ...item,
+        isOwned: ownedItems.some(owned => owned.wardrobeItemId === item.id),
+        isEquipped: (
+          (item.category === 'head' && user?.equippedHead === item.name) ||
+          (item.category === 'shoulders' && user?.equippedShoulders === item.name) ||
+          (item.category === 'neck' && user?.equippedNeck === item.name) ||
+          (item.category === 'chest' && user?.equippedChest === item.name) ||
+          (item.category === 'hands' && user?.equippedHands === item.name) ||
+          (item.category === 'waist' && user?.equippedWaist === item.name) ||
+          (item.category === 'legs' && user?.equippedLegs === item.name) ||
+          (item.category === 'feet' && user?.equippedFeet === item.name)
+        )
+      }));
+    } catch (error) {
+      console.error("Error in getWardrobeItemsWithOwnership:", error);
+      throw error;
+    }
   }
 
   async purchaseWardrobeItem(userId: number, itemId: number): Promise<any> {
@@ -543,7 +553,7 @@ export class DatabaseStorage implements IStorage {
       const user = await this.getUser(userId);
       if (user) {
         await this.updateUser(userId, {
-          experience: user.experience + 5
+          experience: (user.experience ?? 0) + 5
         });
         
         // Mark XP as awarded
@@ -557,9 +567,9 @@ export class DatabaseStorage implements IStorage {
     if (allCompleted && !updatedProgress.streakFreezeAwarded) {
       // Award streak freeze if user has less than 2
       const user = await this.getUser(userId);
-      if (user && user.streakFreezeCount < 2) {
+      if (user && (user.streakFreezeCount ?? 0) < 2) {
         await this.updateUser(userId, {
-          streakFreezeCount: user.streakFreezeCount + 1
+          streakFreezeCount: (user.streakFreezeCount ?? 0) + 1
         });
         
         // Mark streak freeze as awarded
@@ -614,7 +624,7 @@ export class DatabaseStorage implements IStorage {
       let newStreak = 1;
       if (user.lastStreakDate === yesterdayStr) {
         // Continue existing streak
-        newStreak = user.currentStreak + 1;
+        newStreak = (user.currentStreak ?? 0) + 1;
       }
       
       await this.updateUser(userId, {
@@ -642,13 +652,13 @@ export class DatabaseStorage implements IStorage {
     await this.ensureInitialized();
     
     const user = await this.getUser(userId);
-    if (!user || user.streakFreezeCount <= 0) {
-      return { success: false, remainingFreezes: user?.streakFreezeCount || 0 };
+    if (!user || (user.streakFreezeCount ?? 0) <= 0) {
+      return { success: false, remainingFreezes: user?.streakFreezeCount ?? 0 };
     }
     
     // Use streak freeze - extend last streak date to today
     const today = new Date().toISOString().split('T')[0];
-    const newFreezeCount = user.streakFreezeCount - 1;
+    const newFreezeCount = (user.streakFreezeCount ?? 0) - 1;
     
     await this.updateUser(userId, {
       streakFreezeCount: newFreezeCount,

@@ -427,9 +427,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/shop/items", async (req, res) => {
     try {
       const userId = 1; // TODO: Get from session/auth
+      console.log("Fetching shop items for user", userId);
       const shopItems = await storage.getShopItems(userId);
+      console.log("Shop items fetched:", shopItems?.length, "items");
       res.json(shopItems);
     } catch (error) {
+      console.error("Shop items error:", error);
       res.status(500).json({ error: "Failed to fetch shop items" });
     }
   });
