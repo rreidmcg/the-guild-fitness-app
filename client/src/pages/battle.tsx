@@ -797,6 +797,270 @@ export default function Battle() {
     }
   };
 
-  // Battle view would go here but for now just return null
+  // Battle Interface
+  if (battleState) {
+    const calculatePlayerDamage = () => {
+      const baseDamage = 3;
+      const strengthBonus = Math.floor((userStats?.strength || 0) / 2);
+      const randomBonus = Math.floor(Math.random() * 3) + 1;
+      return Math.max(1, baseDamage + strengthBonus + randomBonus);
+    };
+
+    const calculatePlayerEvasion = () => {
+      const agilityBonus = (userStats?.agility || 0) * 5;
+      return Math.min(90, agilityBonus);
+    };
+
+    const handlePlayerAttack = async () => {
+      if (!battleState.isPlayerTurn) return;
+
+      const evasionChance = calculatePlayerEvasion();
+      const evaded = Math.random() * 100 < evasionChance;
+      
+      let newLog = [...battleState.battleLog];
+      let newMonster = { ...battleState.monster };
+
+      if (evaded) {
+        newLog.push(`You evaded ${battleState.monster.name}'s counter-attack!`);
+      } else {
+        const damage = calculatePlayerDamage();
+        newMonster.currentHp = Math.max(0, newMonster.currentHp - damage);
+        newLog.push(`You deal ${damage} damage to ${battleState.monster.name}!`);
+      }
+
+      // Check if monster is defeated
+      if (newMonster.currentHp <= 0) {
+        newLog.push(`${battleState.monster.name} is defeated!`);
+        
+        // Award gold
+        try {
+          await apiRequest('/api/user/add-gold', {
+            method: 'POST',
+            body: { amount: battleState.monster.goldReward }
+          });
+          
+          newLog.push(`You earned ${battleState.monster.goldReward} gold!`);
+          
+          // Invalidate user stats to refresh gold display
+          queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+        } catch (error) {
+          console.error('Failed to award gold:', error);
+        }
+
+        // Check if there are more monsters
+        if (battleState.remainingMonsters.length > 0) {
+          const nextMonster = battleState.remainingMonsters[0];
+          setBattleState({
+            ...battleState,
+            monster: nextMonster,
+            remainingMonsters: battleState.remainingMonsters.slice(1),
+            currentMonsterIndex: battleState.currentMonsterIndex + 1,
+            battleLog: [...newLog, `A wild ${nextMonster.name} appears!`],
+            isPlayerTurn: true
+          });
+        } else {
+          // All monsters defeated - victory!
+          setBattleState({
+            ...battleState,
+            monster: newMonster,
+            battleLog: [...newLog, "Victory! All monsters have been defeated!"],
+            battleResult: 'victory',
+            isPlayerTurn: false
+          });
+          
+          // Handle zone completion
+          if (selectedDungeon) {
+            handleBattleVictory(selectedDungeon.id);
+          }
+        }
+      } else {
+        // Monster counter-attacks
+        const monsterDamage = battleState.monster.attack;
+        const newPlayerHp = Math.max(0, battleState.playerHp - monsterDamage);
+        newLog.push(`${battleState.monster.name} attacks for ${monsterDamage} damage!`);
+
+        if (newPlayerHp <= 0) {
+          newLog.push("You have been defeated!");
+          setBattleState({
+            ...battleState,
+            playerHp: newPlayerHp,
+            monster: newMonster,
+            battleLog: newLog,
+            battleResult: 'defeat',
+            isPlayerTurn: false
+          });
+        } else {
+          setBattleState({
+            ...battleState,
+            playerHp: newPlayerHp,
+            monster: newMonster,
+            battleLog: newLog,
+            isPlayerTurn: true
+          });
+        }
+      }
+      
+      // Update persistent HP
+      setPersistentPlayerHp(battleState.playerHp);
+    };
+
+    const handleBattleEnd = () => {
+      setBattleState(null);
+      setSelectedMonster(null);
+    };
+
+    return (
+      <div className="min-h-screen bg-background text-foreground pb-20 page-content">
+        <PageHeader title={`Battle: ${selectedDungeon?.name || 'Unknown'}`}>
+          <Button 
+            onClick={exitDungeon}
+            variant="outline" 
+            size="sm"
+            className="flex items-center space-x-1"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Exit Dungeon</span>
+          </Button>
+        </PageHeader>
+
+        <div className="max-w-4xl mx-auto p-4 space-y-6">
+          {/* Battle Arena */}
+          <Card className="bg-card border-border">
+            <CardContent className="p-0">
+              <div 
+                className="relative min-h-[300px] bg-cover bg-center bg-no-repeat flex items-end justify-between p-6"
+                style={{ 
+                  backgroundImage: `url(${selectedDungeon?.backgroundImage || forestBackgroundImage})`,
+                  backgroundSize: 'cover'
+                }}
+              >
+                {/* Dark overlay for better text visibility */}
+                <div className="absolute inset-0 bg-black/40 rounded-t-lg"></div>
+                
+                {/* Player */}
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="w-24 h-32 mb-2">
+                    {userStats && (
+                      <Avatar2D 
+                        stats={{
+                          strength: userStats.strength,
+                          stamina: userStats.stamina, 
+                          agility: userStats.agility,
+                          level: userStats.level
+                        }}
+                        className="w-full h-full"
+                      />
+                    )}
+                  </div>
+                  <div className="bg-black/70 rounded px-3 py-2 min-w-[120px]">
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-white mb-1">Player</div>
+                      <div className="flex items-center justify-center space-x-2 text-xs">
+                        <div className="flex items-center space-x-1">
+                          <Heart className="w-3 h-3 text-red-400" />
+                          <span className="text-white">{battleState.playerHp}/{battleState.playerMaxHp}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Zap className="w-3 h-3 text-blue-400" />
+                          <span className="text-white">{battleState.playerMp}/{battleState.playerMaxMp}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monster */}
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="w-24 h-32 mb-2 flex items-center justify-center">
+                    {battleState.monster.image ? (
+                      <img 
+                        src={battleState.monster.image} 
+                        alt={battleState.monster.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold">?</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="bg-black/70 rounded px-3 py-2 min-w-[120px]">
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-white mb-1">{battleState.monster.name}</div>
+                      <div className="flex items-center justify-center space-x-2 text-xs">
+                        <div className="flex items-center space-x-1">
+                          <Heart className="w-3 h-3 text-red-400" />
+                          <span className="text-white">{battleState.monster.currentHp}/{battleState.monster.maxHp}</span>
+                        </div>
+                        <div className="text-yellow-400">Lv.{battleState.monster.level}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Battle Log */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle>Battle Log</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-black/80 rounded p-4 h-32 overflow-y-auto">
+                {battleState.battleLog.map((entry, index) => (
+                  <div key={index} className="text-sm text-green-400 mb-1">
+                    {entry}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Battle Actions */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle>Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {battleState.battleResult === 'ongoing' ? (
+                <div className="flex space-x-4">
+                  <Button 
+                    onClick={handlePlayerAttack}
+                    disabled={!battleState.isPlayerTurn}
+                    className="flex-1"
+                  >
+                    <Sword className="w-4 h-4 mr-2" />
+                    Attack
+                  </Button>
+                  <Button 
+                    onClick={handleBattleEnd}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Flee
+                  </Button>
+                </div>
+              ) : (
+                <div className="text-center space-y-4">
+                  <div className={`text-lg font-bold ${
+                    battleState.battleResult === 'victory' ? 'text-green-400' : 'text-red-400'
+                  }`}>
+                    {battleState.battleResult === 'victory' ? 'Victory!' : 'Defeat!'}
+                  </div>
+                  <Button onClick={handleBattleEnd}>
+                    Continue
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Return to dungeon/zone selection if no battle is active
   return null;
 }
