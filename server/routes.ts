@@ -484,24 +484,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Valid title is required" });
       }
       
-      // Define available titles (could be enhanced with level/achievement requirements)
-      const availableTitles = [
-        "Recruit", "Novice", "Apprentice", "Journeyman", "Expert", 
-        "Master", "Champion", "Legend", "Mythic", "<G.M.>"
-      ];
-      
-      // Check if user can use this title (for now, allow all titles except G.M.)
+      // Get user to check level and current title
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      
+
+      // Define title requirements based on level
+      const titleRequirements = [
+        { title: "Recruit", level: 1 },
+        { title: "Novice", level: 2 },
+        { title: "Apprentice", level: 5 }, 
+        { title: "Journeyman", level: 10 },
+        { title: "Expert", level: 15 },
+        { title: "Master", level: 20 },
+        { title: "Champion", level: 25 },
+        { title: "Legend", level: 30 },
+        { title: "Mythic", level: 40 },
+      ];
+
+      // Check if title is available for user's level
+      const titleReq = titleRequirements.find(req => req.title === title);
+      if (titleReq && user.level < titleReq.level) {
+        return res.status(403).json({ 
+          error: `You need to reach level ${titleReq.level} to unlock the "${title}" title` 
+        });
+      }
+
       // Only allow <G.M.> title if user already has it (prevent regular users from getting admin access)
       if (title === "<G.M.>" && user.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "You don't have permission to use this title" });
       }
-      
-      if (!availableTitles.includes(title)) {
+
+      // Validate title exists in our requirements or is the special admin title
+      const validTitles = titleRequirements.map(req => req.title).concat(["<G.M.>"]);
+      if (!validTitles.includes(title)) {
         return res.status(400).json({ error: "Invalid title selected" });
       }
       

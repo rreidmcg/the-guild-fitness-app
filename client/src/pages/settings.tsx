@@ -77,19 +77,33 @@ export default function Settings() {
     signOutMutation.mutate();
   };
 
-  // Available titles based on progression and achievements
-  const availableTitles = [
-    "Recruit",
-    "Novice",
-    "Apprentice", 
-    "Journeyman",
-    "Expert",
-    "Master",
-    "Champion",
-    "Legend",
-    "Mythic",
-    ...(userStats?.currentTitle === "<G.M.>" ? ["<G.M.>"] : []) // Special admin title
-  ];
+  // Available titles based on level progression
+  const getAvailableTitles = (level: number, currentTitle: string) => {
+    const titleRequirements = [
+      { title: "Recruit", level: 1 },
+      { title: "Novice", level: 2 },
+      { title: "Apprentice", level: 5 }, 
+      { title: "Journeyman", level: 10 },
+      { title: "Expert", level: 15 },
+      { title: "Master", level: 20 },
+      { title: "Champion", level: 25 },
+      { title: "Legend", level: 30 },
+      { title: "Mythic", level: 40 },
+    ];
+
+    const unlockedTitles = titleRequirements
+      .filter(req => level >= req.level)
+      .map(req => req.title);
+
+    // Add special admin title if user already has it
+    if (currentTitle === "<G.M.>") {
+      unlockedTitles.push("<G.M.>");
+    }
+
+    return unlockedTitles;
+  };
+
+  const availableTitles = getAvailableTitles(userStats?.level || 1, userStats?.currentTitle || "");
 
   // Title update mutation
   const updateTitleMutation = useMutation({
@@ -194,6 +208,57 @@ export default function Settings() {
               {updateTitleMutation.isPending && (
                 <p className="text-xs text-muted-foreground mt-2">Updating title...</p>
               )}
+              
+              {/* Title Progression Display */}
+              <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+                <h4 className="text-sm font-semibold text-foreground mb-3">Title Progression</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {[
+                    { title: "Recruit", level: 1 },
+                    { title: "Novice", level: 2 },
+                    { title: "Apprentice", level: 5 }, 
+                    { title: "Journeyman", level: 10 },
+                    { title: "Expert", level: 15 },
+                    { title: "Master", level: 20 },
+                    { title: "Champion", level: 25 },
+                    { title: "Legend", level: 30 },
+                    { title: "Mythic", level: 40 },
+                  ].map(({ title, level }) => {
+                    const isUnlocked = (userStats?.level || 1) >= level;
+                    const isCurrent = userStats?.currentTitle === title;
+                    return (
+                      <div 
+                        key={title}
+                        className={`flex items-center justify-between p-2 rounded ${
+                          isCurrent 
+                            ? 'bg-yellow-500/20 border border-yellow-500/30' 
+                            : isUnlocked 
+                              ? 'bg-green-500/10 border border-green-500/20' 
+                              : 'bg-gray-500/10 border border-gray-500/20 opacity-60'
+                        }`}
+                      >
+                        <span className={`font-medium ${
+                          isCurrent 
+                            ? 'text-yellow-300' 
+                            : isUnlocked 
+                              ? 'text-green-300' 
+                              : 'text-gray-400'
+                        }`}>
+                          {title}
+                        </span>
+                        <span className={`text-xs ${
+                          isUnlocked ? 'text-green-400' : 'text-gray-500'
+                        }`}>
+                          Lv. {level}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  Current Level: {userStats?.level || 1} • Complete workouts and battles to level up and unlock new titles!
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
