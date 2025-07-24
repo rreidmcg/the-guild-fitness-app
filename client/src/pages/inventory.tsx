@@ -68,7 +68,7 @@ const getItemVisual = (item: InventoryItem) => {
           style={{ 
             imageRendering: 'pixelated',
             filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
-            transform: 'scale(1.2)'
+            transform: 'scale(1.4)'
           }}
         />
       );
@@ -82,7 +82,7 @@ const getItemVisual = (item: InventoryItem) => {
           style={{ 
             imageRendering: 'pixelated',
             filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
-            transform: 'scale(1.2)'
+            transform: 'scale(1.4)'
           }}
         />
       );
@@ -96,7 +96,7 @@ const getItemVisual = (item: InventoryItem) => {
           style={{ 
             imageRendering: 'pixelated',
             filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
-            transform: 'scale(1.2)'
+            transform: 'scale(1.4)'
           }}
         />
       );
@@ -110,7 +110,7 @@ const getItemVisual = (item: InventoryItem) => {
           style={{ 
             imageRendering: 'pixelated',
             filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
-            transform: 'scale(1.2)'
+            transform: 'scale(1.4)'
           }}
         />
       );
@@ -124,7 +124,7 @@ const getItemVisual = (item: InventoryItem) => {
         style={{ 
           imageRendering: 'pixelated',
           filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
-          transform: 'scale(1.2)'
+          transform: 'scale(1.4)'
         }}
       />
     );
