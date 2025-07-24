@@ -68,22 +68,35 @@ export default function SignupPage() {
           gender: data.gender
         }),
       });
-      return response.json();
-    },
-    onSuccess: (data) => {
-      // Clear any cached data to ensure fresh data for the new user
-      queryClient.clear();
       
-      // Store user data if needed (for offline access)
-      if (data.user) {
-        localStorage.setItem('user_data', JSON.stringify(data.user));
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || "Signup failed");
       }
       
-      toast({
-        title: "Account created successfully!",
-        description: "Welcome to FitQuest! You can now start your fitness journey.",
-      });
-      setLocation("/");
+      return result;
+    },
+    onSuccess: (data) => {
+      queryClient.clear();
+      
+      if (data.emailVerificationSent) {
+        toast({
+          title: "Account created successfully!",
+          description: "Please check your email to verify your account before logging in.",
+        });
+        setLocation("/login");
+      } else {
+        // If no email verification was sent, proceed to login directly
+        if (data.user) {
+          localStorage.setItem('user_data', JSON.stringify(data.user));
+        }
+        toast({
+          title: "Account created successfully!",
+          description: "Welcome to FitQuest! You can now start your fitness journey.",
+        });
+        setLocation("/");
+      }
     },
     onError: (error: any) => {
       toast({

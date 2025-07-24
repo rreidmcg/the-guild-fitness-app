@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, users, playerInventory } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
+import { authUtils } from "./auth";
 
 // Simple in-memory session storage (in production, use proper session management)
 let currentUserId: number = 1;
@@ -20,11 +21,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Username already taken" });
       }
 
+      // Check if email already exists
+      if (email) {
+        const existingEmail = await storage.getUserByEmail(email);
+        if (existingEmail) {
+          return res.status(400).json({ error: "Email already registered" });
+        }
+      }
+
+      // Hash password securely
+      const hashedPassword = await authUtils.hashPassword(password);
+      
+      // Generate email verification token
+      const verificationToken = authUtils.generateVerificationToken();
+
       // Create user with profile data
       const newUser = await storage.createUser({
         username,
-        password, // In production, hash this password
+        password: hashedPassword,
         email,
+        emailVerified: false,
+        emailVerificationToken: verificationToken,
         height,
         weight,
         fitnessGoal,
@@ -36,18 +53,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         stamina: 0,
         agility: 0,
         gold: 10,
-        currentHp: 10, // Base 10 + (stamina * 3)
-        currentMp: 0, // (stamina * 2) + (agility * 1)
+        currentHp: 10,
+        currentMp: 0,
         skinColor: "#F5C6A0",
         hairColor: "#8B4513",
         currentTier: "E",
         currentTitle: "Recruit"
       } as any);
 
-      // Set the current user ID for session tracking
-      currentUserId = newUser.id;
+      // Send verification email
+      if (email) {
+        const emailSent = await authUtils.sendVerificationEmail(email, username, verificationToken);
+        if (!emailSent) {
+          console.warn("Failed to send verification email to:", email);
+        }
+      }
 
-      res.json({ user: newUser, message: "Account created successfully" });
+      res.json({ 
+        user: { ...newUser, password: undefined }, // Don't send password back
+        message: "Account created successfully! Please check your email to verify your account.",
+        emailVerificationSent: !!email
+      });
     } catch (error) {
       console.error("Error creating user:", error);
       res.status(500).json({ error: "Failed to create account" });
@@ -59,14 +85,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { username, password } = req.body;
       
       const user = await storage.getUserByUsername(username);
-      if (!user || user.password !== password) { // In production, compare hashed passwords
+      if (!user) {
         return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Compare hashed passwords securely
+      const passwordValid = await authUtils.comparePassword(password, user.password);
+      if (!passwordValid) {
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Check if email is verified (if email exists)
+      if (user.email && !user.emailVerified) {
+        return res.status(403).json({ 
+          error: "Please verify your email address before logging in",
+          emailVerificationRequired: true
+        });
       }
 
       // Set the current user ID for session tracking
       currentUserId = user.id;
 
-      res.json({ user, message: "Login successful" });
+      res.json({ 
+        user: { ...user, password: undefined }, // Don't send password back
+        message: "Login successful" 
+      });
     } catch (error) {
       console.error("Error during login:", error);
       res.status(500).json({ error: "Failed to login" });

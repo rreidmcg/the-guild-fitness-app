@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { Eye, EyeOff } from "lucide-react";
+import ForgotPasswordForm from "@/components/forgot-password-form";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -41,7 +43,14 @@ export default function LoginPage() {
         },
         body: JSON.stringify(data),
       });
-      return response.json();
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || "Login failed");
+      }
+      
+      return result;
     },
     onSuccess: (data) => {
       // Clear any cached data to ensure fresh data for the new user
@@ -59,11 +68,21 @@ export default function LoginPage() {
       setLocation("/");
     },
     onError: (error: any) => {
-      toast({
-        title: "Login failed",
-        description: error.message || "Invalid username or password.",
-        variant: "destructive",
-      });
+      const errorMessage = error.message;
+      
+      if (errorMessage.includes("verify your email")) {
+        toast({
+          title: "Email Verification Required",
+          description: "Please check your email and verify your account before logging in.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Login failed",
+          description: errorMessage || "Invalid username or password.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -72,77 +91,101 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card border-border">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-foreground">
-            Welcome Back
-          </CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Sign in to your FitQuest account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter your username" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+      {showForgotPassword ? (
+        <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
+      ) : (
+        <Card className="w-full max-w-md bg-gray-900/80 backdrop-blur-sm border-yellow-500/30">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-yellow-400">
+              Welcome Back
+            </CardTitle>
+            <CardDescription className="text-gray-300">
+              Sign in to your FitQuest account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-200">Username</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Enter your username" 
+                          {...field} 
+                          className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-500"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter your password" 
-                        type="password"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-200">Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input 
+                            placeholder="Enter your password" 
+                            type={showPassword ? "text" : "password"}
+                            {...field} 
+                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-500 pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                          >
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-red-400" />
+                    </FormItem>
+                  )}
+                />
 
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={loginMutation.isPending}
-              >
-                {loginMutation.isPending ? "Signing in..." : "Sign In"}
-              </Button>
-            </form>
-          </Form>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold"
+                  disabled={loginMutation.isPending}
+                >
+                  {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                </Button>
+              </form>
+            </Form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Don't have an account?{" "}
+            <div className="mt-4 text-center">
               <button 
-                onClick={() => setLocation("/signup")}
-                className="text-primary hover:underline font-medium"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-yellow-400 hover:text-yellow-300 hover:underline"
               >
-                Sign up
+                Forgot your password?
               </button>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-400">
+                Don't have an account?{" "}
+                <button 
+                  onClick={() => setLocation("/signup")}
+                  className="text-yellow-400 hover:text-yellow-300 hover:underline font-medium"
+                >
+                  Sign up
+                </button>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
