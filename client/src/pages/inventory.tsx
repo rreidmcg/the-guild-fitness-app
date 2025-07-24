@@ -255,7 +255,7 @@ export default function Inventory() {
                 
                 {/* Quantity - Always show if > 0 */}
                 {item.quantity > 0 && (
-                  <div className="absolute bottom-1 right-1 bg-black/80 text-white text-xs rounded px-1.5 py-0.5 min-w-[20px] text-center font-bold border border-white/20">
+                  <div className="absolute bottom-1 right-1 text-white text-xs px-1.5 py-0.5 min-w-[20px] text-center font-bold" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
                     {item.quantity}
                   </div>
                 )}
