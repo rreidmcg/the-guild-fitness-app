@@ -148,7 +148,7 @@ const E_RANK_ZONES: ZoneLocation[] = [
     description: "An abandoned house with rats in the cellar",
     position: { top: "20%", left: "20%" }, // Top left - House area
     isUnlocked: false,
-    requiredLevel: 2,
+    requiredLevel: 1,
     monsters: [
       { id: 3, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth", image: caveRatImage },
       { id: 4, name: "Giant Rat", level: 3, maxHp: 22, currentHp: 22, attack: 4, goldReward: 4, description: "A massive rodent with glowing red eyes" },
@@ -160,7 +160,7 @@ const E_RANK_ZONES: ZoneLocation[] = [
     description: "A mysterious tower overrun by goblins",
     position: { top: "15%", left: "75%" }, // Top right - Tower area
     isUnlocked: false,
-    requiredLevel: 3,
+    requiredLevel: 1,
     monsters: [
       { id: 5, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger", image: wildGoblinImage },
       { id: 6, name: "Goblin Warrior", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 5, description: "A better equipped goblin fighter" },
@@ -172,7 +172,7 @@ const E_RANK_ZONES: ZoneLocation[] = [
     description: "A forest clearing where spiders have made their nest",
     position: { top: "70%", left: "70%" }, // Bottom right - Campfire area
     isUnlocked: false,
-    requiredLevel: 4,
+    requiredLevel: 1,
     monsters: [
       { id: 7, name: "Forest Spider", level: 4, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs", image: forestSpiderImage },
       { id: 8, name: "Brood Mother", level: 5, maxHp: 45, currentHp: 45, attack: 7, goldReward: 8, description: "The queen of the spider nest" },
@@ -244,6 +244,7 @@ export default function Battle() {
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [monsterCooldowns, setMonsterCooldowns] = useState<{[key: number]: number}>({});
+  const [zoneProgress, setZoneProgress] = useState<Record<number, boolean>>({});
   
   // Persistent health state (survives between battles)
   const [persistentPlayerHp, setPersistentPlayerHp] = useState<number | null>(null);
@@ -437,14 +438,15 @@ export default function Battle() {
                   
                   {/* Zone Waypoint Markers */}
                   {E_RANK_ZONES.map((zone) => {
-                    const isUnlocked = zone.isUnlocked || (userStats?.level || 1) >= zone.requiredLevel;
+                    // Check if previous zone is completed (for zones 2-4) or if it's zone 1 (always unlocked)
+                    const isUnlocked = zone.id === 1 || (zone.id > 1 && zoneProgress[zone.id - 1]);
                     const canEnter = isUnlocked;
 
                     return (
                       <div
                         key={zone.id}
                         className={`absolute transform -translate-x-1/2 -translate-y-full cursor-pointer ${
-                          !canEnter ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
+                          !canEnter ? 'cursor-not-allowed' : 'hover:scale-110'
                         } transition-all duration-200`}
                         style={{
                           top: zone.position.top,
@@ -456,7 +458,9 @@ export default function Battle() {
                           <img 
                             src={waypointMarkerImage} 
                             alt={`${zone.name} waypoint`}
-                            className="w-12 h-12 drop-shadow-lg"
+                            className={`w-12 h-12 drop-shadow-lg ${
+                              !canEnter ? 'grayscale opacity-60' : ''
+                            }`}
                           />
                           {/* Zone number badge */}
                           <div className={`absolute top-1 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -466,6 +470,12 @@ export default function Battle() {
                           }`}>
                             {zone.id}
                           </div>
+                          {/* Completion checkmark */}
+                          {zoneProgress[zone.id] && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                              <CheckCircle className="w-3 h-3 text-white" />
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -475,7 +485,8 @@ export default function Battle() {
                 {/* Zone Legend */}
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {E_RANK_ZONES.map((zone) => {
-                    const isUnlocked = zone.isUnlocked || (userStats?.level || 1) >= zone.requiredLevel;
+                    const isUnlocked = zone.id === 1 || (zone.id > 1 && zoneProgress[zone.id - 1]);
+                    const isCompleted = zoneProgress[zone.id];
                     
                     return (
                       <div 
@@ -483,35 +494,63 @@ export default function Battle() {
                         className={`p-3 rounded-lg ${
                           !isUnlocked 
                             ? 'bg-gray-800 opacity-60' 
+                            : isCompleted
+                            ? 'bg-green-900/20 border border-green-600'
                             : 'bg-card border border-border hover:border-primary transition-colors'
                         }`}
                       >
                         <div className="flex items-center space-x-2 mb-2">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            !isUnlocked ? 'bg-gray-600 text-gray-400' : 'bg-primary text-white'
+                            !isUnlocked 
+                              ? 'bg-gray-600 text-gray-400' 
+                              : isCompleted
+                              ? 'bg-green-600 text-white'
+                              : 'bg-primary text-white'
                           }`}>
-                            {zone.id}
+                            {isCompleted ? '✓' : zone.id}
                           </div>
-                          <h4 className={`font-medium ${!isUnlocked ? 'text-gray-400' : 'text-foreground'}`}>
+                          <h4 className={`font-medium ${
+                            !isUnlocked 
+                              ? 'text-gray-400' 
+                              : isCompleted 
+                              ? 'text-green-400'
+                              : 'text-foreground'
+                          }`}>
                             {zone.name}
                           </h4>
                         </div>
-                        <p className={`text-sm ${!isUnlocked ? 'text-gray-500' : 'text-muted-foreground'}`}>
+                        <p className={`text-sm ${
+                          !isUnlocked 
+                            ? 'text-gray-500' 
+                            : isCompleted
+                            ? 'text-green-300'
+                            : 'text-muted-foreground'
+                        }`}>
                           {zone.description}
                         </p>
                         <div className="flex items-center justify-between mt-2 text-xs">
                           <span className={`px-2 py-1 rounded ${
-                            !isUnlocked ? 'bg-gray-600 text-gray-400' : 'bg-blue-700 text-white'
+                            isCompleted
+                              ? 'bg-green-700 text-green-100'
+                              : !isUnlocked 
+                              ? 'bg-gray-600 text-gray-400' 
+                              : 'bg-blue-700 text-white'
                           }`}>
-                            Req. Lv.{zone.requiredLevel}
+                            {isCompleted ? 'Completed' : `Zone ${zone.id}`}
                           </span>
-                          <span className={`${!isUnlocked ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                          <span className={`${
+                            !isUnlocked 
+                              ? 'text-gray-400' 
+                              : isCompleted
+                              ? 'text-green-400'
+                              : 'text-muted-foreground'
+                          }`}>
                             {zone.monsters.length} Monster{zone.monsters.length > 1 ? 's' : ''}
                           </span>
                         </div>
-                        {!isUnlocked && (
+                        {!isUnlocked && zone.id > 1 && (
                           <div className="mt-2 text-xs text-orange-400">
-                            Level {zone.requiredLevel} required
+                            Complete Zone {zone.id - 1} to unlock
                           </div>
                         )}
                       </div>
@@ -733,6 +772,30 @@ export default function Battle() {
       </div>
     );
   }
+
+  // Handle battle completion and zone progress
+  const handleBattleVictory = (dungeonId: number) => {
+    // If this is an E-rank zone dungeon, mark the zone as completed
+    if (selectedRank === "E" && selectedDungeon?.id && selectedDungeon.id <= 4) {
+      setZoneProgress(prev => ({
+        ...prev,
+        [selectedDungeon.id]: true
+      }));
+      
+      toast({
+        title: "Zone Completed!",
+        description: `You've conquered ${selectedDungeon.name}!`,
+      });
+      
+      // Check if next zone should be unlocked
+      if (selectedDungeon.id < 4) {
+        toast({
+          title: "New Zone Unlocked!",
+          description: `Zone ${selectedDungeon.id + 1} is now available to explore.`,
+        });
+      }
+    }
+  };
 
   // Battle view would go here but for now just return null
   return null;
