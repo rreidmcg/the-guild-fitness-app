@@ -26,6 +26,13 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import minorHealingPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753214477623.png";
 import majorHealingPotionImage from "@assets/1860C3F1-AEFB-419D-BAB2-306C00CA6321_1753215117108.png";
+import characterImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
+import spiderMonsterImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753196270170.png";
+import armorImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_1753151490494.png";
+import characterMaleImage from "@assets/IMG_3682_1753213695174.png";
+import bluePotion1 from "@assets/09037B89-CDBD-4EFA-966C-3794F4AC7E9D_1752966596818.png";
+import bluePotion2 from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
+import fullHealPotionImage from "@assets/A4BC9DED-ED3B-4E46-9964-3A41A15D2B38_1752965718128.png";
 
 interface ShopItem {
   id: number;
@@ -215,6 +222,89 @@ export default function Shop() {
     return inventory?.find((item: any) => item.itemName === itemName)?.quantity || 0;
   };
 
+  const getEquipmentImage = (item: ShopItem) => {
+    // Map specific items to their pixel art images
+    if (item.name.toLowerCase().includes('leather') || item.category === 'head') {
+      return (
+        <img 
+          src={characterImage} 
+          alt={item.name}
+          className="w-16 h-16 object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+    
+    if (item.name.toLowerCase().includes('armor') || item.name.toLowerCase().includes('chest') || item.category === 'chest') {
+      return (
+        <img 
+          src={armorImage} 
+          alt={item.name}
+          className="w-16 h-16 object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+    
+    if (item.name.toLowerCase().includes('casual') || item.category === 'clothing') {
+      return (
+        <img 
+          src={characterMaleImage} 
+          alt={item.name}
+          className="w-16 h-16 object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+
+    // Default fallback based on category
+    const categoryImages = {
+      head: characterImage,
+      chest: armorImage,
+      shoulders: armorImage,
+      hands: characterMaleImage,
+      legs: characterMaleImage,
+      feet: characterMaleImage,
+      neck: characterImage,
+      waist: armorImage
+    };
+
+    const defaultImage = categoryImages[item.category as keyof typeof categoryImages];
+    
+    if (defaultImage) {
+      return (
+        <img 
+          src={defaultImage} 
+          alt={item.name}
+          className="w-16 h-16 object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+          }}
+        />
+      );
+    }
+
+    // Final fallback - colored square with first letter
+    return (
+      <div 
+        className="w-12 h-12 rounded flex items-center justify-center text-white font-bold"
+        style={{ backgroundColor: item.color }}
+      >
+        {item.name[0]}
+      </div>
+    );
+  };
+
 
 
   const filterPotionsByCategory = (category: string) => {
@@ -327,57 +417,125 @@ export default function Shop() {
 
       <div className="max-w-4xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-8">
-            <div className="flex items-center gap-4">
-              {/* Consumables Section */}
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground mb-1">Consumables</span>
-                  <Select value={selectedConsumableCategory} onValueChange={setSelectedConsumableCategory}>
-                    <SelectTrigger className="w-40 h-10 bg-primary text-primary-foreground border-primary hover:bg-primary/90">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">
-                        <div className="flex items-center space-x-2">
-                          <Star className="w-4 h-4" />
-                          <span>All</span>
-                        </div>
-                      </SelectItem>
-                      {consumableCategories.map((category) => {
-                        const Icon = category.icon;
-                        return (
-                          <SelectItem key={category.id} value={category.id}>
-                            <div className="flex items-center space-x-2">
-                              <Icon className="w-4 h-4" />
-                              <span>{category.name}</span>
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="consumables">Consumables</TabsTrigger>
+            <TabsTrigger value="equipment">Equipment</TabsTrigger>
+            <TabsTrigger value="gold">Gold</TabsTrigger>
+          </TabsList>
 
-              {/* Other Category Tabs */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setActiveTab("gold")}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                    activeTab === "gold" 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                  }`}
-                >
-                  <Wallet className="w-4 h-4" />
-                  <span className="text-sm font-medium">Gold</span>
-                </button>
+          <div className="mt-6">
+            {/* Consumables Filter */}
+            {activeTab === "consumables" && (
+              <div className="mb-6">
+                <Select value={selectedConsumableCategory} onValueChange={setSelectedConsumableCategory}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      <div className="flex items-center space-x-2">
+                        <Star className="w-4 h-4" />
+                        <span>All</span>
+                      </div>
+                    </SelectItem>
+                    {consumableCategories.map((category) => {
+                      const Icon = category.icon;
+                      return (
+                        <SelectItem key={category.id} value={category.id}>
+                          <div className="flex items-center space-x-2">
+                            <Icon className="w-4 h-4" />
+                            <span>{category.name}</span>
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
+            )}
           </div>
 
 
+
+          {/* Equipment Tab */}
+          <TabsContent value="equipment">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {shopItems?.filter(item => item.category !== 'potion').map((item) => (
+                <Card key={item.id} className="bg-card border-border relative overflow-hidden">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-bold text-foreground truncate">
+                        {item.name}
+                      </CardTitle>
+                      <Badge className={`text-xs ${rarityColors[item.rarity as keyof typeof rarityColors]} text-white`}>
+                        {item.rarity}
+                      </Badge>
+                    </div>
+                    {item.unlockLevel > 1 && (
+                      <div className="text-xs text-muted-foreground">
+                        Level {item.unlockLevel}+
+                      </div>
+                    )}
+                  </CardHeader>
+                  <CardContent className="p-3">
+                    {/* Equipment Visual */}
+                    <div className="w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border bg-card">
+                      {getEquipmentImage(item)}
+                    </div>
+
+                    {/* Equipment Info */}
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center space-x-1">
+                          <Coins className="w-3 h-3 text-yellow-500" />
+                          <span className="font-medium text-foreground">{item.price}</span>
+                        </div>
+                        {item.isOwned && (
+                          <div className="text-green-400 text-xs">
+                            ✓ Owned
+                          </div>
+                        )}
+                      </div>
+                      
+                      {item.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Purchase Button */}
+                    {item.isOwned ? (
+                      <Button variant="secondary" className="w-full text-xs h-8" disabled>
+                        Owned
+                      </Button>
+                    ) : (userStats?.level || 1) < item.unlockLevel ? (
+                      <Button variant="outline" className="w-full text-xs h-8" disabled>
+                        Level {item.unlockLevel} Required
+                      </Button>
+                    ) : (userStats?.gold || 0) < item.price ? (
+                      <Button variant="destructive" className="w-full text-xs h-8" disabled>
+                        Need Gold
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => handlePurchase(item)}
+                        disabled={purchaseItemMutation.isPending}
+                        className="w-full text-xs h-8 bg-green-600 hover:bg-green-700"
+                      >
+                        Buy {item.price}g
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+              {(!shopItems || shopItems.filter(item => item.category !== 'potion').length === 0) && (
+                <div className="col-span-full text-center py-8 text-muted-foreground">
+                  No equipment items available
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
           {/* Consumables Tab */}
           <TabsContent value="consumables">
@@ -396,7 +554,7 @@ export default function Shop() {
                   </CardHeader>
                   <CardContent className="p-3">
                     {/* Potion Visual */}
-                    <div className={`w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border ${(potion.id === 'minor_healing' || potion.id === 'major_healing') ? 'bg-card' : `bg-gradient-to-br ${potion.color}`}`}>
+                    <div className="w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border bg-card">
                       {potion.id === 'minor_healing' ? (
                         <img 
                           src={minorHealingPotionImage} 
@@ -411,6 +569,46 @@ export default function Shop() {
                         <img 
                           src={majorHealingPotionImage} 
                           alt="Major Healing Potion"
+                          className="w-16 h-16 object-contain"
+                          style={{ 
+                            imageRendering: 'pixelated',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                          }}
+                        />
+                      ) : potion.id === 'full_healing' ? (
+                        <img 
+                          src={fullHealPotionImage} 
+                          alt="Full Healing Potion"
+                          className="w-16 h-16 object-contain"
+                          style={{ 
+                            imageRendering: 'pixelated',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                          }}
+                        />
+                      ) : potion.id === 'minor_mana' ? (
+                        <img 
+                          src={bluePotion1} 
+                          alt="Minor Mana Potion"
+                          className="w-16 h-16 object-contain"
+                          style={{ 
+                            imageRendering: 'pixelated',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                          }}
+                        />
+                      ) : potion.id === 'major_mana' ? (
+                        <img 
+                          src={bluePotion2} 
+                          alt="Major Mana Potion"
+                          className="w-16 h-16 object-contain"
+                          style={{ 
+                            imageRendering: 'pixelated',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
+                          }}
+                        />
+                      ) : potion.id === 'full_mana' ? (
+                        <img 
+                          src={bluePotion1} 
+                          alt="Full Mana Potion"
                           className="w-16 h-16 object-contain"
                           style={{ 
                             imageRendering: 'pixelated',
