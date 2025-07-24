@@ -284,6 +284,16 @@ export default function Settings() {
                 <Smartphone className="w-4 h-4 mr-2" />
                 Contact Support
               </Button>
+              {userStats?.currentTitle === "<G.M.>" && (
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center"
+                  onClick={() => setLocation('/admin')}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin Panel
+                </Button>
+              )}
             </div>
             
             <div className="text-center py-4 border-t border-border">

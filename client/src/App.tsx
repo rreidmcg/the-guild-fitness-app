@@ -20,6 +20,7 @@ import Profile from "@/pages/profile";
 import Inventory from "@/pages/inventory";
 import SignupPage from "@/pages/signup";
 import LoginPage from "@/pages/login";
+import AdminDashboard from "@/pages/admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/signup" component={SignupPage} />
       <Route path="/login" component={LoginPage} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

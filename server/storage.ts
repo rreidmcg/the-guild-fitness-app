@@ -72,6 +72,15 @@ export interface IStorage {
   // Streak system operations
   updateStreak(userId: number): Promise<void>;
   useStreakFreeze(userId: number): Promise<{ success: boolean; remainingFreezes: number }>;
+
+  // Admin operations
+  getAllUsers(): Promise<User[]>;
+  getSystemStats(): Promise<{
+    totalUsers: number;
+    activeToday: number;
+    totalWorkouts: number;
+    averageLevel: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -666,6 +675,45 @@ export class DatabaseStorage implements IStorage {
     });
     
     return { success: true, remainingFreezes: newFreezeCount };
+  }
+
+  // Admin operations
+  async getAllUsers(): Promise<User[]> {
+    await this.ensureInitialized();
+    
+    const allUsers = await db.select().from(users);
+    return allUsers;
+  }
+
+  async getSystemStats(): Promise<{
+    totalUsers: number;
+    activeToday: number;
+    totalWorkouts: number;
+    averageLevel: number;
+  }> {
+    await this.ensureInitialized();
+    
+    // Get total users
+    const totalUsersResult = await db.select({ count: sql`COUNT(*)`.as('count') }).from(users);
+    const totalUsers = Number(totalUsersResult[0]?.count || 0);
+
+    // Get total workout sessions
+    const totalWorkoutsResult = await db.select({ count: sql`COUNT(*)`.as('count') }).from(workoutSessions);
+    const totalWorkouts = Number(totalWorkoutsResult[0]?.count || 0);
+
+    // Get average level
+    const avgLevelResult = await db.select({ avg: sql`AVG(level)`.as('avg') }).from(users);
+    const averageLevel = Math.round(Number(avgLevelResult[0]?.avg || 1));
+
+    // For now, consider all users as active today (in production, you'd check login timestamps)
+    const activeToday = totalUsers;
+
+    return {
+      totalUsers,
+      activeToday,
+      totalWorkouts,
+      averageLevel
+    };
   }
 }
 

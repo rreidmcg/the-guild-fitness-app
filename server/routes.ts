@@ -84,6 +84,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes - only accessible to users with <G.M.> title
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const currentUser = await storage.getUser(currentUserId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const allUsers = await storage.getAllUsers();
+      res.json(allUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.get("/api/admin/system-stats", async (req, res) => {
+    try {
+      const currentUser = await storage.getUser(currentUserId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const stats = await storage.getSystemStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching system stats:", error);
+      res.status(500).json({ error: "Failed to fetch system stats" });
+    }
+  });
+
   // Exercise routes
   app.get("/api/exercises", async (req, res) => {
     try {
