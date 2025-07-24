@@ -107,7 +107,14 @@ export default function Settings() {
                 <Avatar2D size="sm" user={userStats} />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-foreground">{userStats?.username || 'Fitness Warrior'}</h3>
+                <div className="flex items-center space-x-2">
+                  <h3 className="text-lg font-semibold text-foreground">{userStats?.username || 'Fitness Warrior'}</h3>
+                  {userStats?.currentTitle && (
+                    <span className="px-2 py-1 text-xs font-bold bg-yellow-500/20 text-yellow-400 rounded border border-yellow-500/30">
+                      {userStats.currentTitle}
+                    </span>
+                  )}
+                </div>
                 <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Avatar: {userStats?.gender === 'female' ? 'Female' : 'Male'}</p>
               </div>

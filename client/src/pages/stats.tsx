@@ -482,10 +482,17 @@ export default function Stats() {
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
-              <div className="mb-2">
+              <div className="mb-2 space-y-2">
                 <span className="text-sm text-green-300 font-semibold px-3 py-1 bg-green-900/20 rounded-full border border-green-700">
                   &lt;{getLevelTitle(currentLevel)}&gt;
                 </span>
+                {userStats?.currentTitle && (
+                  <div>
+                    <span className="text-sm text-yellow-300 font-bold px-3 py-1 bg-yellow-500/20 rounded-full border border-yellow-500/30">
+                      {userStats.currentTitle}
+                    </span>
+                  </div>
+                )}
               </div>
               <h3 className="text-2xl font-bold mb-6 text-foreground">{userStats?.username || 'Player'}</h3>
             </div>
