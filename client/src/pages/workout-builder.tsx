@@ -123,20 +123,23 @@ export default function WorkoutBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-game-dark text-white pb-20">
-      <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+    <div className="min-h-screen bg-background text-foreground pb-20">
+      <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation("/workouts")}
-                className="text-gray-300 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Workouts
               </Button>
-              <h1 className="text-3xl font-bold">Create Workout</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Create Workout</h1>
+                <p className="text-muted-foreground mt-0.5 text-sm">Build your custom workout routine</p>
+              </div>
             </div>
             
             <div className="flex space-x-3">
@@ -149,7 +152,7 @@ export default function WorkoutBuilder() {
                 Save Workout
               </Button>
               <Button 
-                className="bg-game-primary hover:bg-blue-600"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
                 onClick={handleStartWorkout}
               >
                 <Play className="w-4 h-4 mr-2" />
@@ -164,57 +167,57 @@ export default function WorkoutBuilder() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Workout Details */}
           <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-game-slate border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle>Workout Details</CardTitle>
+                <CardTitle className="text-foreground">Workout Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="workout-name">Workout Name</Label>
+                  <Label htmlFor="workout-name" className="text-foreground">Workout Name</Label>
                   <Input
                     id="workout-name"
                     value={workoutName}
                     onChange={(e) => setWorkoutName(e.target.value)}
                     placeholder="Enter workout name..."
-                    className="bg-gray-700 border-gray-600"
+                    className="bg-background border-border"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="workout-description">Description (Optional)</Label>
+                  <Label htmlFor="workout-description" className="text-foreground">Description (Optional)</Label>
                   <Textarea
                     id="workout-description"
                     value={workoutDescription}
                     onChange={(e) => setWorkoutDescription(e.target.value)}
                     placeholder="Describe your workout..."
-                    className="bg-gray-700 border-gray-600"
+                    className="bg-background border-border"
                   />
                 </div>
               </CardContent>
             </Card>
 
             {/* Selected Exercises */}
-            <Card className="bg-game-slate border-gray-700">
+            <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle>Exercise List ({selectedExercises.length})</CardTitle>
+                <CardTitle className="text-foreground">Exercise List ({selectedExercises.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 {selectedExercises.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-muted-foreground">
                     <Plus className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>No exercises added yet. Select exercises from the right panel.</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {selectedExercises.map((exercise, index) => (
-                      <Card key={index} className="bg-gray-800 border-gray-600">
+                      <Card key={index} className="bg-background border-border">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-semibold text-white">{exercise.exercise?.name}</h3>
+                            <h3 className="font-semibold text-foreground">{exercise.exercise?.name}</h3>
                             <Button 
                               variant="ghost" 
                               size="sm"
                               onClick={() => handleRemoveExercise(index)}
-                              className="text-red-400 hover:text-red-300"
+                              className="text-red-500 hover:text-red-600"
                             >
                               Remove
                             </Button>
@@ -222,39 +225,39 @@ export default function WorkoutBuilder() {
                           
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <div>
-                              <Label className="text-xs text-gray-400">Sets</Label>
+                              <Label className="text-xs text-muted-foreground">Sets</Label>
                               <Input
                                 type="number"
                                 value={exercise.sets}
                                 onChange={(e) => handleUpdateExercise(index, { sets: parseInt(e.target.value) || 0 })}
-                                className="bg-gray-700 border-gray-600"
+                                className="bg-background border-border"
                               />
                             </div>
                             <div>
-                              <Label className="text-xs text-gray-400">Reps</Label>
+                              <Label className="text-xs text-muted-foreground">Reps</Label>
                               <Input
                                 type="number"
                                 value={exercise.reps}
                                 onChange={(e) => handleUpdateExercise(index, { reps: parseInt(e.target.value) || 0 })}
-                                className="bg-gray-700 border-gray-600"
+                                className="bg-background border-border"
                               />
                             </div>
                             <div>
-                              <Label className="text-xs text-gray-400">Weight (lbs)</Label>
+                              <Label className="text-xs text-muted-foreground">Weight (lbs)</Label>
                               <Input
                                 type="number"
                                 value={exercise.weight || 0}
                                 onChange={(e) => handleUpdateExercise(index, { weight: parseInt(e.target.value) || 0 })}
-                                className="bg-gray-700 border-gray-600"
+                                className="bg-background border-border"
                               />
                             </div>
                             <div>
-                              <Label className="text-xs text-gray-400">Rest (sec)</Label>
+                              <Label className="text-xs text-muted-foreground">Rest (sec)</Label>
                               <Input
                                 type="number"
                                 value={exercise.restTime || 60}
                                 onChange={(e) => handleUpdateExercise(index, { restTime: parseInt(e.target.value) || 0 })}
-                                className="bg-gray-700 border-gray-600"
+                                className="bg-background border-border"
                               />
                             </div>
                           </div>
