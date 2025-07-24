@@ -501,6 +501,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Daily quest routes
+  app.get("/api/daily-progress", async (req, res) => {
+    try {
+      const userId = 1; // TODO: Get from session/auth
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const progress = await storage.getDailyProgress(userId, today);
+      res.json(progress || {
+        userId,
+        date: today,
+        hydration: false,
+        steps: false,
+        protein: false,
+        xpAwarded: false
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch daily progress" });
+    }
+  });
+
+  app.post("/api/complete-daily-quest", async (req, res) => {
+    try {
+      const { questType } = req.body;
+      const userId = 1; // TODO: Get from session/auth
+      
+      if (!questType || !['hydration', 'steps', 'protein'].includes(questType)) {
+        return res.status(400).json({ error: "Invalid quest type" });
+      }
+      
+      const result = await storage.completeDailyQuest(userId, questType);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to complete daily quest" });
+    }
+  });
+
   // Inventory endpoints
   app.get("/api/inventory", async (req, res) => {
     const userId = 1; // Hardcoded for now

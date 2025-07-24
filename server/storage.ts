@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -7,7 +7,8 @@ import {
   type WorkoutProgram, type InsertWorkoutProgram,
   type ProgramWorkout, type InsertProgramWorkout,
   type WardrobeItem, type InsertWardrobeItem,
-  type UserWardrobe, type InsertUserWardrobe
+  type UserWardrobe, type InsertUserWardrobe,
+  type DailyProgress, type InsertDailyProgress
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
@@ -62,6 +63,11 @@ export interface IStorage {
 
   // Achievement operations
   getUserAchievements(userId: number): Promise<any[]>;
+
+  // Daily quest operations
+  getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined>;
+  updateDailyProgress(userId: number, date: string, updates: Partial<DailyProgress>): Promise<DailyProgress>;
+  completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -465,6 +471,85 @@ export class DatabaseStorage implements IStorage {
     // For now, return empty array since achievements table is new
     // In the future, this would query the userAchievements table
     return [];
+  }
+
+  // Daily quest operations
+  async getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined> {
+    await this.ensureInitialized();
+    const results = await db.select()
+      .from(dailyProgress)
+      .where(and(eq(dailyProgress.userId, userId), eq(dailyProgress.date, date)))
+      .limit(1);
+    return results[0];
+  }
+
+  async updateDailyProgress(userId: number, date: string, updates: Partial<DailyProgress>): Promise<DailyProgress> {
+    await this.ensureInitialized();
+    
+    // Try to get existing progress
+    const existing = await this.getDailyProgress(userId, date);
+    
+    if (existing) {
+      // Update existing record
+      const results = await db.update(dailyProgress)
+        .set(updates)
+        .where(and(eq(dailyProgress.userId, userId), eq(dailyProgress.date, date)))
+        .returning();
+      return results[0];
+    } else {
+      // Create new record
+      const results = await db.insert(dailyProgress)
+        .values({
+          userId,
+          date,
+          hydration: false,
+          steps: false,
+          protein: false,
+          xpAwarded: false,
+          ...updates
+        })
+        .returning();
+      return results[0];
+    }
+  }
+
+  async completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean }> {
+    await this.ensureInitialized();
+    
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Get or create today's progress
+    let progress = await this.getDailyProgress(userId, today);
+    if (!progress) {
+      progress = await this.updateDailyProgress(userId, today, {});
+    }
+    
+    // Mark the specific quest as completed
+    const updatedProgress = await this.updateDailyProgress(userId, today, {
+      [questType]: true
+    });
+    
+    // Check if all quests are completed and XP hasn't been awarded yet
+    const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein;
+    let xpAwarded = false;
+    
+    if (allCompleted && !updatedProgress.xpAwarded) {
+      // Award 5 XP for completing all daily quests
+      const user = await this.getUser(userId);
+      if (user) {
+        await this.updateUser(userId, {
+          experience: user.experience + 5
+        });
+        
+        // Mark XP as awarded
+        await this.updateDailyProgress(userId, today, {
+          xpAwarded: true
+        });
+        xpAwarded = true;
+      }
+    }
+    
+    return { completed: true, xpAwarded };
   }
 }
 

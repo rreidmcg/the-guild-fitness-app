@@ -128,6 +128,20 @@ export const playerInventory = pgTable("player_inventory", {
   userItemIdx: uniqueIndex("user_item_idx").on(table.userId, table.itemType, table.itemName),
 }));
 
+// Daily quest progress tracking
+export const dailyProgress = pgTable("daily_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  date: text("date").notNull(), // YYYY-MM-DD format
+  hydration: boolean("hydration").default(false),
+  steps: boolean("steps").default(false),
+  protein: boolean("protein").default(false),
+  xpAwarded: boolean("xp_awarded").default(false), // Track if 5 XP was already given
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  userDateIdx: uniqueIndex("user_date_idx").on(table.userId, table.date),
+}));
+
 // Workout programs (structured fitness plans)
 export const workoutPrograms = pgTable("workout_programs", {
   id: serial("id").primaryKey(),
@@ -311,6 +325,11 @@ export const insertPersonalRecordSchema = createInsertSchema(personalRecords).om
   achievedAt: true,
 });
 
+export const insertDailyProgressSchema = createInsertSchema(dailyProgress).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertWorkoutProgramSchema = createInsertSchema(workoutPrograms).omit({
   id: true,
   createdAt: true,
@@ -353,3 +372,5 @@ export type UserAbility = typeof userAbilities.$inferSelect;
 export type InsertUserAbility = z.infer<typeof insertUserAbilitySchema>;
 export type PlayerInventory = typeof playerInventory.$inferSelect;
 export type InsertPlayerInventory = z.infer<typeof insertPlayerInventorySchema>;
+export type DailyProgress = typeof dailyProgress.$inferSelect;
+export type InsertDailyProgress = z.infer<typeof insertDailyProgressSchema>;

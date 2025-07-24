@@ -1,20 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   Dumbbell, 
   Plus, 
   Play, 
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Droplets,
+  Footprints,
+  UtensilsCrossed,
+  Star
 } from "lucide-react";
 
 export default function Workouts() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: workoutSessions } = useQuery({
     queryKey: ["/api/workout-sessions"],
@@ -22,6 +29,42 @@ export default function Workouts() {
 
   const { data: workoutPrograms } = useQuery({
     queryKey: ["/api/workout-programs"],
+  });
+
+  const { data: dailyProgress } = useQuery({
+    queryKey: ["/api/daily-progress"],
+  });
+
+  const completeDailyQuestMutation = useMutation({
+    mutationFn: async (questType: 'hydration' | 'steps' | 'protein') => {
+      return apiRequest("/api/complete-daily-quest", {
+        method: "POST",
+        body: { questType },
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/daily-progress"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      
+      if (data.xpAwarded) {
+        toast({
+          title: "Daily Quests Complete!",
+          description: "You earned 5 XP for completing all daily quests!",
+        });
+      } else {
+        toast({
+          title: "Quest Completed!",
+          description: "Keep going to complete all daily quests for bonus XP!",
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to complete quest. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const recentSessions = workoutSessions?.slice(0, 5) || [];
@@ -45,6 +88,12 @@ export default function Workouts() {
     setLocation(`/workout-session/${program.id}`);
   };
 
+  const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein', checked: boolean) => {
+    if (checked && !dailyProgress?.[questType]) {
+      completeDailyQuestMutation.mutate(questType);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
@@ -52,8 +101,8 @@ export default function Workouts() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Workouts</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">Track your fitness journey</p>
+              <h1 className="text-2xl font-bold text-foreground">Quests</h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
             </div>
             <Button 
               onClick={() => setLocation("/workout-builder")}
@@ -68,6 +117,80 @@ export default function Workouts() {
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
+
+        {/* Daily Quests */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-500" />
+                Daily Quests
+              </CardTitle>
+              <div className="text-sm text-muted-foreground">
+                {dailyProgress?.hydration && dailyProgress?.steps && dailyProgress?.protein
+                  ? dailyProgress?.xpAwarded 
+                    ? "Complete! +5 XP Earned"
+                    : "Complete! XP Processing..."
+                  : "Complete all for +5 XP"
+                }
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Hydration Quest */}
+              <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <Checkbox
+                  checked={dailyProgress?.hydration || false}
+                  onCheckedChange={(checked) => handleQuestCheck('hydration', checked as boolean)}
+                  disabled={dailyProgress?.hydration || completeDailyQuestMutation.isPending}
+                  className="border-blue-500 data-[state=checked]:bg-blue-500"
+                />
+                <div className="flex items-center gap-2 flex-1">
+                  <Droplets className="w-5 h-5 text-blue-500" />
+                  <div>
+                    <p className="font-medium text-foreground">Stay Hydrated</p>
+                    <p className="text-xs text-muted-foreground">Drink 8 glasses of water</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Steps Quest */}
+              <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                <Checkbox
+                  checked={dailyProgress?.steps || false}
+                  onCheckedChange={(checked) => handleQuestCheck('steps', checked as boolean)}
+                  disabled={dailyProgress?.steps || completeDailyQuestMutation.isPending}
+                  className="border-green-500 data-[state=checked]:bg-green-500"
+                />
+                <div className="flex items-center gap-2 flex-1">
+                  <Footprints className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="font-medium text-foreground">Daily Steps</p>
+                    <p className="text-xs text-muted-foreground">Walk 10,000 steps</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Protein Quest */}
+              <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                <Checkbox
+                  checked={dailyProgress?.protein || false}
+                  onCheckedChange={(checked) => handleQuestCheck('protein', checked as boolean)}
+                  disabled={dailyProgress?.protein || completeDailyQuestMutation.isPending}
+                  className="border-orange-500 data-[state=checked]:bg-orange-500"
+                />
+                <div className="flex items-center gap-2 flex-1">
+                  <UtensilsCrossed className="w-5 h-5 text-orange-500" />
+                  <div>
+                    <p className="font-medium text-foreground">Protein Goal</p>
+                    <p className="text-xs text-muted-foreground">Hit your protein target</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Recent Workouts */}
         <Card className="bg-card border-border">
