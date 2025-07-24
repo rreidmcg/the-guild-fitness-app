@@ -408,11 +408,7 @@ export default function Battle() {
                 <SelectContent>
                   {availableRanks.map((rank) => (
                     <SelectItem key={rank.id} value={rank.id}>
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-3 h-3 rounded ${rank.color}`} />
-                        <span>{rank.name}</span>
-                        <span className="text-muted-foreground">- {rank.description}</span>
-                      </div>
+                      {rank.name} (Level {rank.requiredLevel}+)
                     </SelectItem>
                   ))}
                 </SelectContent>
