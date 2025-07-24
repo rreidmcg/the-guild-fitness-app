@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import type { WorkoutSession, WorkoutProgram, DailyProgress, User } from "@shared/schema";
 import { 
   Dumbbell, 
   Plus, 
@@ -28,25 +29,25 @@ export default function Workouts() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: workoutSessions } = useQuery({
+  const { data: workoutSessions } = useQuery<WorkoutSession[]>({
     queryKey: ["/api/workout-sessions"],
   });
 
-  const { data: workoutPrograms } = useQuery({
+  const { data: workoutPrograms } = useQuery<WorkoutProgram[]>({
     queryKey: ["/api/workout-programs"],
   });
 
-  const { data: dailyProgress } = useQuery({
+  const { data: dailyProgress } = useQuery<DailyProgress>({
     queryKey: ["/api/daily-progress"],
   });
 
-  const { data: userStats } = useQuery({
+  const { data: userStats } = useQuery<User>({
     queryKey: ["/api/user/stats"],
   });
 
   const completeDailyQuestMutation = useMutation({
     mutationFn: async (questType: 'hydration' | 'steps' | 'protein') => {
-      return apiRequest("/api/complete-daily-quest", {
+      return apiRequest<{ xpAwarded?: boolean; streakFreezeAwarded?: boolean }>("/api/complete-daily-quest", {
         method: "POST",
         body: { questType },
       });
@@ -83,10 +84,10 @@ export default function Workouts() {
     },
   });
 
-  const recentSessions = workoutSessions?.slice(0, 5) || [];
+  const recentSessions = (workoutSessions || []).slice(0, 5);
   const programs = workoutPrograms || [];
 
-  const handleProgramClick = (program: any) => {
+  const handleProgramClick = (program: WorkoutProgram) => {
     toast({
       title: "Program Selected",
       description: `Opening ${program.name} program details...`,
@@ -95,7 +96,7 @@ export default function Workouts() {
     setLocation("/workout-builder");
   };
 
-  const handleStartProgram = (program: any) => {
+  const handleStartProgram = (program: WorkoutProgram) => {
     toast({
       title: "Starting Workout",
       description: `Beginning ${program.name} workout session...`,
@@ -288,7 +289,7 @@ export default function Workouts() {
                 <p className="mb-6">Start your fitness journey today! Use the "New Workout" button above.</p>
               </div>
             ) : (
-              recentSessions.map((session) => (
+              recentSessions.map((session: WorkoutSession) => (
                 <WorkoutCard key={session.id} session={session} />
               ))
             )}
@@ -308,7 +309,7 @@ export default function Workouts() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {programs.map((program) => (
+                {programs.map((program: WorkoutProgram) => (
                   <Card 
                     key={program.id} 
                     className="bg-card border-border hover:border-game-primary transition-colors cursor-pointer"
@@ -360,7 +361,7 @@ export default function Workouts() {
             <CardContent className="p-6 text-center">
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Total Time</h3>
               <div className="text-3xl font-bold text-game-success mb-1">
-                {recentSessions.reduce((total, session) => total + (session.duration || 0), 0)}
+                {recentSessions.reduce((total: number, session: WorkoutSession) => total + (session.duration || 0), 0)}
               </div>
               <p className="text-xs text-muted-foreground">Minutes this week</p>
             </CardContent>
@@ -370,7 +371,7 @@ export default function Workouts() {
             <CardContent className="p-6 text-center">
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Volume</h3>
               <div className="text-3xl font-bold text-game-warning mb-1">
-                {recentSessions.reduce((total, session) => total + (session.totalVolume || 0), 0).toLocaleString()}
+                {recentSessions.reduce((total: number, session: WorkoutSession) => total + (session.totalVolume || 0), 0).toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">lbs lifted this week</p>
             </CardContent>
