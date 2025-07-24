@@ -38,9 +38,13 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Authentication & User Management
-- User registration and login system (implementation pending)
+- Secure user registration and login system with bcrypt password hashing
+- Email verification system with secure token generation and 24-hour expiry
+- Password recovery system with 1-hour reset token expiry
+- Enhanced login/signup pages with password visibility toggle and forgot password functionality
+- Admin access control for G.M. titled users
 - Character progression system with RPG-style leveling
-- Stat tracking (strength, stamina, endurance, flexibility)
+- Stat tracking (strength, stamina, agility)
 
 ### Exercise Management
 - Comprehensive exercise library with categorization
