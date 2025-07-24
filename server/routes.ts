@@ -5,6 +5,9 @@ import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerforma
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 
+// Simple in-memory session storage (in production, use proper session management)
+let currentUserId: number = 1;
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post("/api/auth/signup", async (req, res) => {
@@ -41,6 +44,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentTitle: "Recruit"
       } as any);
 
+      // Set the current user ID for session tracking
+      currentUserId = newUser.id;
+
       res.json({ user: newUser, message: "Account created successfully" });
     } catch (error) {
       console.error("Error creating user:", error);
@@ -56,6 +62,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user || user.password !== password) { // In production, compare hashed passwords
         return res.status(401).json({ error: "Invalid username or password" });
       }
+
+      // Set the current user ID for session tracking
+      currentUserId = user.id;
 
       res.json({ user, message: "Login successful" });
     } catch (error) {
@@ -88,7 +97,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout routes
   app.get("/api/workouts", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const workouts = await storage.getUserWorkouts(userId);
       res.json(workouts);
     } catch (error) {
@@ -98,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workouts", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const workoutData = insertWorkoutSchema.parse({ ...req.body, userId });
       const workout = await storage.createWorkout(workoutData);
       res.json(workout);
@@ -130,7 +139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout session routes
   app.get("/api/workout-sessions", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const sessions = await storage.getUserWorkoutSessions(userId);
       res.json(sessions);
     } catch (error) {
@@ -140,7 +149,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workout-sessions", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const sessionData = insertWorkoutSessionSchema.parse({ ...req.body, userId });
       
       // Calculate XP and stat gains
@@ -188,7 +197,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Personal records routes
   app.get("/api/personal-records", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const records = await storage.getUserPersonalRecords(userId);
       res.json(records);
     } catch (error) {
@@ -199,7 +208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Wardrobe routes
   app.get("/api/wardrobe/items", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const items = await storage.getWardrobeItemsWithOwnership(userId);
       res.json(items);
     } catch (error) {
@@ -209,7 +218,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/wardrobe/purchase", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const { itemId } = req.body;
       const result = await storage.purchaseWardrobeItem(userId, itemId);
       res.json(result);
@@ -220,7 +229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/wardrobe/equip", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const { itemId, category } = req.body;
       await storage.equipWardrobeItem(userId, itemId, category);
       res.json({ success: true });
@@ -231,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/wardrobe/unequip", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const { category } = req.body;
       await storage.unequipWardrobeItem(userId, category);
       res.json({ success: true });
@@ -263,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user stats with HP and MP regeneration
   app.get("/api/user/stats", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -367,7 +376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/stats", async (req, res) => {
     try {
       const { experienceGain, strengthGain, staminaGain, agilityGain, goldGain, battleWon } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -399,7 +408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/gender", async (req, res) => {
     try {
       const { gender } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       if (!gender || !["male", "female"].includes(gender)) {
         return res.status(400).json({ error: "Invalid gender value" });
@@ -416,7 +425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/profile", async (req, res) => {
     try {
       const { username, skinColor, hairColor, height, weight, fitnessGoal, measurementUnit } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       const updates: any = {};
       if (username) updates.username = username;
@@ -437,7 +446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Shop routes
   app.get("/api/shop/items", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       console.log("Fetching shop items for user", userId);
       const shopItems = await storage.getShopItems(userId);
       console.log("Shop items fetched:", shopItems?.length, "items");
@@ -451,7 +460,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/shop/purchase", async (req, res) => {
     try {
       const { itemId } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       const result = await storage.purchaseShopItem(userId, itemId);
       res.json(result);
@@ -463,7 +472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Wardrobe routes
   app.get("/api/wardrobe/items", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const items = await storage.getWardrobeItemsWithOwnership(userId);
       res.json(items);
     } catch (error) {
@@ -474,7 +483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/wardrobe/purchase", async (req, res) => {
     try {
       const { itemId } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       const result = await storage.purchaseWardrobeItem(userId, itemId);
       res.json(result);
@@ -486,7 +495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/wardrobe/equip", async (req, res) => {
     try {
       const { itemId, category } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       await storage.equipWardrobeItem(userId, itemId, category);
       res.json({ success: true });
@@ -498,7 +507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/wardrobe/unequip", async (req, res) => {
     try {
       const { category } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       await storage.unequipWardrobeItem(userId, category);
       res.json({ success: true });
@@ -510,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Achievements routes
   app.get("/api/user/achievements", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const achievements = await storage.getUserAchievements(userId);
       res.json(achievements);
     } catch (error) {
@@ -521,7 +530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Daily quest routes
   app.get("/api/daily-progress", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
       const progress = await storage.getDailyProgress(userId, today);
       res.json(progress || {
@@ -540,7 +549,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/complete-daily-quest", async (req, res) => {
     try {
       const { questType } = req.body;
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       
       if (!questType || !['hydration', 'steps', 'protein'].includes(questType)) {
         return res.status(400).json({ error: "Invalid quest type" });
@@ -555,7 +564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/use-streak-freeze", async (req, res) => {
     try {
-      const userId = 1; // TODO: Get from session/auth
+      const userId = currentUserId; // Use the current logged-in user
       const result = await storage.useStreakFreeze(userId);
       res.json(result);
     } catch (error) {
@@ -565,7 +574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Inventory endpoints
   app.get("/api/inventory", async (req, res) => {
-    const userId = 1; // Hardcoded for now
+    const userId = currentUserId; // Use the current logged-in user
     
     try {
       const inventory = await db
@@ -582,7 +591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Use potion endpoint
   app.post("/api/use-potion", async (req, res) => {
-    const userId = 1; // Hardcoded for now
+    const userId = currentUserId; // Use the current logged-in user
     const { potionType } = req.body;
     
     if (!potionType || !["minor_healing", "major_healing", "full_healing", "minor_mana", "major_mana", "full_mana"].includes(potionType)) {
@@ -718,7 +727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Purchase potion endpoint
   app.post("/api/shop/buy-potion", async (req, res) => {
-    const userId = 1; // Hardcoded for now
+    const userId = currentUserId; // Use the current logged-in user
     const { potionType, quantity = 1 } = req.body;
     
     const potionPrices = {

@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 
 const signupSchema = z.object({
@@ -69,7 +70,15 @@ export default function SignupPage() {
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Clear any cached data to ensure fresh data for the new user
+      queryClient.clear();
+      
+      // Store user data if needed (for offline access)
+      if (data.user) {
+        localStorage.setItem('user_data', JSON.stringify(data.user));
+      }
+      
       toast({
         title: "Account created successfully!",
         description: "Welcome to FitQuest! You can now start your fitness journey.",

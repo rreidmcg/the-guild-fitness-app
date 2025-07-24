@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -40,7 +41,15 @@ export default function LoginPage() {
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Clear any cached data to ensure fresh data for the new user
+      queryClient.clear();
+      
+      // Store user data if needed (for offline access)
+      if (data.user) {
+        localStorage.setItem('user_data', JSON.stringify(data.user));
+      }
+      
       toast({
         title: "Login successful!",
         description: "Welcome back to FitQuest!",
