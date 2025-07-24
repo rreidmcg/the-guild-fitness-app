@@ -176,7 +176,7 @@ export default function Workouts() {
                   ? dailyProgress?.xpAwarded 
                     ? "Complete! Rewards Earned"
                     : "Complete! Processing rewards..."
-                  : "Complete all quests for rewards"
+                  : ""
                 }
               </div>
             </div>
