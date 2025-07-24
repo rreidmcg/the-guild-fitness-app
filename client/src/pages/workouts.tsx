@@ -189,7 +189,7 @@ export default function Workouts() {
                   <Footprints className="w-5 h-5 text-green-500" />
                   <div>
                     <p className="font-medium text-foreground">Daily Steps</p>
-                    <p className="text-xs text-muted-foreground">Walk 10,000 steps</p>
+                    <p className="text-xs text-muted-foreground">Walk 7,500 steps</p>
                   </div>
                 </div>
               </div>
