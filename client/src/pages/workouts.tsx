@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -16,7 +17,10 @@ import {
   Footprints,
   UtensilsCrossed,
   Star,
-  Settings
+  Settings,
+  Gift,
+  Coins,
+  Shield
 } from "lucide-react";
 
 export default function Workouts() {
@@ -140,6 +144,30 @@ export default function Workouts() {
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
 
+        {/* Daily Quest Rewards */}
+        <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-700">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-center space-x-4">
+              <Gift className="w-6 h-6 text-yellow-500" />
+              <div className="text-center">
+                <h3 className="font-bold text-yellow-400">Daily Quest Completion Rewards</h3>
+                <div className="flex items-center justify-center space-x-4 mt-2 text-sm">
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span className="text-foreground">+5 XP</span>
+                  </div>
+                  <span className="text-muted-foreground">+</span>
+                  <div className="flex items-center space-x-1">
+                    <Shield className="w-4 h-4 text-blue-500" />
+                    <span className="text-foreground">1 Streak Freeze</span>
+                  </div>
+                  <span className="text-muted-foreground">(max 2)</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Daily Quests */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -151,9 +179,9 @@ export default function Workouts() {
               <div className="text-sm text-muted-foreground">
                 {dailyProgress?.hydration && dailyProgress?.steps && dailyProgress?.protein
                   ? dailyProgress?.xpAwarded 
-                    ? "Complete! +5 XP Earned"
-                    : "Complete! XP Processing..."
-                  : "Complete all for +5 XP & Streak Freeze"
+                    ? "Complete! Rewards Earned"
+                    : "Complete! Processing rewards..."
+                  : "Complete all quests for rewards"
                 }
               </div>
             </div>
@@ -161,55 +189,85 @@ export default function Workouts() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Hydration Quest */}
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <Checkbox
-                  checked={dailyProgress?.hydration || false}
-                  onCheckedChange={(checked) => handleQuestCheck('hydration', checked as boolean)}
-                  disabled={dailyProgress?.hydration || completeDailyQuestMutation.isPending}
-                  className="border-blue-500 data-[state=checked]:bg-blue-500"
-                />
-                <div className="flex items-center gap-2 flex-1">
-                  <Droplets className="w-5 h-5 text-blue-500" />
-                  <div>
-                    <p className="font-medium text-foreground">Stay Hydrated</p>
-                    <p className="text-xs text-muted-foreground">Drink 8 glasses of water</p>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 cursor-help">
+                    <Checkbox
+                      checked={dailyProgress?.hydration || false}
+                      onCheckedChange={(checked) => handleQuestCheck('hydration', checked as boolean)}
+                      disabled={dailyProgress?.hydration || completeDailyQuestMutation.isPending}
+                      className="border-blue-500 data-[state=checked]:bg-blue-500"
+                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      <Droplets className="w-5 h-5 text-blue-500" />
+                      <div>
+                        <p className="font-medium text-foreground">Stay Hydrated</p>
+                        <p className="text-xs text-muted-foreground">Drink 8 glasses of water</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="flex items-center space-x-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span>+5 XP on completion</span>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
 
               {/* Steps Quest */}
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-                <Checkbox
-                  checked={dailyProgress?.steps || false}
-                  onCheckedChange={(checked) => handleQuestCheck('steps', checked as boolean)}
-                  disabled={dailyProgress?.steps || completeDailyQuestMutation.isPending}
-                  className="border-green-500 data-[state=checked]:bg-green-500"
-                />
-                <div className="flex items-center gap-2 flex-1">
-                  <Footprints className="w-5 h-5 text-green-500" />
-                  <div>
-                    <p className="font-medium text-foreground">Daily Steps</p>
-                    <p className="text-xs text-muted-foreground">Walk 7,500 steps</p>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-500/10 border border-green-500/20 cursor-help">
+                    <Checkbox
+                      checked={dailyProgress?.steps || false}
+                      onCheckedChange={(checked) => handleQuestCheck('steps', checked as boolean)}
+                      disabled={dailyProgress?.steps || completeDailyQuestMutation.isPending}
+                      className="border-green-500 data-[state=checked]:bg-green-500"
+                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      <Footprints className="w-5 h-5 text-green-500" />
+                      <div>
+                        <p className="font-medium text-foreground">Daily Steps</p>
+                        <p className="text-xs text-muted-foreground">Walk 7,500 steps</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="flex items-center space-x-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span>+5 XP on completion</span>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
 
               {/* Protein Quest */}
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                <Checkbox
-                  checked={dailyProgress?.protein || false}
-                  onCheckedChange={(checked) => handleQuestCheck('protein', checked as boolean)}
-                  disabled={dailyProgress?.protein || completeDailyQuestMutation.isPending}
-                  className="border-orange-500 data-[state=checked]:bg-orange-500"
-                />
-                <div className="flex items-center gap-2 flex-1">
-                  <UtensilsCrossed className="w-5 h-5 text-orange-500" />
-                  <div>
-                    <p className="font-medium text-foreground">Protein Goal</p>
-                    <p className="text-xs text-muted-foreground">Hit your protein target</p>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 cursor-help">
+                    <Checkbox
+                      checked={dailyProgress?.protein || false}
+                      onCheckedChange={(checked) => handleQuestCheck('protein', checked as boolean)}
+                      disabled={dailyProgress?.protein || completeDailyQuestMutation.isPending}
+                      className="border-orange-500 data-[state=checked]:bg-orange-500"
+                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      <UtensilsCrossed className="w-5 h-5 text-orange-500" />
+                      <div>
+                        <p className="font-medium text-foreground">Protein Goal</p>
+                        <p className="text-xs text-muted-foreground">Hit your protein target</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="flex items-center space-x-2">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span>+5 XP on completion</span>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </CardContent>
         </Card>
