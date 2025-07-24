@@ -15,7 +15,8 @@ import {
   Droplets,
   Footprints,
   UtensilsCrossed,
-  Star
+  Star,
+  Settings
 } from "lucide-react";
 
 export default function Workouts() {
@@ -104,14 +105,24 @@ export default function Workouts() {
               <h1 className="text-2xl font-bold text-foreground">Quests</h1>
               <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
             </div>
-            <Button 
-              onClick={() => setLocation("/workout-builder")}
-              size="sm"
-              className="bg-game-primary hover:bg-blue-600"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              New Workout
-            </Button>
+            <div className="flex items-center space-x-3">
+              <Button 
+                onClick={() => setLocation("/workout-builder")}
+                size="sm"
+                className="bg-game-primary hover:bg-blue-600"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                New Workout
+              </Button>
+              <Button 
+                onClick={() => setLocation('/settings')}
+                size="sm"
+                variant="outline"
+                className="p-2"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -19,7 +19,8 @@ import {
   X,
   Clock,
   Volume2,
-  VolumeX
+  VolumeX,
+  Settings
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import caveRatImage from "@assets/IMG_3670_1753151064629.png";
@@ -443,9 +444,25 @@ export default function Battle() {
         {/* Header */}
         <div className="bg-card border-b border-border px-4 py-6">
           <div className="max-w-4xl mx-auto">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Battle Arena</h1>
-              <p className="text-muted-foreground mt-1">Choose your opponent and fight for gold coins</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Battle Arena</h1>
+                <p className="text-muted-foreground mt-1">Choose your opponent and fight for gold coins</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
+                  <Coins className="w-4 h-4 text-yellow-500" />
+                  <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
+                </div>
+                <Button 
+                  onClick={() => setLocation('/settings')}
+                  size="sm"
+                  variant="outline"
+                  className="p-2"
+                >
+                  <Settings className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
