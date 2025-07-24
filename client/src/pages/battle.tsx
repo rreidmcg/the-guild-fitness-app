@@ -31,6 +31,7 @@ import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import zoneMapImage from "@assets/7DCEA0C7-2CDB-488A-B077-B336CB5CE781_1753322118569.png";
+import waypointMarkerImage from "@assets/IMG_3710_1753322680060.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient } from "@/lib/queryClient";
 
@@ -438,30 +439,39 @@ export default function Battle() {
                     style={{ aspectRatio: '1:1' }}
                   />
                   
-                  {/* Zone Buttons */}
+                  {/* Zone Waypoint Markers */}
                   {E_RANK_ZONES.map((zone) => {
                     const isUnlocked = zone.isUnlocked || (userStats?.level || 1) >= zone.requiredLevel;
                     const canEnter = isUnlocked;
 
                     return (
-                      <Button
+                      <div
                         key={zone.id}
-                        onClick={() => canEnter && enterZone(zone)}
-                        className={`absolute transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full ${
-                          !canEnter
-                            ? 'bg-gray-600 cursor-not-allowed opacity-50'
-                            : 'bg-primary hover:bg-primary/80 hover:scale-110 shadow-lg'
+                        className={`absolute transform -translate-x-1/2 -translate-y-full cursor-pointer ${
+                          !canEnter ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
                         } transition-all duration-200`}
                         style={{
                           top: zone.position.top,
                           left: zone.position.left,
                         }}
-                        disabled={!canEnter}
+                        onClick={() => canEnter && enterZone(zone)}
                       >
-                        <div className="flex flex-col items-center text-xs">
-                          <span className="text-white font-bold">{zone.id}</span>
+                        <div className="relative">
+                          <img 
+                            src={waypointMarkerImage} 
+                            alt={`${zone.name} waypoint`}
+                            className="w-12 h-12 drop-shadow-lg"
+                          />
+                          {/* Zone number badge */}
+                          <div className={`absolute top-1 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                            !canEnter 
+                              ? 'bg-gray-600 text-gray-400' 
+                              : 'bg-white text-red-600 shadow-md'
+                          }`}>
+                            {zone.id}
+                          </div>
                         </div>
-                      </Button>
+                      </div>
                     );
                   })}
                 </div>
