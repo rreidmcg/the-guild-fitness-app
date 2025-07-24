@@ -8,13 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { 
   ShoppingCart, 
   Coins, 
-  Crown,
-  Shirt,
-  Zap,
-  Footprints,
   Star,
   Sparkles,
-  Lock,
   Heart,
   Plus,
   CreditCard,
@@ -23,7 +18,8 @@ import {
   Settings,
   ChevronDown,
   Coffee,
-  Beef
+  Beef,
+  Zap
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -80,22 +76,13 @@ const rarityColors = {
   legendary: "bg-yellow-500"
 };
 
-const categoryIcons = {
-  head: Crown,
-  shoulders: Shirt,
-  neck: Zap,
-  chest: Shirt,
-  hands: Footprints,
-  waist: Crown,
-  legs: Zap,
-  feet: Footprints
-};
+
 
 export default function Shop() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState("consumables");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+
   const [selectedConsumableCategory, setSelectedConsumableCategory] = useState("all");
   const [showGoldPurchase, setShowGoldPurchase] = useState(false);
 
@@ -228,15 +215,7 @@ export default function Shop() {
     return inventory?.find((item: any) => item.itemName === itemName)?.quantity || 0;
   };
 
-  const filterItemsByCategory = (category: string) => {
-    if (category === "all") {
-      // Show all armor items (exclude potions and other non-armor items)
-      return shopItems?.filter((item: ShopItem) => 
-        categories.some(cat => cat.id === item.category)
-      ) || [];
-    }
-    return shopItems?.filter((item: ShopItem) => item.category === category) || [];
-  };
+
 
   const filterPotionsByCategory = (category: string) => {
     if (category === "all") {
@@ -252,16 +231,7 @@ export default function Shop() {
     return [];
   };
 
-  const categories = [
-    { id: "head", name: "Head", icon: Crown },
-    { id: "shoulders", name: "Shoulders", icon: Shirt },
-    { id: "neck", name: "Neck", icon: Zap },
-    { id: "chest", name: "Chest", icon: Shirt },
-    { id: "hands", name: "Hands", icon: Footprints },
-    { id: "waist", name: "Waist", icon: Crown },
-    { id: "legs", name: "Legs", icon: Zap },
-    { id: "feet", name: "Feet", icon: Footprints },
-  ];
+
 
   const consumableCategories = [
     { id: "health", name: "Health Potions", icon: Heart },
@@ -359,37 +329,6 @@ export default function Shop() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="sticky top-0 bg-background/95 backdrop-blur-sm z-10 pb-4 mb-8">
             <div className="flex items-center gap-4">
-              {/* Equipment Section */}
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground mb-1">Equipment</span>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-40 h-10 bg-primary text-primary-foreground border-primary hover:bg-primary/90">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">
-                        <div className="flex items-center space-x-2">
-                          <Star className="w-4 h-4" />
-                          <span>All</span>
-                        </div>
-                      </SelectItem>
-                      {categories.map((category) => {
-                        const Icon = category.icon;
-                        return (
-                          <SelectItem key={category.id} value={category.id}>
-                            <div className="flex items-center space-x-2">
-                              <Icon className="w-4 h-4" />
-                              <span>{category.name}</span>
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
               {/* Consumables Section */}
               <div className="flex items-center gap-2">
                 <div className="flex flex-col">
@@ -438,93 +377,7 @@ export default function Shop() {
             </div>
           </div>
 
-          {/* Equipment Tab Content */}
-          <TabsContent value="equipment">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {filterItemsByCategory(selectedCategory).map((item: ShopItem) => (
-                <Card key={item.id} className="bg-card border-border relative overflow-hidden">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-bold text-foreground truncate">{item.name}</CardTitle>
-                      <Badge className={`${rarityColors[item.rarity as keyof typeof rarityColors]} text-white text-xs`}>
-                        {item.rarity[0].toUpperCase()}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-3">
-                    {/* Item Preview */}
-                    <div className="w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border" 
-                         style={{ backgroundColor: item.color }}>
-                      <div className="text-white text-lg font-bold opacity-80">
-                        {item.name[0]}
-                      </div>
-                    </div>
 
-                    {/* Item Info */}
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center space-x-1">
-                          <Coins className="w-3 h-3 text-yellow-500" />
-                          <span className="font-medium text-foreground">{item.price}</span>
-                        </div>
-                        
-                        {item.unlockLevel > 1 && (
-                          <div className="flex items-center space-x-1">
-                            <Star className="w-3 h-3 text-blue-400" />
-                            <span className="text-muted-foreground">Lv.{item.unlockLevel}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Purchase Button */}
-                    {item.isOwned ? (
-                      <Button variant="secondary" className="w-full text-xs h-8" disabled>
-                        ✓ Owned
-                      </Button>
-                    ) : (userStats?.level || 1) < item.unlockLevel ? (
-                      <Button variant="secondary" className="w-full text-xs h-8" disabled>
-                        <Lock className="w-3 h-3 mr-1" />
-                        Lv.{item.unlockLevel}
-                      </Button>
-                    ) : (userStats?.gold || 0) < item.price ? (
-                      <Button variant="destructive" className="w-full text-xs h-8" disabled>
-                        Need Gold
-                      </Button>
-                    ) : (
-                      <Button 
-                        onClick={() => handlePurchase(item)}
-                        disabled={purchaseItemMutation.isPending}
-                        className="w-full bg-game-primary hover:bg-blue-600 text-xs h-8"
-                      >
-                        Buy {item.price}g
-                      </Button>
-                    )}
-                  </CardContent>
-
-                  {/* Rarity Glow Effect */}
-                  {item.rarity === 'legendary' && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 animate-pulse" />
-                    </div>
-                  )}
-                  {item.rarity === 'epic' && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-pink-400/10 animate-pulse" />
-                    </div>
-                  )}
-                </Card>
-              ))}
-            </div>
-
-            {filterItemsByCategory(selectedCategory).length === 0 && (
-              <div className="text-center py-12">
-                <ShoppingCart className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">No Items Available</h3>
-                <p className="text-muted-foreground">Check back later for new {categories.find(c => c.id === selectedCategory)?.name.toLowerCase()}!</p>
-              </div>
-            )}
-          </TabsContent>
 
           {/* Consumables Tab */}
           <TabsContent value="consumables">
