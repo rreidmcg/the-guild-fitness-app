@@ -371,46 +371,7 @@ export default function Inventory() {
           </CardContent>
         </Card>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <Package className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-              <div className="text-lg font-bold">{(inventory as InventoryItem[] || []).length}</div>
-              <div className="text-xs text-muted-foreground">Items</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <Heart className="w-6 h-6 mx-auto mb-2 text-red-500" />
-              <div className="text-lg font-bold">
-                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.itemType === 'potion' && item.itemName.includes('healing')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
-              </div>
-              <div className="text-xs text-muted-foreground">Health Potions</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <Zap className="w-6 h-6 mx-auto mb-2 text-blue-500" />
-              <div className="text-lg font-bold">
-                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.itemType === 'potion' && item.itemName.includes('mana')).reduce((sum: number, item: InventoryItem) => sum + item.quantity, 0)}
-              </div>
-              <div className="text-xs text-muted-foreground">Mana Potions</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card border-border">
-            <CardContent className="p-4 text-center">
-              <Crown className="w-6 h-6 mx-auto mb-2 text-yellow-500" />
-              <div className="text-lg font-bold">
-                {(inventory as InventoryItem[] || []).filter((item: InventoryItem) => item.itemType !== 'potion').length}
-              </div>
-              <div className="text-xs text-muted-foreground">Equipment</div>
-            </CardContent>
-          </Card>
-        </div>
+
       </div>
 
 
