@@ -124,7 +124,7 @@ export default function Workouts() {
               <Button 
                 onClick={() => setLocation("/workout-builder")}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-game-primary hover:bg-blue-600"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 New Workout
@@ -262,7 +262,7 @@ export default function Workouts() {
         </Card>
 
         {/* Recent Workouts */}
-        <Card className="bg-transparent border-transparent">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-foreground mb-3">Recent Sessions</CardTitle>
             <div className="flex items-center space-x-2">
@@ -274,7 +274,7 @@ export default function Workouts() {
                 <Plus className="w-4 h-4 mr-2" />
                 New Workout
               </Button>
-              <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+              <Button variant="ghost" className="text-game-primary hover:text-blue-400">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View All
               </Button>
