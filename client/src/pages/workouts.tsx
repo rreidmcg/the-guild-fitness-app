@@ -124,7 +124,7 @@ export default function Workouts() {
               <Button 
                 onClick={() => setLocation("/workout-builder")}
                 size="sm"
-                className="bg-game-primary hover:bg-blue-600"
+                className="bg-blue-600 hover:bg-blue-700 text-blue-100"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 New Workout
