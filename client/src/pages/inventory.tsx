@@ -139,7 +139,7 @@ export default function Inventory() {
           </Tooltip>
         ) : (
           <div className="text-muted-foreground/50 text-xs">
-            {index + 1}
+            {/* Empty slot - no number */}
           </div>
         )}
       </div>
