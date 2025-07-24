@@ -6,6 +6,7 @@ import { AvatarDisplay } from "@/components/ui/avatar-display";
 import { StatBar } from "@/components/ui/stat-bar";
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { useLocation } from "wouter";
+import type { WorkoutSession, PersonalRecord, User } from "@shared/schema";
 import { 
   Dumbbell, 
   Plus, 
@@ -23,20 +24,20 @@ import {
 export default function Dashboard() {
   const [, setLocation] = useLocation();
 
-  const { data: userStats } = useQuery({
+  const { data: userStats } = useQuery<User>({
     queryKey: ["/api/user/stats"],
   });
 
-  const { data: workoutSessions } = useQuery({
+  const { data: workoutSessions } = useQuery<WorkoutSession[]>({
     queryKey: ["/api/workout-sessions"],
   });
 
-  const { data: personalRecords } = useQuery({
+  const { data: personalRecords } = useQuery<PersonalRecord[]>({
     queryKey: ["/api/personal-records"],
   });
 
-  const recentSessions = workoutSessions?.slice(0, 3) || [];
-  const topRecords = personalRecords?.slice(0, 4) || [];
+  const recentSessions = (workoutSessions || []).slice(0, 3);
+  const topRecords = (personalRecords || []).slice(0, 4);
 
   // Calculate active days
   const calculateActiveDays = () => {
@@ -44,8 +45,8 @@ export default function Dashboard() {
     
     // Get unique dates from workout sessions
     const uniqueDates = new Set(
-      workoutSessions.map(session => {
-        const date = new Date(session.completedAt);
+      workoutSessions.map((session: WorkoutSession) => {
+        const date = new Date(session.completedAt || new Date());
         return date.toDateString(); // This gives us "Mon Oct 09 2023" format
       })
     );
@@ -160,7 +161,7 @@ export default function Dashboard() {
                     <p>No workouts yet. Start your fitness journey!</p>
                   </div>
                 ) : (
-                  recentSessions.map((session) => (
+                  recentSessions.map((session: WorkoutSession) => (
                     <WorkoutCard key={session.id} session={session} />
                   ))
                 )}
@@ -168,7 +169,7 @@ export default function Dashboard() {
             </Card>
 
             {/* Personal Records */}
-            <Card className="bg-card border-border">
+            <Card className="tron-border tron-corners">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
@@ -186,7 +187,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {topRecords.map((record) => (
+                    {topRecords.map((record: PersonalRecord) => (
                       <Card key={record.id} className="bg-muted border-border">
                         <CardContent className="p-4">
                           <div className="flex items-center space-x-3 mb-2">
