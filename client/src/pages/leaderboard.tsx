@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Trophy, Medal, Crown, Star } from "lucide-react";
+import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Wind } from "lucide-react";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 
 export default function LeaderboardPage() {
@@ -12,7 +12,7 @@ export default function LeaderboardPage() {
       case 1:
         return <Crown className="w-5 h-5 text-yellow-500" />;
       case 2:
-        return <Medal className="w-5 h-5 text-gray-400" />;
+        return <Medal className="w-5 h-5 text-gray-300" />;
       case 3:
         return <Medal className="w-5 h-5 text-amber-600" />;
       default:
@@ -103,6 +103,26 @@ export default function LeaderboardPage() {
                             <Star className="w-3 h-3 text-yellow-500" />
                             <span className="text-sm text-muted-foreground">
                               {player.experience} XP
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-4 mt-2">
+                          <div className="flex items-center space-x-1">
+                            <Dumbbell className="w-3 h-3 text-red-400" />
+                            <span className="text-xs text-muted-foreground">
+                              {player.strength || 0}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Heart className="w-3 h-3 text-green-400" />
+                            <span className="text-xs text-muted-foreground">
+                              {player.stamina || 0}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Wind className="w-3 h-3 text-purple-400" />
+                            <span className="text-xs text-muted-foreground">
+                              {player.agility || 0}
                             </span>
                           </div>
                         </div>
