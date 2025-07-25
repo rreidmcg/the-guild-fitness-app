@@ -162,8 +162,115 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
   }
 ];
 
+// D-rank Dungeon Zones (8 weeks to complete - 2x E-rank time)
+const DRANK_DUNGEON_ZONES: DungeonZone[] = [
+  {
+    id: "crystal_mines",
+    name: "The Crystal Mines",
+    description: "Ancient tunnels where crystalline creatures guard precious gems",
+    background: "#2a1845",
+    storyIntro: "You descend into the glittering depths where crystal formations pulse with ethereal light. The air hums with magical energy as gem-encrusted guardians emerge from the walls...",
+    completionStory: "The mine's guardian crystal dims as you claim victory. Deeper passages reveal themselves, leading to even greater challenges.",
+    monsters: [
+      { id: 25, name: "Crystal Sprite", level: 6, maxHp: 35, currentHp: 35, attack: 7, goldReward: 6, description: "A tiny elemental made of living crystal" },
+      { id: 26, name: "Gem Crawler", level: 6, maxHp: 38, currentHp: 38, attack: 7, goldReward: 6, description: "An insectoid creature with diamond-hard shell" },
+      { id: 27, name: "Ruby Golem", level: 7, maxHp: 42, currentHp: 42, attack: 8, goldReward: 7, description: "A construct of animated precious stones" },
+      { id: 28, name: "Sapphire Guardian", level: 7, maxHp: 45, currentHp: 45, attack: 8, goldReward: 7, description: "A blue-crystal sentinel protecting the mines" },
+      { id: 29, name: "Diamond Beast", level: 8, maxHp: 48, currentHp: 48, attack: 9, goldReward: 8, description: "A fearsome creature with unbreakable hide" },
+      { id: 30, name: "Crystal Overlord", level: 8, maxHp: 55, currentHp: 55, attack: 9, goldReward: 12, description: "🏆 MINI-BOSS: Master of the crystal realm" }
+    ]
+  },
+  {
+    id: "shadow_temple",
+    name: "The Shadow Temple",
+    description: "A cursed sanctum where darkness itself takes physical form",
+    background: "#1a1a1a",
+    storyIntro: "You enter the abandoned temple where shadows writhe with malevolent life. Ancient altars drip with dark energy as spectral guardians rise from the void...",
+    completionStory: "Light returns to the temple as the shadow lord falls. The curse begins to lift, revealing pathways to forgotten chambers.",
+    monsters: [
+      { id: 31, name: "Shadow Wisp", level: 7, maxHp: 40, currentHp: 40, attack: 8, goldReward: 7, description: "A floating orb of concentrated darkness" },
+      { id: 32, name: "Shade Walker", level: 7, maxHp: 43, currentHp: 43, attack: 8, goldReward: 7, description: "A humanoid figure born from pure shadow" },
+      { id: 33, name: "Dark Priest", level: 8, maxHp: 46, currentHp: 46, attack: 9, goldReward: 8, description: "A corrupted cleric wielding shadow magic" },
+      { id: 34, name: "Void Stalker", level: 8, maxHp: 49, currentHp: 49, attack: 9, goldReward: 8, description: "A predator that hunts between dimensions" },
+      { id: 35, name: "Shadow Wraith", level: 9, maxHp: 52, currentHp: 52, attack: 10, goldReward: 9, description: "An ancient spirit of pure malice" },
+      { id: 36, name: "Umbral Lord", level: 9, maxHp: 60, currentHp: 60, attack: 10, goldReward: 15, description: "🏆 MINI-BOSS: Sovereign of the shadow realm" }
+    ]
+  },
+  {
+    id: "fire_caverns",
+    name: "The Fire Caverns",
+    description: "Volcanic tunnels where flame elementals guard molten treasures",
+    background: "#8B0000",
+    storyIntro: "Heat waves distort your vision as you enter the blazing caverns. Lava flows like rivers while fire elementals dance in the superheated air...",
+    completionStory: "The flames die down as the fire lord is vanquished. Cooled passages reveal the way to even hotter depths.",
+    monsters: [
+      { id: 37, name: "Flame Imp", level: 8, maxHp: 44, currentHp: 44, attack: 9, goldReward: 8, description: "A mischievous creature of living fire" },
+      { id: 38, name: "Magma Crawler", level: 8, maxHp: 47, currentHp: 47, attack: 9, goldReward: 8, description: "A salamander swimming through molten rock" },
+      { id: 39, name: "Fire Elemental", level: 9, maxHp: 50, currentHp: 50, attack: 10, goldReward: 9, description: "A being of pure flame and fury" },
+      { id: 40, name: "Lava Golem", level: 9, maxHp: 53, currentHp: 53, attack: 10, goldReward: 9, description: "A massive construct of hardened magma" },
+      { id: 41, name: "Inferno Beast", level: 10, maxHp: 56, currentHp: 56, attack: 11, goldReward: 10, description: "A legendary creature born from volcanic fury" },
+      { id: 42, name: "Flame Emperor", level: 10, maxHp: 65, currentHp: 65, attack: 11, goldReward: 18, description: "🏆 MINI-BOSS: Ruler of all fire elementals" }
+    ]
+  },
+  {
+    id: "ice_fortress",
+    name: "The Ice Fortress",
+    description: "A frozen citadel where winter's wrath has crystallized into living beings",
+    background: "#87CEEB",
+    storyIntro: "Your breath fogs in the bitter cold as you approach the ice-covered fortress. Frost creatures patrol the frozen halls while blizzards rage eternal...",
+    completionStory: "The eternal winter breaks as the ice queen falls. Melting walls reveal ancient secrets frozen in time.",
+    monsters: [
+      { id: 43, name: "Frost Sprite", level: 9, maxHp: 48, currentHp: 48, attack: 10, goldReward: 9, description: "A tiny fae creature of winter magic" },
+      { id: 44, name: "Ice Wolf", level: 9, maxHp: 51, currentHp: 51, attack: 10, goldReward: 9, description: "A predator with fangs of pure ice" },
+      { id: 45, name: "Blizzard Mage", level: 10, maxHp: 54, currentHp: 54, attack: 11, goldReward: 10, description: "A sorcerer commanding winter storms" },
+      { id: 46, name: "Glacier Giant", level: 10, maxHp: 57, currentHp: 57, attack: 11, goldReward: 10, description: "A massive humanoid of compressed ice" },
+      { id: 47, name: "Winter Wraith", level: 11, maxHp: 60, currentHp: 60, attack: 12, goldReward: 11, description: "A ghostly guardian of the frozen realm" },
+      { id: 48, name: "Ice Queen", level: 11, maxHp: 70, currentHp: 70, attack: 12, goldReward: 20, description: "🏆 MINI-BOSS: Eternal sovereign of winter" }
+    ]
+  }
+];
+
+// C-rank Dungeon Zones (16 weeks to complete - 2x D-rank time)
+const CRANK_DUNGEON_ZONES: DungeonZone[] = [
+  {
+    id: "void_sanctum",
+    name: "The Void Sanctum",
+    description: "A realm between dimensions where reality itself bends and breaks",
+    background: "#2F0A58",
+    storyIntro: "You step into a place that shouldn't exist, where purple void energy crackles through twisted space. Creatures from beyond reality guard forbidden knowledge...",
+    completionStory: "Reality stabilizes as the void lord is banished. The dimensional rifts seal, but echoes of greater powers still resonate.",
+    monsters: [
+      { id: 49, name: "Void Spawn", level: 12, maxHp: 65, currentHp: 65, attack: 13, goldReward: 12, description: "A writhing mass of dark energy" },
+      { id: 50, name: "Phase Beast", level: 12, maxHp: 68, currentHp: 68, attack: 13, goldReward: 12, description: "A creature that shifts between dimensions" },
+      { id: 51, name: "Reality Bender", level: 13, maxHp: 72, currentHp: 72, attack: 14, goldReward: 13, description: "An entity that warps space itself" },
+      { id: 52, name: "Cosmic Horror", level: 13, maxHp: 76, currentHp: 76, attack: 14, goldReward: 13, description: "A being that defies comprehension" },
+      { id: 53, name: "Dimensional Guardian", level: 14, maxHp: 80, currentHp: 80, attack: 15, goldReward: 14, description: "A sentinel of the void realm" },
+      { id: 54, name: "Void Sovereign", level: 14, maxHp: 90, currentHp: 90, attack: 15, goldReward: 25, description: "🏆 MINI-BOSS: Master of dimensional chaos" }
+    ]
+  },
+  {
+    id: "titan_ruins",
+    name: "The Titan Ruins",
+    description: "Colossal structures where ancient giants once ruled the world",
+    background: "#8B4513",
+    storyIntro: "You stand before massive stone ruins built for beings of impossible size. The very air thrums with ancient power as titan-touched guardians awaken...",
+    completionStory: "The titan's essence fades as their last guardian falls. The ruins begin to crumble, revealing artifacts of a forgotten age.",
+    monsters: [
+      { id: 55, name: "Stone Sentinel", level: 13, maxHp: 70, currentHp: 70, attack: 14, goldReward: 13, description: "A guardian statue brought to life" },
+      { id: 56, name: "Giant's Fist", level: 13, maxHp: 74, currentHp: 74, attack: 14, goldReward: 13, description: "A severed hand still obeying its master" },
+      { id: 57, name: "Colossal Golem", level: 14, maxHp: 78, currentHp: 78, attack: 15, goldReward: 14, description: "A massive construct of titan design" },
+      { id: 58, name: "Elder Giant", level: 14, maxHp: 82, currentHp: 82, attack: 15, goldReward: 14, description: "A diminished but still mighty titan" },
+      { id: 59, name: "Titan Warden", level: 15, maxHp: 86, currentHp: 86, attack: 16, goldReward: 15, description: "The last guardian of titan secrets" },
+      { id: 60, name: "Titan Remnant", level: 15, maxHp: 95, currentHp: 95, attack: 16, goldReward: 30, description: "🏆 MINI-BOSS: The echo of titanic power" }
+    ]
+  }
+];
+
 // Flatten all monsters for compatibility with existing code
 const ERANK_MONSTERS: Monster[] = ERANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
+const DRANK_MONSTERS: Monster[] = DRANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
+const CRANK_MONSTERS: Monster[] = CRANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
+const ALL_MONSTERS: Monster[] = [...ERANK_MONSTERS, ...DRANK_MONSTERS, ...CRANK_MONSTERS];
 
 export default function Battle() {
   const navigate = useNavigate();
@@ -656,9 +763,9 @@ export default function Battle() {
                 onClick={() => setIsMonsterListOpen(!isMonsterListOpen)}
               >
                 <div className="flex items-center space-x-2">
-                  <Skull className="w-6 h-6 text-red-400" />
+                  <Skull className="w-6 h-6 text-green-400" />
                   <span>E-rank Dungeons</span>
-                  <span className="text-sm text-muted-foreground">(Story Progression)</span>
+                  <span className="text-sm text-muted-foreground">(4 weeks - Beginner)</span>
                 </div>
                 {isMonsterListOpen ? (
                   <ChevronDown className="w-5 h-5" />
@@ -778,6 +885,68 @@ export default function Battle() {
                 </div>
               </CardContent>
             )}
+          </Card>
+
+          {/* D-rank Dungeon Zones */}
+          <Card className="bg-card border-border mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Skull className="w-6 h-6 text-blue-400" />
+                <span>D-rank Dungeons</span>
+                <span className="text-sm text-muted-foreground">(8 weeks - Intermediate)</span>
+                <span className="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded">LOCKED</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-sm italic">
+                Complete all E-rank dungeons to unlock intermediate challenges with elemental themes and greater rewards.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 opacity-50">
+                {DRANK_DUNGEON_ZONES.map((zone) => (
+                  <Card key={zone.id} className="bg-muted/30 border-muted">
+                    <CardContent className="p-3 text-center">
+                      <div 
+                        className="w-6 h-6 rounded-full mx-auto mb-2"
+                        style={{ backgroundColor: zone.background }}
+                      />
+                      <h3 className="font-medium text-sm">{zone.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* C-rank Dungeon Zones */}
+          <Card className="bg-card border-border mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Skull className="w-6 h-6 text-purple-400" />
+                <span>C-rank Dungeons</span>
+                <span className="text-sm text-muted-foreground">(16 weeks - Advanced)</span>
+                <span className="text-xs bg-purple-600/20 text-purple-400 px-2 py-1 rounded">LOCKED</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-sm italic">
+                Master D-rank content to face cosmic horrors and titanic guardians. Only the most dedicated adventurers reach this level.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 opacity-50">
+                {CRANK_DUNGEON_ZONES.map((zone) => (
+                  <Card key={zone.id} className="bg-muted/30 border-muted">
+                    <CardContent className="p-3 text-center">
+                      <div 
+                        className="w-6 h-6 rounded-full mx-auto mb-2"
+                        style={{ backgroundColor: zone.background }}
+                      />
+                      <h3 className="font-medium text-sm">{zone.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
           </Card>
         </div>
       </div>

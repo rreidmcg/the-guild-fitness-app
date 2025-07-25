@@ -73,7 +73,11 @@ Preferred communication style: Simple, everyday language.
   - **Strength**: Modifies damage (base 3 + strength/2 + 1-3 random)
   - **Stamina**: Determines HP (10 base + stamina * 3) and MP pool (primary contributor)
   - **Agility**: Determines evasion (5% per agility point, max 90%) and MP regeneration rate
-- **Battle System**: E-rank dungeon with monsters levels 1-10, turn-based combat
+- **Exponential Progression System**: Story-driven dungeon progression with increasing time commitment:
+  - **E-rank (4 weeks)**: 4 zones × 6 monsters each = 24 monsters (Lv 1-5)
+  - **D-rank (8 weeks)**: 4 zones × 6 monsters each = 24 monsters (Lv 6-11) 
+  - **C-rank (16 weeks)**: 2 zones × 6 monsters each = 12 monsters (Lv 12-15)
+  - Each rank takes twice as long as the previous, promoting sustainable 3-workout/week routine
 - Level progression with title system
 - Multi-stat exercises (e.g., power cleans award all three stats)
 - Achievement system through personal records
@@ -94,7 +98,7 @@ Preferred communication style: Simple, everyday language.
 4. **Workout Execution** → Real-time session tracking with timer and performance logging
 5. **Progress Calculation** → XP and stat gains based on workout completion
 6. **Character Progression** → Level ups and stat improvements reflected in dashboard
-7. **Battle System** → Fight monsters in E-rank dungeon to earn gold coins
+7. **Battle System** → Fight monsters in progressive dungeons (E/D/C-rank) to earn gold coins with exponential time investment
 8. **Shop System** → Use gold to purchase armor and equipment (planned feature)
 
 ## External Dependencies
