@@ -1780,41 +1780,79 @@ export default function Battle() {
             </div>
 
             {battleState.battleResult === 'victory' && (
-              <div className="text-center space-y-2">
-                <div className="text-lg font-bold text-yellow-400 mb-2">
-                  <Trophy className="w-5 h-5 inline mr-2" />
-                  VICTORY!
-                </div>
-                <div className="text-sm text-yellow-300 mb-2">
-                  You earned {battleState.monster.goldReward} gold!
-                </div>
-                <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
-                    FIGHT AGAIN
-                  </Button>
-                  <Button onClick={() => navigate("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
-                    HOME
-                  </Button>
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-gradient-to-br from-yellow-900/90 to-yellow-800/90 border-2 border-yellow-400 rounded-xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
+                  <div className="mb-6">
+                    <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-4 animate-bounce" />
+                    <h2 className="text-3xl font-bold text-yellow-100 mb-2">VICTORY!</h2>
+                    <p className="text-yellow-200">You have defeated {battleState.monster.name}!</p>
+                  </div>
+                  
+                  <div className="bg-black/30 rounded-lg p-4 mb-6 border border-yellow-400/30">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <Coins className="w-6 h-6 text-yellow-400" />
+                      <span className="text-xl font-bold text-yellow-100">Gold Earned</span>
+                    </div>
+                    <div className="text-4xl font-bold text-yellow-400">
+                      +{battleState.totalMonsters > 1 ? battleState.monster.goldReward * battleState.totalMonsters : battleState.monster.goldReward}
+                    </div>
+                    <div className="text-sm text-yellow-300 mt-1">
+                      {battleState.totalMonsters > 1 ? `${battleState.monster.goldReward} × ${battleState.totalMonsters} monsters` : ''}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Button 
+                      onClick={returnToMonsterList} 
+                      className="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 text-lg"
+                    >
+                      FIGHT AGAIN
+                    </Button>
+                    <Button 
+                      onClick={() => navigate("/")} 
+                      variant="outline"
+                      className="w-full border-yellow-400 text-yellow-100 hover:bg-yellow-400/20 font-bold py-3 text-lg"
+                    >
+                      RETURN HOME
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
 
             {battleState.battleResult === 'defeat' && (
-              <div className="text-center space-y-2">
-                <div className="text-lg font-bold text-red-400 mb-2">
-                  <Skull className="w-5 h-5 inline mr-2" />
-                  DEFEAT!
-                </div>
-                <div className="text-sm text-red-300 mb-2">
-                  You were defeated by {battleState.monster.name}...
-                </div>
-                <div className="grid grid-cols-2 gap-1">
-                  <Button onClick={returnToMonsterList} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
-                    TRY AGAIN
-                  </Button>
-                  <Button onClick={() => navigate("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
-                    HOME
-                  </Button>
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-gradient-to-br from-red-900/90 to-red-800/90 border-2 border-red-400 rounded-xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
+                  <div className="mb-6">
+                    <Skull className="w-16 h-16 text-red-400 mx-auto mb-4 animate-pulse" />
+                    <h2 className="text-3xl font-bold text-red-100 mb-2">DEFEAT!</h2>
+                    <p className="text-red-200">You were defeated by {battleState.monster.name}...</p>
+                  </div>
+                  
+                  <div className="bg-black/30 rounded-lg p-4 mb-6 border border-red-400/30">
+                    <div className="flex items-center justify-center space-x-2 mb-2">
+                      <Skull className="w-6 h-6 text-red-400" />
+                      <span className="text-xl font-bold text-red-100">No Rewards</span>
+                    </div>
+                    <div className="text-2xl font-bold text-red-400">+0 Gold</div>
+                    <div className="text-sm text-red-300 mt-1">Victory is required for rewards</div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Button 
+                      onClick={returnToMonsterList} 
+                      className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 text-lg"
+                    >
+                      TRY AGAIN
+                    </Button>
+                    <Button 
+                      onClick={() => navigate("/")} 
+                      variant="outline"
+                      className="w-full border-red-400 text-red-100 hover:bg-red-400/20 font-bold py-3 text-lg"
+                    >
+                      RETURN HOME
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

@@ -94,9 +94,13 @@ Preferred communication style: Simple, everyday language.
 ### User Interface
 - Dark gaming theme with custom color palette
 - Mobile-responsive design with bottom navigation
-- Bottom navigation bar with Stats, Workouts, and Settings pages
+- Bottom navigation bar with Stats, Workouts, Battle, Shop, and Leaderboard pages
+- **Reorganized Navigation**: Storage icon moved to thin currency header, replaced with leaderboard button in bottom menu
+- **Currency Header**: Thin header displaying gold, XP, level, and storage access across all pages
+- **Enhanced Battle Results**: Full-screen modal showing detailed victory/defeat information with prominent gold rewards
 - Custom 2D avatar system with visual progression based on stats
 - Real-time workout session interface
+- Leaderboard page ranking all players by total experience points earned
 - Dedicated pages for different app functions
 
 ## Data Flow
