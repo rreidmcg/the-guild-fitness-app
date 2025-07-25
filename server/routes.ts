@@ -8,9 +8,18 @@ import { authUtils } from "./auth";
 import { validateUsername, sanitizeUsername } from "./username-validation";
 import { AtrophySystem } from "./atrophy-system";
 import { calculateStatXpGains, calculateStatLevel } from "./stat-progression";
+import Stripe from "stripe";
 
 // Simple in-memory session storage (in production, use proper session management)
 let currentUserId: number = 1;
+
+// Initialize Stripe
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2025-06-30.basil",
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Leaderboard route
@@ -1126,6 +1135,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error purchasing potion:", error);
       res.status(500).json({ error: "Failed to purchase potion" });
+    }
+  });
+
+  // Stripe payment routes for real money purchases
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { amount, goldAmount, description } = req.body;
+      
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Invalid amount" });
+      }
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          goldAmount: goldAmount?.toString() || "0",
+          userId: currentUserId.toString(),
+          description: description || "Gold purchase"
+        }
+      });
+
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        goldAmount 
+      });
+    } catch (error: any) {
+      console.error("Stripe payment intent error:", error);
+      res.status(500).json({ 
+        error: "Error creating payment intent: " + error.message 
+      });
+    }
+  });
+
+  // Stripe webhook to handle successful payments
+  app.post("/api/stripe-webhook", async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig!, process.env.STRIPE_WEBHOOK_SECRET!);
+    } catch (err: any) {
+      console.log(`Webhook signature verification failed.`, err.message);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle the payment_intent.succeeded event
+    if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      
+      if (paymentIntent.metadata) {
+        const userId = parseInt(paymentIntent.metadata.userId);
+        const goldAmount = parseInt(paymentIntent.metadata.goldAmount);
+        
+        if (userId && goldAmount > 0) {
+          try {
+            // Add gold to user's account
+            const [user] = await db
+              .select()
+              .from(users)
+              .where(eq(users.id, userId));
+            
+            if (user) {
+              await db
+                .update(users)
+                .set({ gold: (user.gold || 0) + goldAmount })
+                .where(eq(users.id, userId));
+              
+              console.log(`Added ${goldAmount} gold to user ${userId} after successful payment`);
+            }
+          } catch (error) {
+            console.error("Error adding gold after payment:", error);
+          }
+        }
+      }
+    }
+
+    res.json({ received: true });
+  });
+
+  // Get payment success route (for redirect after payment)
+  app.get("/api/payment-success", async (req, res) => {
+    try {
+      const { payment_intent } = req.query;
+      
+      if (payment_intent) {
+        const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent as string);
+        
+        if (paymentIntent.status === 'succeeded' && paymentIntent.metadata) {
+          const userId = parseInt(paymentIntent.metadata.userId);
+          const goldAmount = parseInt(paymentIntent.metadata.goldAmount);
+          
+          res.json({
+            success: true,
+            goldAmount,
+            message: `Successfully purchased ${goldAmount} gold!`
+          });
+        } else {
+          res.status(400).json({ error: "Payment not completed" });
+        }
+      } else {
+        res.status(400).json({ error: "No payment intent provided" });
+      }
+    } catch (error: any) {
+      res.status(500).json({ error: "Error verifying payment: " + error.message });
     }
   });
 

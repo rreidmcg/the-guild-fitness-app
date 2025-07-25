@@ -22,6 +22,8 @@ import SignupPage from "@/pages/signup";
 import LoginPage from "@/pages/login";
 import AdminDashboard from "@/pages/admin";
 import Leaderboard from "@/pages/leaderboard";
+import Checkout from "@/pages/checkout";
+import PaymentSuccess from "@/pages/payment-success";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -41,6 +43,8 @@ function Router() {
       <Route path="/signup" component={SignupPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/payment-success" component={PaymentSuccess} />
       <Route component={NotFound} />
     </Switch>
   );
