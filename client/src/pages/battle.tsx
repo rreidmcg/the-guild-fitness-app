@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 // Progress component will be styled manually since it might not exist
@@ -99,7 +99,7 @@ const ERANK_MONSTERS: Monster[] = [
 ];
 
 export default function Battle() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [isMonsterListOpen, setIsMonsterListOpen] = useState(true);
@@ -108,6 +108,13 @@ export default function Battle() {
   // Persistent health state (survives between battles)
   const [persistentPlayerHp, setPersistentPlayerHp] = useState<number | null>(null);
   const [lastRegenTime, setLastRegenTime] = useState<number>(Date.now());
+  
+  // Animation states
+  const [isPlayerAttacking, setIsPlayerAttacking] = useState(false);
+  const [isMonsterAttacking, setIsMonsterAttacking] = useState(false);
+  const [isPlayerTakingDamage, setIsPlayerTakingDamage] = useState(false);
+  const [isMonsterTakingDamage, setIsMonsterTakingDamage] = useState(false);
+  const [damageNumbers, setDamageNumbers] = useState<Array<{id: number, damage: number, x: number, y: number, isPlayer: boolean}>>([]);
   
 
 
@@ -252,10 +259,35 @@ export default function Battle() {
       return;
     }
 
+    // Start player attack animation
+    setIsPlayerAttacking(true);
+    setTimeout(() => setIsPlayerAttacking(false), 600);
+
     // Strength modifies damage (base 3 damage + strength bonus)
     const playerStrength = userStats?.strength || 5;
     const baseDamage = 3 + Math.floor(playerStrength / 2);
     const damage = baseDamage + Math.floor(Math.random() * 3); // 1-3 random bonus
+
+    // Add damage number animation after a short delay (when attack connects)
+    setTimeout(() => {
+      setIsMonsterTakingDamage(true);
+      setTimeout(() => setIsMonsterTakingDamage(false), 400);
+      
+      // Add floating damage number
+      const damageId = Date.now();
+      setDamageNumbers(prev => [...prev, {
+        id: damageId,
+        damage,
+        x: 60 + Math.random() * 20, // Random position around monster
+        y: 40 + Math.random() * 20,
+        isPlayer: false
+      }]);
+      
+      // Remove damage number after animation
+      setTimeout(() => {
+        setDamageNumbers(prev => prev.filter(d => d.id !== damageId));
+      }, 1000);
+    }, 300);
 
     const newMonsterHp = Math.max(0, battleState.monster.currentHp - damage);
     const isMonsterDefeated = newMonsterHp === 0;
@@ -329,6 +361,10 @@ export default function Battle() {
   const monsterAttack = () => {
     if (!battleState || battleState.battleResult !== 'ongoing') return;
 
+    // Start monster attack animation
+    setIsMonsterAttacking(true);
+    setTimeout(() => setIsMonsterAttacking(false), 600);
+
     // Agility determines evasion chance (5% per agility point, max 90%)
     const playerAgility = userStats?.agility || 5;
     const evasionChance = Math.min(0.9, (playerAgility * 0.05));
@@ -347,6 +383,28 @@ export default function Battle() {
     }
 
     const damage = battleState.monster.attack;
+    
+    // Add damage animation and floating number after a short delay
+    setTimeout(() => {
+      setIsPlayerTakingDamage(true);
+      setTimeout(() => setIsPlayerTakingDamage(false), 400);
+      
+      // Add floating damage number
+      const damageId = Date.now();
+      setDamageNumbers(prev => [...prev, {
+        id: damageId,
+        damage,
+        x: 20 + Math.random() * 20, // Random position around player
+        y: 40 + Math.random() * 20,
+        isPlayer: true
+      }]);
+      
+      // Remove damage number after animation
+      setTimeout(() => {
+        setDamageNumbers(prev => prev.filter(d => d.id !== damageId));
+      }, 1000);
+    }, 300);
+
     const newPlayerHp = Math.max(0, battleState.playerHp - damage);
     const isPlayerDefeated = newPlayerHp === 0;
 
@@ -455,7 +513,7 @@ export default function Battle() {
                   <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
                 </div>
                 <Button 
-                  onClick={() => setLocation('/settings')}
+                  onClick={() => navigate('/settings')}
                   size="sm"
                   variant="outline"
                   className="p-2"
@@ -694,17 +752,36 @@ export default function Battle() {
               </div>
             </div>
             
-            <div className="w-44 h-44 flex items-end justify-center">
+            <div className="w-44 h-44 flex items-end justify-center relative">
               <img 
                 src={battlePlayerImage} 
                 alt="Player Character"
-                className="w-40 h-40 object-contain"
+                className={`w-40 h-40 object-contain transition-all duration-300 ${
+                  isPlayerAttacking ? 'translate-x-8 scale-110' : ''
+                } ${
+                  isPlayerTakingDamage ? 'animate-pulse' : ''
+                }`}
                 style={{ 
                   imageRendering: 'pixelated',
-                  filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))',
-                  transform: 'translateY(-15px)'
+                  filter: `drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) ${isPlayerTakingDamage ? 'hue-rotate(0deg) brightness(1.5) saturate(2)' : ''}`,
+                  transform: `translateY(-15px) ${isPlayerAttacking ? 'translateX(20px) scale(1.1)' : ''}`
                 }}
               />
+              {/* Damage numbers for player */}
+              {damageNumbers.filter(d => d.isPlayer).map(damage => (
+                <div
+                  key={damage.id}
+                  className="absolute pointer-events-none text-red-500 font-bold text-xl animate-ping"
+                  style={{
+                    left: `${damage.x}%`,
+                    top: `${damage.y}%`,
+                    animation: 'damageFloat 1s ease-out forwards',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                  }}
+                >
+                  -{damage.damage}
+                </div>
+              ))}
             </div>
           </div>
 
@@ -751,6 +828,21 @@ export default function Battle() {
                   </div>
                 </div>
                 <div className="w-32 h-24 flex items-end justify-center relative">
+                  {/* Damage numbers for monster */}
+                  {damageNumbers.filter(d => !d.isPlayer).map(damage => (
+                    <div
+                      key={damage.id}
+                      className="absolute pointer-events-none text-yellow-400 font-bold text-xl animate-ping"
+                      style={{
+                        left: `${damage.x}%`,
+                        top: `${damage.y}%`,
+                        animation: 'damageFloat 1s ease-out forwards',
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                      }}
+                    >
+                      -{damage.damage}
+                    </div>
+                  ))}
                   {/* Active monster highlight marker - Red oval ring shadow */}
                   {battleState.currentMonsterIndex === 0 && (
                     <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-28 h-8 border-2 border-red-500 opacity-80 animate-pulse"
@@ -765,10 +857,15 @@ export default function Battle() {
                     <img 
                       src={battleState.monster.image} 
                       alt="Green Slime #1"
-                      className="w-20 h-20 object-contain"
+                      className={`w-20 h-20 object-contain transition-all duration-300 ${
+                        isMonsterAttacking ? '-translate-x-8 scale-110' : ''
+                      } ${
+                        isMonsterTakingDamage ? 'animate-pulse' : ''
+                      }`}
                       style={{ 
                         imageRendering: 'pixelated',
-                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                        filter: `drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) ${isMonsterTakingDamage ? 'hue-rotate(0deg) brightness(1.5) saturate(2)' : ''}`,
+                        transform: `${isMonsterAttacking ? 'translateX(-20px) scale(1.1)' : ''}`
                       }}
                     />
                   ) : battleState.remainingMonsters.length > 0 && battleState.remainingMonsters[0] && battleState.remainingMonsters[0].image ? (
@@ -862,6 +959,21 @@ export default function Battle() {
               </div>
               
               <div className="w-36 h-36 flex items-end justify-center relative">
+                {/* Damage numbers for single monster */}
+                {damageNumbers.filter(d => !d.isPlayer).map(damage => (
+                  <div
+                    key={damage.id}
+                    className="absolute pointer-events-none text-yellow-400 font-bold text-xl animate-ping"
+                    style={{
+                      left: `${damage.x}%`,
+                      top: `${damage.y}%`,
+                      animation: 'damageFloat 1s ease-out forwards',
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                    }}
+                  >
+                    -{damage.damage}
+                  </div>
+                ))}
                 {/* Active monster highlight marker - Red oval ring shadow */}
                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-10 border-2 border-red-500 opacity-80 animate-pulse"
                      style={{ 
@@ -874,10 +986,15 @@ export default function Battle() {
                   <img 
                     src={battleState.monster.image} 
                     alt={battleState.monster.name}
-                    className="w-32 h-32 object-contain"
+                    className={`w-32 h-32 object-contain transition-all duration-300 ${
+                      isMonsterAttacking ? '-translate-x-8 scale-110' : ''
+                    } ${
+                      isMonsterTakingDamage ? 'animate-pulse' : ''
+                    }`}
                     style={{ 
                       imageRendering: 'pixelated',
-                      filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                      filter: `drop-shadow(2px 2px 4px rgba(0,0,0,0.8)) ${isMonsterTakingDamage ? 'hue-rotate(0deg) brightness(1.5) saturate(2)' : ''}`,
+                      transform: `${isMonsterAttacking ? 'translateX(-20px) scale(1.1)' : ''}`
                     }}
                   />
                 ) : (
