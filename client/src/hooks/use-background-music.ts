@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'wouter';
 import defaultMusicFile from '@assets/Pixelated Dreams ext v1.2_1753061935579.mp3';
-import battleMusicFile from '@assets/battle-cry_1753222802553.mp3';
+import battleMusicFile from '@assets/finale_1753453869533.mp3';
 
 export function useBackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
