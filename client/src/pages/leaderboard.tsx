@@ -69,7 +69,7 @@ export default function LeaderboardPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {(leaderboard as any[])?.map((player: any, index: number) => {
+            {Array.isArray(leaderboard) && leaderboard.map((player: any, index: number) => {
               const rank = index + 1;
               return (
                 <div
@@ -145,7 +145,7 @@ export default function LeaderboardPage() {
           </div>
         )}
 
-        {leaderboard && (leaderboard as any[]).length === 0 && (
+        {leaderboard && Array.isArray(leaderboard) && leaderboard.length === 0 ? (
           <div className="text-center py-12">
             <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-foreground mb-2">No Rankings Yet</h3>
@@ -153,7 +153,7 @@ export default function LeaderboardPage() {
               Complete workouts to earn XP and appear on the leaderboard!
             </p>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

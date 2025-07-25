@@ -129,19 +129,19 @@ export default function Stats() {
     return Math.round(baseWater); // in ml
   };
   
-  const { data: userStats } = useQuery({
+  const { data: userStats, isLoading: userStatsLoading } = useQuery({
     queryKey: ["/api/user/stats"],
   });
 
-  const { data: workoutSessions } = useQuery({
+  const { data: workoutSessions, isLoading: workoutSessionsLoading } = useQuery({
     queryKey: ["/api/workout-sessions"],
   });
 
-  const { data: personalRecords } = useQuery({
+  const { data: personalRecords, isLoading: personalRecordsLoading } = useQuery({
     queryKey: ["/api/personal-records"],
   });
 
-  const { data: inventory } = useQuery({
+  const { data: inventory, isLoading: inventoryLoading } = useQuery({
     queryKey: ["/api/inventory"],
   });
 
@@ -206,23 +206,26 @@ export default function Stats() {
     },
   });
 
-  const recentSessions = workoutSessions?.slice(0, 3) || [];
-  const topRecords = personalRecords?.slice(0, 4) || [];
+  const recentSessions = Array.isArray(workoutSessions) ? workoutSessions.slice(0, 3) : [];
+  const topRecords = Array.isArray(personalRecords) ? personalRecords.slice(0, 4) : [];
 
+  // Safely cast userStats and provide fallbacks
+  const safeUserStats = (userStats as any) || {};
+  
   // Calculate stats
   const calculateTotalBattles = () => {
     // For now, we'll use the user's battle count from stats
     // This will be updated when we have battle history
-    return userStats?.battlesWon || 0;
+    return safeUserStats.battlesWon || 0;
   };
 
   // Use streak from user stats instead of calculating
-  const streak = userStats?.currentStreak || 0;
+  const streak = safeUserStats.currentStreak || 0;
 
   const totalBattles = calculateTotalBattles();
-  const totalVolumeThisMonth = workoutSessions?.reduce((total, session) => total + (session.totalVolume || 0), 0) || 0;
-  const currentXP = userStats?.experience || 0;
-  const currentLevel = userStats?.level || 1;
+  const totalVolumeThisMonth = Array.isArray(workoutSessions) ? workoutSessions.reduce((total: number, session: any) => total + (session.totalVolume || 0), 0) : 0;
+  const currentXP = safeUserStats.experience || 0;
+  const currentLevel = safeUserStats.level || 1;
   const xpForNextLevel = currentLevel * 1000;
   const xpProgress = (currentXP % 1000) / 1000 * 100;
 
@@ -236,6 +239,20 @@ export default function Stats() {
     const titleIndex = Math.min(Math.floor(level / 5), titles.length - 1);
     return titles[titleIndex];
   };
+
+  if (userStatsLoading || workoutSessionsLoading || personalRecordsLoading || inventoryLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground pb-20">
+        <CurrencyHeader />
+        <div className="max-w-4xl mx-auto p-6 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading your stats...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
@@ -476,19 +493,19 @@ export default function Stats() {
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
-              {userStats?.currentTitle && (
+              {safeUserStats.currentTitle && (
                 <div className="mb-2">
-                  <span className={getTitleComponent(userStats.currentTitle, "md").className}>
-                    {userStats.currentTitle}
+                  <span className={getTitleComponent(safeUserStats.currentTitle, "md").className}>
+                    {safeUserStats.currentTitle}
                   </span>
                 </div>
               )}
-              <h3 className="text-2xl font-bold mb-6 text-foreground">{userStats?.username || 'Player'}</h3>
+              <h3 className="text-2xl font-bold mb-6 text-foreground">{safeUserStats.username || 'Player'}</h3>
             </div>
 
             {/* 2D Avatar Display */}
             <div className="flex flex-col items-center mb-6">
-              <Avatar2D user={userStats} size="lg" />
+              <Avatar2D user={safeUserStats} size="lg" />
               
               {/* Character Stats Below Avatar */}
               <div className="text-center mt-6">
@@ -529,14 +546,14 @@ export default function Stats() {
                   <span className="font-semibold text-red-400">Health</span>
                 </div>
                 <span className="text-sm text-red-300">
-                  {userStats?.currentHp || 0} / {userStats?.maxHp || 40}
+                  {safeUserStats.currentHp || 0} / {safeUserStats.maxHp || 40}
                 </span>
               </div>
               <div className="w-full bg-red-900/40 rounded-full h-3">
                 <div 
                   className="bg-gradient-to-r from-red-500 to-red-400 h-3 rounded-full transition-all duration-300"
                   style={{
-                    width: `${Math.max(0, Math.min(100, ((userStats?.currentHp || 0) / (userStats?.maxHp || 1)) * 100))}%`
+                    width: `${Math.max(0, Math.min(100, ((safeUserStats.currentHp || 0) / (safeUserStats.maxHp || 1)) * 100))}%`
                   }}
                 />
               </div>
@@ -552,9 +569,9 @@ export default function Stats() {
                     major_healing: 'Major', 
                     full_healing: 'Full'
                   };
-                  const quantity = inventory?.find((item: any) => 
+                  const quantity = Array.isArray(inventory) ? (inventory.find((item: any) => 
                     item.itemName === potionType && item.itemType === 'potion'
-                  )?.quantity || 0;
+                  )?.quantity || 0) : 0;
                   
                   return quantity > 0 ? (
                     <Button
@@ -570,7 +587,7 @@ export default function Stats() {
                     </Button>
                   ) : null;
                 })}
-                {(!inventory || inventory.filter((item: any) => item.itemType === 'potion').length === 0) && (
+                {(!Array.isArray(inventory) || inventory.filter((item: any) => item.itemType === 'potion').length === 0) && (
                   <p className="text-xs text-muted-foreground">Visit the shop to buy healing potions</p>
                 )}
               </div>
@@ -584,14 +601,14 @@ export default function Stats() {
                   <span className="font-semibold text-blue-400">Magic Points</span>
                 </div>
                 <span className="text-sm text-blue-300">
-                  {userStats?.currentMp || 0} / {userStats?.maxMp || 20}
+                  {safeUserStats.currentMp || 0} / {safeUserStats.maxMp || 20}
                 </span>
               </div>
               <div className="w-full bg-blue-900/40 rounded-full h-3">
                 <div 
                   className="bg-gradient-to-r from-blue-500 to-blue-400 h-3 rounded-full transition-all duration-300"
                   style={{
-                    width: `${Math.max(0, Math.min(100, ((userStats?.currentMp || 0) / (userStats?.maxMp || 1)) * 100))}%`
+                    width: `${Math.max(0, Math.min(100, ((safeUserStats.currentMp || 0) / (safeUserStats.maxMp || 1)) * 100))}%`
                   }}
                 />
               </div>
@@ -607,9 +624,9 @@ export default function Stats() {
                     major_mana: 'Major',
                     full_mana: 'Full'
                   };
-                  const quantity = inventory?.find((item: any) => 
+                  const quantity = Array.isArray(inventory) ? (inventory.find((item: any) => 
                     item.itemName === potionType && item.itemType === 'potion'
-                  )?.quantity || 0;
+                  )?.quantity || 0) : 0;
                   
                   return quantity > 0 ? (
                     <Button
@@ -625,7 +642,7 @@ export default function Stats() {
                     </Button>
                   ) : null;
                 })}
-                {(!inventory || inventory.filter((item: any) => 
+                {(!Array.isArray(inventory) || inventory.filter((item: any) => 
                   item.itemType === 'potion' && item.itemName.includes('mana')
                 ).length === 0) && (
                   <p className="text-xs text-muted-foreground">Visit the shop to buy mana potions</p>
@@ -637,22 +654,22 @@ export default function Stats() {
             <div className="space-y-4">
               <EnhancedStatBar
                 label="Strength"
-                statLevel={userStats?.strength || 0}
-                totalXp={userStats?.strengthXp || 0}
+                statLevel={safeUserStats.strength || 0}
+                totalXp={safeUserStats.strengthXp || 0}
                 color="text-red-400"
                 icon={<Dumbbell className="w-5 h-5" />}
               />
               <EnhancedStatBar
                 label="Stamina"
-                statLevel={userStats?.stamina || 0}
-                totalXp={userStats?.staminaXp || 0}
+                statLevel={safeUserStats.stamina || 0}
+                totalXp={safeUserStats.staminaXp || 0}
                 color="text-yellow-400"
                 icon={<Heart className="w-5 h-5" />}
               />
               <EnhancedStatBar
                 label="Agility"
-                statLevel={userStats?.agility || 0}
-                totalXp={userStats?.agilityXp || 0}
+                statLevel={safeUserStats.agility || 0}
+                totalXp={safeUserStats.agilityXp || 0}
                 color="text-green-400"
                 icon={<Zap className="w-5 h-5" />}
               />
@@ -666,7 +683,7 @@ export default function Stats() {
             <div className="flex items-center justify-center mb-2">
               <Coins className="w-6 h-6 text-yellow-400" />
             </div>
-            <div className="text-2xl font-bold text-primary">{userStats?.gold || 0}</div>
+            <div className="text-2xl font-bold text-primary">{safeUserStats.gold || 0}</div>
             <div className="text-xs font-semibold text-muted-foreground">Gold Coins</div>
           </div>
           
@@ -684,11 +701,11 @@ export default function Stats() {
             </div>
             <div className="text-2xl font-bold text-orange-400">{streak}</div>
             <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
-            {(userStats?.streakFreezeCount || 0) > 0 && (
+            {(safeUserStats.streakFreezeCount || 0) > 0 && (
               <div className="space-y-1 mt-2">
                 <div className="flex items-center justify-center gap-1">
                   <Shield className="w-3 h-3 text-blue-500" />
-                  <span className="text-xs text-blue-500">{userStats?.streakFreezeCount} Freeze{userStats?.streakFreezeCount !== 1 ? 's' : ''}</span>
+                  <span className="text-xs text-blue-500">{safeUserStats.streakFreezeCount} Freeze{safeUserStats.streakFreezeCount !== 1 ? 's' : ''}</span>
                 </div>
                 <Button
                   size="sm"
