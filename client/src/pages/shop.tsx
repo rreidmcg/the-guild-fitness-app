@@ -408,16 +408,7 @@ export default function Shop() {
               <h1 className="text-2xl font-bold text-foreground">Shop</h1>
               <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
-            <div className="flex items-center space-x-3">
-              <Button 
-                onClick={() => navigate('/settings')}
-                size="sm"
-                variant="outline"
-                className="p-2"
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
+
           </div>
         </div>
       </div>

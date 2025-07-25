@@ -164,14 +164,6 @@ export default function Workouts() {
                 <Plus className="w-4 h-4 mr-1" />
                 New Workout
               </Button>
-              <Button 
-                onClick={() => navigate('/settings')}
-                size="sm"
-                variant="outline"
-                className="p-2"
-              >
-                <Settings className="w-4 h-4" />
-              </Button>
             </div>
           </div>
         </div>
