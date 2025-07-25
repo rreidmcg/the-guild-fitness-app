@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 export default function Workouts() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -123,7 +123,7 @@ export default function Workouts() {
       description: `Opening ${program.name} program details...`,
     });
     // Navigate to workout builder
-    setLocation("/workout-builder");
+    navigate("/workout-builder");
   };
 
   const handleStartProgram = (program: WorkoutProgram) => {
@@ -132,7 +132,7 @@ export default function Workouts() {
       description: `Beginning ${program.name} workout session...`,
     });
     // Navigate to workout session with program ID
-    setLocation(`/workout-session/${program.id}`);
+    navigate(`/workout-session/${program.id}`);
   };
 
   const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein' | 'sleep', checked: boolean) => {
@@ -154,7 +154,7 @@ export default function Workouts() {
             </div>
             <div className="flex items-center space-x-3">
               <Button 
-                onClick={() => setLocation("/workout-builder")}
+                onClick={() => navigate("/workout-builder")}
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-blue-100"
               >
@@ -162,7 +162,7 @@ export default function Workouts() {
                 New Workout
               </Button>
               <Button 
-                onClick={() => setLocation('/settings')}
+                onClick={() => navigate('/settings')}
                 size="sm"
                 variant="outline"
                 className="p-2"
@@ -331,7 +331,7 @@ export default function Workouts() {
             <CardTitle className="text-xl font-bold text-foreground mb-3">Recent Sessions</CardTitle>
             <div className="flex items-center space-x-2">
               <Button 
-                onClick={() => setLocation('/workout-builder')}
+                onClick={() => navigate('/workout-builder')}
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >

@@ -22,6 +22,7 @@ import {
   Zap
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useNavigate } from "@/hooks/use-navigate";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import minorHealingPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753214477623.png";
@@ -88,6 +89,7 @@ const rarityColors = {
 export default function Shop() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("consumables");
 
   const [selectedConsumableCategory, setSelectedConsumableCategory] = useState("all");
@@ -422,7 +424,7 @@ export default function Shop() {
                 </Button>
               )}
               <Button 
-                onClick={() => setLocation('/settings')}
+                onClick={() => navigate('/settings')}
                 size="sm"
                 variant="outline"
                 className="p-2"
