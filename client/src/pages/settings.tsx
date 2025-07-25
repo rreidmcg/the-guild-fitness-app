@@ -103,7 +103,7 @@ export default function Settings() {
     return unlockedTitles;
   };
 
-  const availableTitles = getAvailableTitles(userStats?.level || 1, userStats?.currentTitle || "");
+  const availableTitles = getAvailableTitles((userStats as any)?.level || 1, (userStats as any)?.currentTitle || "");
 
   // Title update mutation
   const updateTitleMutation = useMutation({
@@ -158,19 +158,19 @@ export default function Settings() {
           <CardContent className="space-y-6">
             <div className="flex items-center space-x-6">
               <div className="flex-shrink-0">
-                <Avatar2D size="sm" user={userStats} />
+                <Avatar2D size="sm" user={userStats as any} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
-                  <h3 className="text-lg font-semibold text-foreground">{userStats?.username || 'Fitness Warrior'}</h3>
-                  {userStats?.currentTitle && (
+                  <h3 className="text-lg font-semibold text-foreground">{(userStats as any)?.username || 'Fitness Warrior'}</h3>
+                  {(userStats as any)?.currentTitle && (
                     <span className="px-2 py-1 text-xs font-bold bg-yellow-500/20 text-yellow-400 rounded border border-yellow-500/30">
-                      {userStats.currentTitle}
+                      {(userStats as any).currentTitle}
                     </span>
                   )}
                 </div>
-                <p className="text-muted-foreground">Level {userStats?.level || 1} • {userStats?.experience || 0} XP</p>
-                <p className="text-sm text-muted-foreground">Avatar: {userStats?.gender === 'female' ? 'Female' : 'Male'}</p>
+                <p className="text-muted-foreground">Level {(userStats as any)?.level || 1} • {(userStats as any)?.experience || 0} XP</p>
+                <p className="text-sm text-muted-foreground">Avatar: {(userStats as any)?.gender === 'female' ? 'Female' : 'Male'}</p>
               </div>
             </div>
 
@@ -188,7 +188,7 @@ export default function Settings() {
                 </div>
                 <div className="w-48">
                   <Select 
-                    value={userStats?.currentTitle || "Recruit"} 
+                    value={(userStats as any)?.currentTitle || "Recruit"} 
                     onValueChange={(value) => updateTitleMutation.mutate(value)}
                     disabled={updateTitleMutation.isPending}
                   >
@@ -224,8 +224,8 @@ export default function Settings() {
                     { title: "Legend", level: 30 },
                     { title: "Mythic", level: 40 },
                   ].map(({ title, level }) => {
-                    const isUnlocked = (userStats?.level || 1) >= level;
-                    const isCurrent = userStats?.currentTitle === title;
+                    const isUnlocked = ((userStats as any)?.level || 1) >= level;
+                    const isCurrent = (userStats as any)?.currentTitle === title;
                     return (
                       <div 
                         key={title}
@@ -256,7 +256,7 @@ export default function Settings() {
                   })}
                 </div>
                 <p className="text-xs text-muted-foreground mt-3">
-                  Current Level: {userStats?.level || 1} • Complete workouts and battles to level up and unlock new titles!
+                  Current Level: {(userStats as any)?.level || 1} • Complete workouts and battles to level up and unlock new titles!
                 </p>
               </div>
             </div>
@@ -432,7 +432,7 @@ export default function Settings() {
                 <Smartphone className="w-4 h-4 mr-2" />
                 Contact Support
               </Button>
-              {userStats?.currentTitle === "<G.M.>" && (
+              {(userStats as any)?.currentTitle === "<G.M.>" && (
                 <Button 
                   variant="outline" 
                   className="flex items-center justify-center"
