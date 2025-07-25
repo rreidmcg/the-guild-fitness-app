@@ -33,8 +33,8 @@ function containsProfanity(username: string): boolean {
     // Direct match
     if (normalized.includes(profanity)) return true;
     
-    // Match with spaces or numbers inserted
-    const spaced = profanity.split('').join('[\\s\\d]*');
+    // Match with numbers inserted (since spaces are no longer allowed)
+    const spaced = profanity.split('').join('[\\d]*');
     const regex = new RegExp(spaced, 'i');
     return regex.test(normalized);
   });
@@ -63,20 +63,10 @@ export function validateUsername(username: string): UsernameValidationResult {
     return { isValid: false, error: "Username must be 20 characters or less" };
   }
 
-  // Check for valid characters (letters and spaces only)
-  const validCharRegex = /^[a-zA-Z\s]+$/;
+  // Check for valid characters (letters only, no spaces)
+  const validCharRegex = /^[a-zA-Z]+$/;
   if (!validCharRegex.test(trimmed)) {
-    return { isValid: false, error: "Username can only contain letters and spaces" };
-  }
-
-  // Check for excessive spaces
-  if (trimmed.includes('  ')) {
-    return { isValid: false, error: "Username cannot contain multiple consecutive spaces" };
-  }
-
-  // Check if it starts or ends with a space
-  if (trimmed.startsWith(' ') || trimmed.endsWith(' ')) {
-    return { isValid: false, error: "Username cannot start or end with a space" };
+    return { isValid: false, error: "Username can only contain letters (no spaces or special characters)" };
   }
 
   // Check for profanity
@@ -103,6 +93,6 @@ export function validateUsername(username: string): UsernameValidationResult {
 export function sanitizeUsername(username: string): string {
   if (!username) return '';
   
-  // Trim and normalize spaces
-  return username.trim().replace(/\s+/g, ' ');
+  // Trim whitespace only (no spaces allowed in usernames)
+  return username.trim();
 }
