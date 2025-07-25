@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
+import { CurrencyHeader } from "@/components/ui/currency-header";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Play, Pause, Square, Check } from "lucide-react";
@@ -91,6 +92,8 @@ export default function WorkoutSession() {
 
   return (
     <div className="min-h-screen bg-game-dark text-white pb-20">
+      <CurrencyHeader />
+      
       <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">

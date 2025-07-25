@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ExerciseSelector } from "@/components/ui/exercise-selector";
+import { CurrencyHeader } from "@/components/ui/currency-header";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Plus, Save, Play } from "lucide-react";
@@ -124,6 +125,8 @@ export default function WorkoutBuilder() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <CurrencyHeader />
+      
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">

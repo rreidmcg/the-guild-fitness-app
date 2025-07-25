@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { StatBar } from "@/components/ui/stat-bar";
 import { EnhancedStatBar } from "@/components/ui/enhanced-stat-bar";
+import { CurrencyHeader } from "@/components/ui/currency-header";
 import { AtrophyWarning } from "@/components/ui/atrophy-warning";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -239,6 +240,8 @@ export default function Stats() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <CurrencyHeader />
+      
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
