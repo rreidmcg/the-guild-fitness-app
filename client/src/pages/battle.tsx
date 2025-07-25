@@ -1108,8 +1108,7 @@ export default function Battle() {
                       </div>
                     </div>
                     <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">
-                      <Heart className="w-4 h-4 mr-1" />
-                      Health Potion
+                      <Heart className="w-4 h-4" />
                     </Button>
                   </div>
                   
