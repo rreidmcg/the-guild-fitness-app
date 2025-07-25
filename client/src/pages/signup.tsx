@@ -99,7 +99,7 @@ export default function SignupPage() {
         }
         toast({
           title: "Account created successfully!",
-          description: "Welcome to FitQuest! You can now start your fitness journey.",
+          description: "Welcome to Dumbbells & Dragons! You can now start your fitness journey.",
         });
         setLocation("/");
       }
@@ -145,7 +145,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-md bg-card border-border">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-foreground">
-            Join FitQuest
+            Join Dumbbells & Dragons
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             {step === 1 ? "Create your account" : "Complete your profile"}

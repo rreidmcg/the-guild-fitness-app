@@ -77,7 +77,7 @@ export function validateUsername(username: string): UsernameValidationResult {
   // Check for reserved words or patterns
   const reservedPatterns = [
     /^admin/i, /^mod/i, /^staff/i, /^support/i, /^official/i,
-    /^fitquest/i, /^system/i, /^root/i, /^test/i, /^null/i,
+    /^dumbellsanddragons/i, /^system/i, /^root/i, /^test/i, /^null/i,
     /^undefined/i, /^anonymous/i, /^guest/i, /^user\d*$/i
   ];
 

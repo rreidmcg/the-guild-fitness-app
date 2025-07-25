@@ -63,7 +63,7 @@ export default function LoginPage() {
       
       toast({
         title: "Login successful!",
-        description: "Welcome back to FitQuest!",
+        description: "Welcome back to Dumbbells & Dragons!",
       });
       setLocation("/");
     },
@@ -101,7 +101,7 @@ export default function LoginPage() {
               Welcome Back
             </CardTitle>
             <CardDescription className="text-gray-300">
-              Sign in to your FitQuest account
+              Sign in to your Dumbbells & Dragons account
             </CardDescription>
           </CardHeader>
           <CardContent>

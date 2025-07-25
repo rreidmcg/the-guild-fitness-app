@@ -69,7 +69,7 @@ const CheckoutForm = ({ goldAmount }: { goldAmount: number }) => {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              You're purchasing {goldAmount} gold coins for your FitQuest adventure. 
+              You're purchasing {goldAmount} gold coins for your Dumbbells & Dragons adventure. 
               Use these coins to buy equipment, potions, and other items in the shop.
             </p>
           </CardContent>

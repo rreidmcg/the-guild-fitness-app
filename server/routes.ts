@@ -207,9 +207,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(`
         <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
           <h2 style="color: #2563eb;">Email Verified Successfully!</h2>
-          <p>Your FitQuest account has been verified. You can now log in.</p>
+          <p>Your Dumbbells & Dragons account has been verified. You can now log in.</p>
           <a href="/" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
-            Go to FitQuest
+            Go to Dumbbells & Dragons
           </a>
         </body></html>
       `);

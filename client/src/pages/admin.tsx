@@ -94,7 +94,7 @@ export default function AdminDashboard() {
                   <Crown className="w-6 h-6 text-yellow-500 mr-2" />
                   Admin Dashboard
                 </h1>
-                <p className="text-muted-foreground mt-0.5 text-sm">FitQuest System Management</p>
+                <p className="text-muted-foreground mt-0.5 text-sm">Dumbbells & Dragons System Management</p>
               </div>
             </div>
             <div className="text-sm text-muted-foreground">

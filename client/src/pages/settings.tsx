@@ -59,7 +59,7 @@ export default function Settings() {
       // Show success message
       toast({
         title: "Signed out successfully",
-        description: "You have been logged out of FitQuest",
+        description: "You have been logged out of Dumbbells & Dragons",
       });
       
       // Redirect to login page
@@ -140,7 +140,7 @@ export default function Settings() {
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">Customize your FitQuest experience</p>
+          <p className="text-muted-foreground mt-0.5 text-sm">Customize your Dumbbells & Dragons experience</p>
         </div>
       </div>
 
@@ -448,7 +448,7 @@ export default function Settings() {
             </div>
             
             <div className="text-center py-4 border-t border-border">
-              <p className="text-sm text-muted-foreground mb-2">FitQuest v1.0.0</p>
+              <p className="text-sm text-muted-foreground mb-2">Dumbbells & Dragons v1.0.0</p>
               <p className="text-xs text-muted-foreground">
                 Made with ❤️ for fitness enthusiasts
               </p>

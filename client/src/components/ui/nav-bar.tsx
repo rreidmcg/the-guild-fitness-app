@@ -16,7 +16,7 @@ export function NavBar() {
         <div className="flex items-center space-x-3">
           <Dumbbell className="text-game-primary text-2xl" />
           <h1 className="text-xl font-bold cursor-pointer text-foreground" onClick={() => navigate("/")}>
-            FitQuest
+            Dumbbells & Dragons
           </h1>
         </div>
         

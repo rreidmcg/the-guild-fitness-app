@@ -1,8 +1,8 @@
-# FitQuest - Gamified Fitness Tracking Application
+# Dumbbells & Dragons - Gamified Fitness Tracking Application
 
 ## Overview
 
-FitQuest is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create workouts, track their sessions, and earn experience points while building their character's stats (strength, stamina, endurance, flexibility). The app features a mobile-friendly bottom navigation with dedicated pages for Stats, Workouts, and Settings, plus a custom 2D avatar system.
+Dumbbells & Dragons is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create workouts, track their sessions, and earn experience points while building their character's stats (strength, stamina, endurance, flexibility). The app features a mobile-friendly bottom navigation with dedicated pages for Stats, Workouts, and Settings, plus a custom 2D avatar system.
 
 ## User Preferences
 
