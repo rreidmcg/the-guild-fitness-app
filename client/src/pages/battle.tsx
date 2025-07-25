@@ -1076,7 +1076,7 @@ export default function Battle() {
                   <Button onClick={returnToMonsterList} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     FIGHT AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
+                  <Button onClick={() => navigate("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     HOME
                   </Button>
                 </div>
@@ -1096,7 +1096,7 @@ export default function Battle() {
                   <Button onClick={returnToMonsterList} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     TRY AGAIN
                   </Button>
-                  <Button onClick={() => setLocation("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
+                  <Button onClick={() => navigate("/")} className="text-blue-100 border py-1 px-2 text-xs font-bold h-7 backdrop-blur-sm" style={{ backgroundColor: 'rgba(13, 25, 59, 0.7)', borderColor: 'rgba(13, 25, 59, 0.5)', textShadow: '0 0 10px rgba(173, 216, 255, 0.8)' }}>
                     HOME
                   </Button>
                 </div>
