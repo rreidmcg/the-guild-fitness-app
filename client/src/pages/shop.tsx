@@ -410,7 +410,10 @@ export default function Shop() {
               </div>
               {(userStats?.gold || 0) < 50 && (
                 <Button 
-                  onClick={() => setActiveTab('gold')}
+                  onClick={() => {
+                    setActiveTab('gold');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   size="sm"
                   className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white animate-pulse"
                 >
@@ -432,7 +435,10 @@ export default function Shop() {
       </div>
 
       <div className="max-w-4xl mx-auto p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => {
+          setActiveTab(value);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="consumables">Consumables</TabsTrigger>
             <TabsTrigger value="equipment">Equipment</TabsTrigger>
