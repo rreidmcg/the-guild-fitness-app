@@ -268,14 +268,7 @@ export default function Stats() {
               <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
             </div>
             <div className="flex items-center space-x-3">
-              <Button 
-                onClick={() => setShowCalculators(!showCalculators)}
-                size="sm"
-                variant="outline"
-                className="p-2"
-              >
-                <Calculator className="w-4 h-4" />
-              </Button>
+              {/* Calculator button hidden per user request */}
             </div>
           </div>
         </div>
@@ -285,8 +278,8 @@ export default function Stats() {
         {/* Atrophy Warning */}
         <AtrophyWarning />
 
-        {/* Calculators */}
-        {showCalculators && (
+        {/* Calculators - Hidden per user request */}
+        {false && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Calorie & Macro Calculator */}
             <Card className="bg-card border-border">
