@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Coins, Backpack, Settings } from "lucide-react";
+import { Coins, Backpack, Settings, Volume2 } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
+import { useBackgroundMusic } from "@/hooks/use-background-music";
 
 export function CurrencyHeader() {
   const navigate = useNavigate();
+  const { toggleMusic } = useBackgroundMusic();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -27,6 +29,13 @@ export function CurrencyHeader() {
               title="Inventory"
             >
               <Backpack className="w-4 h-4 text-muted-foreground" />
+            </button>
+            <button
+              onClick={toggleMusic}
+              className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+              title="Toggle Music"
+            >
+              <Volume2 className="w-4 h-4 text-muted-foreground" />
             </button>
             <button
               onClick={() => navigate('/settings')}
