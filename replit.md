@@ -177,4 +177,10 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 - Resolved TypeScript errors in stats and leaderboard pages  
 - Added proper loading states and data validation for all API responses
 - Fixed title color display issue for `<G.M.>` title on leaderboard (now shows red/relic color)
+- **Implemented Daily Quest Reset System**: Daily quests now automatically reset at 12:00 AM local time
+  - Added timezone detection and automatic timezone setting for users
+  - Created `DailyResetSystem` service with timezone-aware date calculations
+  - Added user timezone field to database schema
+  - Integrated timezone-based reset logic into daily progress API endpoints
+  - Users' timezones are automatically detected and set on first app load
 - Application fully functional with all features working properly

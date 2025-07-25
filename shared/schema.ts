@@ -56,6 +56,7 @@ export const users = pgTable("users", {
   weight: integer("weight_kg"), // Weight in kilograms
   fitnessGoal: text("fitness_goal"), // "lose_weight", "gain_muscle", "improve_endurance", "general_fitness"
   measurementUnit: text("measurement_unit").default("metric"), // "metric" or "imperial"
+  timezone: text("timezone"), // User's timezone for daily quest resets (e.g., "America/New_York")
   createdAt: timestamp("created_at").defaultNow(),
 });
 

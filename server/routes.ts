@@ -847,18 +847,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/daily-progress", async (req, res) => {
     try {
       const userId = currentUserId; // Use the current logged-in user
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-      const progress = await storage.getDailyProgress(userId, today);
-      res.json(progress || {
-        userId,
-        date: today,
-        hydration: false,
-        steps: false,
-        protein: false,
-        sleep: false,
-        xpAwarded: false
-      });
+      
+      // Get progress with automatic daily reset based on user's timezone
+      const progress = await storage.getDailyProgress(userId);
+      
+      if (progress) {
+        res.json(progress);
+      } else {
+        // Get user's timezone for current date
+        const user = await storage.getUser(userId);
+        const userTimezone = user?.timezone || undefined;
+        
+        // Import the daily reset service properly
+        const { dailyResetService } = await import("./daily-reset-system.js");
+        const today = dailyResetService.getCurrentDateForUser(userTimezone);
+        
+        res.json({
+          userId,
+          date: today,
+          hydration: false,
+          steps: false,
+          protein: false,
+          sleep: false,
+          xpAwarded: false,
+          streakFreezeAwarded: false
+        });
+      }
     } catch (error) {
+      console.error("Daily progress error:", error);
       res.status(500).json({ error: "Failed to fetch daily progress" });
     }
   });
@@ -1243,6 +1259,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error: any) {
       res.status(500).json({ error: "Error verifying payment: " + error.message });
+    }
+  });
+
+  // User timezone setting
+  app.post("/api/user/timezone", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const { timezone } = req.body;
+      
+      if (!timezone || typeof timezone !== 'string') {
+        return res.status(400).json({ error: "Invalid timezone" });
+      }
+      
+      // Validate timezone using Intl API
+      try {
+        Intl.DateTimeFormat(undefined, { timeZone: timezone });
+      } catch (error) {
+        return res.status(400).json({ error: "Invalid timezone format" });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, { timezone });
+      res.json({ success: true, timezone: updatedUser.timezone });
+    } catch (error) {
+      console.error("Error setting timezone:", error);
+      res.status(500).json({ error: "Failed to set timezone" });
     }
   });
 

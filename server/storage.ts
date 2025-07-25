@@ -12,6 +12,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
+import { dailyResetService } from "./daily-reset-system.js";
 
 export interface IStorage {
   // User operations
@@ -516,11 +517,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Daily quest operations
-  async getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined> {
+  async getDailyProgress(userId: number, date?: string): Promise<DailyProgress | undefined> {
     await this.ensureInitialized();
+    
+    // Get user's timezone to ensure proper daily reset
+    const user = await this.getUser(userId);
+    const userTimezone = user?.timezone || undefined;
+    
+    // Check and perform daily reset if needed
+    await dailyResetService.checkAndResetDailyQuests(userId, userTimezone);
+    
+    // Use current date for user's timezone if not provided
+    const targetDate = date || dailyResetService.getCurrentDateForUser(userTimezone);
+    
     const results = await db.select()
       .from(dailyProgress)
-      .where(and(eq(dailyProgress.userId, userId), eq(dailyProgress.date, date)))
+      .where(and(eq(dailyProgress.userId, userId), eq(dailyProgress.date, targetDate)))
       .limit(1);
     return results[0];
   }
@@ -559,7 +571,15 @@ export class DatabaseStorage implements IStorage {
   async toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }> {
     await this.ensureInitialized();
     
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    // Get user's timezone for proper daily reset
+    const user = await this.getUser(userId);
+    const userTimezone = user?.timezone || undefined;
+    
+    // Check and perform daily reset if needed
+    await dailyResetService.checkAndResetDailyQuests(userId, userTimezone);
+    
+    // Use user's timezone to get current date
+    const today = dailyResetService.getCurrentDateForUser(userTimezone);
     
     // Get or create today's progress
     let progress = await this.getDailyProgress(userId, today);

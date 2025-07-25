@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { useBackgroundMusic } from "@/hooks/use-background-music";
+import { useTimezone } from "@/hooks/use-timezone";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX } from "lucide-react";
 import { useEffect } from "react";
@@ -50,8 +51,11 @@ function Router() {
   );
 }
 
-function App() {
+function AppContent() {
   const { isPlaying, isMuted, toggleMusic, startMusic } = useBackgroundMusic();
+  
+  // Initialize timezone detection for daily quest resets
+  useTimezone();
 
   // Auto-start music on first user interaction
   useEffect(() => {
@@ -75,17 +79,37 @@ function App() {
   }, [isMuted, isPlaying, startMusic]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="min-h-screen bg-background text-foreground">
-          <Toaster />
-          
-
-
-          <Router />
-          <BottomNav />
+    <TooltipProvider>
+      <div className="min-h-screen bg-background text-foreground">
+        <Toaster />
+        
+        {/* Music Controls */}
+        <div className="fixed top-4 right-4 z-50">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleMusic}
+            className="bg-background/80 backdrop-blur-sm border-border/50"
+          >
+            {isMuted || !isPlaying ? (
+              <VolumeX className="h-4 w-4" />
+            ) : (
+              <Volume2 className="h-4 w-4" />
+            )}
+          </Button>
         </div>
-      </TooltipProvider>
+
+        <Router />
+        <BottomNav />
+      </div>
+    </TooltipProvider>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
     </QueryClientProvider>
   );
 }
