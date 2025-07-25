@@ -1,12 +1,9 @@
-import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { useToast } from "@/hooks/use-toast";
 import { CurrencyHeader } from "@/components/ui/currency-header";
@@ -26,31 +23,13 @@ import {
   Settings,
   Gift,
   Coins,
-  Shield,
-  Calculator
+  Shield
 } from "lucide-react";
 
 export default function Workouts() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  // Calculator states
-  const [showCalculators, setShowCalculators] = useState(false);
-  const [calorieForm, setCalorieForm] = useState({
-    age: '',
-    weight: '',
-    height: '',
-    gender: 'male',
-    activityLevel: 'moderate',
-    goal: 'maintain'
-  });
-  
-  const [hydrationForm, setHydrationForm] = useState({
-    weight: '',
-    activityLevel: 'moderate',
-    climate: 'moderate'
-  });
 
   const { data: workoutSessions } = useQuery<WorkoutSession[]>({
     queryKey: ["/api/workout-sessions"],
@@ -136,84 +115,6 @@ export default function Workouts() {
     },
   });
 
-  // Calculator functions
-  const calculateBMR = () => {
-    const { age, weight, height, gender } = calorieForm;
-    if (!age || !weight || !height) return 0;
-    
-    const ageNum = parseInt(age);
-    const weightNum = parseFloat(weight);
-    const heightNum = parseFloat(height);
-    
-    // Mifflin-St Jeor Equation
-    if (gender === 'male') {
-      return (10 * weightNum) + (6.25 * heightNum) - (5 * ageNum) + 5;
-    } else {
-      return (10 * weightNum) + (6.25 * heightNum) - (5 * ageNum) - 161;
-    }
-  };
-
-  const calculateTDEE = () => {
-    const bmr = calculateBMR();
-    const activityMultipliers = {
-      sedentary: 1.2,
-      light: 1.375,
-      moderate: 1.55,
-      active: 1.725,
-      veryActive: 1.9
-    };
-    return bmr * activityMultipliers[calorieForm.activityLevel as keyof typeof activityMultipliers];
-  };
-
-  const calculateCalorieGoal = () => {
-    const tdee = calculateTDEE();
-    const goalMultipliers = {
-      lose: 0.8,
-      maintain: 1.0,
-      gain: 1.2
-    };
-    return tdee * goalMultipliers[calorieForm.goal as keyof typeof goalMultipliers];
-  };
-
-  const calculateMacros = (calories: number) => {
-    return {
-      protein: Math.round((calories * 0.25) / 4), // 25% protein
-      carbs: Math.round((calories * 0.45) / 4),   // 45% carbs
-      fats: Math.round((calories * 0.3) / 9)      // 30% fats
-    };
-  };
-
-  const calculateHydration = () => {
-    const { weight, activityLevel, climate } = hydrationForm;
-    if (!weight) return 0;
-    
-    const weightNum = parseFloat(weight);
-    let baseWater = weightNum * 35; // 35ml per kg baseline
-    
-    // Activity level multipliers
-    const activityMultipliers = {
-      sedentary: 1.0,
-      light: 1.1,
-      moderate: 1.2,
-      active: 1.3,
-      veryActive: 1.5
-    };
-    
-    // Climate multipliers
-    const climateMultipliers = {
-      cold: 0.9,
-      moderate: 1.0,
-      hot: 1.2,
-      veryHot: 1.4
-    };
-    
-    const totalWater = baseWater * 
-      activityMultipliers[activityLevel as keyof typeof activityMultipliers] * 
-      climateMultipliers[climate as keyof typeof climateMultipliers];
-    
-    return Math.round(totalWater);
-  };
-
   const recentSessions = (workoutSessions || []).slice(0, 5);
   const programs = workoutPrograms || [];
 
@@ -256,14 +157,6 @@ export default function Workouts() {
             </div>
             <div className="flex items-center space-x-3">
               <Button 
-                onClick={() => setShowCalculators(!showCalculators)}
-                size="sm"
-                variant="outline"
-                className="p-2"
-              >
-                <Calculator className="w-4 h-4" />
-              </Button>
-              <Button 
                 onClick={() => navigate("/workout-builder")}
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-blue-100"
@@ -299,211 +192,6 @@ export default function Workouts() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Calculators */}
-        {showCalculators && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Calorie & Macro Calculator */}
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Calculator className="w-5 h-5 text-blue-500" />
-                  Calorie & Macro Calculator
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Age</label>
-                    <Input
-                      type="number"
-                      placeholder="25"
-                      value={calorieForm.age}
-                      onChange={(e) => setCalorieForm(prev => ({ ...prev, age: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Weight (kg)</label>
-                    <Input
-                      type="number"
-                      placeholder="70"
-                      value={calorieForm.weight}
-                      onChange={(e) => setCalorieForm(prev => ({ ...prev, weight: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Height (cm)</label>
-                    <Input
-                      type="number"
-                      placeholder="175"
-                      value={calorieForm.height}
-                      onChange={(e) => setCalorieForm(prev => ({ ...prev, height: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Gender</label>
-                    <Select value={calorieForm.gender} onValueChange={(value) => setCalorieForm(prev => ({ ...prev, gender: value }))}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Activity Level</label>
-                    <Select value={calorieForm.activityLevel} onValueChange={(value) => setCalorieForm(prev => ({ ...prev, activityLevel: value }))}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sedentary">Sedentary</SelectItem>
-                        <SelectItem value="light">Light Activity</SelectItem>
-                        <SelectItem value="moderate">Moderate Activity</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="veryActive">Very Active</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Goal</label>
-                    <Select value={calorieForm.goal} onValueChange={(value) => setCalorieForm(prev => ({ ...prev, goal: value }))}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="lose">Lose Weight</SelectItem>
-                        <SelectItem value="maintain">Maintain Weight</SelectItem>
-                        <SelectItem value="gain">Gain Weight</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {calculateCalorieGoal() > 0 && (
-                  <div className="mt-4 p-4 bg-blue-900/20 rounded-lg border border-blue-700">
-                    <h4 className="font-semibold text-blue-400 mb-2">Your Results</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">BMR:</span>
-                        <span className="ml-2 font-bold text-foreground">{Math.round(calculateBMR())} cal</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">TDEE:</span>
-                        <span className="ml-2 font-bold text-foreground">{Math.round(calculateTDEE())} cal</span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-muted-foreground">Daily Goal:</span>
-                        <span className="ml-2 font-bold text-blue-400">{Math.round(calculateCalorieGoal())} calories</span>
-                      </div>
-                    </div>
-                    <div className="mt-3 border-t border-blue-700 pt-3">
-                      <h5 className="text-sm font-semibold text-blue-400 mb-2">Macro Breakdown</h5>
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        {(() => {
-                          const macros = calculateMacros(calculateCalorieGoal());
-                          return (
-                            <>
-                              <div className="text-center p-2 bg-red-900/30 rounded">
-                                <div className="font-bold text-red-400">{macros.protein}g</div>
-                                <div className="text-muted-foreground">Protein</div>
-                              </div>
-                              <div className="text-center p-2 bg-yellow-900/30 rounded">
-                                <div className="font-bold text-yellow-400">{macros.carbs}g</div>
-                                <div className="text-muted-foreground">Carbs</div>
-                              </div>
-                              <div className="text-center p-2 bg-purple-900/30 rounded">
-                                <div className="font-bold text-purple-400">{macros.fats}g</div>
-                                <div className="text-muted-foreground">Fat</div>
-                              </div>
-                            </>
-                          );
-                        })()}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Hydration Calculator */}
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-                  <Droplets className="w-5 h-5 text-blue-500" />
-                  Hydration Calculator
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Body Weight (kg)</label>
-                    <Input
-                      type="number"
-                      placeholder="70"
-                      value={hydrationForm.weight}
-                      onChange={(e) => setHydrationForm(prev => ({ ...prev, weight: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Activity Level</label>
-                    <Select value={hydrationForm.activityLevel} onValueChange={(value) => setHydrationForm(prev => ({ ...prev, activityLevel: value }))}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sedentary">Sedentary</SelectItem>
-                        <SelectItem value="light">Light Activity</SelectItem>
-                        <SelectItem value="moderate">Moderate Activity</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="veryActive">Very Active</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Climate</label>
-                    <Select value={hydrationForm.climate} onValueChange={(value) => setHydrationForm(prev => ({ ...prev, climate: value }))}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cold">Cold</SelectItem>
-                        <SelectItem value="moderate">Moderate</SelectItem>
-                        <SelectItem value="hot">Hot</SelectItem>
-                        <SelectItem value="veryHot">Very Hot</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {calculateHydration() > 0 && (
-                  <div className="mt-4 p-4 bg-blue-900/20 rounded-lg border border-blue-700">
-                    <h4 className="font-semibold text-blue-400 mb-2">Your Daily Water Needs</h4>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-400">{calculateHydration()} ml</div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        ≈ {Math.round(calculateHydration() / 250)} glasses (250ml each)
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        ≈ {(calculateHydration() / 1000).toFixed(1)} liters
-                      </div>
-                    </div>
-                    <div className="mt-3 text-xs text-muted-foreground border-t border-blue-700 pt-3">
-                      <p><strong>Note:</strong> Based on 35ml per kg body weight with adjustments for activity level and climate. 
-                      Increase intake during illness, pregnancy, or breastfeeding.</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
         {/* Daily Quests */}
         <Card className="bg-card border-border">
