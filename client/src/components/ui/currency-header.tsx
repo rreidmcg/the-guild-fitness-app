@@ -16,16 +16,16 @@ export function CurrencyHeader() {
   const potionCount = (inventory as any[])?.filter((item: any) => item.itemType === "potion").length || 0;
 
   return (
-    <div className="bg-card/50 border-b border-border/50 px-4 py-2">
+    <div className="bg-card/80 border-b border-border/50 px-4 py-1.5">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-2">
-              <Coins className="w-4 h-4 text-yellow-500" />
+              <Coins className="w-3.5 h-3.5 text-yellow-500" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gold || 0}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Zap className="w-4 h-4 text-blue-500" />
+              <Zap className="w-3.5 h-3.5 text-blue-500" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.experience || 0} XP</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -35,9 +35,9 @@ export function CurrencyHeader() {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => navigate('/inventory')}
-              className="flex items-center space-x-2 hover:bg-muted/50 px-2 py-1 rounded transition-colors"
+              className="flex items-center space-x-2 hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
             >
-              <Package className="w-4 h-4 text-muted-foreground" />
+              <Package className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">{potionCount}</span>
             </button>
           </div>
