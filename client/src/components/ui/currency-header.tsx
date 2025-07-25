@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Coins, Zap, Backpack } from "lucide-react";
+import { Coins, Backpack } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
 
 export function CurrencyHeader() {
@@ -15,20 +15,12 @@ export function CurrencyHeader() {
     <div className="bg-card/80 border-b border-border/50 px-4 py-1.5">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6">
+          <div></div>
+          <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <Coins className="w-3.5 h-3.5 text-yellow-500" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gold || 0}</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Zap className="w-3.5 h-3.5 text-blue-500" />
-              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.experience || 0} XP</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="font-semibold text-foreground text-sm">Lv {(userStats as any)?.level || 1}</span>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
             <button
               onClick={() => navigate('/inventory')}
               className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
