@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Play, Pause, Square, Check } from "lucide-react";
@@ -19,6 +20,8 @@ export default function WorkoutSession() {
   const [time, setTime] = useState(0);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [exerciseData, setExerciseData] = useState<any[]>([]);
+  const [showVictoryModal, setShowVictoryModal] = useState(false);
+  const [completedSession, setCompletedSession] = useState<any>(null);
 
   // Timer effect
   useEffect(() => {
@@ -33,17 +36,18 @@ export default function WorkoutSession() {
 
   const completeWorkoutMutation = useMutation({
     mutationFn: async (sessionData: any) => {
-      const response = await apiRequest("POST", "/api/workout-sessions", sessionData);
-      return response.json();
+      return await apiRequest("/api/workout-sessions", {
+        method: "POST",
+        body: sessionData,
+      });
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["/api/workout-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      toast({
-        title: "Workout Complete!",
-        description: "Great job! You earned XP and improved your stats.",
-      });
-      setLocation("/workouts");
+      
+      // Show victory modal with the session data
+      setCompletedSession(result);
+      setShowVictoryModal(true);
     },
     onError: () => {
       toast({
@@ -73,8 +77,14 @@ export default function WorkoutSession() {
       xpEarned: 0, // Will be calculated server-side
       statsEarned: {},
     };
-
+    
+    setIsActive(false); // Stop the timer
     completeWorkoutMutation.mutate(sessionData);
+  };
+
+  const handleVictoryClose = () => {
+    setShowVictoryModal(false);
+    setLocation("/workouts");
   };
 
   const progress = exerciseData.length > 0 ? (currentExerciseIndex / exerciseData.length) * 100 : 0;
@@ -168,6 +178,19 @@ export default function WorkoutSession() {
           </Button>
         </div>
       </div>
+
+      {/* Victory Modal */}
+      {showVictoryModal && completedSession && (
+        <WorkoutVictoryModal
+          isOpen={showVictoryModal}
+          onClose={handleVictoryClose}
+          workoutName={completedSession.name || "Workout"}
+          xpGained={completedSession.xpEarned || 0}
+          statsGained={completedSession.statsEarned || {}}
+          duration={completedSession.duration || 0}
+          totalVolume={completedSession.totalVolume}
+        />
+      )}
     </div>
   );
 }

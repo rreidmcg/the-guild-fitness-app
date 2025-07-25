@@ -341,7 +341,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Record activity to prevent atrophy
       await AtrophySystem.recordActivity(userId);
       
-      res.json(session);
+      // Return session data with calculated rewards for the victory screen
+      res.json({
+        ...session,
+        xpEarned,
+        statsEarned,
+        name: sessionData.name || "Workout Session"
+      });
     } catch (error) {
       res.status(400).json({ error: "Invalid session data" });
     }
