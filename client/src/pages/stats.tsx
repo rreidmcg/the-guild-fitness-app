@@ -23,7 +23,6 @@ import {
   Zap,
   TrendingUp,
   Calendar,
-  Wind,
   Coins,
   Plus,
   Shield,
@@ -646,15 +645,15 @@ export default function Stats() {
                 label="Stamina"
                 statLevel={userStats?.stamina || 0}
                 totalXp={userStats?.staminaXp || 0}
-                color="text-green-400"
+                color="text-yellow-400"
                 icon={<Heart className="w-5 h-5" />}
               />
               <EnhancedStatBar
                 label="Agility"
                 statLevel={userStats?.agility || 0}
                 totalXp={userStats?.agilityXp || 0}
-                color="text-purple-400"
-                icon={<Wind className="w-5 h-5" />}
+                color="text-green-400"
+                icon={<Zap className="w-5 h-5" />}
               />
             </div>
           </CardContent>
