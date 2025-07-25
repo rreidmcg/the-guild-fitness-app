@@ -19,8 +19,7 @@ import {
   X,
   Clock,
   Volume2,
-  VolumeX,
-  Plus
+  VolumeX
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import caveRatImage from "@assets/IMG_3670_1753151064629.png";
@@ -28,7 +27,6 @@ import wildGoblinImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_175315
 import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753196270170.png";
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
-import manaIcon from "@assets/icons8-mana-32_1753480226817.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { queryClient } from "@/lib/queryClient";
@@ -1108,8 +1106,9 @@ export default function Battle() {
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white p-2">
-                      <Plus className="w-6 h-6" />
+                    <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">
+                      <Heart className="w-4 h-4 mr-1" />
+                      Health Potion
                     </Button>
                   </div>
                   
@@ -1126,8 +1125,9 @@ export default function Battle() {
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white p-2">
-                      <img src={manaIcon} alt="Mana Potion" className="w-6 h-6" />
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                      <Zap className="w-4 h-4 mr-1" />
+                      Mana Potion
                     </Button>
                   </div>
                 </div>
