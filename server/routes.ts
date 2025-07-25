@@ -6,6 +6,7 @@ import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
 import { authUtils } from "./auth";
 import { validateUsername, sanitizeUsername } from "./username-validation";
+import { AtrophySystem } from "./atrophy-system";
 
 // Simple in-memory session storage (in production, use proper session management)
 let currentUserId: number = 1;
@@ -93,6 +94,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentTier: "E",
         currentTitle: "Recruit"
       } as any);
+      
+      // Grant new user immunity to atrophy for 7 days
+      await AtrophySystem.grantNewUserImmunity(newUser.id);
 
       // Send verification email
       if (email) {
@@ -333,6 +337,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update streak after completing workout
       await storage.updateStreak(userId);
+      
+      // Record activity to prevent atrophy
+      await AtrophySystem.recordActivity(userId);
       
       res.json(session);
     } catch (error) {
@@ -613,6 +620,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user profile" });
+    }
+  });
+
+  // Atrophy system routes
+  app.get("/api/user/atrophy-status", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const status = await AtrophySystem.getUserAtrophyStatus(userId);
+      res.json(status);
+    } catch (error) {
+      console.error("Error fetching atrophy status:", error);
+      res.status(500).json({ error: "Failed to fetch atrophy status" });
+    }
+  });
+
+  app.post("/api/user/use-streak-freeze", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const success = await AtrophySystem.useStreakFreeze(userId);
+      
+      if (!success) {
+        return res.status(400).json({ error: "No streak freezes available" });
+      }
+      
+      res.json({ success: true, message: "Streak freeze used successfully" });
+    } catch (error) {
+      console.error("Error using streak freeze:", error);
+      res.status(500).json({ error: "Failed to use streak freeze" });
+    }
+  });
+
+  app.post("/api/admin/process-atrophy", async (req, res) => {
+    try {
+      const currentUser = await storage.getUser(currentUserId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      await AtrophySystem.processAtrophy();
+      res.json({ success: true, message: "Atrophy processing completed" });
+    } catch (error) {
+      console.error("Error processing atrophy:", error);
+      res.status(500).json({ error: "Failed to process atrophy" });
     }
   });
 

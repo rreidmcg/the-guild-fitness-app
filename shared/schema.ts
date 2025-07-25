@@ -33,6 +33,9 @@ export const users = pgTable("users", {
   currentStreak: integer("current_streak").default(0),
   lastStreakDate: text("last_streak_date"), // YYYY-MM-DD format
   streakFreezeCount: integer("streak_freeze_count").default(0), // Max 2
+  // Atrophy system
+  lastActivityDate: text("last_activity_date"), // YYYY-MM-DD format - last workout, battle, or streak freeze
+  atrophyImmunityUntil: text("atrophy_immunity_until"), // YYYY-MM-DD format - grace period for new users
   // Character customization - New armor slot system
   equippedHead: text("equipped_head"),
   equippedShoulders: text("equipped_shoulders"),

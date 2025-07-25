@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { StatBar } from "@/components/ui/stat-bar";
+import { AtrophyWarning } from "@/components/ui/atrophy-warning";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -272,6 +273,8 @@ export default function Stats() {
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
+        {/* Atrophy Warning */}
+        <AtrophyWarning />
 
         {/* Calculators */}
         {showCalculators && (

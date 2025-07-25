@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **API Design**: RESTful API with JSON responses
 
 ### Database Schema
-- **Users**: Character progression with level, experience, three-stat tracking (Strength, Stamina, Agility), gold currency, HP system, and new MP system
+- **Users**: Character progression with level, experience, three-stat tracking (Strength, Stamina, Agility), gold currency, HP system, MP system, and atrophy tracking fields
 - **Exercises**: Exercise library with multi-stat allocation system using JSON statTypes field
 - **Workouts**: Template-based workout creation with JSON exercise configuration
 - **Workout Sessions**: Completed workout tracking with sophisticated XP and stat allocation
@@ -36,6 +36,13 @@ Preferred communication style: Simple, everyday language.
 - **Personal Records**: Achievement tracking for user milestones
 
 ## Key Components
+
+### Atrophy System
+- **Daily Stat Degradation**: Players lose 1% of overall XP and all main stats each day without activity
+- **Activity Tracking**: Workouts, battles, and streak freezes count as activity to prevent atrophy
+- **New User Protection**: 7-day immunity period for new players to learn the system
+- **Streak Freeze Integration**: Existing streak freezes can be used to prevent atrophy
+- **Real-time Warnings**: UI components alert players when they're at risk of stat loss
 
 ### Authentication & User Management
 - Secure user registration and login system with bcrypt password hashing
