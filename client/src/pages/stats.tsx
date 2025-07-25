@@ -26,7 +26,6 @@ import {
   Wind,
   Coins,
   Plus,
-  Settings,
   Shield,
   Calculator,
   Droplets
@@ -240,6 +239,7 @@ export default function Stats() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <CurrencyHeader />
       
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
@@ -250,10 +250,6 @@ export default function Stats() {
               <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
-                <Coins className="w-4 h-4 text-yellow-500" />
-                <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
-              </div>
               <Button 
                 onClick={() => setShowCalculators(!showCalculators)}
                 size="sm"
@@ -261,14 +257,6 @@ export default function Stats() {
                 className="p-2"
               >
                 <Calculator className="w-4 h-4" />
-              </Button>
-              <Button 
-                onClick={() => setLocation('/settings')}
-                size="sm"
-                variant="outline"
-                className="p-2"
-              >
-                <Settings className="w-4 h-4" />
               </Button>
             </div>
           </div>
