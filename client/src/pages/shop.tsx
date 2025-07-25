@@ -25,6 +25,7 @@ import { useLocation } from "wouter";
 import { useNavigate } from "@/hooks/use-navigate";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { CurrencyHeader } from "@/components/ui/currency-header";
 import minorHealingPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753214477623.png";
 import majorHealingPotionImage from "@assets/1860C3F1-AEFB-419D-BAB2-306C00CA6321_1753215117108.png";
 import characterImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
@@ -397,6 +398,8 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <CurrencyHeader />
+      
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
@@ -406,23 +409,6 @@ export default function Shop() {
               <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-muted px-3 py-2 rounded-lg">
-                <Coins className="w-4 h-4 text-yellow-500" />
-                <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
-              </div>
-              {(userStats?.gold || 0) < 50 && (
-                <Button 
-                  onClick={() => {
-                    setActiveTab('gold');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  size="sm"
-                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white animate-pulse"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Buy Gold
-                </Button>
-              )}
               <Button 
                 onClick={() => navigate('/settings')}
                 size="sm"

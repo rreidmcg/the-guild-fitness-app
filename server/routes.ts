@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, users, playerInventory } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { authUtils } from "./auth";
 import { validateUsername, sanitizeUsername } from "./username-validation";
 
@@ -11,6 +11,30 @@ import { validateUsername, sanitizeUsername } from "./username-validation";
 let currentUserId: number = 1;
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Leaderboard route
+  app.get("/api/leaderboard", async (req, res) => {
+    try {
+      const leaderboard = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          level: users.level,
+          experience: users.experience,
+          title: users.title,
+        })
+        .from(users)
+        .orderBy(desc(users.experience))
+        .limit(100);
+      
+
+      
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ error: "Failed to fetch leaderboard" });
+    }
+  });
+
   // Auth routes
   app.post("/api/auth/signup", async (req, res) => {
     try {

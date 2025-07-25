@@ -21,6 +21,7 @@ import Inventory from "@/pages/inventory";
 import SignupPage from "@/pages/signup";
 import LoginPage from "@/pages/login";
 import AdminDashboard from "@/pages/admin";
+import Leaderboard from "@/pages/leaderboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/wardrobe" component={Wardrobe} />
       <Route path="/shop" component={Shop} />
       <Route path="/profile" component={Profile} />
+      <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/signup" component={SignupPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AdminDashboard} />
