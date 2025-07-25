@@ -169,3 +169,12 @@ Preferred communication style: Simple, everyday language.
 - **Static Assets**: Served through Express in production
 
 The application follows a monorepo structure with shared TypeScript schemas between frontend and backend, ensuring type safety across the entire stack. The gaming theme is implemented through custom CSS variables and a comprehensive UI component system built on Radix UI primitives.
+
+# Recent Changes
+
+**January 25, 2025:**
+- Fixed critical application startup errors and undefined data access issues
+- Resolved TypeScript errors in stats and leaderboard pages  
+- Added proper loading states and data validation for all API responses
+- Fixed title color display issue for `<G.M.>` title on leaderboard (now shows red/relic color)
+- Application fully functional with all features working properly
