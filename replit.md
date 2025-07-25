@@ -75,9 +75,10 @@ Preferred communication style: Simple, everyday language.
   - **Agility**: Determines evasion (5% per agility point, max 90%) and MP regeneration rate
 - **Exponential Progression System**: Story-driven dungeon progression with increasing time commitment:
   - **E-rank (4 weeks)**: 4 zones × 6 monsters each = 24 monsters (Lv 1-5)
-  - **D-rank (8 weeks)**: 4 zones × 6 monsters each = 24 monsters (Lv 6-11) 
-  - **C-rank (16 weeks)**: 2 zones × 6 monsters each = 12 monsters (Lv 12-15)
+  - **D-rank (8 weeks)**: 6 zones × 6 monsters each = 36 monsters (Lv 6-13) 
+  - **C-rank (16 weeks)**: 8 zones × 6 monsters each = 48 monsters (Lv 14-23)
   - Each rank takes twice as long as the previous, promoting sustainable 3-workout/week routine
+  - Total: 108 monsters across 18 themed zones with cosmic/transcendent endgame content
 - Level progression with title system
 - Multi-stat exercises (e.g., power cleans award all three stats)
 - Achievement system through personal records

@@ -227,6 +227,38 @@ const DRANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 47, name: "Winter Wraith", level: 11, maxHp: 60, currentHp: 60, attack: 12, goldReward: 11, description: "A ghostly guardian of the frozen realm" },
       { id: 48, name: "Ice Queen", level: 11, maxHp: 70, currentHp: 70, attack: 12, goldReward: 20, description: "🏆 MINI-BOSS: Eternal sovereign of winter" }
     ]
+  },
+  {
+    id: "storm_peaks",
+    name: "The Storm Peaks",
+    description: "Mountain heights where lightning elementals dance among eternal thunderclouds",
+    background: "#4B0082",
+    storyIntro: "Thunder echoes across jagged peaks as you climb through storm-wracked cliffs. Lightning crackles overhead while wind elementals guard the sacred heights...",
+    completionStory: "The storms calm as the thunder lord is defeated. Clear skies reveal paths to even higher peaks.",
+    monsters: [
+      { id: 49, name: "Storm Pixie", level: 10, maxHp: 52, currentHp: 52, attack: 11, goldReward: 10, description: "A tiny elemental crackling with electric energy" },
+      { id: 50, name: "Wind Dancer", level: 10, maxHp: 55, currentHp: 55, attack: 11, goldReward: 10, description: "An ethereal being of swirling air currents" },
+      { id: 51, name: "Lightning Beast", level: 11, maxHp: 58, currentHp: 58, attack: 12, goldReward: 11, description: "A creature born from pure electrical energy" },
+      { id: 52, name: "Thunder Guardian", level: 11, maxHp: 61, currentHp: 61, attack: 12, goldReward: 11, description: "A massive elemental resonating with sound" },
+      { id: 53, name: "Tempest Warden", level: 12, maxHp: 64, currentHp: 64, attack: 13, goldReward: 12, description: "A sentinel commanding all weather" },
+      { id: 54, name: "Storm Lord", level: 12, maxHp: 75, currentHp: 75, attack: 13, goldReward: 22, description: "🏆 MINI-BOSS: Master of all atmospheric fury" }
+    ]
+  },
+  {
+    id: "earth_sanctum",
+    name: "The Earth Sanctum",
+    description: "Sacred caverns where stone itself has awakened to defend ancient secrets",
+    background: "#8B4513",
+    storyIntro: "The ground trembles beneath your feet as you enter halls carved from living rock. Stone guardians emerge from the walls, their eyes glowing with primal earth magic...",
+    completionStory: "The sanctum grows still as the earth lord returns to slumber. New passages open, revealing deeper mysteries.",
+    monsters: [
+      { id: 55, name: "Rock Sprite", level: 11, maxHp: 56, currentHp: 56, attack: 12, goldReward: 11, description: "A small elemental of animated stone" },
+      { id: 56, name: "Boulder Beast", level: 11, maxHp: 59, currentHp: 59, attack: 12, goldReward: 11, description: "A rolling mass of hardened earth" },
+      { id: 57, name: "Stone Warden", level: 12, maxHp: 62, currentHp: 62, attack: 13, goldReward: 12, description: "A towering guardian of granite and marble" },
+      { id: 58, name: "Crystal Titan", level: 12, maxHp: 65, currentHp: 65, attack: 13, goldReward: 12, description: "A massive being of precious minerals" },
+      { id: 59, name: "Geo Sentinel", level: 13, maxHp: 68, currentHp: 68, attack: 14, goldReward: 13, description: "An ancient protector of earthen secrets" },
+      { id: 60, name: "Earth Lord", level: 13, maxHp: 80, currentHp: 80, attack: 14, goldReward: 25, description: "🏆 MINI-BOSS: Sovereign of all terrestrial power" }
+    ]
   }
 ];
 
@@ -240,28 +272,124 @@ const CRANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "You step into a place that shouldn't exist, where purple void energy crackles through twisted space. Creatures from beyond reality guard forbidden knowledge...",
     completionStory: "Reality stabilizes as the void lord is banished. The dimensional rifts seal, but echoes of greater powers still resonate.",
     monsters: [
-      { id: 49, name: "Void Spawn", level: 12, maxHp: 65, currentHp: 65, attack: 13, goldReward: 12, description: "A writhing mass of dark energy" },
-      { id: 50, name: "Phase Beast", level: 12, maxHp: 68, currentHp: 68, attack: 13, goldReward: 12, description: "A creature that shifts between dimensions" },
-      { id: 51, name: "Reality Bender", level: 13, maxHp: 72, currentHp: 72, attack: 14, goldReward: 13, description: "An entity that warps space itself" },
-      { id: 52, name: "Cosmic Horror", level: 13, maxHp: 76, currentHp: 76, attack: 14, goldReward: 13, description: "A being that defies comprehension" },
-      { id: 53, name: "Dimensional Guardian", level: 14, maxHp: 80, currentHp: 80, attack: 15, goldReward: 14, description: "A sentinel of the void realm" },
-      { id: 54, name: "Void Sovereign", level: 14, maxHp: 90, currentHp: 90, attack: 15, goldReward: 25, description: "🏆 MINI-BOSS: Master of dimensional chaos" }
+      { id: 61, name: "Void Spawn", level: 14, maxHp: 70, currentHp: 70, attack: 15, goldReward: 14, description: "A writhing mass of dark energy" },
+      { id: 62, name: "Phase Beast", level: 14, maxHp: 74, currentHp: 74, attack: 15, goldReward: 14, description: "A creature that shifts between dimensions" },
+      { id: 63, name: "Reality Bender", level: 15, maxHp: 78, currentHp: 78, attack: 16, goldReward: 15, description: "An entity that warps space itself" },
+      { id: 64, name: "Cosmic Horror", level: 15, maxHp: 82, currentHp: 82, attack: 16, goldReward: 15, description: "A being that defies comprehension" },
+      { id: 65, name: "Dimensional Guardian", level: 16, maxHp: 86, currentHp: 86, attack: 17, goldReward: 16, description: "A sentinel of the void realm" },
+      { id: 66, name: "Void Sovereign", level: 16, maxHp: 95, currentHp: 95, attack: 17, goldReward: 30, description: "🏆 MINI-BOSS: Master of dimensional chaos" }
     ]
   },
   {
     id: "titan_ruins",
     name: "The Titan Ruins",
     description: "Colossal structures where ancient giants once ruled the world",
-    background: "#8B4513",
+    background: "#654321",
     storyIntro: "You stand before massive stone ruins built for beings of impossible size. The very air thrums with ancient power as titan-touched guardians awaken...",
     completionStory: "The titan's essence fades as their last guardian falls. The ruins begin to crumble, revealing artifacts of a forgotten age.",
     monsters: [
-      { id: 55, name: "Stone Sentinel", level: 13, maxHp: 70, currentHp: 70, attack: 14, goldReward: 13, description: "A guardian statue brought to life" },
-      { id: 56, name: "Giant's Fist", level: 13, maxHp: 74, currentHp: 74, attack: 14, goldReward: 13, description: "A severed hand still obeying its master" },
-      { id: 57, name: "Colossal Golem", level: 14, maxHp: 78, currentHp: 78, attack: 15, goldReward: 14, description: "A massive construct of titan design" },
-      { id: 58, name: "Elder Giant", level: 14, maxHp: 82, currentHp: 82, attack: 15, goldReward: 14, description: "A diminished but still mighty titan" },
-      { id: 59, name: "Titan Warden", level: 15, maxHp: 86, currentHp: 86, attack: 16, goldReward: 15, description: "The last guardian of titan secrets" },
-      { id: 60, name: "Titan Remnant", level: 15, maxHp: 95, currentHp: 95, attack: 16, goldReward: 30, description: "🏆 MINI-BOSS: The echo of titanic power" }
+      { id: 67, name: "Stone Sentinel", level: 15, maxHp: 76, currentHp: 76, attack: 16, goldReward: 15, description: "A guardian statue brought to life" },
+      { id: 68, name: "Giant's Fist", level: 15, maxHp: 80, currentHp: 80, attack: 16, goldReward: 15, description: "A severed hand still obeying its master" },
+      { id: 69, name: "Colossal Golem", level: 16, maxHp: 84, currentHp: 84, attack: 17, goldReward: 16, description: "A massive construct of titan design" },
+      { id: 70, name: "Elder Giant", level: 16, maxHp: 88, currentHp: 88, attack: 17, goldReward: 16, description: "A diminished but still mighty titan" },
+      { id: 71, name: "Titan Warden", level: 17, maxHp: 92, currentHp: 92, attack: 18, goldReward: 17, description: "The last guardian of titan secrets" },
+      { id: 72, name: "Titan Remnant", level: 17, maxHp: 100, currentHp: 100, attack: 18, goldReward: 35, description: "🏆 MINI-BOSS: The echo of titanic power" }
+    ]
+  },
+  {
+    id: "celestial_observatory",
+    name: "The Celestial Observatory",
+    description: "A tower reaching toward the stars where cosmic entities study mortal affairs",
+    background: "#191970",
+    storyIntro: "You ascend spiral stairs that seem to stretch into infinity. Starlight illuminates ancient telescopes while celestial beings turn their gaze upon you...",
+    completionStory: "The stars dim as the astral lord retreats to higher planes. The observatory falls silent, its cosmic purpose fulfilled.",
+    monsters: [
+      { id: 73, name: "Star Wisp", level: 16, maxHp: 82, currentHp: 82, attack: 17, goldReward: 16, description: "A fragment of distant starlight given form" },
+      { id: 74, name: "Comet Rider", level: 16, maxHp: 86, currentHp: 86, attack: 17, goldReward: 16, description: "A being that travels between worlds" },
+      { id: 75, name: "Solar Guardian", level: 17, maxHp: 90, currentHp: 90, attack: 18, goldReward: 17, description: "A sentinel powered by solar energy" },
+      { id: 76, name: "Nebula Spirit", level: 17, maxHp: 94, currentHp: 94, attack: 18, goldReward: 17, description: "An entity born from cosmic gas and dust" },
+      { id: 77, name: "Constellation Keeper", level: 18, maxHp: 98, currentHp: 98, attack: 19, goldReward: 18, description: "A guardian of stellar arrangements" },
+      { id: 78, name: "Astral Lord", level: 18, maxHp: 110, currentHp: 110, attack: 19, goldReward: 40, description: "🏆 MINI-BOSS: Sovereign of cosmic forces" }
+    ]
+  },
+  {
+    id: "temporal_nexus",
+    name: "The Temporal Nexus",
+    description: "A junction where all timelines converge and past meets future",
+    background: "#8A2BE2",
+    storyIntro: "Time flows strangely here as you witness echoes of what was and visions of what might be. Temporal guardians emerge from paradoxes, protecting the flow of time itself...",
+    completionStory: "The timeline stabilizes as the chronarch falls. Time resumes its natural flow, but the memory of infinity lingers.",
+    monsters: [
+      { id: 79, name: "Time Echo", level: 17, maxHp: 88, currentHp: 88, attack: 18, goldReward: 17, description: "A reflection from another timeline" },
+      { id: 80, name: "Paradox Beast", level: 17, maxHp: 92, currentHp: 92, attack: 18, goldReward: 17, description: "A creature that exists in multiple timelines" },
+      { id: 81, name: "Chronos Guardian", level: 18, maxHp: 96, currentHp: 96, attack: 19, goldReward: 18, description: "A protector of temporal stability" },
+      { id: 82, name: "Future Wraith", level: 18, maxHp: 100, currentHp: 100, attack: 19, goldReward: 18, description: "A being from a timeline that never was" },
+      { id: 83, name: "Temporal Warden", level: 19, maxHp: 104, currentHp: 104, attack: 20, goldReward: 19, description: "A sentinel of all time streams" },
+      { id: 84, name: "Chronarch", level: 19, maxHp: 115, currentHp: 115, attack: 20, goldReward: 45, description: "🏆 MINI-BOSS: Master of time itself" }
+    ]
+  },
+  {
+    id: "abyssal_depths",
+    name: "The Abyssal Depths",
+    description: "The deepest darkness where primordial horrors slumber in eternal night",
+    background: "#000000",
+    storyIntro: "You descend into absolute darkness where no light has ever touched. Ancient entities stir in the depths, their malevolent presence pressing against your mind...",
+    completionStory: "Light pierces the eternal darkness as the void emperor is banished. The abyss seals itself, but its influence lingers.",
+    monsters: [
+      { id: 85, name: "Abyssal Spawn", level: 18, maxHp: 94, currentHp: 94, attack: 19, goldReward: 18, description: "A creature born from primordial darkness" },
+      { id: 86, name: "Deep Horror", level: 18, maxHp: 98, currentHp: 98, attack: 19, goldReward: 18, description: "An entity that defies mortal comprehension" },
+      { id: 87, name: "Nightmare Weaver", level: 19, maxHp: 102, currentHp: 102, attack: 20, goldReward: 19, description: "A being that feeds on fear and despair" },
+      { id: 88, name: "Void Leviathan", level: 19, maxHp: 106, currentHp: 106, attack: 20, goldReward: 19, description: "A massive entity from the deep void" },
+      { id: 89, name: "Darkness Incarnate", level: 20, maxHp: 110, currentHp: 110, attack: 21, goldReward: 20, description: "The living embodiment of absolute darkness" },
+      { id: 90, name: "Void Emperor", level: 20, maxHp: 120, currentHp: 120, attack: 21, goldReward: 50, description: "🏆 MINI-BOSS: Ruler of the endless abyss" }
+    ]
+  },
+  {
+    id: "prismatic_cathedral",
+    name: "The Prismatic Cathedral",
+    description: "A crystalline sanctum where pure light has taken sentient form",
+    background: "#FFD700",
+    storyIntro: "Brilliant light refracts through countless crystal surfaces as you enter a cathedral of pure radiance. Light elementals dance in rainbow patterns, guarding sacred luminescence...",
+    completionStory: "The cathedral dims as the light sovereign ascends to higher planes. The crystals lose their glow, but warmth remains.",
+    monsters: [
+      { id: 91, name: "Prism Sprite", level: 19, maxHp: 100, currentHp: 100, attack: 20, goldReward: 19, description: "A tiny being of refracted light" },
+      { id: 92, name: "Rainbow Guardian", level: 19, maxHp: 104, currentHp: 104, attack: 20, goldReward: 19, description: "A protector wreathed in all colors" },
+      { id: 93, name: "Radiance Keeper", level: 20, maxHp: 108, currentHp: 108, attack: 21, goldReward: 20, description: "A sentinel of pure illumination" },
+      { id: 94, name: "Crystal Angel", level: 20, maxHp: 112, currentHp: 112, attack: 21, goldReward: 20, description: "A divine being of crystallized light" },
+      { id: 95, name: "Luminous Archon", level: 21, maxHp: 116, currentHp: 116, attack: 22, goldReward: 21, description: "A celestial guardian of all light" },
+      { id: 96, name: "Light Sovereign", level: 21, maxHp: 125, currentHp: 125, attack: 22, goldReward: 55, description: "🏆 MINI-BOSS: Absolute ruler of illumination" }
+    ]
+  },
+  {
+    id: "infinity_chamber",
+    name: "The Infinity Chamber",
+    description: "A paradoxical space where mathematics becomes reality and concepts take physical form",
+    background: "#663399",
+    storyIntro: "You enter a space that defies geometry, where infinite fractals spiral into impossible dimensions. Abstract concepts manifest as guardians protecting the secrets of existence...",
+    completionStory: "The infinite patterns collapse as the paradox king is defeated. Reality reasserts itself, but the memory of boundless possibility remains.",
+    monsters: [
+      { id: 97, name: "Fractal Wisp", level: 20, maxHp: 106, currentHp: 106, attack: 21, goldReward: 20, description: "A being of infinite recursive patterns" },
+      { id: 98, name: "Concept Beast", level: 20, maxHp: 110, currentHp: 110, attack: 21, goldReward: 20, description: "An abstract idea given physical form" },
+      { id: 99, name: "Infinite Guardian", level: 21, maxHp: 114, currentHp: 114, attack: 22, goldReward: 21, description: "A protector of mathematical truths" },
+      { id: 100, name: "Reality Weaver", level: 21, maxHp: 118, currentHp: 118, attack: 22, goldReward: 21, description: "An entity that shapes existence itself" },
+      { id: 101, name: "Omniversal Sentinel", level: 22, maxHp: 122, currentHp: 122, attack: 23, goldReward: 22, description: "A guardian of all possible realities" },
+      { id: 102, name: "Paradox King", level: 22, maxHp: 130, currentHp: 130, attack: 23, goldReward: 60, description: "🏆 MINI-BOSS: Sovereign of impossible possibilities" }
+    ]
+  },
+  {
+    id: "ultimate_threshold",
+    name: "The Ultimate Threshold",
+    description: "The final barrier between mortal realm and transcendent divinity",
+    background: "#FF6347",
+    storyIntro: "You stand before the ultimate test, where the most powerful entities in existence guard the threshold to divinity. This is the culmination of your journey...",
+    completionStory: "The threshold opens as the supreme entity acknowledges your worthiness. You have achieved the impossible - transcendence through dedication.",
+    monsters: [
+      { id: 103, name: "Transcendent Echo", level: 21, maxHp: 112, currentHp: 112, attack: 22, goldReward: 21, description: "A reflection of divine power" },
+      { id: 104, name: "Godling Avatar", level: 21, maxHp: 116, currentHp: 116, attack: 22, goldReward: 21, description: "A fragment of true divinity" },
+      { id: 105, name: "Eternal Warden", level: 22, maxHp: 120, currentHp: 120, attack: 23, goldReward: 22, description: "A timeless guardian of the threshold" },
+      { id: 106, name: "Divine Sentinel", level: 22, maxHp: 124, currentHp: 124, attack: 23, goldReward: 22, description: "A protector of ultimate power" },
+      { id: 107, name: "Ascended Lord", level: 23, maxHp: 128, currentHp: 128, attack: 24, goldReward: 23, description: "A being who achieved transcendence" },
+      { id: 108, name: "Supreme Entity", level: 23, maxHp: 140, currentHp: 140, attack: 24, goldReward: 100, description: "🏆 FINAL BOSS: The ultimate test of worthiness" }
     ]
   }
 ];
@@ -893,7 +1021,7 @@ export default function Battle() {
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-6 h-6 text-blue-400" />
                 <span>D-rank Dungeons</span>
-                <span className="text-sm text-muted-foreground">(8 weeks - Intermediate)</span>
+                <span className="text-sm text-muted-foreground">(8 weeks - 6 dungeons)</span>
                 <span className="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
@@ -901,7 +1029,7 @@ export default function Battle() {
               <p className="text-muted-foreground text-sm italic">
                 Complete all E-rank dungeons to unlock intermediate challenges with elemental themes and greater rewards.
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 opacity-50">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-4 opacity-50">
                 {DRANK_DUNGEON_ZONES.map((zone) => (
                   <Card key={zone.id} className="bg-muted/30 border-muted">
                     <CardContent className="p-3 text-center">
@@ -924,15 +1052,15 @@ export default function Battle() {
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-6 h-6 text-purple-400" />
                 <span>C-rank Dungeons</span>
-                <span className="text-sm text-muted-foreground">(16 weeks - Advanced)</span>
+                <span className="text-sm text-muted-foreground">(16 weeks - 8 dungeons)</span>
                 <span className="text-xs bg-purple-600/20 text-purple-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm italic">
-                Master D-rank content to face cosmic horrors and titanic guardians. Only the most dedicated adventurers reach this level.
+                Master D-rank content to face cosmic horrors, temporal paradoxes, and transcendent beings. Only the most dedicated adventurers reach this level.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 opacity-50">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 opacity-50">
                 {CRANK_DUNGEON_ZONES.map((zone) => (
                   <Card key={zone.id} className="bg-muted/30 border-muted">
                     <CardContent className="p-3 text-center">
