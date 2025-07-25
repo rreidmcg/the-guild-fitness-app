@@ -1107,8 +1107,8 @@ export default function Battle() {
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">
-                      <Heart className="w-4 h-4" />
+                    <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white p-2">
+                      <Heart className="w-6 h-6" />
                     </Button>
                   </div>
                   
@@ -1125,8 +1125,8 @@ export default function Battle() {
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <img src={manaIcon} alt="Mana Potion" className="w-4 h-4" />
+                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white p-2">
+                      <img src={manaIcon} alt="Mana Potion" className="w-6 h-6" />
                     </Button>
                   </div>
                 </div>
