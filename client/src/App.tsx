@@ -83,21 +83,23 @@ function AppContent() {
       <div className="min-h-screen bg-background text-foreground">
         <Toaster />
         
-        {/* Music Controls */}
-        <div className="fixed top-4 right-4 z-50">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleMusic}
-            className="bg-background/80 backdrop-blur-sm border-border/50"
-          >
-            {isMuted || !isPlaying ? (
-              <VolumeX className="h-4 w-4" />
-            ) : (
-              <Volume2 className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
+        {/* Music Controls - Hidden per user request */}
+        {false && (
+          <div className="fixed top-4 right-4 z-50">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleMusic}
+              className="bg-background/80 backdrop-blur-sm border-border/50"
+            >
+              {isMuted || !isPlaying ? (
+                <VolumeX className="h-4 w-4" />
+              ) : (
+                <Volume2 className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        )}
 
         <Router />
         <BottomNav />
