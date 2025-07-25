@@ -1006,13 +1006,13 @@ export default function Battle() {
         </div>
 
         {/* Battle Log Area - Overlaid on battle screen */}
-        <div className="absolute left-2 right-2 z-10 bg-black/70 border border-blue-400/50 p-2 min-h-[80px] max-h-[120px] overflow-y-auto backdrop-blur-sm rounded" style={{ bottom: 'calc(5rem + 10px)' }}>
-          <div className="text-sm text-white font-medium" style={{ textShadow: '0 0 8px rgba(173, 216, 255, 0.6)' }}>
+        <div className="absolute left-2 right-2 z-10 bg-black/70 border border-blue-400/50 p-2 min-h-[70px] max-h-[100px] overflow-y-auto backdrop-blur-sm rounded" style={{ bottom: 'calc(5rem + 10px)' }}>
+          <div className="text-xs text-white font-medium" style={{ textShadow: '0 0 8px rgba(173, 216, 255, 0.6)' }}>
             {battleState.battleLog.length === 0 ? (
               <div className="text-blue-200/80 italic">Battle begins...</div>
             ) : (
               battleState.battleLog.map((log, index) => (
-                <div key={index} className="mb-1 text-blue-100" style={{ textShadow: '0 0 6px rgba(173, 216, 255, 0.4)' }}>
+                <div key={index} className="mb-0.5 text-blue-100 leading-tight" style={{ textShadow: '0 0 6px rgba(173, 216, 255, 0.4)' }}>
                   {log}
                 </div>
               ))
