@@ -394,10 +394,276 @@ const CRANK_DUNGEON_ZONES: DungeonZone[] = [
   }
 ];
 
+// B-rank Dungeon Zones (32 weeks to complete - 2x C-rank time)
+const BRANK_DUNGEON_ZONES: DungeonZone[] = [
+  {
+    id: "genesis_core",
+    name: "The Genesis Core",
+    description: "The primordial source where all existence began",
+    background: "#FFD700",
+    storyIntro: "You approach the birthplace of reality itself, where the first spark of creation still burns. Genesis entities guard the fundamental forces that gave birth to all worlds...",
+    completionStory: "The core pulses with renewed energy as the first guardian acknowledges your strength. Creation itself trembles at your approach.",
+    monsters: [
+      { id: 109, name: "Proto Essence", level: 24, maxHp: 135, currentHp: 135, attack: 25, goldReward: 24, description: "The raw material of existence" },
+      { id: 110, name: "Origin Spark", level: 24, maxHp: 140, currentHp: 140, attack: 25, goldReward: 24, description: "A fragment of the first light" },
+      { id: 111, name: "Prime Creator", level: 25, maxHp: 145, currentHp: 145, attack: 26, goldReward: 25, description: "An architect of fundamental reality" },
+      { id: 112, name: "Genesis Angel", level: 25, maxHp: 150, currentHp: 150, attack: 26, goldReward: 25, description: "A divine herald of creation" },
+      { id: 113, name: "First Born", level: 26, maxHp: 155, currentHp: 155, attack: 27, goldReward: 26, description: "The eldest of all created beings" },
+      { id: 114, name: "Genesis Prime", level: 26, maxHp: 170, currentHp: 170, attack: 27, goldReward: 70, description: "🏆 MINI-BOSS: Guardian of the first flame" }
+    ]
+  },
+  {
+    id: "quantum_laboratory",
+    name: "The Quantum Laboratory",
+    description: "A realm where probability and possibility are weaponized",
+    background: "#00CED1",
+    storyIntro: "Reality shifts constantly as you enter a space where quantum mechanics rule supreme. Probability creatures phase in and out of existence while uncertainty itself becomes your enemy...",
+    completionStory: "Probability collapses into certainty as the quantum lord is defeated. The laboratory stabilizes, but echoes of infinite possibility remain.",
+    monsters: [
+      { id: 115, name: "Probability Ghost", level: 25, maxHp: 142, currentHp: 142, attack: 26, goldReward: 25, description: "A being existing in quantum superposition" },
+      { id: 116, name: "Schrödinger's Beast", level: 25, maxHp: 147, currentHp: 147, attack: 26, goldReward: 25, description: "A creature both alive and dead until observed" },
+      { id: 117, name: "Wave Function", level: 26, maxHp: 152, currentHp: 152, attack: 27, goldReward: 26, description: "Mathematical probability given form" },
+      { id: 118, name: "Uncertainty Principle", level: 26, maxHp: 157, currentHp: 157, attack: 27, goldReward: 26, description: "The embodiment of quantum indeterminacy" },
+      { id: 119, name: "Quantum Entangler", level: 27, maxHp: 162, currentHp: 162, attack: 28, goldReward: 27, description: "A being connected across all dimensions" },
+      { id: 120, name: "Quantum Overlord", level: 27, maxHp: 175, currentHp: 175, attack: 28, goldReward: 75, description: "🏆 MINI-BOSS: Master of all possibilities" }
+    ]
+  },
+  {
+    id: "multiverse_nexus",
+    name: "The Multiverse Nexus",
+    description: "The central hub connecting all parallel realities",
+    background: "#9932CC",
+    storyIntro: "You stand at the crossroads of infinite realities, where every possible version of existence converges. Multiverse guardians from countless timelines unite to test your worth...",
+    completionStory: "The nexus acknowledges your singular achievement as the dimensional emperor falls. You have proven worthy across all realities.",
+    monsters: [
+      { id: 121, name: "Parallel Self", level: 26, maxHp: 149, currentHp: 149, attack: 27, goldReward: 26, description: "A version of you from another reality" },
+      { id: 122, name: "Reality Shifter", level: 26, maxHp: 154, currentHp: 154, attack: 27, goldReward: 26, description: "A being that rewrites dimensional laws" },
+      { id: 123, name: "Omniverse Walker", level: 27, maxHp: 159, currentHp: 159, attack: 28, goldReward: 27, description: "A traveler between all possible worlds" },
+      { id: 124, name: "Infinity Mirror", level: 27, maxHp: 164, currentHp: 164, attack: 28, goldReward: 27, description: "A reflection of endless possibilities" },
+      { id: 125, name: "Multiverse Warden", level: 28, maxHp: 169, currentHp: 169, attack: 29, goldReward: 28, description: "Guardian of dimensional stability" },
+      { id: 126, name: "Dimensional Emperor", level: 28, maxHp: 180, currentHp: 180, attack: 29, goldReward: 80, description: "🏆 MINI-BOSS: Ruler of all realities" }
+    ]
+  },
+  {
+    id: "conceptual_plane",
+    name: "The Conceptual Plane",
+    description: "A realm where abstract ideas take physical form and wage eternal war",
+    background: "#4169E1",
+    storyIntro: "You enter a battlefield where pure concepts clash in eternal struggle. Love battles Hate, Order wars with Chaos, and abstract ideals manifest as living entities seeking dominance...",
+    completionStory: "Balance is restored as the concept emperor yields. Ideas return to their abstract forms, but their power now flows through you.",
+    monsters: [
+      { id: 127, name: "Living Paradox", level: 27, maxHp: 156, currentHp: 156, attack: 28, goldReward: 27, description: "A contradiction given form" },
+      { id: 128, name: "Embodied Logic", level: 27, maxHp: 161, currentHp: 161, attack: 28, goldReward: 27, description: "Pure reason made manifest" },
+      { id: 129, name: "Chaos Incarnate", level: 28, maxHp: 166, currentHp: 166, attack: 29, goldReward: 28, description: "The living essence of disorder" },
+      { id: 130, name: "Order Absolute", level: 28, maxHp: 171, currentHp: 171, attack: 29, goldReward: 28, description: "Perfect structure made real" },
+      { id: 131, name: "Unity Principle", level: 29, maxHp: 176, currentHp: 176, attack: 30, goldReward: 29, description: "The force that binds all concepts" },
+      { id: 132, name: "Concept Emperor", level: 29, maxHp: 185, currentHp: 185, attack: 30, goldReward: 85, description: "🏆 MINI-BOSS: Supreme ruler of all ideas" }
+    ]
+  },
+  {
+    id: "meta_reality",
+    name: "The Meta Reality",
+    description: "A layer of existence above existence itself",
+    background: "#DC143C",
+    storyIntro: "You transcend into a space that exists outside normal reality, where the very concept of 'being' is questioned. Meta-entities observe existence from beyond, and now they turn their attention to you...",
+    completionStory: "The meta-realm shimmers as the transcendent falls. You have moved beyond the boundaries of normal existence.",
+    monsters: [
+      { id: 133, name: "Meta Observer", level: 28, maxHp: 163, currentHp: 163, attack: 29, goldReward: 28, description: "A being that watches existence from outside" },
+      { id: 134, name: "Beyond Walker", level: 28, maxHp: 168, currentHp: 168, attack: 29, goldReward: 28, description: "An entity that exists outside normal space" },
+      { id: 135, name: "Narrative Force", level: 29, maxHp: 173, currentHp: 173, attack: 30, goldReward: 29, description: "The power that shapes all stories" },
+      { id: 136, name: "Fourth Wall", level: 29, maxHp: 178, currentHp: 178, attack: 30, goldReward: 29, description: "The barrier between fiction and reality" },
+      { id: 137, name: "Meta Guardian", level: 30, maxHp: 183, currentHp: 183, attack: 31, goldReward: 30, description: "Protector of the reality layer" },
+      { id: 138, name: "Transcendent One", level: 30, maxHp: 190, currentHp: 190, attack: 31, goldReward: 90, description: "🏆 MINI-BOSS: Being beyond all comprehension" }
+    ]
+  },
+  {
+    id: "source_codex",
+    name: "The Source Codex",
+    description: "The fundamental programming language of reality itself",
+    background: "#228B22",
+    storyIntro: "You access the underlying code that defines existence itself. Digital deities and programming primordials guard the source code of reality, ready to debug your very existence...",
+    completionStory: "The codex accepts your input as the architect yields. You now understand the fundamental algorithms of existence.",
+    monsters: [
+      { id: 139, name: "Bug Entity", level: 29, maxHp: 170, currentHp: 170, attack: 30, goldReward: 29, description: "A glitch in the code of reality" },
+      { id: 140, name: "Syntax Guardian", level: 29, maxHp: 175, currentHp: 175, attack: 30, goldReward: 29, description: "Protector of logical structure" },
+      { id: 141, name: "Algorithm God", level: 30, maxHp: 180, currentHp: 180, attack: 31, goldReward: 30, description: "A divine being of pure logic" },
+      { id: 142, name: "Code Compiler", level: 30, maxHp: 185, currentHp: 185, attack: 31, goldReward: 30, description: "The force that makes reality executable" },
+      { id: 143, name: "System Admin", level: 31, maxHp: 190, currentHp: 190, attack: 32, goldReward: 31, description: "The ultimate user with root access" },
+      { id: 144, name: "Reality Architect", level: 31, maxHp: 195, currentHp: 195, attack: 32, goldReward: 95, description: "🏆 MINI-BOSS: Programmer of existence itself" }
+    ]
+  },
+  {
+    id: "omega_terminus",
+    name: "The Omega Terminus",
+    description: "The theoretical end point where all possibilities converge",
+    background: "#8B0000",
+    storyIntro: "You reach the ultimate endpoint where all journeys end and all stories conclude. Omega entities representing the finality of existence prepare for the ultimate test...",
+    completionStory: "The terminus acknowledges your achievement as the omega sovereign yields. You have reached the theoretical peak of dedication.",
+    monsters: [
+      { id: 145, name: "End Walker", level: 30, maxHp: 177, currentHp: 177, attack: 31, goldReward: 30, description: "A being that represents conclusion" },
+      { id: 146, name: "Final Echo", level: 30, maxHp: 182, currentHp: 182, attack: 31, goldReward: 30, description: "The last reverberation of existence" },
+      { id: 147, name: "Terminus Guard", level: 31, maxHp: 187, currentHp: 187, attack: 32, goldReward: 31, description: "Protector of the ultimate endpoint" },
+      { id: 148, name: "Omega Angel", level: 31, maxHp: 192, currentHp: 192, attack: 32, goldReward: 31, description: "Herald of the final achievement" },
+      { id: 149, name: "Conclusion Lord", level: 32, maxHp: 197, currentHp: 197, attack: 33, goldReward: 32, description: "Master of all endings" },
+      { id: 150, name: "Omega Sovereign", level: 32, maxHp: 200, currentHp: 200, attack: 33, goldReward: 100, description: "🏆 MINI-BOSS: The ultimate challenge" }
+    ]
+  },
+  {
+    id: "infinite_recursion",
+    name: "The Infinite Recursion",
+    description: "A loop of existence that calls itself endlessly",
+    background: "#FF1493",
+    storyIntro: "You enter a space that contains itself, where recursive entities loop through infinite iterations of self-reference. Each battle echoes endlessly through fractal dimensions...",
+    completionStory: "The recursion terminates as the loop lord yields. Infinity folds back upon itself, acknowledging your singular achievement.",
+    monsters: [
+      { id: 151, name: "Self Reference", level: 31, maxHp: 184, currentHp: 184, attack: 32, goldReward: 31, description: "A being that defines itself" },
+      { id: 152, name: "Recursive Echo", level: 31, maxHp: 189, currentHp: 189, attack: 32, goldReward: 31, description: "An entity calling itself infinitely" },
+      { id: 153, name: "Fractal Mind", level: 32, maxHp: 194, currentHp: 194, attack: 33, goldReward: 32, description: "Consciousness that contains itself" },
+      { id: 154, name: "Loop Guardian", level: 32, maxHp: 199, currentHp: 199, attack: 33, goldReward: 32, description: "Protector of endless cycles" },
+      { id: 155, name: "Infinite Mirror", level: 33, maxHp: 204, currentHp: 204, attack: 34, goldReward: 33, description: "Reflection reflecting itself forever" },
+      { id: 156, name: "Recursion Lord", level: 33, maxHp: 205, currentHp: 205, attack: 34, goldReward: 105, description: "🏆 MINI-BOSS: Master of self-containing loops" }
+    ]
+  },
+  {
+    id: "absolute_zero",
+    name: "The Absolute Zero",
+    description: "The theoretical point where all motion and possibility cease",
+    background: "#000080",
+    storyIntro: "You enter a realm of perfect stillness where entropy itself has been defeated. Zero-point entities represent the absence of all things, challenging the very notion of existence...",
+    completionStory: "Motion returns to the stillness as the null emperor falls. You have proven that dedication can overcome even absolute nothingness.",
+    monsters: [
+      { id: 157, name: "Void Null", level: 32, maxHp: 191, currentHp: 191, attack: 33, goldReward: 32, description: "The absence of existence itself" },
+      { id: 158, name: "Zero Point", level: 32, maxHp: 196, currentHp: 196, attack: 33, goldReward: 32, description: "The theoretical minimum of all things" },
+      { id: 159, name: "Entropy's End", level: 33, maxHp: 201, currentHp: 201, attack: 34, goldReward: 33, description: "The cessation of all change" },
+      { id: 160, name: "Perfect Vacuum", level: 33, maxHp: 206, currentHp: 206, attack: 34, goldReward: 33, description: "The absence of all matter and energy" },
+      { id: 161, name: "Null Consciousness", level: 34, maxHp: 211, currentHp: 211, attack: 35, goldReward: 34, description: "Awareness of absolute nothingness" },
+      { id: 162, name: "Null Emperor", level: 34, maxHp: 210, currentHp: 210, attack: 35, goldReward: 110, description: "🏆 MINI-BOSS: Sovereign of absolute emptiness" }
+    ]
+  },
+  {
+    id: "beyond_beyond",
+    name: "The Beyond Beyond",
+    description: "A place that exists past the concept of 'beyond' itself",
+    background: "#FF4500",
+    storyIntro: "You step into a realm that transcends transcendence itself. Here, entities exist that are beyond the very concept of being beyond, challenging the limits of imagination...",
+    completionStory: "The beyond yields to your determination as the hyper-entity acknowledges your impossible achievement. You have gone beyond beyond.",
+    monsters: [
+      { id: 163, name: "Meta-Beyond", level: 33, maxHp: 198, currentHp: 198, attack: 34, goldReward: 33, description: "Beyond the concept of beyond" },
+      { id: 164, name: "Hyper-Transcendent", level: 33, maxHp: 203, currentHp: 203, attack: 34, goldReward: 33, description: "Transcending transcendence itself" },
+      { id: 165, name: "Ultra-Concept", level: 34, maxHp: 208, currentHp: 208, attack: 35, goldReward: 34, description: "A concept beyond conceptualization" },
+      { id: 166, name: "Mega-Reality", level: 34, maxHp: 213, currentHp: 213, attack: 35, goldReward: 34, description: "Reality beyond reality's boundaries" },
+      { id: 167, name: "Giga-Existence", level: 35, maxHp: 218, currentHp: 218, attack: 36, goldReward: 35, description: "Existence beyond existing" },
+      { id: 168, name: "Beyond Entity", level: 35, maxHp: 215, currentHp: 215, attack: 36, goldReward: 115, description: "🏆 MINI-BOSS: Being beyond beyondness" }
+    ]
+  },
+  {
+    id: "ultimate_pinnacle",
+    name: "The Ultimate Pinnacle",
+    description: "The absolute peak of all possible achievement",
+    background: "#FFD700",
+    storyIntro: "You stand at the theoretical maximum of dedication and achievement. Here, the ultimate entities represent the pinnacle of what is possible through unwavering commitment...",
+    completionStory: "The pinnacle bows to your unmatched dedication as the apex sovereign yields. You have achieved the ultimate - perfect commitment to your journey.",
+    monsters: [
+      { id: 169, name: "Peak Essence", level: 34, maxHp: 205, currentHp: 205, attack: 35, goldReward: 34, description: "The concentrated essence of achievement" },
+      { id: 170, name: "Summit Guardian", level: 34, maxHp: 210, currentHp: 210, attack: 35, goldReward: 34, description: "Protector of the highest point" },
+      { id: 171, name: "Zenith Lord", level: 35, maxHp: 215, currentHp: 215, attack: 36, goldReward: 35, description: "Master of ultimate heights" },
+      { id: 172, name: "Apex Angel", level: 35, maxHp: 220, currentHp: 220, attack: 36, goldReward: 35, description: "Herald of perfect achievement" },
+      { id: 173, name: "Pinnacle God", level: 36, maxHp: 225, currentHp: 225, attack: 37, goldReward: 36, description: "Divine embodiment of peak performance" },
+      { id: 174, name: "Apex Sovereign", level: 36, maxHp: 250, currentHp: 250, attack: 37, goldReward: 200, description: "🏆 FINAL B-RANK BOSS: Ultimate test of dedication" }
+    ]
+  }
+];
+
+// A-rank Dungeon Zones (64 weeks to complete - 2x B-rank time)
+const ARANK_DUNGEON_ZONES: DungeonZone[] = [
+  {
+    id: "primordial_chaos",
+    name: "The Primordial Chaos",
+    description: "The raw, unformed potential that existed before existence",
+    background: "#800080",
+    storyIntro: "You dive into the swirling maelstrom of pure possibility that predates creation itself. Chaos entities of unimaginable power emerge from the primordial soup of reality...",
+    completionStory: "Order emerges from chaos as the primordial sovereign acknowledges your mastery. You have tamed the untameable.",
+    monsters: [
+      { id: 175, name: "Chaos Seed", level: 37, maxHp: 230, currentHp: 230, attack: 38, goldReward: 37, description: "The potential for all disorder" },
+      { id: 176, name: "Primordial Wisp", level: 37, maxHp: 235, currentHp: 235, attack: 38, goldReward: 37, description: "A fragment of pre-creation energy" },
+      { id: 177, name: "Unformed Giant", level: 38, maxHp: 240, currentHp: 240, attack: 39, goldReward: 38, description: "A titan that never achieved final form" },
+      { id: 178, name: "Possibility Storm", level: 38, maxHp: 245, currentHp: 245, attack: 39, goldReward: 38, description: "A tempest of infinite potential" },
+      { id: 179, name: "Chaos Architect", level: 39, maxHp: 250, currentHp: 250, attack: 40, goldReward: 39, description: "Designer of ordered disorder" },
+      { id: 180, name: "Primordial Sovereign", level: 39, maxHp: 275, currentHp: 275, attack: 40, goldReward: 150, description: "🏆 MINI-BOSS: Ruler of original chaos" }
+    ]
+  },
+  {
+    id: "akashic_records",
+    name: "The Akashic Records",
+    description: "The universal database containing all knowledge that ever was or will be",
+    background: "#4B0082",
+    storyIntro: "You enter the cosmic library where every thought, action, and possibility is recorded for eternity. Knowledge guardians protect the infinite wisdom stored within...",
+    completionStory: "The records acknowledge your worthiness as the archive keeper yields. All knowledge flows through your consciousness.",
+    monsters: [
+      { id: 181, name: "Memory Fragment", level: 38, maxHp: 237, currentHp: 237, attack: 39, goldReward: 38, description: "A shard of forgotten knowledge" },
+      { id: 182, name: "Living Library", level: 38, maxHp: 242, currentHp: 242, attack: 39, goldReward: 38, description: "A repository of endless information" },
+      { id: 183, name: "Wisdom Guardian", level: 39, maxHp: 247, currentHp: 247, attack: 40, goldReward: 39, description: "Protector of ancient knowledge" },
+      { id: 184, name: "Truth Seeker", level: 39, maxHp: 252, currentHp: 252, attack: 40, goldReward: 39, description: "An entity pursuing absolute truth" },
+      { id: 185, name: "Omniscient Eye", level: 40, maxHp: 257, currentHp: 257, attack: 41, goldReward: 40, description: "The all-seeing observer of reality" },
+      { id: 186, name: "Archive Keeper", level: 40, maxHp: 280, currentHp: 280, attack: 41, goldReward: 155, description: "🏆 MINI-BOSS: Guardian of infinite knowledge" }
+    ]
+  },
+  {
+    id: "divine_forge",
+    name: "The Divine Forge",
+    description: "The cosmic smithy where gods craft the fundamental forces of reality",
+    background: "#B22222",
+    storyIntro: "You enter the workshop of the gods where reality itself is hammered into shape. Divine smiths work tirelessly, forging the laws of physics on anvils of pure energy...",
+    completionStory: "The forge acknowledges your strength as the cosmic smith yields. You are now worthy to shape reality itself.",
+    monsters: [
+      { id: 187, name: "Forge Spirit", level: 39, maxHp: 244, currentHp: 244, attack: 40, goldReward: 39, description: "The essence of divine craftsmanship" },
+      { id: 188, name: "Reality Hammer", level: 39, maxHp: 249, currentHp: 249, attack: 40, goldReward: 39, description: "A tool that shapes existence itself" },
+      { id: 189, name: "Divine Anvil", level: 40, maxHp: 254, currentHp: 254, attack: 41, goldReward: 40, description: "The foundation upon which reality is forged" },
+      { id: 190, name: "Cosmic Bellows", level: 40, maxHp: 259, currentHp: 259, attack: 41, goldReward: 40, description: "The breath that fans the fires of creation" },
+      { id: 191, name: "God-Smith", level: 41, maxHp: 264, currentHp: 264, attack: 42, goldReward: 41, description: "A divine craftsman of reality" },
+      { id: 192, name: "Cosmic Smith", level: 41, maxHp: 285, currentHp: 285, attack: 42, goldReward: 160, description: "🏆 MINI-BOSS: Master forger of existence" }
+    ]
+  },
+  {
+    id: "eternal_moment",
+    name: "The Eternal Moment",
+    description: "A single instant stretched across infinite time",
+    background: "#20B2AA",
+    storyIntro: "You step into a moment that lasts forever, where time has crystallized into a perfect eternal now. Temporal entities exist in suspended animation, guarding the secret of timeless existence...",
+    completionStory: "Time flows again as the moment keeper yields. You have learned to exist outside the stream of temporal progression.",
+    monsters: [
+      { id: 193, name: "Frozen Time", level: 40, maxHp: 251, currentHp: 251, attack: 41, goldReward: 40, description: "A shard of crystallized temporal flow" },
+      { id: 194, name: "Eternal Echo", level: 40, maxHp: 256, currentHp: 256, attack: 41, goldReward: 40, description: "A sound that never fades" },
+      { id: 195, name: "Moment Guardian", level: 41, maxHp: 261, currentHp: 261, attack: 42, goldReward: 41, description: "Protector of the eternal now" },
+      { id: 196, name: "Timeless Sage", level: 41, maxHp: 266, currentHp: 266, attack: 42, goldReward: 41, description: "A being existing outside temporal flow" },
+      { id: 197, name: "Infinity Clock", level: 42, maxHp: 271, currentHp: 271, attack: 43, goldReward: 42, description: "A timepiece measuring eternity" },
+      { id: 198, name: "Moment Keeper", level: 42, maxHp: 290, currentHp: 290, attack: 43, goldReward: 165, description: "🏆 MINI-BOSS: Guardian of eternal now" }
+    ]
+  },
+  {
+    id: "perfect_symmetry",
+    name: "The Perfect Symmetry",
+    description: "A realm of absolute balance and mathematical perfection",
+    background: "#DAA520",
+    storyIntro: "You enter a space of flawless proportion where every force has its equal opposite. Symmetry entities maintain perfect balance while testing whether you can tip the scales...",
+    completionStory: "Balance is preserved as the symmetry lord yields. You have achieved perfect harmony between all opposing forces.",
+    monsters: [
+      { id: 199, name: "Mirror Twin", level: 41, maxHp: 258, currentHp: 258, attack: 42, goldReward: 41, description: "Your perfect opposite in all things" },
+      { id: 200, name: "Balance Point", level: 41, maxHp: 263, currentHp: 263, attack: 42, goldReward: 41, description: "The fulcrum of all equilibrium" },
+      { id: 201, name: "Harmonic Resonance", level: 42, maxHp: 268, currentHp: 268, attack: 43, goldReward: 42, description: "Perfect vibrational alignment" },
+      { id: 202, name: "Golden Ratio", level: 42, maxHp: 273, currentHp: 273, attack: 43, goldReward: 42, description: "The mathematical essence of beauty" },
+      { id: 203, name: "Equilibrium Master", level: 43, maxHp: 278, currentHp: 278, attack: 44, goldReward: 43, description: "Keeper of perfect balance" },
+      { id: 204, name: "Symmetry Lord", level: 43, maxHp: 295, currentHp: 295, attack: 44, goldReward: 170, description: "🏆 MINI-BOSS: Master of all proportion" }
+    ]
+  }
+];
+
 // Flatten all monsters for compatibility with existing code
 const ERANK_MONSTERS: Monster[] = ERANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
 const DRANK_MONSTERS: Monster[] = DRANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
 const CRANK_MONSTERS: Monster[] = CRANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
+const BRANK_MONSTERS: Monster[] = BRANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
+const ARANK_MONSTERS: Monster[] = ARANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
 const ALL_MONSTERS: Monster[] = [...ERANK_MONSTERS, ...DRANK_MONSTERS, ...CRANK_MONSTERS];
 
 export default function Battle() {
@@ -1070,6 +1336,66 @@ export default function Battle() {
                       />
                       <h3 className="font-medium text-sm">{zone.name}</h3>
                       <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* B-rank Dungeons - Locked Preview */}
+          <Card className="bg-card/50 border-orange-600/20 mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Skull className="w-6 h-6 text-orange-400" />
+                <span>B-rank Dungeons</span>
+                <span className="text-sm text-muted-foreground">(32 weeks - 12 dungeons)</span>
+                <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded">LOCKED</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-sm italic">
+                Master C-rank content to face primordial forces, quantum mechanics, and meta-reality entities. The ultimate test of long-term dedication.
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mt-4 opacity-50">
+                {BRANK_DUNGEON_ZONES.map((zone) => (
+                  <Card key={zone.id} className="bg-muted/30 border-muted">
+                    <CardContent className="p-2 text-center">
+                      <div 
+                        className="w-3 h-3 rounded-full mx-auto mb-1"
+                        style={{ backgroundColor: zone.background }}
+                      />
+                      <p className="text-xs text-muted-foreground truncate">{zone.name}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* A-rank Dungeons - Locked Preview */}
+          <Card className="bg-card/50 border-red-600/20 mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Skull className="w-6 h-6 text-red-400" />
+                <span>A-rank Dungeons</span>
+                <span className="text-sm text-muted-foreground">(64 weeks - 5 dungeons)</span>
+                <span className="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">LOCKED</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-sm italic">
+                The ultimate endgame content for the most dedicated fitness adventurers. Face primordial chaos, divine forges, and perfect symmetry.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mt-4 opacity-50">
+                {ARANK_DUNGEON_ZONES.map((zone) => (
+                  <Card key={zone.id} className="bg-muted/30 border-muted">
+                    <CardContent className="p-2 text-center">
+                      <div 
+                        className="w-3 h-3 rounded-full mx-auto mb-1"
+                        style={{ backgroundColor: zone.background }}
+                      />
+                      <p className="text-xs text-muted-foreground truncate">{zone.name}</p>
                     </CardContent>
                   </Card>
                 ))}

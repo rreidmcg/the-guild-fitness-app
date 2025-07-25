@@ -77,8 +77,10 @@ Preferred communication style: Simple, everyday language.
   - **E-rank (4 weeks)**: 4 zones × 6 monsters each = 24 monsters (Lv 1-5)
   - **D-rank (8 weeks)**: 6 zones × 6 monsters each = 36 monsters (Lv 6-13) 
   - **C-rank (16 weeks)**: 8 zones × 6 monsters each = 48 monsters (Lv 14-23)
+  - **B-rank (32 weeks)**: 12 zones × 6 monsters each = 72 monsters (Lv 24-36)
+  - **A-rank (64 weeks)**: 5 zones × 6 monsters each = 30 monsters (Lv 37-43)
   - Each rank takes twice as long as the previous, promoting sustainable 3-workout/week routine
-  - Total: 108 monsters across 18 themed zones with cosmic/transcendent endgame content
+  - Total: 210 monsters across 35 themed zones representing 2.5+ years of dedicated fitness content
 - Level progression with title system
 - Multi-stat exercises (e.g., power cleans award all three stats)
 - Achievement system through personal records
