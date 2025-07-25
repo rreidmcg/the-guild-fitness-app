@@ -26,7 +26,6 @@ import {
   Plus,
   Shield
 } from "lucide-react";
-import manaIcon from "@assets/icons8-mana-32_1753480226817.png";
 
 export default function Stats() {
   const [, setLocation] = useLocation();
@@ -109,25 +108,7 @@ export default function Stats() {
     },
   });
 
-  const safeUserStats = userStats || {
-    level: 1,
-    experience: 0,
-    strength: 0,
-    strengthXp: 0,
-    stamina: 0,
-    staminaXp: 0,
-    agility: 0,
-    agilityXp: 0,
-    currentHP: 100,
-    maxHP: 100,
-    currentMP: 100,
-    maxMP: 100,
-    streak: 0,
-    streakFreezes: 0,
-    gold: 0,
-    currentTitle: null,
-    username: 'Player'
-  };
+  const safeUserStats = userStats || {};
   const safeWorkoutSessions = workoutSessions || [];
   const safePersonalRecords = personalRecords || [];
   const safeInventory = inventory as Array<{
@@ -138,11 +119,11 @@ export default function Stats() {
   }> || [];
 
   // Calculate stats
-  const currentLevel = safeUserStats.level;
-  const currentXP = safeUserStats.experience;
+  const currentLevel = safeUserStats.level || 1;
+  const currentXP = safeUserStats.experience || 0;
   const xpForNextLevel = currentLevel * 1000;
   const xpProgress = (currentXP % 1000) / 1000 * 100;
-  const streak = safeUserStats.streak;
+  const streak = safeUserStats.streak || 0;
   
   // Get recent session stats
   const recentSessions = safeWorkoutSessions.slice(0, 7); // Last 7 sessions
@@ -204,7 +185,7 @@ export default function Stats() {
                   </span>
                 </div>
               )}
-              <h3 className="text-2xl font-bold mb-6 text-foreground">{safeUserStats.username}</h3>
+              <h3 className="text-2xl font-bold mb-6 text-foreground">{safeUserStats.username || 'Player'}</h3>
             </div>
 
             {/* 2D Avatar Display */}
@@ -250,13 +231,13 @@ export default function Stats() {
                   <span className="font-semibold text-red-400">Health</span>
                 </div>
                 <span className="text-sm text-red-300">
-                  {safeUserStats.currentHP}/{safeUserStats.maxHP} HP
+                  {safeUserStats.currentHP || 0}/{safeUserStats.maxHP || 100} HP
                 </span>
               </div>
               <div className="w-full bg-red-900 rounded-full h-3">
                 <div 
                   className="h-3 rounded-full transition-all duration-300 bg-gradient-to-r from-red-600 to-red-500" 
-                  style={{ width: `${(safeUserStats.currentHP / safeUserStats.maxHP) * 100}%` }}
+                  style={{ width: `${((safeUserStats.currentHP || 0) / (safeUserStats.maxHP || 100)) * 100}%` }}
                 ></div>
               </div>
             </div>
@@ -265,17 +246,17 @@ export default function Stats() {
             <div className="mb-6 p-4 bg-blue-900/20 rounded-lg border border-blue-700">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <img src={manaIcon} alt="Mana" className="w-5 h-5" />
+                  <Zap className="w-5 h-5 text-blue-400" />
                   <span className="font-semibold text-blue-400">Mana</span>
                 </div>
                 <span className="text-sm text-blue-300">
-                  {safeUserStats.currentMP}/{safeUserStats.maxMP} MP
+                  {safeUserStats.currentMP || 0}/{safeUserStats.maxMP || 100} MP
                 </span>
               </div>
               <div className="w-full bg-blue-900 rounded-full h-3">
                 <div 
                   className="h-3 rounded-full transition-all duration-300 bg-gradient-to-r from-blue-600 to-blue-500" 
-                  style={{ width: `${(safeUserStats.currentMP / safeUserStats.maxMP) * 100}%` }}
+                  style={{ width: `${((safeUserStats.currentMP || 0) / (safeUserStats.maxMP || 100)) * 100}%` }}
                 ></div>
               </div>
             </div>
@@ -284,24 +265,27 @@ export default function Stats() {
             <div className="grid grid-cols-3 gap-4 mb-6">
               <EnhancedStatBar
                 label="STR"
-                statLevel={safeUserStats.strength}
-                totalXp={safeUserStats.strengthXp}
+                currentValue={safeUserStats.strength || 0}
+                currentXP={safeUserStats.strengthXp || 0}
                 color="red"
                 icon={<Dumbbell />}
+                tooltip="Strength affects your lifting capacity and muscle building"
               />
               <EnhancedStatBar
                 label="STA"
-                statLevel={safeUserStats.stamina}
-                totalXp={safeUserStats.staminaXp}
+                currentValue={safeUserStats.stamina || 0}
+                currentXP={safeUserStats.staminaXp || 0}
                 color="green"
                 icon={<Heart />}
+                tooltip="Stamina affects your endurance and recovery speed"
               />
               <EnhancedStatBar
                 label="AGI"
-                statLevel={safeUserStats.agility}
-                totalXp={safeUserStats.agilityXp}
+                currentValue={safeUserStats.agility || 0}
+                currentXP={safeUserStats.agilityXp || 0}
                 color="blue"
                 icon={<Zap />}
+                tooltip="Agility affects your speed and coordination"
               />
             </div>
           </CardContent>
@@ -326,7 +310,7 @@ export default function Stats() {
                   <Button
                     size="sm"
                     onClick={() => usePotionMutation.mutate("health")}
-                    disabled={usePotionMutation.isPending || safeUserStats.currentHP >= safeUserStats.maxHP}
+                    disabled={usePotionMutation.isPending || (safeUserStats.currentHP || 0) >= (safeUserStats.maxHP || 100)}
                     className="w-full bg-red-600 hover:bg-red-700 text-xs"
                   >
                     Use
@@ -343,7 +327,7 @@ export default function Stats() {
                   <Button
                     size="sm"
                     onClick={() => usePotionMutation.mutate("mana")}
-                    disabled={usePotionMutation.isPending || safeUserStats.currentMP >= safeUserStats.maxMP}
+                    disabled={usePotionMutation.isPending || (safeUserStats.currentMP || 0) >= (safeUserStats.maxMP || 100)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-xs"
                   >
                     Use
@@ -355,11 +339,11 @@ export default function Stats() {
               <div className="bg-cyan-900/20 border border-cyan-700 rounded-lg p-4 text-center">
                 <div className="text-2xl mb-2">🧊</div>
                 <p className="text-sm font-medium text-cyan-400">Streak Freeze</p>
-                <p className="text-xs text-muted-foreground mb-2">Count: {safeUserStats.streakFreezes}</p>
+                <p className="text-xs text-muted-foreground mb-2">Count: {safeUserStats.streakFreezes || 0}</p>
                 <Button
                   size="sm"
                   onClick={() => useStreakFreezeMutation.mutate()}
-                  disabled={useStreakFreezeMutation.isPending || safeUserStats.streakFreezes === 0}
+                  disabled={useStreakFreezeMutation.isPending || (safeUserStats.streakFreezes || 0) === 0}
                   className="w-full bg-cyan-600 hover:bg-cyan-700 text-xs"
                 >
                   Use
@@ -370,7 +354,7 @@ export default function Stats() {
               <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4 text-center">
                 <div className="text-2xl mb-2">🪙</div>
                 <p className="text-sm font-medium text-yellow-400">Gold</p>
-                <p className="text-lg font-bold text-yellow-300">{safeUserStats.gold}</p>
+                <p className="text-lg font-bold text-yellow-300">{safeUserStats.gold || 0}</p>
               </div>
             </div>
           </CardContent>
