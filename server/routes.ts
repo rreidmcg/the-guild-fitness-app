@@ -598,7 +598,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if title is available for user's level
       const titleReq = titleRequirements.find(req => req.title === title);
-      if (titleReq && user.level < titleReq.level) {
+      const userLevel = user.level || 1; // Default to level 1 if null
+      if (titleReq && userLevel < titleReq.level) {
         return res.status(403).json({ 
           error: `You need to reach level ${titleReq.level} to unlock the "${title}" title` 
         });
