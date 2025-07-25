@@ -36,9 +36,9 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
   };
 
   return (
-    <Card className="bg-game-slate border-gray-700">
+    <Card className="bg-gray-900/80 backdrop-blur-sm border-yellow-500/30">
       <CardHeader>
-        <CardTitle>Exercise Library</CardTitle>
+        <CardTitle className="text-yellow-400">Exercise Library</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Search */}
@@ -48,7 +48,7 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
             placeholder="Search exercises..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-700 border-gray-600"
+            className="pl-10 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-500"
           />
         </div>
 
@@ -58,7 +58,10 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
             variant={selectedCategory === null ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory(null)}
-            className="text-xs"
+            className={selectedCategory === null 
+              ? "text-xs bg-yellow-600 hover:bg-yellow-700 text-black" 
+              : "text-xs border-gray-600 text-gray-300 hover:bg-gray-700"
+            }
           >
             All
           </Button>
@@ -68,7 +71,10 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
               variant={selectedCategory === category ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category)}
-              className="text-xs capitalize"
+              className={selectedCategory === category 
+                ? "text-xs bg-yellow-600 hover:bg-yellow-700 text-black capitalize" 
+                : "text-xs border-gray-600 text-gray-300 hover:bg-gray-700 capitalize"
+              }
             >
               {category}
             </Button>
@@ -84,8 +90,8 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
                 key={exercise.id} 
                 className={`cursor-pointer transition-colors ${
                   isSelected 
-                    ? 'bg-game-primary/20 border-game-primary' 
-                    : 'bg-gray-800 border-gray-600 hover:bg-gray-700'
+                    ? 'bg-yellow-500/20 border-yellow-500' 
+                    : 'bg-gray-800/70 border-gray-600 hover:bg-gray-700/80 hover:border-yellow-500/50'
                 }`}
                 onClick={() => !isSelected && onSelectExercise(exercise)}
               >
@@ -104,9 +110,9 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
                     </div>
                     <div className="ml-2">
                       {isSelected ? (
-                        <Check className="w-4 h-4 text-game-success" />
+                        <Check className="w-4 h-4 text-yellow-400" />
                       ) : (
-                        <Plus className="w-4 h-4 text-gray-400" />
+                        <Plus className="w-4 h-4 text-gray-400 hover:text-yellow-400 transition-colors" />
                       )}
                     </div>
                   </div>
