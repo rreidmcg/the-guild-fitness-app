@@ -144,6 +144,7 @@ export const dailyProgress = pgTable("daily_progress", {
   hydration: boolean("hydration").default(false),
   steps: boolean("steps").default(false),
   protein: boolean("protein").default(false),
+  sleep: boolean("sleep").default(false), // New sleep quest (7+ hours)
   xpAwarded: boolean("xp_awarded").default(false), // Track if 5 XP was already given
   streakFreezeAwarded: boolean("streak_freeze_awarded").default(false), // Track if streak freeze was given
   createdAt: timestamp("created_at").defaultNow(),

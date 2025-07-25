@@ -17,6 +17,7 @@ import {
   Droplets,
   Footprints,
   UtensilsCrossed,
+  Moon,
   Star,
   Settings,
   Gift,
@@ -46,7 +47,7 @@ export default function Workouts() {
   });
 
   const toggleDailyQuestMutation = useMutation({
-    mutationFn: async ({ questType, completed }: { questType: 'hydration' | 'steps' | 'protein'; completed: boolean }) => {
+    mutationFn: async ({ questType, completed }: { questType: 'hydration' | 'steps' | 'protein' | 'sleep'; completed: boolean }) => {
       return apiRequest<{ 
         completed: boolean; 
         xpAwarded?: boolean; 
@@ -68,13 +69,13 @@ export default function Workouts() {
         let description = "Keep going to complete all daily quests for rewards!";
         
         if (data.xpAwarded && data.streakFreezeAwarded) {
-          message = "All Daily Quests Complete!";
+          message = "Rewards Earned!";
           description = "You earned 5 XP and a Streak Freeze!";
         } else if (data.xpAwarded) {
           message = "All Daily Quests Complete!";
           description = "You earned 5 XP! (Already have max Streak Freezes)";
         } else if (data.streakFreezeAwarded) {
-          message = "All Daily Quests Complete!";
+          message = "2+ Quests Complete!";
           description = "You earned a Streak Freeze!";
         }
         
@@ -134,7 +135,7 @@ export default function Workouts() {
     setLocation(`/workout-session/${program.id}`);
   };
 
-  const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein', checked: boolean) => {
+  const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein' | 'sleep', checked: boolean) => {
     // Only update if the state is actually changing
     if (checked !== dailyProgress?.[questType]) {
       toggleDailyQuestMutation.mutate({ questType, completed: checked });
@@ -181,13 +182,16 @@ export default function Workouts() {
             <div className="flex items-center justify-center space-x-4">
               <Gift className="w-6 h-6 text-yellow-500" />
               <div className="text-center">
-                <h3 className="font-bold text-yellow-400">Daily Quest Completion Rewards</h3>
-                <div className="flex items-center justify-center space-x-4 mt-2 text-sm">
+                <h3 className="font-bold text-yellow-400">Daily Quest Rewards</h3>
+                <div className="flex items-center justify-center space-x-6 mt-2 text-sm">
                   <div className="flex items-center space-x-1">
                     <Shield className="w-4 h-4 text-blue-500" />
-                    <span className="text-foreground">1 Streak Freeze</span>
+                    <span className="text-foreground">2+ Quests: Streak Freeze</span>
                   </div>
-                  <span className="text-muted-foreground">(max 2)</span>
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span className="text-foreground">All 4: +5 XP</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -203,17 +207,21 @@ export default function Workouts() {
                 Daily Quests
               </CardTitle>
               <div className="text-sm text-muted-foreground">
-                {dailyProgress?.hydration && dailyProgress?.steps && dailyProgress?.protein
+                {dailyProgress?.hydration && dailyProgress?.steps && dailyProgress?.protein && dailyProgress?.sleep
                   ? dailyProgress?.xpAwarded 
-                    ? "Complete! Rewards Earned"
-                    : "Complete! Processing rewards..."
-                  : ""
+                    ? "All Complete! Rewards Earned"
+                    : "All Complete! Processing rewards..."
+                  : [dailyProgress?.hydration, dailyProgress?.steps, dailyProgress?.protein, dailyProgress?.sleep].filter(Boolean).length >= 2
+                    ? dailyProgress?.streakFreezeAwarded
+                      ? "2+ Complete! Streak Freeze Earned"
+                      : "2+ Complete! Processing rewards..."
+                    : ""
                 }
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Hydration Quest */}
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -281,6 +289,31 @@ export default function Workouts() {
                         <p className="text-xs text-muted-foreground">Hit your protein target</p>
                       </div>
                       <div className="text-xs text-orange-500 font-medium">+5 XP</div>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span>Check/uncheck to mark quest completion status</span>
+                </TooltipContent>
+              </Tooltip>
+
+              {/* Sleep Quest */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center space-x-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 cursor-help">
+                    <Checkbox
+                      checked={dailyProgress?.sleep || false}
+                      onCheckedChange={(checked) => handleQuestCheck('sleep', checked as boolean)}
+                      disabled={toggleDailyQuestMutation.isPending}
+                      className="border-purple-500 data-[state=checked]:bg-purple-500"
+                    />
+                    <div className="flex items-center gap-2 flex-1">
+                      <Moon className="w-5 h-5 text-purple-500" />
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">Sleep Well</p>
+                        <p className="text-xs text-muted-foreground">Get 7+ hours of sleep</p>
+                      </div>
+                      <div className="text-xs text-purple-500 font-medium">+5 XP</div>
                     </div>
                   </div>
                 </TooltipTrigger>

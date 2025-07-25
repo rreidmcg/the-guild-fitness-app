@@ -718,6 +718,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hydration: false,
         steps: false,
         protein: false,
+        sleep: false,
         xpAwarded: false
       });
     } catch (error) {
@@ -730,7 +731,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { questType, completed } = req.body;
       const userId = currentUserId; // Use the current logged-in user
       
-      if (!questType || !['hydration', 'steps', 'protein'].includes(questType)) {
+      if (!questType || !['hydration', 'steps', 'protein', 'sleep'].includes(questType)) {
         return res.status(400).json({ error: "Invalid quest type" });
       }
       
@@ -750,7 +751,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { questType } = req.body;
       const userId = currentUserId; // Use the current logged-in user
       
-      if (!questType || !['hydration', 'steps', 'protein'].includes(questType)) {
+      if (!questType || !['hydration', 'steps', 'protein', 'sleep'].includes(questType)) {
         return res.status(400).json({ error: "Invalid quest type" });
       }
       

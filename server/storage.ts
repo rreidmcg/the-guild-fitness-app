@@ -70,8 +70,8 @@ export interface IStorage {
   // Daily quest operations
   getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined>;
   updateDailyProgress(userId: number, date: string, updates: Partial<DailyProgress>): Promise<DailyProgress>;
-  toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }>;
-  completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }>;
+  toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }>;
+  completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }>;
   
   // Streak system operations
   updateStreak(userId: number): Promise<void>;
@@ -547,6 +547,7 @@ export class DatabaseStorage implements IStorage {
           hydration: false,
           steps: false,
           protein: false,
+          sleep: false,
           xpAwarded: false,
           ...updates
         })
@@ -555,7 +556,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }> {
+  async toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }> {
     await this.ensureInitialized();
     
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -567,7 +568,8 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Store previous state
-    const previousAllCompleted = progress.hydration && progress.steps && progress.protein;
+    const previousAllCompleted = progress.hydration && progress.steps && progress.protein && progress.sleep;
+    const previousTwoOrMoreCompleted = [progress.hydration, progress.steps, progress.protein, progress.sleep].filter(Boolean).length >= 2;
     const wasXpAwarded = progress.xpAwarded;
     const wasStreakFreezeAwarded = progress.streakFreezeAwarded;
     
@@ -576,8 +578,9 @@ export class DatabaseStorage implements IStorage {
       [questType]: completed
     });
     
-    // Check if all quests are completed after this change
-    const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein;
+    // Check completion states after this change
+    const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein && updatedProgress.sleep;
+    const twoOrMoreCompleted = [updatedProgress.hydration, updatedProgress.steps, updatedProgress.protein, updatedProgress.sleep].filter(Boolean).length >= 2;
     let xpAwarded = false;
     let streakFreezeAwarded = false;
     let xpRemoved = false;
@@ -601,8 +604,8 @@ export class DatabaseStorage implements IStorage {
         }
       }
       
-      if (allCompleted && !updatedProgress.streakFreezeAwarded) {
-        // Award streak freeze if user has less than 2
+      if (twoOrMoreCompleted && !updatedProgress.streakFreezeAwarded) {
+        // Award streak freeze if user has less than 2 (requires 2 of 4 quests)
         const user = await this.getUser(userId);
         if (user && (user.streakFreezeCount ?? 0) < 2) {
           await this.updateUser(userId, {
@@ -618,25 +621,24 @@ export class DatabaseStorage implements IStorage {
       }
     } else {
       // UNCHECKING A QUEST
-      // If we had all completed before but now we don't, remove rewards
-      if (previousAllCompleted && !allCompleted) {
-        const user = await this.getUser(userId);
-        if (user) {
-          // Remove XP if it was awarded
-          if (wasXpAwarded) {
-            await this.updateUser(userId, {
-              experience: Math.max(0, (user.experience ?? 0) - 5)
-            });
-            
-            // Mark XP as not awarded
-            await this.updateDailyProgress(userId, today, {
-              xpAwarded: false
-            });
-            xpRemoved = true;
-          }
+      const user = await this.getUser(userId);
+      if (user) {
+        // Remove XP if it was awarded and we no longer have all 4 quests
+        if (previousAllCompleted && !allCompleted && wasXpAwarded) {
+          await this.updateUser(userId, {
+            experience: Math.max(0, (user.experience ?? 0) - 5)
+          });
           
-          // Remove streak freeze if it was awarded  
-          if (wasStreakFreezeAwarded && (user.streakFreezeCount ?? 0) > 0) {
+          // Mark XP as not awarded
+          await this.updateDailyProgress(userId, today, {
+            xpAwarded: false
+          });
+          xpRemoved = true;
+        }
+        
+        // Remove streak freeze if it was awarded and we now have less than 2 quests
+        if (previousTwoOrMoreCompleted && !twoOrMoreCompleted && wasStreakFreezeAwarded) {
+          if ((user.streakFreezeCount ?? 0) > 0) {
             await this.updateUser(userId, {
               streakFreezeCount: (user.streakFreezeCount ?? 0) - 1
             });
@@ -658,7 +660,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Keep backwards compatibility
-  async completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }> {
+  async completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }> {
     const result = await this.toggleDailyQuest(userId, questType, true);
     return { completed: result.completed, xpAwarded: result.xpAwarded, streakFreezeAwarded: result.streakFreezeAwarded };
   }
@@ -685,11 +687,12 @@ export class DatabaseStorage implements IStorage {
     const completedQuests = [
       todaysProgress?.hydration,
       todaysProgress?.steps, 
-      todaysProgress?.protein
+      todaysProgress?.protein,
+      todaysProgress?.sleep
     ].filter(Boolean).length;
     
     // Check if streak requirements are met:
-    // - 2 of 3 daily quests completed OR at least 1 workout completed
+    // - 2 of 4 daily quests completed OR at least 1 workout completed
     const streakRequirementMet = completedQuests >= 2 || todaysWorkouts.length > 0;
     
     if (streakRequirementMet) {
