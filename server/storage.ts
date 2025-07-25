@@ -70,6 +70,7 @@ export interface IStorage {
   // Daily quest operations
   getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined>;
   updateDailyProgress(userId: number, date: string, updates: Partial<DailyProgress>): Promise<DailyProgress>;
+  toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }>;
   completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }>;
   
   // Streak system operations
@@ -554,7 +555,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }> {
+  async toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }> {
     await this.ensureInitialized();
     
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -565,52 +566,101 @@ export class DatabaseStorage implements IStorage {
       progress = await this.updateDailyProgress(userId, today, {});
     }
     
-    // Mark the specific quest as completed
+    // Store previous state
+    const previousAllCompleted = progress.hydration && progress.steps && progress.protein;
+    const wasXpAwarded = progress.xpAwarded;
+    const wasStreakFreezeAwarded = progress.streakFreezeAwarded;
+    
+    // Update the specific quest state
     const updatedProgress = await this.updateDailyProgress(userId, today, {
-      [questType]: true
+      [questType]: completed
     });
     
-    // Check if all quests are completed
+    // Check if all quests are completed after this change
     const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein;
     let xpAwarded = false;
     let streakFreezeAwarded = false;
+    let xpRemoved = false;
+    let streakFreezeRemoved = false;
     
-    if (allCompleted && !updatedProgress.xpAwarded) {
-      // Award 5 XP for completing all daily quests
-      const user = await this.getUser(userId);
-      if (user) {
-        await this.updateUser(userId, {
-          experience: (user.experience ?? 0) + 5
-        });
-        
-        // Mark XP as awarded
-        await this.updateDailyProgress(userId, today, {
-          xpAwarded: true
-        });
-        xpAwarded = true;
+    if (completed) {
+      // COMPLETING A QUEST
+      if (allCompleted && !updatedProgress.xpAwarded) {
+        // Award 5 XP for completing all daily quests
+        const user = await this.getUser(userId);
+        if (user) {
+          await this.updateUser(userId, {
+            experience: (user.experience ?? 0) + 5
+          });
+          
+          // Mark XP as awarded
+          await this.updateDailyProgress(userId, today, {
+            xpAwarded: true
+          });
+          xpAwarded = true;
+        }
+      }
+      
+      if (allCompleted && !updatedProgress.streakFreezeAwarded) {
+        // Award streak freeze if user has less than 2
+        const user = await this.getUser(userId);
+        if (user && (user.streakFreezeCount ?? 0) < 2) {
+          await this.updateUser(userId, {
+            streakFreezeCount: (user.streakFreezeCount ?? 0) + 1
+          });
+          
+          // Mark streak freeze as awarded
+          await this.updateDailyProgress(userId, today, {
+            streakFreezeAwarded: true
+          });
+          streakFreezeAwarded = true;
+        }
+      }
+    } else {
+      // UNCHECKING A QUEST
+      // If we had all completed before but now we don't, remove rewards
+      if (previousAllCompleted && !allCompleted) {
+        const user = await this.getUser(userId);
+        if (user) {
+          // Remove XP if it was awarded
+          if (wasXpAwarded) {
+            await this.updateUser(userId, {
+              experience: Math.max(0, (user.experience ?? 0) - 5)
+            });
+            
+            // Mark XP as not awarded
+            await this.updateDailyProgress(userId, today, {
+              xpAwarded: false
+            });
+            xpRemoved = true;
+          }
+          
+          // Remove streak freeze if it was awarded  
+          if (wasStreakFreezeAwarded && (user.streakFreezeCount ?? 0) > 0) {
+            await this.updateUser(userId, {
+              streakFreezeCount: (user.streakFreezeCount ?? 0) - 1
+            });
+            
+            // Mark streak freeze as not awarded
+            await this.updateDailyProgress(userId, today, {
+              streakFreezeAwarded: false
+            });
+            streakFreezeRemoved = true;
+          }
+        }
       }
     }
     
-    if (allCompleted && !updatedProgress.streakFreezeAwarded) {
-      // Award streak freeze if user has less than 2
-      const user = await this.getUser(userId);
-      if (user && (user.streakFreezeCount ?? 0) < 2) {
-        await this.updateUser(userId, {
-          streakFreezeCount: (user.streakFreezeCount ?? 0) + 1
-        });
-        
-        // Mark streak freeze as awarded
-        await this.updateDailyProgress(userId, today, {
-          streakFreezeAwarded: true
-        });
-        streakFreezeAwarded = true;
-      }
-    }
-    
-    // Update streak after completing quest
+    // Update streak after quest change
     await this.updateStreak(userId);
     
-    return { completed: true, xpAwarded, streakFreezeAwarded };
+    return { completed, xpAwarded, streakFreezeAwarded, xpRemoved, streakFreezeRemoved };
+  }
+
+  // Keep backwards compatibility
+  async completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }> {
+    const result = await this.toggleDailyQuest(userId, questType, true);
+    return { completed: result.completed, xpAwarded: result.xpAwarded, streakFreezeAwarded: result.streakFreezeAwarded };
   }
 
   async updateStreak(userId: number): Promise<void> {

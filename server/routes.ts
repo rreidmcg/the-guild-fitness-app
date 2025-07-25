@@ -725,6 +725,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/toggle-daily-quest", async (req, res) => {
+    try {
+      const { questType, completed } = req.body;
+      const userId = currentUserId; // Use the current logged-in user
+      
+      if (!questType || !['hydration', 'steps', 'protein'].includes(questType)) {
+        return res.status(400).json({ error: "Invalid quest type" });
+      }
+      
+      if (typeof completed !== 'boolean') {
+        return res.status(400).json({ error: "Completed must be a boolean" });
+      }
+      
+      const result = await storage.toggleDailyQuest(userId, questType, completed);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to toggle daily quest" });
+    }
+  });
+
   app.post("/api/complete-daily-quest", async (req, res) => {
     try {
       const { questType } = req.body;

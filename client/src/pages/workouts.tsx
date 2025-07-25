@@ -45,40 +45,69 @@ export default function Workouts() {
     queryKey: ["/api/user/stats"],
   });
 
-  const completeDailyQuestMutation = useMutation({
-    mutationFn: async (questType: 'hydration' | 'steps' | 'protein') => {
-      return apiRequest<{ xpAwarded?: boolean; streakFreezeAwarded?: boolean }>("/api/complete-daily-quest", {
+  const toggleDailyQuestMutation = useMutation({
+    mutationFn: async ({ questType, completed }: { questType: 'hydration' | 'steps' | 'protein'; completed: boolean }) => {
+      return apiRequest<{ 
+        completed: boolean; 
+        xpAwarded?: boolean; 
+        streakFreezeAwarded?: boolean; 
+        xpRemoved?: boolean; 
+        streakFreezeRemoved?: boolean 
+      }>("/api/toggle-daily-quest", {
         method: "POST",
-        body: { questType },
+        body: { questType, completed },
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/daily-progress"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       
-      let message = "Quest Completed!";
-      let description = "Keep going to complete all daily quests for rewards!";
-      
-      if (data.xpAwarded && data.streakFreezeAwarded) {
-        message = "All Daily Quests Complete!";
-        description = "You earned 5 XP and a Streak Freeze!";
-      } else if (data.xpAwarded) {
-        message = "All Daily Quests Complete!";
-        description = "You earned 5 XP! (Already have max Streak Freezes)";
-      } else if (data.streakFreezeAwarded) {
-        message = "All Daily Quests Complete!";
-        description = "You earned a Streak Freeze!";
+      if (variables.completed) {
+        // Quest completed
+        let message = "Quest Completed!";
+        let description = "Keep going to complete all daily quests for rewards!";
+        
+        if (data.xpAwarded && data.streakFreezeAwarded) {
+          message = "All Daily Quests Complete!";
+          description = "You earned 5 XP and a Streak Freeze!";
+        } else if (data.xpAwarded) {
+          message = "All Daily Quests Complete!";
+          description = "You earned 5 XP! (Already have max Streak Freezes)";
+        } else if (data.streakFreezeAwarded) {
+          message = "All Daily Quests Complete!";
+          description = "You earned a Streak Freeze!";
+        }
+        
+        toast({
+          title: message,
+          description: description,
+        });
+      } else {
+        // Quest unchecked
+        let message = "Quest Unchecked";
+        let description = "Quest marked as incomplete.";
+        
+        if (data.xpRemoved && data.streakFreezeRemoved) {
+          message = "Rewards Removed";
+          description = "5 XP and 1 Streak Freeze have been removed.";
+        } else if (data.xpRemoved) {
+          message = "XP Removed";
+          description = "5 XP has been removed for uncompleting all quests.";
+        } else if (data.streakFreezeRemoved) {
+          message = "Streak Freeze Removed";
+          description = "1 Streak Freeze has been removed.";
+        }
+        
+        toast({
+          title: message,
+          description: description,
+        });
       }
-      
-      toast({
-        title: message,
-        description: description,
-      });
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to complete quest. Please try again.",
+        description: "Failed to update quest. Please try again.",
         variant: "destructive",
       });
     },
@@ -106,8 +135,9 @@ export default function Workouts() {
   };
 
   const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein', checked: boolean) => {
-    if (checked && !dailyProgress?.[questType]) {
-      completeDailyQuestMutation.mutate(questType);
+    // Only update if the state is actually changing
+    if (checked !== dailyProgress?.[questType]) {
+      toggleDailyQuestMutation.mutate({ questType, completed: checked });
     }
   };
 
@@ -191,7 +221,7 @@ export default function Workouts() {
                     <Checkbox
                       checked={dailyProgress?.hydration || false}
                       onCheckedChange={(checked) => handleQuestCheck('hydration', checked as boolean)}
-                      disabled={dailyProgress?.hydration || completeDailyQuestMutation.isPending}
+                      disabled={toggleDailyQuestMutation.isPending}
                       className="border-blue-500 data-[state=checked]:bg-blue-500"
                     />
                     <div className="flex items-center gap-2 flex-1">
@@ -205,7 +235,7 @@ export default function Workouts() {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <span>Check off when you've completed this daily quest</span>
+                  <span>Check/uncheck to mark quest completion status</span>
                 </TooltipContent>
               </Tooltip>
 
@@ -216,7 +246,7 @@ export default function Workouts() {
                     <Checkbox
                       checked={dailyProgress?.steps || false}
                       onCheckedChange={(checked) => handleQuestCheck('steps', checked as boolean)}
-                      disabled={dailyProgress?.steps || completeDailyQuestMutation.isPending}
+                      disabled={toggleDailyQuestMutation.isPending}
                       className="border-green-500 data-[state=checked]:bg-green-500"
                     />
                     <div className="flex items-center gap-2 flex-1">
@@ -230,7 +260,7 @@ export default function Workouts() {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <span>Check off when you've completed this daily quest</span>
+                  <span>Check/uncheck to mark quest completion status</span>
                 </TooltipContent>
               </Tooltip>
 
@@ -241,7 +271,7 @@ export default function Workouts() {
                     <Checkbox
                       checked={dailyProgress?.protein || false}
                       onCheckedChange={(checked) => handleQuestCheck('protein', checked as boolean)}
-                      disabled={dailyProgress?.protein || completeDailyQuestMutation.isPending}
+                      disabled={toggleDailyQuestMutation.isPending}
                       className="border-orange-500 data-[state=checked]:bg-orange-500"
                     />
                     <div className="flex items-center gap-2 flex-1">
@@ -255,7 +285,7 @@ export default function Workouts() {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <span>Check off when you've completed this daily quest</span>
+                  <span>Check/uncheck to mark quest completion status</span>
                 </TooltipContent>
               </Tooltip>
             </div>
