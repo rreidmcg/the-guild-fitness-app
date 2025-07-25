@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap } from "lucide-react";
 import { CurrencyHeader } from "@/components/ui/currency-header";
+import { getTitleComponent } from "@/lib/title-rarity";
 
 export default function LeaderboardPage() {
   const { data: leaderboard, isLoading } = useQuery({
@@ -90,7 +91,7 @@ export default function LeaderboardPage() {
                         <div className="flex items-center space-x-2">
                           <h3 className="font-semibold text-foreground">{player.username}</h3>
                           {player.title && (
-                            <span className="text-xs px-2 py-1 bg-purple-600/20 text-purple-400 rounded-full border border-purple-600/30">
+                            <span className={getTitleComponent(player.title, "sm").className}>
                               {player.title}
                             </span>
                           )}

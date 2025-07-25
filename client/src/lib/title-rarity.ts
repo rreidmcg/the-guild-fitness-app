@@ -1,0 +1,157 @@
+/**
+ * Title rarity system for Dumbbells & Dragons
+ * Defines color coding for titles based on rarity tiers
+ */
+
+export interface TitleRarity {
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  rarity: string;
+}
+
+export const getTitleRarity = (title: string): TitleRarity => {
+  // G.M. title is highest rarity (red/relic)
+  if (title === "G.M.") {
+    return {
+      color: "text-red-400",
+      bgColor: "bg-red-600/20",
+      borderColor: "border-red-600/30",
+      rarity: "relic"
+    };
+  }
+
+  // Define title rarities based on progression
+  const titleRarities: Record<string, TitleRarity> = {
+    // Common titles (white) - starter titles
+    "Recruit": {
+      color: "text-gray-300",
+      bgColor: "bg-gray-600/20",
+      borderColor: "border-gray-600/30",
+      rarity: "common"
+    },
+    "Fitness Novice": {
+      color: "text-gray-300",
+      bgColor: "bg-gray-600/20",
+      borderColor: "border-gray-600/30",
+      rarity: "common"
+    },
+
+    // Uncommon titles (green) - early progression
+    "Fitness Apprentice": {
+      color: "text-green-400",
+      bgColor: "bg-green-600/20",
+      borderColor: "border-green-600/30",
+      rarity: "uncommon"
+    },
+    "Iron Novice": {
+      color: "text-green-400",
+      bgColor: "bg-green-600/20",
+      borderColor: "border-green-600/30",
+      rarity: "uncommon"
+    },
+
+    // Rare titles (blue) - mid progression
+    "Fitness Warrior": {
+      color: "text-blue-400",
+      bgColor: "bg-blue-600/20",
+      borderColor: "border-blue-600/30",
+      rarity: "rare"
+    },
+    "Iron Warrior": {
+      color: "text-blue-400",
+      bgColor: "bg-blue-600/20",
+      borderColor: "border-blue-600/30",
+      rarity: "rare"
+    },
+    "Fitness Veteran": {
+      color: "text-blue-400",
+      bgColor: "bg-blue-600/20",
+      borderColor: "border-blue-600/30",
+      rarity: "rare"
+    },
+
+    // Epic titles (purple) - high progression
+    "Fitness Champion": {
+      color: "text-purple-400",
+      bgColor: "bg-purple-600/20",
+      borderColor: "border-purple-600/30",
+      rarity: "epic"
+    },
+    "Iron Champion": {
+      color: "text-purple-400",
+      bgColor: "bg-purple-600/20",
+      borderColor: "border-purple-600/30",
+      rarity: "epic"
+    },
+    "Fitness Master": {
+      color: "text-purple-400",
+      bgColor: "bg-purple-600/20",
+      borderColor: "border-purple-600/30",
+      rarity: "epic"
+    },
+
+    // Legendary titles (yellow) - very high progression
+    "Fitness Grandmaster": {
+      color: "text-yellow-400",
+      bgColor: "bg-yellow-600/20",
+      borderColor: "border-yellow-600/30",
+      rarity: "legendary"
+    },
+    "Iron Grandmaster": {
+      color: "text-yellow-400",
+      bgColor: "bg-yellow-600/20",
+      borderColor: "border-yellow-600/30",
+      rarity: "legendary"
+    },
+    "Fitness Legend": {
+      color: "text-yellow-400",
+      bgColor: "bg-yellow-600/20",
+      borderColor: "border-yellow-600/30",
+      rarity: "legendary"
+    },
+
+    // Mythic titles (orange) - elite progression
+    "Fitness Mythic": {
+      color: "text-orange-400",
+      bgColor: "bg-orange-600/20",
+      borderColor: "border-orange-600/30",
+      rarity: "mythic"
+    },
+    "Iron Mythic": {
+      color: "text-orange-400",
+      bgColor: "bg-orange-600/20",
+      borderColor: "border-orange-600/30",
+      rarity: "mythic"
+    },
+    "Fitness Godlike": {
+      color: "text-orange-400",
+      bgColor: "bg-orange-600/20",
+      borderColor: "border-orange-600/30",
+      rarity: "mythic"
+    },
+  };
+
+  // Return the title's rarity or default to common
+  return titleRarities[title] || {
+    color: "text-gray-300",
+    bgColor: "bg-gray-600/20",
+    borderColor: "border-gray-600/30",
+    rarity: "common"
+  };
+};
+
+export const getTitleComponent = (title: string, size: "sm" | "md" | "lg" = "sm") => {
+  const rarity = getTitleRarity(title);
+  
+  const sizeClasses = {
+    sm: "text-xs px-2 py-1",
+    md: "text-sm px-3 py-1.5",
+    lg: "text-base px-4 py-2"
+  };
+
+  return {
+    className: `${sizeClasses[size]} ${rarity.color} ${rarity.bgColor} rounded-full border ${rarity.borderColor} font-medium`,
+    rarity: rarity.rarity
+  };
+};

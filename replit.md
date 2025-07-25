@@ -55,6 +55,15 @@ Preferred communication style: Simple, everyday language.
   - Reserved word protection (admin, staff, etc.)
   - Real-time validation feedback in forms
   - Backend and frontend validation consistency
+- **Title Rarity System**: Comprehensive color-coded title progression system:
+  - White (common): Recruit, Fitness Novice
+  - Green (uncommon): Fitness Apprentice, Iron Novice
+  - Blue (rare): Fitness Warrior, Iron Warrior, Fitness Veteran
+  - Purple (epic): Fitness Champion, Iron Champion, Fitness Master
+  - Yellow (legendary): Fitness Grandmaster, Iron Grandmaster, Fitness Legend
+  - Orange (mythic): Fitness Mythic, Iron Mythic, Fitness Godlike
+  - Red (relic): G.M. title (highest rarity for admin users)
+  - Applied consistently across leaderboard, stats, admin, and settings pages
 - Admin access control for G.M. titled users
 - Character progression system with RPG-style leveling
 - Stat tracking (strength, stamina, agility)

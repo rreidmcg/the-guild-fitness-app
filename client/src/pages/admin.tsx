@@ -11,6 +11,7 @@ import {
   Dumbbell,
   Crown
 } from "lucide-react";
+import { getTitleComponent } from "@/lib/title-rarity";
 
 interface UserData {
   id: number;
@@ -99,6 +100,11 @@ export default function AdminDashboard() {
             </div>
             <div className="text-sm text-muted-foreground">
               Welcome, <span className="text-yellow-500 font-bold">{userStats?.username}</span>
+              {userStats?.currentTitle && (
+                <span className={`ml-2 ${getTitleComponent(userStats.currentTitle, "sm").className}`}>
+                  {userStats.currentTitle}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -206,7 +212,11 @@ export default function AdminDashboard() {
                         <span className="text-purple-400">{user.agility}</span>
                       </td>
                       <td className="p-2 text-yellow-500">{user.gold}</td>
-                      <td className="p-2 text-muted-foreground text-sm">{user.currentTitle || "Recruit"}</td>
+                      <td className="p-2">
+                        <span className={getTitleComponent(user.currentTitle || "Recruit", "sm").className}>
+                          {user.currentTitle || "Recruit"}
+                        </span>
+                      </td>
                       <td className="p-2 text-foreground">{user.battlesWon || 0}</td>
                       <td className="p-2 text-muted-foreground text-sm">
                         {new Date(user.createdAt).toLocaleDateString()}

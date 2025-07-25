@@ -11,6 +11,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { CurrencyHeader } from "@/components/ui/currency-header";
+import { getTitleComponent } from "@/lib/title-rarity";
 import { 
   User, 
   Bell, 
@@ -167,7 +168,7 @@ export default function Settings() {
                 <div className="flex items-center space-x-2">
                   <h3 className="text-lg font-semibold text-foreground">{(userStats as any)?.username || 'Fitness Warrior'}</h3>
                   {(userStats as any)?.currentTitle && (
-                    <span className="px-2 py-1 text-xs font-bold bg-yellow-500/20 text-yellow-400 rounded border border-yellow-500/30">
+                    <span className={getTitleComponent((userStats as any).currentTitle, "sm").className}>
                       {(userStats as any).currentTitle}
                     </span>
                   )}
@@ -240,12 +241,8 @@ export default function Settings() {
                               : 'bg-gray-500/10 border border-gray-500/20 opacity-60'
                         }`}
                       >
-                        <span className={`font-medium ${
-                          isCurrent 
-                            ? 'text-yellow-300' 
-                            : isUnlocked 
-                              ? 'text-green-300' 
-                              : 'text-gray-400'
+                        <span className={`font-medium ${getTitleComponent(title, "sm").className} ${
+                          !isUnlocked ? 'opacity-50' : ''
                         }`}>
                           {title}
                         </span>

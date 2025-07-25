@@ -12,6 +12,7 @@ import { CurrencyHeader } from "@/components/ui/currency-header";
 import { AtrophyWarning } from "@/components/ui/atrophy-warning";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getTitleComponent } from "@/lib/title-rarity";
 import { 
   Dumbbell, 
   Trophy, 
@@ -477,7 +478,7 @@ export default function Stats() {
             <div className="text-center mb-6">
               {userStats?.currentTitle && (
                 <div className="mb-2">
-                  <span className="text-sm text-yellow-300 font-bold px-3 py-1 bg-yellow-500/20 rounded-full border border-yellow-500/30">
+                  <span className={getTitleComponent(userStats.currentTitle, "md").className}>
                     {userStats.currentTitle}
                   </span>
                 </div>
