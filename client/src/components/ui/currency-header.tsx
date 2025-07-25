@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Coins, Backpack } from "lucide-react";
+import { Coins, Backpack, Settings } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
 
 export function CurrencyHeader() {
@@ -27,6 +27,13 @@ export function CurrencyHeader() {
               title="Inventory"
             >
               <Backpack className="w-4 h-4 text-muted-foreground" />
+            </button>
+            <button
+              onClick={() => navigate('/settings')}
+              className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+              title="Settings"
+            >
+              <Settings className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </div>
