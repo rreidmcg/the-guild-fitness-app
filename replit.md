@@ -76,7 +76,8 @@ Preferred communication style: Simple, everyday language.
   - Energy system classification (ATP-PC, Glycolytic, Mixed, Aerobic, Recovery)
   - RPE-based effort scaling (1-10 perceived effort scale)
   - Work unit calculations for resistance vs cardio exercises
-  - Three-stat system: Strength, Stamina, Agility
+  - **Individual Stat Progression**: Each stat (Strength, Stamina, Agility) has its own XP system with visual progress bars
+  - Exponential leveling formula: level^2 * 100 XP per stat level
 - **Dual Resource System**:
   - **HP (Health Points)**: Base 10 + (Stamina × 3), regenerates 1% per minute
   - **MP (Magic Points)**: (Stamina × 2) + (Agility × 1), regenerates (Agility ÷ 2)% per minute

@@ -7,6 +7,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { authUtils } from "./auth";
 import { validateUsername, sanitizeUsername } from "./username-validation";
 import { AtrophySystem } from "./atrophy-system";
+import { calculateStatXpGains, calculateStatLevel } from "./stat-progression";
 
 // Simple in-memory session storage (in production, use proper session management)
 let currentUserId: number = 1;
@@ -313,25 +314,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = currentUserId; // Use the current logged-in user
       const sessionData = insertWorkoutSessionSchema.parse({ ...req.body, userId });
       
-      // Calculate XP and stat gains
+      // Calculate character XP and individual stat XP gains
       const { xpEarned, statsEarned } = calculateRewards(sessionData);
+      const { strengthXp, staminaXp, agilityXp } = calculateStatXpGains(sessionData);
+      
       sessionData.xpEarned = xpEarned;
       sessionData.statsEarned = statsEarned;
       
       const session = await storage.createWorkoutSession(sessionData);
       
-      // Update user stats
+      // Update user stats with both character XP and individual stat XP
       const user = await storage.getUser(userId);
       if (user) {
         const newExperience = (user.experience || 0) + xpEarned;
         const newLevel = calculateLevel(newExperience);
         
+        // Calculate new stat XP totals and levels
+        const newStrengthXp = (user.strengthXp || 0) + strengthXp;
+        const newStaminaXp = (user.staminaXp || 0) + staminaXp;
+        const newAgilityXp = (user.agilityXp || 0) + agilityXp;
+        
+        const newStrengthLevel = calculateStatLevel(newStrengthXp);
+        const newStaminaLevel = calculateStatLevel(newStaminaXp);
+        const newAgilityLevel = calculateStatLevel(newAgilityXp);
+        
         await storage.updateUser(userId, {
           experience: newExperience,
           level: newLevel,
-          strength: (user.strength || 0) + (statsEarned.strength || 0),
-          stamina: (user.stamina || 0) + (statsEarned.stamina || 0),
-          agility: (user.agility || 0) + (statsEarned.agility || 0),
+          strength: newStrengthLevel,
+          strengthXp: newStrengthXp,
+          stamina: newStaminaLevel,
+          staminaXp: newStaminaXp,
+          agility: newAgilityLevel,
+          agilityXp: newAgilityXp,
         });
       }
       
@@ -345,7 +360,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         ...session,
         xpEarned,
-        statsEarned,
+        statsEarned: {
+          strength: strengthXp,
+          stamina: staminaXp,
+          agility: agilityXp
+        },
         name: sessionData.name || "Workout Session"
       });
     } catch (error) {

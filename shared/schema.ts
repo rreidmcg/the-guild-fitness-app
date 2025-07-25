@@ -15,8 +15,11 @@ export const users = pgTable("users", {
   level: integer("level").default(1),
   experience: integer("experience").default(0),
   strength: integer("strength").default(0),
+  strengthXp: integer("strength_xp").default(0),
   stamina: integer("stamina").default(0),
+  staminaXp: integer("stamina_xp").default(0),
   agility: integer("agility").default(0),
+  agilityXp: integer("agility_xp").default(0),
   gold: integer("gold").default(0),
   battlesWon: integer("battles_won").default(0),
   // Health system

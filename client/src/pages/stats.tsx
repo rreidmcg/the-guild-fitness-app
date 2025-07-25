@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { StatBar } from "@/components/ui/stat-bar";
+import { EnhancedStatBar } from "@/components/ui/enhanced-stat-bar";
 import { AtrophyWarning } from "@/components/ui/atrophy-warning";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -642,23 +643,29 @@ export default function Stats() {
               </div>
             </div>
 
-            {/* Character Stats - Numerical Display */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-red-900/20 rounded-lg border border-red-700">
-                <Dumbbell className="w-6 h-6 text-red-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-red-300">{userStats?.strength || 0}</div>
-                <div className="text-sm font-semibold text-red-400">Strength</div>
-              </div>
-              <div className="text-center p-4 bg-green-900/20 rounded-lg border border-green-700">
-                <Heart className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-300">{userStats?.stamina || 0}</div>
-                <div className="text-sm font-semibold text-green-400">Stamina</div>
-              </div>
-              <div className="text-center p-4 bg-purple-900/20 rounded-lg border border-purple-700">
-                <Wind className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-300">{userStats?.agility || 0}</div>
-                <div className="text-sm font-semibold text-purple-400">Agility</div>
-              </div>
+            {/* Character Stats - XP Progress Bars */}
+            <div className="space-y-4">
+              <EnhancedStatBar
+                label="Strength"
+                statLevel={userStats?.strength || 0}
+                totalXp={userStats?.strengthXp || 0}
+                color="text-red-400"
+                icon={<Dumbbell className="w-5 h-5" />}
+              />
+              <EnhancedStatBar
+                label="Stamina"
+                statLevel={userStats?.stamina || 0}
+                totalXp={userStats?.staminaXp || 0}
+                color="text-green-400"
+                icon={<Heart className="w-5 h-5" />}
+              />
+              <EnhancedStatBar
+                label="Agility"
+                statLevel={userStats?.agility || 0}
+                totalXp={userStats?.agilityXp || 0}
+                color="text-purple-400"
+                icon={<Wind className="w-5 h-5" />}
+              />
             </div>
           </CardContent>
         </Card>

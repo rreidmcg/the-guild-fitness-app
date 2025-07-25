@@ -61,19 +61,19 @@ export function WorkoutVictoryModal({
               <div className="grid grid-cols-3 gap-2">
                 {statsGained.strength && (
                   <div className="text-center">
-                    <div className="text-xl font-bold text-red-400">+{statsGained.strength}</div>
+                    <div className="text-xl font-bold text-red-400">+{statsGained.strength} XP</div>
                     <div className="text-xs text-red-300">Strength</div>
                   </div>
                 )}
                 {statsGained.stamina && (
                   <div className="text-center">
-                    <div className="text-xl font-bold text-green-400">+{statsGained.stamina}</div>
+                    <div className="text-xl font-bold text-green-400">+{statsGained.stamina} XP</div>
                     <div className="text-xs text-green-300">Stamina</div>
                   </div>
                 )}
                 {statsGained.agility && (
                   <div className="text-center">
-                    <div className="text-xl font-bold text-blue-400">+{statsGained.agility}</div>
+                    <div className="text-xl font-bold text-blue-400">+{statsGained.agility} XP</div>
                     <div className="text-xs text-blue-300">Agility</div>
                   </div>
                 )}
