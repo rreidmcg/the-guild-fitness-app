@@ -104,9 +104,9 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "You enter the murky depths of the Slime Caverns. The air is thick with moisture and the sound of dripping echoes through the tunnels. Strange, luminescent slimes block your path...",
     completionStory: "The caverns grow quiet as the last slime dissolves. Ancient runes on the walls begin to glow, revealing the path forward to deeper mysteries.",
     monsters: [
-      { id: 1, name: "Tiny Slime", level: 1, maxHp: 12, currentHp: 12, attack: 2, goldReward: 2, description: "A small, translucent blob that quivers nervously", image: greenSlimeImage },
-      { id: 2, name: "Green Slime", level: 2, maxHp: 20, currentHp: 20, attack: 3, goldReward: 3, description: "A larger, more aggressive gelatinous creature", image: greenSlimeImage },
-      { id: 3, name: "Slime King", level: 3, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "🏆 MINI-BOSS: The ruler of the slime caverns, pulsing with ancient power" }
+      { id: 1, name: "Tiny Slime", level: 1, maxHp: 8, currentHp: 8, attack: 1, goldReward: 1, description: "A small, translucent blob that quivers nervously", image: greenSlimeImage },
+      { id: 2, name: "Green Slime", level: 1, maxHp: 12, currentHp: 12, attack: 2, goldReward: 2, description: "A larger, more aggressive gelatinous creature", image: greenSlimeImage },
+      { id: 3, name: "Slime King", level: 2, maxHp: 18, currentHp: 18, attack: 3, goldReward: 4, description: "🏆 MINI-BOSS: The ruler of the slime caverns, pulsing with ancient power" }
     ]
   },
   {
@@ -117,9 +117,9 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "The narrow tunnels stretch endlessly before you, filled with the chittering of countless rats. Their red eyes gleam in the darkness as they sense an intruder in their domain...",
     completionStory: "The warren falls silent. In the distance, you hear the echo of larger threats stirring in the depths, drawn by the commotion.",
     monsters: [
-      { id: 4, name: "Sewer Rat", level: 2, maxHp: 16, currentHp: 16, attack: 3, goldReward: 3, description: "A disease-ridden rodent with yellowed fangs", image: caveRatImage },
-      { id: 5, name: "Cave Rat", level: 3, maxHp: 24, currentHp: 24, attack: 4, goldReward: 4, description: "A larger rat adapted to cave life", image: caveRatImage },
-      { id: 6, name: "Rat Chieftain", level: 4, maxHp: 38, currentHp: 38, attack: 6, goldReward: 6, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack" }
+      { id: 4, name: "Sewer Rat", level: 2, maxHp: 14, currentHp: 14, attack: 2, goldReward: 2, description: "A disease-ridden rodent with yellowed fangs", image: caveRatImage },
+      { id: 5, name: "Cave Rat", level: 2, maxHp: 16, currentHp: 16, attack: 3, goldReward: 3, description: "A larger rat adapted to cave life", image: caveRatImage },
+      { id: 6, name: "Rat Chieftain", level: 3, maxHp: 24, currentHp: 24, attack: 4, goldReward: 5, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack" }
     ]
   },
   {
@@ -130,9 +130,9 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "Crude wooden spikes and torn banners mark the goblin territory. The air smells of smoke and rotting food. Cackling voices grow louder as the goblins spot your approach...",
     completionStory: "The outpost burns as the last goblin falls. Among the ashes, you find a crude map pointing to darker territories beyond.",
     monsters: [
-      { id: 7, name: "Goblin Scout", level: 3, maxHp: 22, currentHp: 22, attack: 4, goldReward: 4, description: "A sneaky goblin carrying a rusty knife", image: wildGoblinImage },
-      { id: 8, name: "Wild Goblin", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 5, description: "A fierce goblin warrior with crude weapons", image: wildGoblinImage },
-      { id: 9, name: "Goblin Warlord", level: 5, maxHp: 45, currentHp: 45, attack: 7, goldReward: 7, description: "🏆 MINI-BOSS: A battle-scarred goblin chief with stolen armor and weapons" }
+      { id: 7, name: "Goblin Scout", level: 2, maxHp: 16, currentHp: 16, attack: 3, goldReward: 3, description: "A sneaky goblin carrying a rusty knife", image: wildGoblinImage },
+      { id: 8, name: "Wild Goblin", level: 3, maxHp: 20, currentHp: 20, attack: 4, goldReward: 4, description: "A fierce goblin warrior with crude weapons", image: wildGoblinImage },
+      { id: 9, name: "Goblin Warlord", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 6, description: "🏆 MINI-BOSS: A battle-scarred goblin chief with stolen armor and weapons" }
     ]
   },
   {
@@ -143,9 +143,9 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "Thick webs block every passage, and the skittering of eight legs echoes from all directions. The air is heavy with the scent of silk and venom...",
     completionStory: "The great web collapses as the nest's guardian falls. In the silence, you notice passages leading deeper into the earth.",
     monsters: [
-      { id: 10, name: "Web Spinner", level: 4, maxHp: 28, currentHp: 28, attack: 5, goldReward: 5, description: "A quick spider that weaves binding webs", image: forestSpiderImage },
-      { id: 11, name: "Forest Spider", level: 5, maxHp: 36, currentHp: 36, attack: 6, goldReward: 6, description: "A venomous hunter with razor-sharp fangs", image: forestSpiderImage },
-      { id: 12, name: "Broodmother", level: 6, maxHp: 52, currentHp: 52, attack: 8, goldReward: 9, description: "🏆 MINI-BOSS: An enormous spider surrounded by her countless offspring" }
+      { id: 10, name: "Web Spinner", level: 3, maxHp: 22, currentHp: 22, attack: 4, goldReward: 4, description: "A quick spider that weaves binding webs", image: forestSpiderImage },
+      { id: 11, name: "Forest Spider", level: 4, maxHp: 26, currentHp: 26, attack: 5, goldReward: 5, description: "A venomous hunter with razor-sharp fangs", image: forestSpiderImage },
+      { id: 12, name: "Broodmother", level: 5, maxHp: 35, currentHp: 35, attack: 6, goldReward: 8, description: "🏆 MINI-BOSS: An enormous spider surrounded by her countless offspring" }
     ]
   }
 ];
