@@ -22,7 +22,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: users.username,
           level: users.level,
           experience: users.experience,
-          title: users.title,
+          title: users.currentTitle,
         })
         .from(users)
         .orderBy(desc(users.experience))
