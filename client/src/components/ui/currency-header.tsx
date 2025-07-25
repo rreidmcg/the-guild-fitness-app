@@ -26,7 +26,7 @@ export function CurrencyHeader() {
               className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
               title="Inventory"
             >
-              <Backpack className="w-3.5 h-3.5 text-muted-foreground" />
+              <Backpack className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </div>
