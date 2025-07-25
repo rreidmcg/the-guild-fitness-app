@@ -8,6 +8,7 @@ import { authUtils } from "./auth";
 import { validateUsername, sanitizeUsername } from "./username-validation";
 import { AtrophySystem } from "./atrophy-system";
 import { calculateStatXpGains, calculateStatLevel } from "./stat-progression";
+import { workoutValidator } from "./workout-validation";
 import Stripe from "stripe";
 
 // Simple in-memory session storage (in production, use proper session management)
@@ -326,9 +327,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = currentUserId; // Use the current logged-in user
       const sessionData = insertWorkoutSessionSchema.parse({ ...req.body, userId });
       
-      // Calculate character XP and individual stat XP gains
-      const { xpEarned, statsEarned } = calculateRewards(sessionData);
-      const { strengthXp, staminaXp, agilityXp } = calculateStatXpGains(sessionData);
+      // Get user data for workout validation
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Extract validation parameters
+      const userBodyweight = user.weight || 70; // Default 70kg if not set
+      const reportedRPE = sessionData.perceivedEffort || 7;
+      const duration = sessionData.duration || 0;
+      
+      // Convert session data to validation format
+      const exercises = sessionData.exercises || [];
+      const performanceInputs = exercises.map((exercise: any) => ({
+        exerciseId: exercise.exerciseId,
+        exercise: {
+          name: exercise.name || "Unknown Exercise",
+          category: exercise.category || "strength",
+          statTypes: exercise.statTypes || { strength: 1 }
+        },
+        sets: exercise.sets || [{ reps: 1, weight: 0, completed: true }]
+      }));
+      
+      // Use sophisticated validation system
+      const validationResult = workoutValidator.calculateValidatedXP(
+        performanceInputs,
+        duration,
+        userBodyweight,
+        reportedRPE
+      );
+      
+      // Check if workout is valid
+      if (!validationResult.validation.isValid) {
+        return res.status(400).json({ 
+          error: "Workout validation failed",
+          details: validationResult.validation.validationErrors
+        });
+      }
+      
+      const { xpTotal, xpStr, xpSta, xpAgi, validation } = validationResult;
+      
+      // Use validated XP values
+      const xpEarned = xpTotal;
+      const strengthXp = xpStr;
+      const staminaXp = xpSta;
+      const agilityXp = xpAgi;
+      
+      // Legacy statsEarned for compatibility (can be removed later)
+      const statsEarned = {
+        strength: strengthXp,
+        stamina: staminaXp,
+        agility: agilityXp,
+      };
       
       sessionData.xpEarned = xpEarned;
       sessionData.statsEarned = statsEarned;
@@ -336,7 +387,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await storage.createWorkoutSession(sessionData);
       
       // Update user stats with both character XP and individual stat XP
-      const user = await storage.getUser(userId);
+      // Reuse the user object we already fetched for validation
       if (user) {
         const newExperience = (user.experience || 0) + xpEarned;
         const newLevel = calculateLevel(newExperience);
@@ -368,10 +419,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Record activity to prevent atrophy
       await AtrophySystem.recordActivity(userId);
       
-      // Return session data with calculated rewards for the victory screen
+      // Return session data with calculated rewards and validation info for the victory screen
       res.json({
         ...session,
         xpEarned,
+        validation: {
+          multiplier: validation.xpMultiplier,
+          suspicious: validation.suspiciousReasons,
+          confidence: validation.xpMultiplier >= 0.9 ? "high" : validation.xpMultiplier >= 0.7 ? "medium" : "low"
+        },
         statsEarned: {
           strength: strengthXp,
           stamina: staminaXp,

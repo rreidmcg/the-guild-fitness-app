@@ -14,6 +14,11 @@ interface WorkoutVictoryModalProps {
   };
   duration: number;
   totalVolume?: number;
+  validation?: {
+    multiplier: number;
+    suspicious: string[];
+    confidence: "high" | "medium" | "low";
+  };
 }
 
 export function WorkoutVictoryModal({
@@ -23,7 +28,8 @@ export function WorkoutVictoryModal({
   xpGained,
   statsGained,
   duration,
-  totalVolume
+  totalVolume,
+  validation
 }: WorkoutVictoryModalProps) {
   const formatDuration = (minutes: number) => {
     const hrs = Math.floor(minutes / 60);
@@ -94,6 +100,39 @@ export function WorkoutVictoryModal({
               </div>
             )}
           </div>
+
+          {/* Validation Info */}
+          {validation && (
+            <div className="bg-black/20 rounded-lg p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-green-300 text-sm">XP Confidence:</span>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    validation.confidence === "high" ? "bg-green-400" : 
+                    validation.confidence === "medium" ? "bg-yellow-400" : "bg-orange-400"
+                  }`} />
+                  <span className={`text-xs font-medium ${
+                    validation.confidence === "high" ? "text-green-400" : 
+                    validation.confidence === "medium" ? "text-yellow-400" : "text-orange-400"
+                  }`}>
+                    {validation.confidence.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+              
+              {validation.multiplier !== 1.0 && (
+                <div className="text-xs text-green-200">
+                  XP Multiplier: {validation.multiplier.toFixed(2)}x
+                </div>
+              )}
+              
+              {validation.suspicious.length > 0 && (
+                <div className="text-xs text-yellow-300">
+                  Note: {validation.suspicious[0]}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Motivational Message */}
           <div className="text-green-200 text-sm italic">
