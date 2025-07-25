@@ -14,9 +14,9 @@ export const getTitleRarity = (title: string): TitleRarity => {
   // G.M. title is highest rarity (red/relic)
   if (title === "G.M.") {
     return {
-      color: "text-red-400",
-      bgColor: "bg-red-600/20",
-      borderColor: "border-red-600/30",
+      color: "text-red-300",
+      bgColor: "bg-red-500/20",
+      borderColor: "border-red-400/40",
       rarity: "relic"
     };
   }
@@ -25,118 +25,118 @@ export const getTitleRarity = (title: string): TitleRarity => {
   const titleRarities: Record<string, TitleRarity> = {
     // Common titles (white) - starter titles
     "Recruit": {
-      color: "text-gray-300",
-      bgColor: "bg-gray-600/20",
-      borderColor: "border-gray-600/30",
+      color: "text-gray-100",
+      bgColor: "bg-gray-500/20",
+      borderColor: "border-gray-400/40",
       rarity: "common"
     },
     "Fitness Novice": {
-      color: "text-gray-300",
-      bgColor: "bg-gray-600/20",
-      borderColor: "border-gray-600/30",
+      color: "text-gray-100",
+      bgColor: "bg-gray-500/20",
+      borderColor: "border-gray-400/40",
       rarity: "common"
     },
 
     // Uncommon titles (green) - early progression
     "Fitness Apprentice": {
-      color: "text-green-400",
-      bgColor: "bg-green-600/20",
-      borderColor: "border-green-600/30",
+      color: "text-green-300",
+      bgColor: "bg-green-500/20",
+      borderColor: "border-green-400/40",
       rarity: "uncommon"
     },
     "Iron Novice": {
-      color: "text-green-400",
-      bgColor: "bg-green-600/20",
-      borderColor: "border-green-600/30",
+      color: "text-green-300",
+      bgColor: "bg-green-500/20",
+      borderColor: "border-green-400/40",
       rarity: "uncommon"
     },
 
     // Rare titles (blue) - mid progression
     "Fitness Warrior": {
-      color: "text-blue-400",
-      bgColor: "bg-blue-600/20",
-      borderColor: "border-blue-600/30",
+      color: "text-blue-300",
+      bgColor: "bg-blue-500/20",
+      borderColor: "border-blue-400/40",
       rarity: "rare"
     },
     "Iron Warrior": {
-      color: "text-blue-400",
-      bgColor: "bg-blue-600/20",
-      borderColor: "border-blue-600/30",
+      color: "text-blue-300",
+      bgColor: "bg-blue-500/20",
+      borderColor: "border-blue-400/40",
       rarity: "rare"
     },
     "Fitness Veteran": {
-      color: "text-blue-400",
-      bgColor: "bg-blue-600/20",
-      borderColor: "border-blue-600/30",
+      color: "text-blue-300",
+      bgColor: "bg-blue-500/20",
+      borderColor: "border-blue-400/40",
       rarity: "rare"
     },
 
     // Epic titles (purple) - high progression
     "Fitness Champion": {
-      color: "text-purple-400",
-      bgColor: "bg-purple-600/20",
-      borderColor: "border-purple-600/30",
+      color: "text-purple-300",
+      bgColor: "bg-purple-500/20",
+      borderColor: "border-purple-400/40",
       rarity: "epic"
     },
     "Iron Champion": {
-      color: "text-purple-400",
-      bgColor: "bg-purple-600/20",
-      borderColor: "border-purple-600/30",
+      color: "text-purple-300",
+      bgColor: "bg-purple-500/20",
+      borderColor: "border-purple-400/40",
       rarity: "epic"
     },
     "Fitness Master": {
-      color: "text-purple-400",
-      bgColor: "bg-purple-600/20",
-      borderColor: "border-purple-600/30",
+      color: "text-purple-300",
+      bgColor: "bg-purple-500/20",
+      borderColor: "border-purple-400/40",
       rarity: "epic"
     },
 
     // Legendary titles (yellow) - very high progression
     "Fitness Grandmaster": {
-      color: "text-yellow-400",
-      bgColor: "bg-yellow-600/20",
-      borderColor: "border-yellow-600/30",
+      color: "text-yellow-300",
+      bgColor: "bg-yellow-500/20",
+      borderColor: "border-yellow-400/40",
       rarity: "legendary"
     },
     "Iron Grandmaster": {
-      color: "text-yellow-400",
-      bgColor: "bg-yellow-600/20",
-      borderColor: "border-yellow-600/30",
+      color: "text-yellow-300",
+      bgColor: "bg-yellow-500/20",
+      borderColor: "border-yellow-400/40",
       rarity: "legendary"
     },
     "Fitness Legend": {
-      color: "text-yellow-400",
-      bgColor: "bg-yellow-600/20",
-      borderColor: "border-yellow-600/30",
+      color: "text-yellow-300",
+      bgColor: "bg-yellow-500/20",
+      borderColor: "border-yellow-400/40",
       rarity: "legendary"
     },
 
     // Mythic titles (orange) - elite progression
     "Fitness Mythic": {
-      color: "text-orange-400",
-      bgColor: "bg-orange-600/20",
-      borderColor: "border-orange-600/30",
+      color: "text-orange-300",
+      bgColor: "bg-orange-500/20",
+      borderColor: "border-orange-400/40",
       rarity: "mythic"
     },
     "Iron Mythic": {
-      color: "text-orange-400",
-      bgColor: "bg-orange-600/20",
-      borderColor: "border-orange-600/30",
+      color: "text-orange-300",
+      bgColor: "bg-orange-500/20",
+      borderColor: "border-orange-400/40",
       rarity: "mythic"
     },
     "Fitness Godlike": {
-      color: "text-orange-400",
-      bgColor: "bg-orange-600/20",
-      borderColor: "border-orange-600/30",
+      color: "text-orange-300",
+      bgColor: "bg-orange-500/20",
+      borderColor: "border-orange-400/40",
       rarity: "mythic"
     },
   };
 
   // Return the title's rarity or default to common
   return titleRarities[title] || {
-    color: "text-gray-300",
-    bgColor: "bg-gray-600/20",
-    borderColor: "border-gray-600/30",
+    color: "text-gray-100",
+    bgColor: "bg-gray-500/20",
+    borderColor: "border-gray-400/40",
     rarity: "common"
   };
 };
