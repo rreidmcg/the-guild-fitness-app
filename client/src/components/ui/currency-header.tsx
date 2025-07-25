@@ -17,7 +17,15 @@ export function CurrencyHeader() {
     <div className="bg-card/80 border-b border-border/50 px-4 py-1.5">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between">
-          <div></div>
+          <div className="flex items-center">
+            <button
+              onClick={toggleMusic}
+              className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+              title="Toggle Music"
+            >
+              <Volume2 className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
               <Coins className="w-3.5 h-3.5 text-yellow-500" />
@@ -29,13 +37,6 @@ export function CurrencyHeader() {
               title="Inventory"
             >
               <Backpack className="w-4 h-4 text-muted-foreground" />
-            </button>
-            <button
-              onClick={toggleMusic}
-              className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
-              title="Toggle Music"
-            >
-              <Volume2 className="w-4 h-4 text-muted-foreground" />
             </button>
             <button
               onClick={() => navigate('/settings')}
