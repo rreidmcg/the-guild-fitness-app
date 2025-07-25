@@ -84,19 +84,74 @@ interface BattleState {
   totalMonsters: number;
 }
 
-// E-rank dungeon monsters (levels 1-10) - HP increased by 5%
-const ERANK_MONSTERS: Monster[] = [
-  { id: 1, name: "Green Slime", level: 1, maxHp: 13, currentHp: 13, attack: 2, goldReward: 2, description: "A gelatinous blob that bounces menacingly", image: greenSlimeImage },
-  { id: 2, name: "Cave Rat", level: 2, maxHp: 19, currentHp: 19, attack: 3, goldReward: 3, description: "A mangy rodent with sharp teeth", image: caveRatImage },
-  { id: 3, name: "Wild Goblin", level: 3, maxHp: 26, currentHp: 26, attack: 4, goldReward: 4, description: "A mischievous creature wielding a rusty dagger", image: wildGoblinImage },
-  { id: 4, name: "Forest Spider", level: 4, maxHp: 32, currentHp: 32, attack: 5, goldReward: 5, description: "An eight-legged predator with venomous fangs", image: forestSpiderImage },
-  { id: 5, name: "Skeleton Warrior", level: 5, maxHp: 42, currentHp: 42, attack: 7, goldReward: 6, description: "Animated bones wielding ancient weapons" },
-  { id: 6, name: "Stone Golem", level: 6, maxHp: 58, currentHp: 58, attack: 8, goldReward: 7, description: "A sturdy construct of animated rock" },
-  { id: 7, name: "Shadow Wolf", level: 7, maxHp: 50, currentHp: 50, attack: 10, goldReward: 8, description: "A spectral predator that hunts in darkness" },
-  { id: 8, name: "Fire Elemental", level: 8, maxHp: 63, currentHp: 63, attack: 12, goldReward: 9, description: "A being of pure flame and fury" },
-  { id: 9, name: "Orc Berserker", level: 9, maxHp: 79, currentHp: 79, attack: 14, goldReward: 10, description: "A brutal warrior lost to bloodlust" },
-  { id: 10, name: "Lesser Dragon", level: 10, maxHp: 105, currentHp: 105, attack: 18, goldReward: 10, description: "A young but fierce draconic beast" },
+// Story-driven E-rank Dungeon Zones with progression
+interface DungeonZone {
+  id: string;
+  name: string;
+  description: string;
+  background: string;
+  monsters: Monster[];
+  storyIntro: string;
+  completionStory: string;
+}
+
+const ERANK_DUNGEON_ZONES: DungeonZone[] = [
+  {
+    id: "slime_caverns",
+    name: "The Slime Caverns",
+    description: "Dark, damp caves where gelatinous creatures multiply in the shadows",
+    background: "#1a2b3d",
+    storyIntro: "You enter the murky depths of the Slime Caverns. The air is thick with moisture and the sound of dripping echoes through the tunnels. Strange, luminescent slimes block your path...",
+    completionStory: "The caverns grow quiet as the last slime dissolves. Ancient runes on the walls begin to glow, revealing the path forward to deeper mysteries.",
+    monsters: [
+      { id: 1, name: "Tiny Slime", level: 1, maxHp: 10, currentHp: 10, attack: 1, goldReward: 1, description: "A small, translucent blob that quivers nervously", image: greenSlimeImage },
+      { id: 2, name: "Green Slime", level: 2, maxHp: 15, currentHp: 15, attack: 2, goldReward: 2, description: "A larger, more aggressive gelatinous creature", image: greenSlimeImage },
+      { id: 3, name: "Slime King", level: 3, maxHp: 25, currentHp: 25, attack: 4, goldReward: 5, description: "🏆 MINI-BOSS: The ruler of the slime caverns, pulsing with ancient power" }
+    ]
+  },
+  {
+    id: "rat_warrens",
+    name: "The Rat Warrens",
+    description: "A maze of tunnels infested with oversized rodents and their corrupted kin",
+    background: "#2d1810",
+    storyIntro: "The narrow tunnels stretch endlessly before you, filled with the chittering of countless rats. Their red eyes gleam in the darkness as they sense an intruder in their domain...",
+    completionStory: "The warren falls silent. In the distance, you hear the echo of larger threats stirring in the depths, drawn by the commotion.",
+    monsters: [
+      { id: 4, name: "Sewer Rat", level: 2, maxHp: 12, currentHp: 12, attack: 2, goldReward: 2, description: "A disease-ridden rodent with yellowed fangs", image: caveRatImage },
+      { id: 5, name: "Cave Rat", level: 3, maxHp: 18, currentHp: 18, attack: 3, goldReward: 3, description: "A larger rat adapted to cave life", image: caveRatImage },
+      { id: 6, name: "Rat Chieftain", level: 4, maxHp: 30, currentHp: 30, attack: 5, goldReward: 6, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack" }
+    ]
+  },
+  {
+    id: "goblin_outpost",
+    name: "The Goblin Outpost",
+    description: "A ramshackle camp where mischievous goblins plot their next raid",
+    background: "#1f2b1a",
+    storyIntro: "Crude wooden spikes and torn banners mark the goblin territory. The air smells of smoke and rotting food. Cackling voices grow louder as the goblins spot your approach...",
+    completionStory: "The outpost burns as the last goblin falls. Among the ashes, you find a crude map pointing to darker territories beyond.",
+    monsters: [
+      { id: 7, name: "Goblin Scout", level: 3, maxHp: 16, currentHp: 16, attack: 3, goldReward: 3, description: "A sneaky goblin carrying a rusty knife", image: wildGoblinImage },
+      { id: 8, name: "Wild Goblin", level: 4, maxHp: 22, currentHp: 22, attack: 4, goldReward: 4, description: "A fierce goblin warrior with crude weapons", image: wildGoblinImage },
+      { id: 9, name: "Goblin Warlord", level: 5, maxHp: 35, currentHp: 35, attack: 6, goldReward: 7, description: "🏆 MINI-BOSS: A battle-scarred goblin chief with stolen armor and weapons" }
+    ]
+  },
+  {
+    id: "spider_nest",
+    name: "The Spider's Nest",
+    description: "A web-covered lair where giant arachnids weave their deadly traps",
+    background: "#1a1a2e",
+    storyIntro: "Thick webs block every passage, and the skittering of eight legs echoes from all directions. The air is heavy with the scent of silk and venom...",
+    completionStory: "The great web collapses as the nest's guardian falls. In the silence, you notice passages leading deeper into the earth.",
+    monsters: [
+      { id: 10, name: "Web Spinner", level: 4, maxHp: 20, currentHp: 20, attack: 4, goldReward: 4, description: "A quick spider that weaves binding webs", image: forestSpiderImage },
+      { id: 11, name: "Forest Spider", level: 5, maxHp: 28, currentHp: 28, attack: 5, goldReward: 5, description: "A venomous hunter with razor-sharp fangs", image: forestSpiderImage },
+      { id: 12, name: "Broodmother", level: 6, maxHp: 45, currentHp: 45, attack: 7, goldReward: 8, description: "🏆 MINI-BOSS: An enormous spider surrounded by her countless offspring" }
+    ]
+  }
 ];
+
+// Flatten all monsters for compatibility with existing code
+const ERANK_MONSTERS: Monster[] = ERANK_DUNGEON_ZONES.flatMap(zone => zone.monsters);
 
 export default function Battle() {
   const navigate = useNavigate();
@@ -581,7 +636,7 @@ export default function Battle() {
 
 
 
-        {/* E-rank Dungeon */}
+        {/* E-rank Dungeon Zones */}
           <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle 
@@ -590,8 +645,8 @@ export default function Battle() {
               >
                 <div className="flex items-center space-x-2">
                   <Skull className="w-6 h-6 text-red-400" />
-                  <span>E-rank Dungeon</span>
-                  <span className="text-sm text-muted-foreground">(Levels 1-10)</span>
+                  <span>E-rank Dungeons</span>
+                  <span className="text-sm text-muted-foreground">(Story Progression)</span>
                 </div>
                 {isMonsterListOpen ? (
                   <ChevronDown className="w-5 h-5" />
@@ -602,86 +657,112 @@ export default function Battle() {
             </CardHeader>
             {isMonsterListOpen && (
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {ERANK_MONSTERS.map((monster) => {
-                    const onCooldown = isMonsterOnCooldown(monster.id);
-                    const remainingTime = getRemainingCooldown(monster.id);
-                    
-                    return (
-                      <Card 
-                        key={monster.id}
-                        className={`transition-all duration-200 ${
-                          onCooldown 
-                            ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-700 border-gray-400 dark:border-gray-500 shadow-none' 
-                            : 'bg-card border-border hover:border-primary hover:shadow-lg hover:scale-105 cursor-pointer'
-                        }`}
-                        onClick={() => !onCooldown && startBattle(monster)}
-                      >
-                        <CardContent className={`p-4 ${onCooldown ? 'bg-gray-50 dark:bg-gray-800' : ''}`}>
-                          <div className="flex items-start space-x-4">
-                            {/* Monster Image */}
-                            {monster.image && (
-                              <div className="flex-shrink-0 relative">
-                                <img 
-                                  src={monster.image} 
-                                  alt={monster.name}
-                                  className={`w-16 h-16 object-contain rounded-lg border border-border bg-transparent ${
-                                    onCooldown ? 'grayscale' : ''
-                                  }`}
-                                  style={{ backgroundColor: 'transparent' }}
-                                />
-                                {onCooldown && (
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <Clock className="w-6 h-6 text-gray-400" />
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                <div className="space-y-6">
+                  {ERANK_DUNGEON_ZONES.map((zone) => (
+                    <Card key={zone.id} className="bg-card border-border">
+                      <CardHeader className="pb-3">
+                        <CardTitle className="text-lg flex items-center space-x-2">
+                          <div 
+                            className="w-4 h-4 rounded-full"
+                            style={{ backgroundColor: zone.background }}
+                          />
+                          <span>{zone.name}</span>
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground italic">
+                          {zone.description}
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="mb-4 p-3 bg-muted/50 rounded border-l-4 border-primary text-sm">
+                          {zone.storyIntro}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          {zone.monsters.map((monster, index) => {
+                            const onCooldown = isMonsterOnCooldown(monster.id);
+                            const remainingTime = getRemainingCooldown(monster.id);
+                            const isBoss = monster.description.includes('MINI-BOSS');
                             
-                            {/* Monster Info */}
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                <h3 className={`font-bold ${onCooldown ? 'text-gray-400' : 'text-foreground'}`}>
-                                  {monster.name}
-                                </h3>
-                                <span className={`text-sm px-2 py-1 rounded ${
+                            return (
+                              <Card 
+                                key={monster.id}
+                                className={`transition-all duration-200 ${
                                   onCooldown 
-                                    ? 'bg-gray-500 text-gray-300 border border-gray-400' 
-                                    : 'bg-red-700 text-white'
-                                }`}>
-                                  Lv.{monster.level}
-                                </span>
-                              </div>
-                              
-                              {onCooldown ? (
-                                <div className="text-orange-400 text-sm mb-3 flex items-center">
-                                  <Clock className="w-4 h-4 mr-1" />
-                                  Resting for {remainingTime} minute(s)
-                                </div>
-                              ) : (
-                                <p className="text-muted-foreground text-sm mb-3">{monster.description}</p>
-                              )}
-                              
-                              <div className="grid grid-cols-3 gap-2 text-xs">
-                                <div className="flex items-center space-x-1">
-                                  <Heart className={`w-3 h-3 ${onCooldown ? 'text-gray-400' : 'text-red-400'}`} />
-                                  <span className={onCooldown ? 'text-gray-400' : ''}>{monster.maxHp}</span>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                  <Sword className={`w-3 h-3 ${onCooldown ? 'text-gray-400' : 'text-orange-400'}`} />
-                                  <span className={onCooldown ? 'text-gray-400' : ''}>{monster.attack}</span>
-                                </div>
-                                <div className={`flex items-center space-x-1 ${onCooldown ? 'text-gray-400' : 'text-yellow-400'}`}>
-                                  <Coins className="w-3 h-3" />
-                                  <span>{monster.goldReward}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                                    ? 'opacity-40 cursor-not-allowed bg-gray-200 dark:bg-gray-700 border-gray-400 dark:border-gray-500 shadow-none' 
+                                    : `bg-card border-border hover:border-primary hover:shadow-lg hover:scale-105 cursor-pointer ${
+                                        isBoss ? 'ring-2 ring-yellow-500/50 bg-gradient-to-br from-yellow-900/20 to-orange-900/20' : ''
+                                      }`
+                                }`}
+                                onClick={() => !onCooldown && startBattle(monster)}
+                              >
+                                <CardContent className={`p-3 ${onCooldown ? 'bg-gray-50 dark:bg-gray-800' : ''}`}>
+                                  <div className="flex items-start space-x-4">
+                                    {/* Monster Image */}
+                                    {monster.image && (
+                                      <div className="flex-shrink-0 relative">
+                                        <img 
+                                          src={monster.image} 
+                                          alt={monster.name}
+                                          className={`w-16 h-16 object-contain rounded-lg border border-border bg-transparent ${
+                                            onCooldown ? 'grayscale' : ''
+                                          }`}
+                                          style={{ backgroundColor: 'transparent' }}
+                                        />
+                                        {onCooldown && (
+                                          <div className="absolute inset-0 flex items-center justify-center">
+                                            <Clock className="w-6 h-6 text-gray-400" />
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                    
+                                    {/* Monster Info */}
+                                    <div className="flex-1">
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h3 className={`font-bold ${onCooldown ? 'text-gray-400' : 'text-foreground'}`}>
+                                          {monster.name}
+                                        </h3>
+                                        <span className={`text-sm px-2 py-1 rounded ${
+                                          onCooldown 
+                                            ? 'bg-gray-500 text-gray-300 border border-gray-400' 
+                                            : 'bg-red-700 text-white'
+                                        }`}>
+                                          Lv.{monster.level}
+                                        </span>
+                                      </div>
+                                      
+                                      {onCooldown ? (
+                                        <div className="text-orange-400 text-sm mb-3 flex items-center">
+                                          <Clock className="w-4 h-4 mr-1" />
+                                          Resting for {remainingTime} minute(s)
+                                        </div>
+                                      ) : (
+                                        <p className="text-muted-foreground text-sm mb-3">{monster.description}</p>
+                                      )}
+                                      
+                                      <div className="grid grid-cols-3 gap-2 text-xs">
+                                        <div className="flex items-center space-x-1">
+                                          <Heart className={`w-3 h-3 ${onCooldown ? 'text-gray-400' : 'text-red-400'}`} />
+                                          <span className={onCooldown ? 'text-gray-400' : ''}>{monster.maxHp}</span>
+                                        </div>
+                                        <div className="flex items-center space-x-1">
+                                          <Sword className={`w-3 h-3 ${onCooldown ? 'text-gray-400' : 'text-orange-400'}`} />
+                                          <span className={onCooldown ? 'text-gray-400' : ''}>{monster.attack}</span>
+                                        </div>
+                                        <div className={`flex items-center space-x-1 ${onCooldown ? 'text-gray-400' : 'text-yellow-400'}`}>
+                                          <Coins className="w-3 h-3" />
+                                          <span>{monster.goldReward}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             )}
