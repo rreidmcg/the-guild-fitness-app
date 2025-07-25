@@ -42,6 +42,12 @@ Preferred communication style: Simple, everyday language.
 - Email verification system with secure token generation and 24-hour expiry
 - Password recovery system with 1-hour reset token expiry
 - Enhanced login/signup pages with password visibility toggle and forgot password functionality
+- **Username Validation & Profanity Filtering**: Comprehensive validation system with:
+  - Character restrictions (letters and spaces only, 2-20 characters)
+  - Profanity detection with leetspeak normalization
+  - Reserved word protection (admin, staff, etc.)
+  - Real-time validation feedback in forms
+  - Backend and frontend validation consistency
 - Admin access control for G.M. titled users
 - Character progression system with RPG-style leveling
 - Stat tracking (strength, stamina, agility)

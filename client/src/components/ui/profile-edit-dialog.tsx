@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { validateUsername, formatUsernameInput } from "@/utils/username-validation";
 import {
   Dialog,
   DialogContent,
@@ -34,20 +35,44 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
     gender: "male",
   });
 
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+
   // Update form data when user stats change
   useEffect(() => {
     if (userStats) {
       setFormData({
-        username: userStats.username || "",
-        skinColor: userStats.skinColor || "#F5C6A0",
-        hairColor: userStats.hairColor || "#8B4513",
-        gender: userStats.gender || "male",
+        username: (userStats as any).username || "",
+        skinColor: (userStats as any).skinColor || "#F5C6A0",
+        hairColor: (userStats as any).hairColor || "#8B4513",
+        gender: (userStats as any).gender || "male",
       });
+      setUsernameError(null);
     }
   }, [userStats]);
 
+  const handleUsernameChange = (value: string) => {
+    const formatted = formatUsernameInput(value);
+    setFormData(prev => ({ ...prev, username: formatted }));
+    
+    // Validate username in real-time
+    if (formatted) {
+      const validation = validateUsername(formatted);
+      setUsernameError(validation.isValid ? null : validation.error || null);
+    } else {
+      setUsernameError(null);
+    }
+  };
+
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: any) => {
+      // Validate username before submission
+      if (updates.username) {
+        const validation = validateUsername(updates.username);
+        if (!validation.isValid) {
+          throw new Error(validation.error);
+        }
+      }
+      
       console.log("Mutation received updates:", updates);
       console.log("Current userStats:", userStats);
       
@@ -72,7 +97,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
       }
       
       // Update gender if changed
-      if (gender !== userStats?.gender) {
+      if (gender !== (userStats as any)?.gender) {
         const genderResult = await apiRequest("/api/user/gender", {
           method: "PATCH",
           body: { gender },
@@ -102,6 +127,17 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Final validation check
+    if (usernameError) {
+      toast({
+        title: "Invalid Username",
+        description: usernameError,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     console.log("Submitting form data:", formData);
     updateProfileMutation.mutate(formData);
   };
@@ -122,7 +158,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
         <form onSubmit={handleSubmit} className="space-y-4 pb-4">
           {/* Avatar Preview */}
           <div className="flex justify-center">
-            <Avatar2D user={{...userStats, ...formData}} size="sm" />
+            <Avatar2D user={{...(userStats as any), ...formData}} size="sm" />
           </div>
 
           {/* Gender Selection */}
@@ -154,9 +190,17 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
             <Input
               id="username"
               value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              placeholder="Enter username"
+              onChange={(e) => handleUsernameChange(e.target.value)}
+              placeholder="Enter username (letters and spaces only)"
+              maxLength={20}
+              className={usernameError ? "border-red-500" : ""}
             />
+            {usernameError && (
+              <p className="text-sm text-red-500">{usernameError}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              2-20 characters, letters and spaces only
+            </p>
           </div>
 
           {/* Skin Color */}
@@ -210,7 +254,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
             </Button>
             <Button
               type="submit"
-              disabled={updateProfileMutation.isPending}
+              disabled={updateProfileMutation.isPending || !!usernameError}
             >
               {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>

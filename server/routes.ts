@@ -5,6 +5,7 @@ import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerforma
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import { authUtils } from "./auth";
+import { validateUsername, sanitizeUsername } from "./username-validation";
 
 // Simple in-memory session storage (in production, use proper session management)
 let currentUserId: number = 1;
@@ -15,8 +16,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, username, password, height, weight, fitnessGoal, measurementUnit, gender } = req.body;
       
+      // Validate and sanitize username
+      const validation = validateUsername(username);
+      if (!validation.isValid) {
+        return res.status(400).json({ error: validation.error });
+      }
+
+      const sanitizedUsername = sanitizeUsername(username);
+      
       // Check if username already exists
-      const existingUser = await storage.getUserByUsername(username);
+      const existingUser = await storage.getUserByUsername(sanitizedUsername);
       if (existingUser) {
         return res.status(400).json({ error: "Username already taken" });
       }
@@ -37,7 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create user with profile data
       const newUser = await storage.createUser({
-        username,
+        username: sanitizedUsername,
         password: hashedPassword,
         email,
         emailVerified: false,
@@ -552,7 +561,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = currentUserId; // Use the current logged-in user
       
       const updates: any = {};
-      if (username) updates.username = username;
+      if (username) {
+        // Validate and sanitize username
+        const validation = validateUsername(username);
+        if (!validation.isValid) {
+          return res.status(400).json({ error: validation.error });
+        }
+
+        const sanitizedUsername = sanitizeUsername(username);
+        
+        // Check if username already exists (exclude current user)
+        const existingUser = await storage.getUserByUsername(sanitizedUsername);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ error: "Username already taken" });
+        }
+
+        updates.username = sanitizedUsername;
+      }
       if (skinColor) updates.skinColor = skinColor;
       if (hairColor) updates.hairColor = hairColor;
       if (height !== undefined) updates.height = height;

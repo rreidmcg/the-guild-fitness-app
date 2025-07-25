@@ -12,10 +12,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
+import { validateUsername, formatUsernameInput } from "@/utils/username-validation";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  username: z.string().min(3, "Username must be at least 3 characters").max(20, "Username must be at most 20 characters"),
+  username: z.string().min(2, "Username must be at least 2 characters").max(20, "Username must be at most 20 characters").refine((val) => {
+    const validation = validateUsername(val);
+    return validation.isValid;
+  }, {
+    message: "Username contains inappropriate content or invalid characters"
+  }),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
   height: z.number().min(1, "Height is required"),
@@ -176,11 +182,19 @@ export default function SignupPage() {
                         <FormLabel>Username</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="Choose a username" 
-                            {...field} 
+                            placeholder="Choose a username (letters and spaces only)" 
+                            {...field}
+                            maxLength={20}
+                            onChange={(e) => {
+                              const formatted = formatUsernameInput(e.target.value);
+                              field.onChange(formatted);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
+                        <p className="text-xs text-muted-foreground">
+                          2-20 characters, letters and spaces only
+                        </p>
                       </FormItem>
                     )}
                   />
