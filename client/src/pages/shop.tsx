@@ -107,7 +107,10 @@ export default function Shop() {
 
   const purchaseItemMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      return apiRequest("POST", "/api/shop/purchase", { itemId });
+      return apiRequest("/api/shop/purchase", { 
+        method: "POST",
+        body: { itemId }
+      });
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/shop/items"] });
@@ -155,7 +158,10 @@ export default function Shop() {
 
   const purchasePotionMutation = useMutation({
     mutationFn: async ({ potionType, quantity }: { potionType: string; quantity: number }) => {
-      return apiRequest("POST", "/api/shop/buy-potion", { potionType, quantity });
+      return apiRequest("/api/shop/buy-potion", { 
+        method: "POST",
+        body: { potionType, quantity }
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
@@ -402,6 +408,16 @@ export default function Shop() {
                 <Coins className="w-4 h-4 text-yellow-500" />
                 <span className="font-bold text-foreground text-sm">{userStats?.gold || 0}</span>
               </div>
+              {(userStats?.gold || 0) < 50 && (
+                <Button 
+                  onClick={() => setActiveTab('gold')}
+                  size="sm"
+                  className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white animate-pulse"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Buy Gold
+                </Button>
+              )}
               <Button 
                 onClick={() => setLocation('/settings')}
                 size="sm"
@@ -420,7 +436,10 @@ export default function Shop() {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="consumables">Consumables</TabsTrigger>
             <TabsTrigger value="equipment">Equipment</TabsTrigger>
-            <TabsTrigger value="gold">Gold</TabsTrigger>
+            <TabsTrigger value="gold" className="text-yellow-600 font-semibold data-[state=active]:bg-yellow-100 data-[state=active]:text-yellow-800 dark:text-yellow-400 dark:data-[state=active]:bg-yellow-900/30 dark:data-[state=active]:text-yellow-200">
+              <Coins className="w-4 h-4 mr-1" />
+              Buy Gold
+            </TabsTrigger>
           </TabsList>
 
           <div className="mt-6">
@@ -727,13 +746,13 @@ export default function Shop() {
                     <Button 
                       onClick={() => purchaseGoldMutation.mutate(goldPackage)}
                       disabled={purchaseGoldMutation.isPending}
-                      className={`w-full ${goldPackage.popular 
-                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700' 
-                        : 'bg-game-primary hover:bg-blue-600'
-                      } text-white`}
+                      className={`w-full h-12 text-white font-bold text-lg ${goldPackage.popular 
+                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 shadow-lg shadow-yellow-500/25' 
+                        : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+                      }`}
                     >
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Purchase
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Purchase Now
                     </Button>
                   </CardContent>
 
