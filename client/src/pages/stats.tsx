@@ -543,7 +543,7 @@ export default function Stats() {
             <div className="mb-6 p-4 bg-red-900/20 rounded-lg border border-red-700">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <Heart className="w-5 h-5 text-red-400" />
+                  <Plus className="w-5 h-5 text-red-400" />
                   <span className="font-semibold text-red-400">Health</span>
                 </div>
                 <span className="text-sm text-red-300">
@@ -583,7 +583,7 @@ export default function Stats() {
                       disabled={usePotionMutation.isPending}
                       className="text-xs border-red-500 text-red-300 hover:bg-red-900/30"
                     >
-                      <Heart className="w-3 h-3 mr-1" />
+                      <Plus className="w-3 h-3 mr-1" />
                       {potionNames[potionType as keyof typeof potionNames]} ({quantity})
                     </Button>
                   ) : null;
@@ -665,7 +665,7 @@ export default function Stats() {
                 statLevel={safeUserStats.stamina || 0}
                 totalXp={safeUserStats.staminaXp || 0}
                 color="text-yellow-400"
-                icon={<Heart className="w-5 h-5" />}
+                icon={<Plus className="w-5 h-5" />}
               />
               <EnhancedStatBar
                 label="Agility"
