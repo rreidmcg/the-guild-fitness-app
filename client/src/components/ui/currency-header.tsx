@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Coins, Zap, Package } from "lucide-react";
+import { Coins, Zap, Backpack } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
 
 export function CurrencyHeader() {
@@ -9,11 +9,7 @@ export function CurrencyHeader() {
     queryKey: ["/api/user/stats"],
   });
 
-  const { data: inventory } = useQuery({
-    queryKey: ["/api/inventory"],
-  });
 
-  const potionCount = (inventory as any[])?.filter((item: any) => item.itemType === "potion").length || 0;
 
   return (
     <div className="bg-card/80 border-b border-border/50 px-4 py-1.5">
@@ -35,10 +31,10 @@ export function CurrencyHeader() {
           <div className="flex items-center space-x-3">
             <button
               onClick={() => navigate('/inventory')}
-              className="flex items-center space-x-2 hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+              className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+              title="Inventory"
             >
-              <Package className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{potionCount}</span>
+              <Backpack className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           </div>
         </div>
