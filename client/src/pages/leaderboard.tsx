@@ -12,7 +12,7 @@ export default function LeaderboardPage() {
       case 1:
         return <Crown className="w-5 h-5 text-yellow-500" />;
       case 2:
-        return <Medal className="w-5 h-5 text-gray-300" />;
+        return <Medal className="w-5 h-5 text-gray-100" />;
       case 3:
         return <Medal className="w-5 h-5 text-amber-600" />;
       default:
