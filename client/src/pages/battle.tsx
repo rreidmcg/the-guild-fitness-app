@@ -19,7 +19,8 @@ import {
   X,
   Clock,
   Volume2,
-  VolumeX
+  VolumeX,
+  Plus
 } from "lucide-react";
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
 import caveRatImage from "@assets/IMG_3670_1753151064629.png";
@@ -1108,7 +1109,7 @@ export default function Battle() {
                       </div>
                     </div>
                     <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white p-2">
-                      <Heart className="w-6 h-6" />
+                      <Plus className="w-6 h-6" />
                     </Button>
                   </div>
                   
