@@ -15,6 +15,7 @@ import {
   Skull,
   ChevronDown,
   ChevronRight,
+  Coins,
   X,
   Clock,
   Volume2,

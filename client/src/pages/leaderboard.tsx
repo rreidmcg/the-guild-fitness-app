@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap } from "lucide-react";
+import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap, Sparkles } from "lucide-react";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 
 export default function LeaderboardPage() {
@@ -114,15 +114,21 @@ export default function LeaderboardPage() {
                             </span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Heart className="w-3 h-3 text-green-400" />
+                            <Heart className="w-3 h-3 text-yellow-400" />
                             <span className="text-xs text-muted-foreground">
                               {player.stamina || 0}
                             </span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Zap className="w-3 h-3 text-blue-400" />
+                            <Zap className="w-3 h-3 text-green-400" />
                             <span className="text-xs text-muted-foreground">
                               {player.agility || 0}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Sparkles className="w-3 h-3 text-blue-400" />
+                            <span className="text-xs text-muted-foreground">
+                              {player.currentMp || 0}/{player.maxMp || 0}
                             </span>
                           </div>
                         </div>
