@@ -1068,7 +1068,6 @@ export default function Battle() {
   if (!battleState) {
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
-        <CurrencyHeader />
         
         {/* Header */}
         <div className="bg-card border-b border-border px-4 py-6">
