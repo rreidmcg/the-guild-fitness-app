@@ -1150,7 +1150,6 @@ export default function Battle() {
                 <div className="flex items-center space-x-2">
                   <Skull className="w-6 h-6 text-green-400" />
                   <span>E-rank Dungeons</span>
-                  <span className="text-sm text-muted-foreground">(4 weeks - Beginner)</span>
                 </div>
                 {isMonsterListOpen ? (
                   <ChevronDown className="w-5 h-5" />
@@ -1172,9 +1171,6 @@ export default function Battle() {
                           />
                           <span>{zone.name}</span>
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground italic">
-                          {zone.description}
-                        </p>
                       </CardHeader>
                       <CardContent>
                         <div className="mb-4 p-3 bg-muted/50 rounded border-l-4 border-primary text-sm">
@@ -1278,7 +1274,6 @@ export default function Battle() {
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-6 h-6 text-blue-400" />
                 <span>D-rank Dungeons</span>
-                <span className="text-sm text-muted-foreground">(8 weeks - 6 dungeons)</span>
                 <span className="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
@@ -1309,7 +1304,6 @@ export default function Battle() {
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-6 h-6 text-purple-400" />
                 <span>C-rank Dungeons</span>
-                <span className="text-sm text-muted-foreground">(16 weeks - 8 dungeons)</span>
                 <span className="text-xs bg-purple-600/20 text-purple-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
@@ -1340,7 +1334,6 @@ export default function Battle() {
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-6 h-6 text-yellow-400" />
                 <span>B-rank Dungeons</span>
-                <span className="text-sm text-muted-foreground">(32 weeks - 12 dungeons)</span>
                 <span className="text-xs bg-yellow-600/20 text-yellow-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
@@ -1370,7 +1363,6 @@ export default function Battle() {
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-6 h-6 text-orange-400" />
                 <span>A-rank Dungeons</span>
-                <span className="text-sm text-muted-foreground">(64 weeks - 5 dungeons)</span>
                 <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
@@ -1401,7 +1393,6 @@ export default function Battle() {
               <CardTitle className="flex items-center space-x-2">
                 <Skull className="w-6 h-6 text-red-400" />
                 <span>S-rank Dungeons</span>
-                <span className="text-sm text-muted-foreground">(??? weeks - ??? dungeons)</span>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">LOCKED</span>
                   <span className="text-xs bg-gradient-to-r from-red-600 to-red-500 text-white px-3 py-1 rounded-full font-semibold animate-pulse">
