@@ -1393,6 +1393,41 @@ export default function Battle() {
               </div>
             </CardContent>
           </Card>
+
+          {/* S-rank Dungeons - Coming Soon */}
+          <Card className="bg-card/30 border-red-600/30 mt-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-900/10 to-red-800/5"></div>
+            <CardHeader className="relative">
+              <CardTitle className="flex items-center space-x-2">
+                <Skull className="w-6 h-6 text-red-400" />
+                <span>S-rank Dungeons</span>
+                <span className="text-sm text-muted-foreground">(??? weeks - ??? dungeons)</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">LOCKED</span>
+                  <span className="text-xs bg-gradient-to-r from-red-600 to-red-500 text-white px-3 py-1 rounded-full font-semibold animate-pulse">
+                    COMING SOON
+                  </span>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <p className="text-muted-foreground text-sm italic mb-4">
+                The legendary apex of all challenges. Reserved for the most elite fitness warriors who have transcended mortal limits. Details shrouded in mystery...
+              </p>
+              <div className="flex items-center justify-center py-12 opacity-60">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-red-600/20 flex items-center justify-center mx-auto mb-4">
+                    <Skull className="w-8 h-8 text-red-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-red-400 mb-2">Secrets Await</h3>
+                  <p className="text-sm text-muted-foreground max-w-md">
+                    The ultimate dungeons are being forged in the fires of legend. Only those who master A-rank content will be deemed worthy...
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
     );
