@@ -48,20 +48,22 @@ export function CurrencyHeader() {
               <Coins className="w-3.5 h-3.5 text-yellow-500" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gold || 0}</span>
             </div>
-            <button
-              onClick={() => navigate('/inventory')}
-              className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
-              title="Inventory"
-            >
-              <Backpack className="w-4 h-4 text-muted-foreground" />
-            </button>
-            <button
-              onClick={() => navigate('/settings')}
-              className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
-              title="Settings"
-            >
-              <Settings className="w-4 h-4 text-muted-foreground" />
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => navigate('/inventory')}
+                className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+                title="Inventory"
+              >
+                <Backpack className="w-4 h-4 text-muted-foreground" />
+              </button>
+              <button
+                onClick={() => navigate('/settings')}
+                className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+                title="Settings"
+              >
+                <Settings className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
