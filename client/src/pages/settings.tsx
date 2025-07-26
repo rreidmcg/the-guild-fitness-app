@@ -225,7 +225,7 @@ export default function Settings() {
                     { title: "Recruit", requirement: "Default", levelRange: "Any Level", available: true, rarity: "common" },
                     { title: "Broodmother Slayer", requirement: "Complete E-Rank Dungeons", levelRange: "Lv 1-10", available: false, rarity: "common" },
                     { title: "Earth Lord Conqueror", requirement: "Complete D-Rank Dungeons", levelRange: "Lv 10-20", available: false, rarity: "uncommon" },
-                    { title: "Supreme Entity Vanquisher", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 20-30", available: false, rarity: "rare" },
+                    { title: "Light Sovereign Destroyer", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 20-30", available: false, rarity: "rare" },
                     { title: "Apex Sovereign Destroyer", requirement: "Complete B-Rank Dungeons", levelRange: "Lv 30-50", available: false, rarity: "epic", locked: true },
                     { title: "Symmetry Lord Transcendent", requirement: "Complete A-Rank Dungeons", levelRange: "Lv 50-75", available: false, rarity: "legendary", locked: true },
                     { title: "Omega Void Master", requirement: "Complete S-Rank Dungeons", levelRange: "Lv 75-100", available: false, rarity: "mythic", locked: true },

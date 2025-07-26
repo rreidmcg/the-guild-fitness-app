@@ -358,39 +358,7 @@ const CRANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 93, name: "Radiance Keeper", level: 20, maxHp: 108, currentHp: 108, attack: 21, goldReward: 20, description: "A sentinel of pure illumination" },
       { id: 94, name: "Crystal Angel", level: 20, maxHp: 112, currentHp: 112, attack: 21, goldReward: 20, description: "A divine being of crystallized light" },
       { id: 95, name: "Luminous Archon", level: 21, maxHp: 116, currentHp: 116, attack: 22, goldReward: 21, description: "A celestial guardian of all light" },
-      { id: 96, name: "Light Sovereign", level: 21, maxHp: 125, currentHp: 125, attack: 22, goldReward: 55, description: "🏆 MINI-BOSS: Absolute ruler of illumination" }
-    ]
-  },
-  {
-    id: "infinity_chamber",
-    name: "The Infinity Chamber",
-    description: "A paradoxical space where mathematics becomes reality and concepts take physical form",
-    background: "#663399",
-    storyIntro: "You enter a space that defies geometry, where infinite fractals spiral into impossible dimensions. Abstract concepts manifest as guardians protecting the secrets of existence...",
-    completionStory: "The infinite patterns collapse as the paradox king is defeated. Reality reasserts itself, but the memory of boundless possibility remains.",
-    monsters: [
-      { id: 97, name: "Fractal Wisp", level: 20, maxHp: 106, currentHp: 106, attack: 21, goldReward: 20, description: "A being of infinite recursive patterns" },
-      { id: 98, name: "Concept Beast", level: 20, maxHp: 110, currentHp: 110, attack: 21, goldReward: 20, description: "An abstract idea given physical form" },
-      { id: 99, name: "Infinite Guardian", level: 21, maxHp: 114, currentHp: 114, attack: 22, goldReward: 21, description: "A protector of mathematical truths" },
-      { id: 100, name: "Reality Weaver", level: 21, maxHp: 118, currentHp: 118, attack: 22, goldReward: 21, description: "An entity that shapes existence itself" },
-      { id: 101, name: "Omniversal Sentinel", level: 22, maxHp: 122, currentHp: 122, attack: 23, goldReward: 22, description: "A guardian of all possible realities" },
-      { id: 102, name: "Paradox King", level: 22, maxHp: 130, currentHp: 130, attack: 23, goldReward: 60, description: "🏆 MINI-BOSS: Sovereign of impossible possibilities" }
-    ]
-  },
-  {
-    id: "ultimate_threshold",
-    name: "The Ultimate Threshold",
-    description: "The final barrier between mortal realm and transcendent divinity",
-    background: "#FF6347",
-    storyIntro: "You stand before the ultimate test, where the most powerful entities in existence guard the threshold to divinity. This is the culmination of your journey...",
-    completionStory: "The threshold opens as the supreme entity acknowledges your worthiness. You have achieved the impossible - transcendence through dedication.",
-    monsters: [
-      { id: 103, name: "Transcendent Echo", level: 21, maxHp: 112, currentHp: 112, attack: 22, goldReward: 21, description: "A reflection of divine power" },
-      { id: 104, name: "Godling Avatar", level: 21, maxHp: 116, currentHp: 116, attack: 22, goldReward: 21, description: "A fragment of true divinity" },
-      { id: 105, name: "Eternal Warden", level: 22, maxHp: 120, currentHp: 120, attack: 23, goldReward: 22, description: "A timeless guardian of the threshold" },
-      { id: 106, name: "Divine Sentinel", level: 22, maxHp: 124, currentHp: 124, attack: 23, goldReward: 22, description: "A protector of ultimate power" },
-      { id: 107, name: "Ascended Lord", level: 23, maxHp: 128, currentHp: 128, attack: 24, goldReward: 23, description: "A being who achieved transcendence" },
-      { id: 108, name: "Supreme Entity", level: 23, maxHp: 140, currentHp: 140, attack: 24, goldReward: 100, description: "🏆 FINAL BOSS: The ultimate test of worthiness" }
+      { id: 96, name: "Light Sovereign", level: 21, maxHp: 140, currentHp: 140, attack: 22, goldReward: 100, description: "🏆 FINAL C-RANK BOSS: Absolute ruler of illumination" }
     ]
   }
 ];
