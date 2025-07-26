@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { 
   Package, 
   Coins, 
@@ -195,6 +199,9 @@ const getItemVisual = (item: InventoryItem) => {
 
 export default function Inventory() {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const [itemActionDialog, setItemActionDialog] = useState<{ open: boolean; item: InventoryItem | null }>({ open: false, item: null });
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{ open: boolean; item: InventoryItem | null }>({ open: false, item: null });
+  const { toast } = useToast();
 
   const { data: inventory } = useQuery({
     queryKey: ["/api/inventory"],
@@ -202,6 +209,56 @@ export default function Inventory() {
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
+  });
+
+  // Mutation for using potions
+  const usePotionMutation = useMutation({
+    mutationFn: async (itemName: string) => {
+      return apiRequest(`/api/use-potion`, {
+        method: 'POST',
+        body: JSON.stringify({ potionType: itemName }),
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Potion Used",
+        description: data.message || "Potion used successfully!",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      setItemActionDialog({ open: false, item: null });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Use Potion",
+        description: error.message || "Could not use the potion",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutation for deleting items
+  const deleteItemMutation = useMutation({
+    mutationFn: async (itemId: number) => {
+      return apiRequest(`/api/delete-item/${itemId}`, {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Item Deleted",
+        description: "Item has been removed from your inventory",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      setDeleteConfirmDialog({ open: false, item: null });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Delete Item",
+        description: error.message || "Could not delete the item",
+        variant: "destructive",
+      });
+    }
   });
 
   // Create a 50-slot grid (5x10)
@@ -237,7 +294,13 @@ export default function Inventory() {
           ${selectedSlot === index ? 'ring-2 ring-primary' : ''}
           cursor-pointer transition-colors
         `}
-        onClick={() => setSelectedSlot(selectedSlot === index ? null : index)}
+        onClick={() => {
+          if (item) {
+            setItemActionDialog({ open: true, item });
+          } else {
+            setSelectedSlot(selectedSlot === index ? null : index);
+          }
+        }}
       >
         {item ? (
           <Tooltip>
@@ -305,7 +368,7 @@ export default function Inventory() {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Inventory</h1>
               <p className="text-muted-foreground mt-0.5 text-sm">
-                Manage your items and equipment • {inventory?.length || 0}/{totalSlots} slots used
+                Manage your items and equipment • {Array.isArray(inventory) ? inventory.length : 0}/{totalSlots} slots used
               </p>
             </div>
 
@@ -374,10 +437,89 @@ export default function Inventory() {
           </CardContent>
         </Card>
 
+        {/* Item Action Dialog */}
+        <Dialog open={itemActionDialog.open} onOpenChange={(open) => !open && setItemActionDialog({ open: false, item: null })}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Item Actions</DialogTitle>
+              <DialogDescription>
+                {itemActionDialog.item?.itemName} - What would you like to do?
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center space-x-4 py-4">
+              <div className="w-16 h-16 rounded flex items-center justify-center overflow-hidden border border-border">
+                {itemActionDialog.item && (
+                  <>
+                    {typeof getItemVisual(itemActionDialog.item) === 'string' ? (
+                      <span className="text-4xl">{getItemVisual(itemActionDialog.item)}</span>
+                    ) : (
+                      <div className="w-12 h-12">
+                        {getItemVisual(itemActionDialog.item)}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medium">{itemActionDialog.item?.itemName}</h3>
+                <p className="text-sm text-muted-foreground">{itemActionDialog.item?.description || 'No description available'}</p>
+                <p className="text-xs text-muted-foreground mt-1">Quantity: {itemActionDialog.item?.quantity}</p>
+              </div>
+            </div>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              {itemActionDialog.item?.itemType === 'potion' && (
+                <Button 
+                  onClick={() => usePotionMutation.mutate(itemActionDialog.item!.itemName)}
+                  disabled={usePotionMutation.isPending}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Heart className="w-4 h-4 mr-2" />
+                  Use Potion
+                </Button>
+              )}
+              <Button 
+                variant="destructive"
+                onClick={() => {
+                  setItemActionDialog({ open: false, item: null });
+                  setDeleteConfirmDialog({ open: true, item: itemActionDialog.item });
+                }}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Item
+              </Button>
+              <Button variant="outline" onClick={() => setItemActionDialog({ open: false, item: null })}>
+                Cancel
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteConfirmDialog.open} onOpenChange={(open) => !open && setDeleteConfirmDialog({ open: false, item: null })}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete "{deleteConfirmDialog.item?.itemName}"? 
+                {deleteConfirmDialog.item?.quantity && deleteConfirmDialog.item.quantity > 1 
+                  ? ` This will delete all ${deleteConfirmDialog.item.quantity} items.` 
+                  : ''
+                } This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => deleteItemMutation.mutate(deleteConfirmDialog.item!.id)}
+                disabled={deleteItemMutation.isPending}
+                className="bg-destructive hover:bg-destructive/90"
+              >
+                {deleteItemMutation.isPending ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-
     </div>
   );
 }

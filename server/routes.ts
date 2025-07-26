@@ -991,6 +991,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete item endpoint
+  app.delete("/api/delete-item/:id", async (req, res) => {
+    const userId = currentUserId; // Use the current logged-in user
+    const itemId = parseInt(req.params.id);
+    
+    if (!itemId || isNaN(itemId)) {
+      return res.status(400).json({ error: "Invalid item ID" });
+    }
+    
+    try {
+      // Check if the item belongs to the user
+      const [item] = await db
+        .select()
+        .from(playerInventory)
+        .where(
+          and(
+            eq(playerInventory.id, itemId),
+            eq(playerInventory.userId, userId)
+          )
+        );
+      
+      if (!item) {
+        return res.status(404).json({ error: "Item not found or doesn't belong to you" });
+      }
+      
+      // Delete the item
+      await db
+        .delete(playerInventory)
+        .where(
+          and(
+            eq(playerInventory.id, itemId),
+            eq(playerInventory.userId, userId)
+          )
+        );
+      
+      res.json({ success: true, message: "Item deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      res.status(500).json({ error: "Failed to delete item" });
+    }
+  });
+
   // Use potion endpoint
   app.post("/api/use-potion", async (req, res) => {
     const userId = currentUserId; // Use the current logged-in user
