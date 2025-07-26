@@ -702,29 +702,80 @@ export default function WorkoutBuilder() {
         </DialogHeader>
         
         <div className="space-y-4 pb-4">
-          {['workout', 'warmup', 'cooldown', 'recovery'].map((type) => (
-            <div 
-              key={type}
-              className="flex items-center justify-between cursor-pointer py-3"
-              onClick={() => {
-                setCurrentSection(prev => prev ? {...prev, type: type as any} : null);
-                setShowTypeSelector(false);
-              }}
-            >
-              <div className="flex-1">
-                <h3 className="font-semibold text-foreground mb-1 capitalize">
-                  {type === 'warmup' ? 'Warm-up' : 
-                   type === 'cooldown' ? 'Cool down' : 
-                   type.charAt(0).toUpperCase() + type.slice(1)}
-                </h3>
-              </div>
-              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                {currentSection?.type === type && (
-                  <Check className="w-4 h-4 text-white" />
-                )}
-              </div>
+          {/* Workout (Regular) */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, type: 'workout'} : null);
+              setShowTypeSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Workout (Regular)</h3>
             </div>
-          ))}
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+              {currentSection?.type === 'workout' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
+          
+          {/* Warm-up */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, type: 'warmup'} : null);
+              setShowTypeSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Warm-up</h3>
+              <p className="text-sm text-muted-foreground">Not included in the exercise chart</p>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-3 flex-shrink-0">
+              {currentSection?.type === 'warmup' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
+          
+          {/* Cool down */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, type: 'cooldown'} : null);
+              setShowTypeSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Cool down</h3>
+              <p className="text-sm text-muted-foreground">Not included in the exercise chart</p>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-3 flex-shrink-0">
+              {currentSection?.type === 'cooldown' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
+          
+          {/* Recovery */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, type: 'recovery'} : null);
+              setShowTypeSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Recovery</h3>
+              <p className="text-sm text-muted-foreground">Not included in the exercise chart</p>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-3 flex-shrink-0">
+              {currentSection?.type === 'recovery' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
