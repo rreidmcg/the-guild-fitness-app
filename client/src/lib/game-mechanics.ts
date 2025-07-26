@@ -13,10 +13,34 @@ export interface StatGains {
   agility: number;
 }
 
+// Calculate XP required for a specific level using exponential formula
+function getXpRequiredForLevel(level: number): number {
+  if (level <= 1) return 0;
+  // Exponential formula: level^1.8 * 100
+  // This creates a curve where early levels are fast, later levels take much longer
+  // Tuned so level 100 takes ~5 years of consistent training (3 workouts/week)
+  return Math.floor(Math.pow(level - 1, 1.8) * 100);
+}
+
+// Calculate level from total XP
+function getLevelFromXp(totalXp: number): number {
+  if (totalXp < 0) return 1;
+  
+  let level = 1;
+  let xpRequired = 0;
+  
+  while (xpRequired <= totalXp) {
+    level++;
+    xpRequired = getXpRequiredForLevel(level);
+  }
+  
+  return level - 1;
+}
+
 export function calculateLevel(experience: number): LevelInfo {
-  const level = Math.floor(experience / 1000) + 1;
-  const xpRequired = (level - 1) * 1000;
-  const xpForNext = level * 1000;
+  const level = getLevelFromXp(experience);
+  const xpRequired = getXpRequiredForLevel(level);
+  const xpForNext = getXpRequiredForLevel(level + 1);
   
   const titles = [
     "Novice", "Apprentice", "Warrior", "Veteran", "Champion", 

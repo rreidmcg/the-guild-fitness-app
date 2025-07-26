@@ -1776,7 +1776,26 @@ function calculateRewards(sessionData: any) {
   return { xpEarned, statsEarned };
 }
 
+// Calculate XP required for a specific level using exponential formula
+function getXpRequiredForLevel(level: number): number {
+  if (level <= 1) return 0;
+  // Exponential formula: level^1.8 * 100
+  // This creates a curve where early levels are fast, later levels take much longer
+  // Tuned so level 100 takes ~5 years of consistent training (3 workouts/week)
+  return Math.floor(Math.pow(level - 1, 1.8) * 100);
+}
+
+// Calculate level from total XP
 function calculateLevel(experience: number): number {
-  // Simple level calculation: every 1000 XP = 1 level
-  return Math.floor(experience / 1000) + 1;
+  if (experience < 0) return 1;
+  
+  let level = 1;
+  let xpRequired = 0;
+  
+  while (xpRequired <= experience) {
+    level++;
+    xpRequired = getXpRequiredForLevel(level);
+  }
+  
+  return level - 1;
 }

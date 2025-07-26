@@ -48,7 +48,8 @@ const RPE_MULTIPLIERS: Record<number, number> = {
 };
 
 // Base XP multiplier (adjustable during playtesting)
-const BASE_XP_MULTIPLIER = 10;
+// Reduced from 10 to 2 to slow progression for long-term engagement
+const BASE_XP_MULTIPLIER = 2;
 
 /**
  * Calculates work units based on exercise type
