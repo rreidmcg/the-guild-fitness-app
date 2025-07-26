@@ -6,31 +6,60 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ExerciseSelector } from "@/components/ui/exercise-selector";
+import { Badge } from "@/components/ui/badge";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Save, Play } from "lucide-react";
+import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter } from "lucide-react";
 import type { Exercise } from "@shared/schema";
 
+interface WorkoutSection {
+  id: string;
+  name: string;
+  format: 'regular' | 'amrap' | 'timed' | 'interval' | 'freestyle';
+  type: 'workout' | 'warmup' | 'cooldown' | 'recovery';
+  description?: string;
+  exercises: WorkoutExercise[];
+}
+
 interface WorkoutExercise {
+  id: string;
   exerciseId: number;
   exercise?: Exercise;
-  sets: number;
-  reps: number;
-  weight?: number;
-  duration?: number;
-  restTime?: number;
+  sets: ExerciseSet[];
+  notes?: string;
 }
+
+interface ExerciseSet {
+  id: string;
+  reps?: number;
+  weight?: number;
+  duration?: string;
+  rest?: string;
+  completed?: boolean;
+}
+
+type WorkoutBuilderStep = 'details' | 'sections' | 'section-form' | 'exercise-selection';
 
 export default function WorkoutBuilder() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Main state
+  const [step, setStep] = useState<WorkoutBuilderStep>('details');
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDescription, setWorkoutDescription] = useState("");
-  const [selectedExercises, setSelectedExercises] = useState<WorkoutExercise[]>([]);
+  const [sections, setSections] = useState<WorkoutSection[]>([]);
+  
+  // Section form state
+  const [currentSection, setCurrentSection] = useState<Partial<WorkoutSection> | null>(null);
+  const [isEditingSection, setIsEditingSection] = useState(false);
+  
+  // Exercise selection state
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [exerciseSearch, setExerciseSearch] = useState("");
+  const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
 
   const { data: exercises } = useQuery({
     queryKey: ["/api/exercises"],
@@ -58,42 +87,481 @@ export default function WorkoutBuilder() {
     },
   });
 
-  const handleAddExercise = (exercise: Exercise) => {
-    const newExercise: WorkoutExercise = {
-      exerciseId: exercise.id,
-      exercise,
-      sets: 3,
-      reps: 10,
-      weight: 0,
-      restTime: 60,
-    };
-    setSelectedExercises([...selectedExercises, newExercise]);
+  // Step 1: Workout Details
+  const renderDetailsStep = () => (
+    <div className="min-h-screen bg-background text-foreground">
+      <CurrencyHeader />
+      
+      <div className="bg-card border-b border-border px-4 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            onClick={() => setLocation("/workouts")}
+            className="text-muted-foreground hover:text-foreground p-2"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+          
+          <h1 className="text-lg font-semibold text-foreground">New Workout</h1>
+          
+          <Button 
+            onClick={() => setStep('sections')}
+            disabled={!workoutName.trim()}
+            className="text-primary disabled:text-muted-foreground"
+            variant="ghost"
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-6 max-w-4xl mx-auto space-y-6">
+        <div>
+          <Label className="text-sm font-medium text-muted-foreground mb-2 block">WORKOUT NAME</Label>
+          <Input
+            value={workoutName}
+            onChange={(e) => setWorkoutName(e.target.value)}
+            placeholder="Add workout name"
+            className="bg-background border-border text-foreground text-lg font-medium"
+          />
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium text-muted-foreground mb-2 block">DESCRIPTION</Label>
+          <Textarea
+            value={workoutDescription}
+            onChange={(e) => setWorkoutDescription(e.target.value)}
+            placeholder="Add workout description..."
+            className="bg-muted border-border text-foreground min-h-[120px] resize-none"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  // Step 2: Sections Overview
+  const renderSectionsStep = () => (
+    <div className="min-h-screen bg-background text-foreground">
+      <CurrencyHeader />
+      
+      <div className="bg-card border-b border-border px-4 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            onClick={() => setStep('details')}
+            className="text-muted-foreground hover:text-foreground p-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          
+          <h1 className="text-lg font-semibold text-foreground">{workoutName}</h1>
+          
+          <Button 
+            onClick={handleSaveWorkout}
+            disabled={sections.length === 0}
+            className="text-primary disabled:text-muted-foreground"
+            variant="ghost"
+          >
+            Save
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-6 max-w-4xl mx-auto">
+        {sections.length === 0 ? (
+          <div className="text-center py-16 space-y-6">
+            <div className="mx-auto w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-background rounded border-2 border-dashed border-border flex items-center justify-center">
+                <div className="w-6 h-6 bg-primary rounded"></div>
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-xl font-semibold text-foreground mb-2">Add Exercises</h2>
+              <p className="text-muted-foreground">Please add at least 1 exercise or section to create the workout</p>
+            </div>
+
+            <div className="space-y-3">
+              <Button 
+                onClick={() => {
+                  setCurrentSection({
+                    id: Date.now().toString(),
+                    name: "",
+                    format: 'regular',
+                    type: 'workout',
+                    exercises: []
+                  });
+                  setStep('section-form');
+                }}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                Add Exercise
+              </Button>
+              
+              <Button 
+                onClick={() => {
+                  setCurrentSection({
+                    id: Date.now().toString(),
+                    name: "",
+                    format: 'regular',
+                    type: 'workout', 
+                    exercises: []
+                  });
+                  setStep('section-form');
+                }}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                Add Section
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {sections.map((section) => (
+              <Card key={section.id} className="bg-card border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold text-foreground">{section.name}</h3>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Badge variant="secondary" className="text-xs uppercase">
+                      {section.format}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {section.exercises.length} EXERCISE{section.exercises.length !== 1 ? 'S' : ''}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-2">
+                    {section.exercises.map((exercise) => (
+                      <div key={exercise.id} className="pl-4 border-l-2 border-muted">
+                        <p className="text-sm font-medium text-foreground">{exercise.exercise?.name}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            <div className="flex space-x-3 pt-4">
+              <Button 
+                onClick={() => {
+                  setCurrentSection({
+                    id: Date.now().toString(),
+                    name: "",
+                    format: 'regular',
+                    type: 'workout',
+                    exercises: []
+                  });
+                  setStep('section-form');
+                }}
+                variant="outline"
+                className="flex-1"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add
+              </Button>
+              
+              <Button 
+                onClick={handleSaveWorkout}
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Step 3: Section Form
+  const renderSectionForm = () => (
+    <div className="min-h-screen bg-background text-foreground">
+      <CurrencyHeader />
+      
+      <div className="bg-card border-b border-border px-4 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            onClick={() => setStep('sections')}
+            className="text-muted-foreground hover:text-foreground p-2"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+          
+          <h1 className="text-lg font-semibold text-foreground">New Section</h1>
+          
+          <div className="w-8"></div>
+        </div>
+      </div>
+
+      <div className="p-6 max-w-4xl mx-auto space-y-6">
+        <div>
+          <Label className="text-sm font-medium text-muted-foreground mb-2 block">SECTION NAME</Label>
+          <Input
+            value={currentSection?.name || ""}
+            onChange={(e) => setCurrentSection(prev => prev ? {...prev, name: e.target.value} : null)}
+            placeholder="Section name"
+            className="bg-background border-border text-foreground text-lg font-medium"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground mb-2 block">SECTION FORMAT</Label>
+            <Button 
+              variant="outline"
+              className="w-full justify-between text-left font-normal"
+              onClick={() => {}} // TODO: Add format selector
+            >
+              <span className="capitalize">{currentSection?.format || 'Regular'}</span>
+              <span>{'>'}</span>
+            </Button>
+          </div>
+          
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground mb-2 block">SECTION TYPE</Label>
+            <Button 
+              variant="outline"
+              className="w-full justify-between text-left font-normal capitalize"
+              onClick={() => {}} // TODO: Add type selector
+            >
+              <span className="capitalize">{currentSection?.type || 'Workout'}</span>
+              <span>{'>'}</span>
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <Label className="text-sm font-medium text-muted-foreground mb-2 block">DESCRIPTION</Label>
+          <Textarea
+            value={currentSection?.description || ""}
+            onChange={(e) => setCurrentSection(prev => prev ? {...prev, description: e.target.value} : null)}
+            placeholder="Add a description..."
+            className="bg-muted border-border text-foreground min-h-[120px] resize-none"
+          />
+        </div>
+
+        {/* Exercise List */}
+        {currentSection?.exercises && currentSection.exercises.length > 0 && (
+          <div className="space-y-4">
+            {currentSection.exercises.map((exercise) => (
+              <Card key={exercise.id} className="bg-background border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
+                        <span className="text-xs font-medium">Ex</span>
+                      </div>
+                      <h3 className="font-semibold text-foreground">{exercise.exercise?.name}</h3>
+                    </div>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Sets Table */}
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-4 gap-4 text-xs font-medium text-muted-foreground uppercase">
+                      <div>SET</div>
+                      <div>REPS</div>
+                      <div>LB</div>
+                      <div>REST</div>
+                    </div>
+                    
+                    {exercise.sets.map((set, index) => (
+                      <div key={set.id} className="grid grid-cols-4 gap-4 items-center py-2">
+                        <div className="text-sm font-medium">{index + 1}</div>
+                        <div className="text-sm">-</div>
+                        <div className="text-sm">-</div>
+                        <div className="text-sm">00:00</div>
+                      </div>
+                    ))}
+
+                    <Button 
+                      variant="ghost" 
+                      className="text-primary text-sm"
+                      onClick={() => {
+                        // Add new set
+                        if (currentSection) {
+                          const updatedExercises = currentSection.exercises.map(ex => 
+                            ex.id === exercise.id 
+                              ? {...ex, sets: [...ex.sets, {id: Date.now().toString()}]}
+                              : ex
+                          );
+                          setCurrentSection({...currentSection, exercises: updatedExercises});
+                        }
+                      }}
+                    >
+                      + Add Set
+                    </Button>
+                  </div>
+
+                  <div className="mt-4">
+                    <Textarea 
+                      placeholder="Add note..."
+                      className="bg-muted border-0 text-sm resize-none"
+                      rows={2}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        <div className="flex space-x-3 pt-4">
+          <Button 
+            onClick={() => {
+              setSelectedSectionId(currentSection?.id || null);
+              setStep('exercise-selection');
+            }}
+            variant="outline"
+            className="flex-1"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Exercise
+          </Button>
+          
+          <Button 
+            onClick={handleSaveSection}
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+            disabled={!currentSection?.name?.trim()}
+          >
+            Save
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Step 4: Exercise Selection
+  const renderExerciseSelection = () => {
+    const filteredExercises = exercises?.filter(exercise => 
+      exercise.name.toLowerCase().includes(exerciseSearch.toLowerCase()) ||
+      exercise.muscleGroups.some(mg => mg.toLowerCase().includes(exerciseSearch.toLowerCase()))
+    ) || [];
+
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <CurrencyHeader />
+        
+        <div className="bg-card border-b border-border px-4 py-4">
+          <div className="max-w-4xl mx-auto flex items-center justify-between">
+            <Button 
+              variant="ghost" 
+              onClick={() => setStep('section-form')}
+              className="text-muted-foreground hover:text-foreground p-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            
+            <h1 className="text-lg font-semibold text-foreground">Select exercises</h1>
+            
+            <Button variant="ghost" size="sm">
+              <Filter className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="p-6 max-w-4xl mx-auto">
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search exercise.."
+              value={exerciseSearch}
+              onChange={(e) => setExerciseSearch(e.target.value)}
+              className="pl-10 bg-muted border-border"
+            />
+          </div>
+
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground">EXERCISES ({filteredExercises.length})</p>
+          </div>
+
+          {/* Exercise List */}
+          <div className="space-y-3 mb-20">
+            {filteredExercises.map(exercise => (
+              <div 
+                key={exercise.id}
+                className="flex items-center space-x-3 cursor-pointer"
+                onClick={() => handleToggleExercise(exercise.id)}
+              >
+                <div className="w-6 h-6 rounded-full border-2 border-muted-foreground flex items-center justify-center">
+                  {selectedExercises.includes(exercise.id) && (
+                    <Check className="w-4 h-4 text-primary" />
+                  )}
+                </div>
+                
+                <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
+                  <span className="text-xs font-medium">Ex</span>
+                </div>
+                
+                <div className="flex-1">
+                  <h3 className="font-medium text-foreground">{exercise.name}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
-  const handleUpdateExercise = (index: number, updates: Partial<WorkoutExercise>) => {
-    const updated = [...selectedExercises];
-    updated[index] = { ...updated[index], ...updates };
-    setSelectedExercises(updated);
+  // Handlers
+  const handleToggleExercise = (exerciseId: number) => {
+    setSelectedExercises(prev => 
+      prev.includes(exerciseId) 
+        ? prev.filter(id => id !== exerciseId)
+        : [...prev, exerciseId]
+    );
   };
 
-  const handleRemoveExercise = (index: number) => {
-    setSelectedExercises(selectedExercises.filter((_, i) => i !== index));
+  const handleSaveSection = () => {
+    if (!currentSection?.name?.trim()) return;
+
+    // Add selected exercises to current section
+    const exercisesToAdd = selectedExercises.map(exerciseId => {
+      const exercise = exercises?.find(ex => ex.id === exerciseId);
+      return {
+        id: Date.now().toString() + Math.random(),
+        exerciseId,
+        exercise,
+        sets: [{id: Date.now().toString()}] // Start with one set
+      };
+    });
+
+    const finalSection = {
+      ...currentSection,
+      exercises: [...(currentSection.exercises || []), ...exercisesToAdd]
+    } as WorkoutSection;
+
+    if (isEditingSection) {
+      setSections(prev => prev.map(section => 
+        section.id === finalSection.id ? finalSection : section
+      ));
+    } else {
+      setSections(prev => [...prev, finalSection]);
+    }
+
+    // Reset state
+    setCurrentSection(null);
+    setIsEditingSection(false);
+    setSelectedExercises([]);
+    setStep('sections');
   };
 
   const handleSaveWorkout = () => {
-    if (!workoutName.trim()) {
+    if (!workoutName.trim() || sections.length === 0) {
       toast({
         title: "Error",
-        description: "Please enter a workout name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (selectedExercises.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please add at least one exercise",
+        description: "Please add a workout name and at least one section",
         variant: "destructive",
       });
       return;
@@ -102,189 +570,31 @@ export default function WorkoutBuilder() {
     const workoutData = {
       name: workoutName,
       description: workoutDescription,
-      exercises: selectedExercises.map(ex => ({
-        exerciseId: ex.exerciseId,
-        sets: ex.sets,
-        reps: ex.reps,
-        weight: ex.weight,
-        duration: ex.duration,
-        restTime: ex.restTime,
-      })),
+      exercises: sections.flatMap(section => 
+        section.exercises.map(ex => ({
+          exerciseId: ex.exerciseId,
+          sets: ex.sets.length,
+          reps: 10, // Default
+          weight: 0, // Default
+          restTime: 60 // Default
+        }))
+      ),
     };
 
     createWorkoutMutation.mutate(workoutData);
   };
 
-  const handleStartWorkout = () => {
-    // TODO: Navigate to workout session with current exercises
-    toast({
-      title: "Coming Soon",
-      description: "Workout session functionality will be added soon",
-    });
-  };
-
-  return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
-      
-      <div className="bg-card border-b border-border px-4 py-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center justify-between">
-              <Button 
-                variant="ghost" 
-                onClick={() => setLocation("/workouts")}
-                className="text-muted-foreground hover:text-foreground p-2"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={handleSaveWorkout}
-                  disabled={createWorkoutMutation.isPending}
-                  size="sm"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save
-                </Button>
-                <Button 
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={handleStartWorkout}
-                  size="sm"
-                >
-                  <Play className="w-4 h-4 mr-2" />
-                  Start
-                </Button>
-              </div>
-            </div>
-            
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-foreground">Create Workout</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">Build your custom workout routine</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Workout Details */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-foreground">Workout Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="workout-name" className="text-foreground">Workout Name</Label>
-                  <Input
-                    id="workout-name"
-                    value={workoutName}
-                    onChange={(e) => setWorkoutName(e.target.value)}
-                    placeholder="Enter workout name..."
-                    className="bg-background border-border"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="workout-description" className="text-foreground">Description (Optional)</Label>
-                  <Textarea
-                    id="workout-description"
-                    value={workoutDescription}
-                    onChange={(e) => setWorkoutDescription(e.target.value)}
-                    placeholder="Describe your workout..."
-                    className="bg-background border-border"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Selected Exercises */}
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-foreground">Exercise List ({selectedExercises.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {selectedExercises.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Plus className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No exercises added yet. Select exercises from the right panel.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {selectedExercises.map((exercise, index) => (
-                      <Card key={index} className="bg-background border-border">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-semibold text-foreground">{exercise.exercise?.name}</h3>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleRemoveExercise(index)}
-                              className="text-red-500 hover:text-red-600"
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Sets</Label>
-                              <Input
-                                type="number"
-                                value={exercise.sets}
-                                onChange={(e) => handleUpdateExercise(index, { sets: parseInt(e.target.value) || 0 })}
-                                className="bg-background border-border"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Reps</Label>
-                              <Input
-                                type="number"
-                                value={exercise.reps}
-                                onChange={(e) => handleUpdateExercise(index, { reps: parseInt(e.target.value) || 0 })}
-                                className="bg-background border-border"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Weight (lbs)</Label>
-                              <Input
-                                type="number"
-                                value={exercise.weight || 0}
-                                onChange={(e) => handleUpdateExercise(index, { weight: parseInt(e.target.value) || 0 })}
-                                className="bg-background border-border"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Rest (sec)</Label>
-                              <Input
-                                type="number"
-                                value={exercise.restTime || 60}
-                                onChange={(e) => handleUpdateExercise(index, { restTime: parseInt(e.target.value) || 0 })}
-                                className="bg-background border-border"
-                              />
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Exercise Selection */}
-          <div>
-            <ExerciseSelector 
-              exercises={exercises || []}
-              onSelectExercise={handleAddExercise}
-              selectedExerciseIds={selectedExercises.map(ex => ex.exerciseId)}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // Main render based on step
+  switch (step) {
+    case 'details':
+      return renderDetailsStep();
+    case 'sections':
+      return renderSectionsStep();
+    case 'section-form':
+      return renderSectionForm();
+    case 'exercise-selection':
+      return renderExerciseSelection();
+    default:
+      return renderDetailsStep();
+  }
 }
