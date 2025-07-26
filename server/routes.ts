@@ -733,21 +733,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/user/use-streak-freeze", async (req, res) => {
-    try {
-      const userId = currentUserId;
-      const success = await AtrophySystem.useStreakFreeze(userId);
-      
-      if (!success) {
-        return res.status(400).json({ error: "No streak freezes available" });
-      }
-      
-      res.json({ success: true, message: "Streak freeze used successfully" });
-    } catch (error) {
-      console.error("Error using streak freeze:", error);
-      res.status(500).json({ error: "Failed to use streak freeze" });
-    }
-  });
+  // Manual streak freeze endpoint removed - now handled automatically at midnight
 
   app.post("/api/admin/process-atrophy", async (req, res) => {
     try {

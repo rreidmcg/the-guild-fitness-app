@@ -1,10 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { Shield, AlertTriangle, Clock, Zap } from "lucide-react";
+import { Shield, AlertTriangle, Zap } from "lucide-react";
 
 interface AtrophyStatus {
   isAtRisk: boolean;
@@ -14,35 +11,11 @@ interface AtrophyStatus {
 }
 
 export function AtrophyWarning() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const { data: atrophyStatus } = useQuery<AtrophyStatus>({
     queryKey: ["/api/user/atrophy-status"],
   });
 
-  const useStreakFreezeMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("/api/user/use-streak-freeze", {
-        method: "POST",
-      });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Streak Freeze Used",
-        description: "Your stats are protected from atrophy today!",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/user/atrophy-status"] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to use streak freeze",
-        variant: "destructive",
-      });
-    },
-  });
+  // Streak freeze is now handled automatically at midnight
 
   if (!atrophyStatus) return null;
 
@@ -77,15 +50,10 @@ export function AtrophyWarning() {
               {atrophyStatus.daysInactive} day(s) inactive. Losing 1% XP/stats daily.
             </div>
           </div>
-          <Button
-            onClick={() => useStreakFreezeMutation.mutate()}
-            disabled={useStreakFreezeMutation.isPending}
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-xs px-2 py-1 h-auto"
-          >
-            <Zap className="w-3 h-3 mr-1" />
-            Use Freeze
-          </Button>
+          <div className="text-xs text-blue-400 bg-blue-900/30 px-2 py-1 rounded">
+            <Zap className="w-3 h-3 mr-1 inline" />
+            Auto-Protected
+          </div>
         </div>
       </AlertDescription>
     </Alert>

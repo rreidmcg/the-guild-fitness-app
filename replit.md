@@ -186,6 +186,8 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 - **UI Improvements**: Made atrophy warning more compact and less intrusive
   - Reduced padding, text sizes, and icon dimensions
   - Shortened warning text while preserving essential information
+  - Removed manual "Use Freeze" buttons since system is now fully automatic
+  - Updated streak freeze display to show "Auto-Freeze" instead of manual button
 
 **January 25, 2025:**
 - Fixed critical application startup errors and undefined data access issues

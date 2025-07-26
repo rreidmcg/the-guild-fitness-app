@@ -176,36 +176,7 @@ export default function Stats() {
     },
   });
 
-  const useStreakFreezeMutation = useMutation({
-    mutationFn: async () => {
-      return apiRequest("/api/use-streak-freeze", {
-        method: "POST",
-      });
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      
-      if (data.success) {
-        toast({
-          title: "Streak Freeze Used!",
-          description: `Your streak is protected today. Remaining: ${data.remainingFreezes}`,
-        });
-      } else {
-        toast({
-          title: "No Streak Freezes",
-          description: "You need to complete daily quests to earn streak freezes.",
-          variant: "destructive",
-        });
-      }
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to use streak freeze. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  // Streak freeze mutation removed - now handled automatically at midnight
 
   const recentSessions = Array.isArray(workoutSessions) ? workoutSessions.slice(0, 3) : [];
   const topRecords = Array.isArray(personalRecords) ? personalRecords.slice(0, 4) : [];
@@ -696,20 +667,9 @@ export default function Stats() {
             <div className="text-2xl font-bold text-orange-400">{streak}</div>
             <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
             {(safeUserStats.streakFreezeCount || 0) > 0 && (
-              <div className="space-y-1 mt-2">
-                <div className="flex items-center justify-center gap-1">
-                  <Shield className="w-3 h-3 text-blue-500" />
-                  <span className="text-xs text-blue-500">{safeUserStats.streakFreezeCount} Freeze{safeUserStats.streakFreezeCount !== 1 ? 's' : ''}</span>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => useStreakFreezeMutation.mutate()}
-                  disabled={useStreakFreezeMutation.isPending}
-                  className="text-xs px-2 py-1 h-6 border-blue-500 text-blue-400 hover:bg-blue-900/30"
-                >
-                  Use Freeze
-                </Button>
+              <div className="flex items-center justify-center gap-1 mt-2">
+                <Shield className="w-3 h-3 text-blue-500" />
+                <span className="text-xs text-blue-500">{safeUserStats.streakFreezeCount} Auto-Freeze{safeUserStats.streakFreezeCount !== 1 ? 's' : ''}</span>
               </div>
             )}
           </div>
