@@ -463,86 +463,21 @@ export default function Shop() {
 
           {/* Equipment Tab */}
           <TabsContent value="equipment">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {shopItems?.filter(item => item.category !== 'potion').map((item) => (
-                <Card key={item.id} className="bg-card border-border relative overflow-hidden">
-                  <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-bold text-foreground truncate">
-                        {item.name}
-                      </CardTitle>
-                      <Badge className={`text-xs ${rarityColors[item.rarity as keyof typeof rarityColors]} text-white`}>
-                        {item.rarity}
-                      </Badge>
-                    </div>
-                    {item.unlockLevel > 1 && (
-                      <div className="text-xs text-muted-foreground">
-                        Level {item.unlockLevel}+
-                      </div>
-                    )}
-                  </CardHeader>
-                  <CardContent className="p-3">
-                    {/* Equipment Visual */}
-                    <div className="w-full h-20 rounded-lg mb-3 flex items-center justify-center border border-border bg-card">
-                      {getEquipmentImage(item)}
-                    </div>
-
-                    {/* Equipment Info */}
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center space-x-1">
-                          <Coins className="w-3 h-3 text-yellow-500" />
-                          <span className="font-medium text-foreground">{item.price}</span>
-                        </div>
-                        {item.isOwned && (
-                          <div className="text-green-400 text-xs">
-                            ✓ Owned
-                          </div>
-                        )}
-                      </div>
-                      
-                      {item.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Purchase Button */}
-                    {item.isOwned ? (
-                      <Button variant="secondary" className="w-full text-xs h-8" disabled>
-                        Owned
-                      </Button>
-                    ) : (userStats?.level || 1) < item.unlockLevel ? (
-                      <Button variant="outline" className="w-full text-xs h-8" disabled>
-                        Level {item.unlockLevel} Required
-                      </Button>
-                    ) : (userStats?.gold || 0) < item.price ? (
-                      <Button variant="destructive" className="w-full text-xs h-8" disabled>
-                        Need Gold
-                      </Button>
-                    ) : (
-                      <Button 
-                        onClick={() => handlePurchase(item)}
-                        disabled={purchaseItemMutation.isPending}
-                        className="w-full text-xs h-8 bg-green-600 hover:bg-green-700"
-                      >
-                        Buy {item.price}g
-                      </Button>
-                    )}
-                    
-                    {/* Number Owned */}
-                    <div className="text-center text-xs text-muted-foreground mt-2">
-                      Owned: {item.isOwned ? 1 : 0}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-              {(!shopItems || shopItems.filter(item => item.category !== 'potion').length === 0) && (
-                <div className="col-span-full text-center py-8 text-muted-foreground">
-                  No equipment items available
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-600/20 to-blue-600/20 flex items-center justify-center mx-auto mb-6">
+                  <Shield className="w-10 h-10 text-purple-400" />
                 </div>
-              )}
+                <h3 className="text-2xl font-bold text-foreground mb-2">Equipment Coming Soon</h3>
+                <p className="text-muted-foreground max-w-md mx-auto mb-4">
+                  Legendary armor, powerful weapons, and mystical accessories are being forged in the depths of the realm.
+                </p>
+                <div className="inline-flex items-center space-x-2 text-sm text-purple-400">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                  <span>In Development</span>
+                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                </div>
+              </div>
             </div>
           </TabsContent>
 
