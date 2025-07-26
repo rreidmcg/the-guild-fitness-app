@@ -223,16 +223,16 @@ export default function Settings() {
                 <div className="grid grid-cols-1 gap-2 text-xs">
                   {[
                     { title: "Recruit", requirement: "Default", levelRange: "Any Level", available: true, rarity: "common" },
-                    { title: "E-Rank Survivor", requirement: "Complete E-Rank Dungeons", levelRange: "Lv 1-10", available: false, rarity: "common" },
-                    { title: "D-Rank Conqueror", requirement: "Complete D-Rank Dungeons", levelRange: "Lv 10-20", available: false, rarity: "uncommon" },
-                    { title: "C-Rank Vanquisher", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 20-30", available: false, rarity: "rare" },
-                    { title: "B-Rank Champion", requirement: "Complete B-Rank Dungeons", levelRange: "Lv 30-40", available: false, rarity: "epic", locked: true },
-                    { title: "A-Rank Legend", requirement: "Complete A-Rank Dungeons", levelRange: "Lv 40-50", available: false, rarity: "legendary", locked: true },
-                    { title: "S-Rank Dominator", requirement: "Complete S-Rank Dungeons", levelRange: "Lv 50+", available: false, rarity: "mythic", locked: true },
+                    { title: "Broodmother Slayer", requirement: "Complete E-Rank Dungeons", levelRange: "Lv 1-10", available: false, rarity: "common" },
+                    { title: "Earth Lord Conqueror", requirement: "Complete D-Rank Dungeons", levelRange: "Lv 10-20", available: false, rarity: "uncommon" },
+                    { title: "Supreme Entity Vanquisher", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 20-30", available: false, rarity: "rare" },
+                    { title: "Apex Sovereign Destroyer", requirement: "Complete B-Rank Dungeons", levelRange: "Lv 30-40", available: false, rarity: "epic", locked: true },
+                    { title: "Symmetry Lord Transcendent", requirement: "Complete A-Rank Dungeons", levelRange: "Lv 40-50", available: false, rarity: "legendary", locked: true },
+                    { title: "Omega Void Master", requirement: "Complete S-Rank Dungeons", levelRange: "Lv 50+", available: false, rarity: "mythic", locked: true },
                   ].map(({ title, requirement, levelRange, available, rarity, locked }) => {
                     const isCurrent = (userStats as any)?.currentTitle === title;
                     const rarityColors = {
-                      common: 'text-gray-300',
+                      common: 'text-white',
                       uncommon: 'text-green-300', 
                       rare: 'text-blue-300',
                       epic: 'text-purple-300',
