@@ -1093,42 +1093,30 @@ export default function Battle() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* HP Bar with Potion Button */}
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <div className="relative w-full bg-gray-800 rounded-full h-6 border border-gray-400 overflow-hidden">
-                        <div 
-                          className="bg-gradient-to-r from-green-600 to-green-500 h-full rounded-full transition-all duration-300" 
-                          style={{ width: `${(persistentPlayerHp / Math.max(10, 10 + userStats.stamina * 3)) * 100}%` }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white drop-shadow-lg">
-                          HP: {persistentPlayerHp}/{Math.max(10, 10 + userStats.stamina * 3)}
-                        </div>
+                  {/* HP Bar */}
+                  <div className="w-full">
+                    <div className="relative w-full bg-gray-800 rounded-full h-6 border border-gray-400 overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-green-600 to-green-500 h-full rounded-full transition-all duration-300" 
+                        style={{ width: `${(persistentPlayerHp / Math.max(10, 10 + userStats.stamina * 3)) * 100}%` }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white drop-shadow-lg">
+                        HP: {persistentPlayerHp}/{Math.max(10, 10 + userStats.stamina * 3)}
                       </div>
                     </div>
-                    <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">
-                      <Heart className="w-4 h-4 mr-1" />
-                      Health Potion
-                    </Button>
                   </div>
                   
-                  {/* MP Bar with Potion Button */}
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <div className="relative w-full bg-gray-800 rounded-full h-6 border border-gray-400 overflow-hidden">
-                        <div 
-                          className="bg-gradient-to-r from-blue-600 to-blue-500 h-full rounded-full transition-all duration-300" 
-                          style={{ width: `${(userStats.currentMp / userStats.maxMp) * 100}%` }}
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white drop-shadow-lg">
-                          MP: {userStats.currentMp}/{userStats.maxMp}
-                        </div>
+                  {/* MP Bar */}
+                  <div className="w-full">
+                    <div className="relative w-full bg-gray-800 rounded-full h-6 border border-gray-400 overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-blue-600 to-blue-500 h-full rounded-full transition-all duration-300" 
+                        style={{ width: `${(userStats.currentMp / userStats.maxMp) * 100}%` }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white drop-shadow-lg">
+                        MP: {userStats.currentMp}/{userStats.maxMp}
                       </div>
                     </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                      <Zap className="w-4 h-4 mr-1" />
-                      Mana Potion
-                    </Button>
                   </div>
                 </div>
               </CardContent>
