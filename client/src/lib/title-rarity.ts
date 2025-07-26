@@ -23,6 +23,14 @@ export const getTitleRarity = (title: string): TitleRarity => {
 
   // Define title rarities based on dungeon rank completion
   const titleRarities: Record<string, TitleRarity> = {
+    // No title option
+    "No Title": {
+      color: "text-gray-500",
+      bgColor: "bg-gray-600/10",
+      borderColor: "border-gray-500/30",
+      rarity: "none"
+    },
+    
     // Default starting title
     "Recruit": {
       color: "text-gray-100",
@@ -131,8 +139,10 @@ export const getTitleRarity = (title: string): TitleRarity => {
   };
 };
 
-export const getTitleComponent = (title: string, size: "sm" | "md" | "lg" = "sm") => {
-  const rarity = getTitleRarity(title);
+export const getTitleComponent = (title: string | null, size: "sm" | "md" | "lg" = "sm") => {
+  // Handle null/empty title case
+  const displayTitle = title || "No Title";
+  const rarity = getTitleRarity(displayTitle);
   
   const sizeClasses = {
     sm: "text-xs px-2 py-1",
@@ -142,6 +152,7 @@ export const getTitleComponent = (title: string, size: "sm" | "md" | "lg" = "sm"
 
   return {
     className: `${sizeClasses[size]} ${rarity.color} ${rarity.bgColor} rounded-full border ${rarity.borderColor} font-medium`,
-    rarity: rarity.rarity
+    rarity: rarity.rarity,
+    displayTitle
   };
 };

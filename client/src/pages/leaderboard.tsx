@@ -101,11 +101,14 @@ export default function LeaderboardPage() {
                       <div>
                         <div className="flex items-center space-x-2">
                           <h3 className="font-semibold text-foreground">{player.username}</h3>
-                          {player.title && (
-                            <span className={getTitleComponent(player.title, "sm").className}>
-                              {player.title}
-                            </span>
-                          )}
+                          {(() => {
+                            const titleComponent = getTitleComponent(player.title, "sm");
+                            return (
+                              <span className={titleComponent.className}>
+                                {titleComponent.displayTitle}
+                              </span>
+                            );
+                          })()}
                         </div>
                         <div className="flex items-center space-x-4 mt-1">
                           <span className="text-sm text-muted-foreground">

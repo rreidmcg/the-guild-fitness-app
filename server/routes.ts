@@ -872,13 +872,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "You don't have permission to use this title" });
       }
 
-      // Validate title exists in our requirements or is the special admin title
-      const validTitles = titleRequirements.map(req => req.title).concat(["<G.M.>"]);
+      // Handle "No Title" option (set to null)
+      const titleToSet = title === "No Title" ? null : title;
+      
+      // Validate title exists in our requirements or is the special admin title or is "No Title"
+      const validTitles = titleRequirements.map(req => req.title).concat(["<G.M.>", "No Title"]);
       if (!validTitles.includes(title)) {
         return res.status(400).json({ error: "Invalid title selected" });
       }
       
-      const updatedUser = await storage.updateUser(userId, { currentTitle: title });
+      const updatedUser = await storage.updateUser(userId, { currentTitle: titleToSet });
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user title" });

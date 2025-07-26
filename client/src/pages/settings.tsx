@@ -82,6 +82,7 @@ export default function Settings() {
   // Available titles based on dungeon rank completion
   const getAvailableTitles = (userProgress: any, currentTitle: string) => {
     const titleRequirements = [
+      { title: "No Title", requirement: "default" }, // Always available option
       { title: "Recruit", requirement: "default" },
       { title: "E-Rank Survivor", requirement: "e_rank_complete" },
       { title: "Novice Adventurer", requirement: "e_rank_complete" },
@@ -173,11 +174,14 @@ export default function Settings() {
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
                   <h3 className="text-lg font-semibold text-foreground">{(userStats as any)?.username || 'Fitness Warrior'}</h3>
-                  {(userStats as any)?.currentTitle && (
-                    <span className={getTitleComponent((userStats as any).currentTitle, "sm").className}>
-                      {(userStats as any).currentTitle}
-                    </span>
-                  )}
+                  {(() => {
+                    const titleComponent = getTitleComponent((userStats as any)?.currentTitle, "sm");
+                    return (
+                      <span className={titleComponent.className}>
+                        {titleComponent.displayTitle}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <p className="text-muted-foreground">Level {(userStats as any)?.level || 1} • {(userStats as any)?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Avatar: {(userStats as any)?.gender === 'female' ? 'Female' : 'Male'}</p>
@@ -198,7 +202,7 @@ export default function Settings() {
                 </div>
                 <div className="w-48">
                   <Select 
-                    value={(userStats as any)?.currentTitle || "Recruit"} 
+                    value={(userStats as any)?.currentTitle || "No Title"} 
                     onValueChange={(value) => updateTitleMutation.mutate(value)}
                     disabled={updateTitleMutation.isPending}
                   >
@@ -211,7 +215,7 @@ export default function Settings() {
                         return (
                           <SelectItem key={title} value={title}>
                             <span className={titleComponent.className}>
-                              {title}
+                              {titleComponent.displayTitle}
                             </span>
                           </SelectItem>
                         );
