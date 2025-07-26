@@ -25,6 +25,7 @@ import AdminDashboard from "@/pages/admin";
 import Leaderboard from "@/pages/leaderboard";
 import Checkout from "@/pages/checkout";
 import PaymentSuccess from "@/pages/payment-success";
+import WorkoutRecommendationsPage from "@/pages/workout-recommendations";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,6 +33,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Stats} />
       <Route path="/workouts" component={Workouts} />
+      <Route path="/workout-recommendations" component={WorkoutRecommendationsPage} />
       <Route path="/inventory" component={Inventory} />
       <Route path="/settings" component={Settings} />
       <Route path="/workout-builder" component={WorkoutBuilder} />

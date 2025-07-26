@@ -9,6 +9,7 @@ import { validateUsername, sanitizeUsername } from "./username-validation";
 import { AtrophySystem } from "./atrophy-system";
 import { calculateStatXpGains, calculateStatLevel } from "./stat-progression";
 import { workoutValidator } from "./workout-validation";
+import { workoutRecommendationEngine } from "./workout-recommendations";
 import Stripe from "stripe";
 
 // Simple in-memory session storage (in production, use proper session management)
@@ -23,6 +24,54 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Workout recommendations route
+  app.get("/api/workout-recommendations", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const recommendations = await workoutRecommendationEngine.getRecommendationsForUser(userId);
+      res.json(recommendations);
+    } catch (error) {
+      console.error("Error generating workout recommendations:", error);
+      res.status(500).json({ error: "Failed to generate workout recommendations" });
+    }
+  });
+
+  // Create workout from recommendation
+  app.post("/api/workout-recommendations/:id/create", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const recommendationId = req.params.id;
+      
+      // Get the recommendation
+      const recommendations = await workoutRecommendationEngine.getRecommendationsForUser(userId);
+      const recommendation = recommendations.find(r => r.id === recommendationId);
+      
+      if (!recommendation) {
+        return res.status(404).json({ error: "Recommendation not found" });
+      }
+      
+      // Create workout from recommendation
+      const workout = await storage.createWorkout({
+        userId,
+        name: recommendation.name,
+        description: recommendation.description,
+        exercises: recommendation.exercises.map(ex => ({
+          exerciseId: ex.exerciseId,
+          sets: ex.sets,
+          reps: ex.reps,
+          weight: ex.weight,
+          duration: ex.duration,
+          restTime: ex.restTime,
+        })),
+      });
+      
+      res.json(workout);
+    } catch (error) {
+      console.error("Error creating workout from recommendation:", error);
+      res.status(500).json({ error: "Failed to create workout" });
+    }
+  });
+
   // Leaderboard route
   app.get("/api/leaderboard", async (req, res) => {
     try {
