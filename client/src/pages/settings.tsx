@@ -101,8 +101,9 @@ export default function Settings() {
       })
       .map(req => req.title);
 
-    // Add special admin title if user already has it
-    if (currentTitle === "<G.M.>") {
+    // Add special admin title for specific users or if user already has it
+    const username = userProgress?.username;
+    if (currentTitle === "<G.M.>" || username === "Player 1") {
       unlockedTitles.push("<G.M.>");
     }
 
