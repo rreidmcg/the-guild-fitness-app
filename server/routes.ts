@@ -36,6 +36,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           strength: users.strength,
           stamina: users.stamina,
           agility: users.agility,
+          skinColor: users.skinColor,
+          hairColor: users.hairColor,
+          gender: users.gender,
+          height: users.height,
+          weight: users.weight,
+          fitnessGoal: users.fitnessGoal,
         })
         .from(users)
         .orderBy(desc(users.experience))

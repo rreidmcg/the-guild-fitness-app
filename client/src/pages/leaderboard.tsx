@@ -1,9 +1,16 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap } from "lucide-react";
+import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap, X } from "lucide-react";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { getTitleComponent } from "@/lib/title-rarity";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Avatar2D } from "@/components/ui/avatar-2d";
+import { Badge } from "@/components/ui/badge";
 
 export default function LeaderboardPage() {
+  const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
+  const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
+
   const { data: leaderboard, isLoading } = useQuery({
     queryKey: ["/api/leaderboard"],
   });
@@ -74,7 +81,11 @@ export default function LeaderboardPage() {
               return (
                 <div
                   key={player.id}
-                  className={`border rounded-lg p-4 transition-all hover:shadow-md ${getRankBg(rank)}`}
+                  className={`border rounded-lg p-4 transition-all hover:shadow-md cursor-pointer ${getRankBg(rank)}`}
+                  onClick={() => {
+                    setSelectedPlayer(player);
+                    setIsPlayerModalOpen(true);
+                  }}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
@@ -149,6 +160,100 @@ export default function LeaderboardPage() {
           </div>
         ) : null}
       </div>
+
+      {/* Player Avatar Dialog */}
+      <Dialog open={isPlayerModalOpen} onOpenChange={setIsPlayerModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
+                {selectedPlayer && (
+                  <>
+                    {(() => {
+                      const rank = leaderboard?.findIndex((p: any) => p.id === selectedPlayer.id) + 1 || 0;
+                      switch (rank) {
+                        case 1:
+                          return <Crown className="w-5 h-5 text-yellow-500" />;
+                        case 2:
+                          return <Medal className="w-5 h-5 text-gray-100" />;
+                        case 3:
+                          return <Medal className="w-5 h-5 text-amber-600" />;
+                        default:
+                          return <Trophy className="w-5 h-5 text-muted-foreground" />;
+                      }
+                    })()}
+                    <span>#{leaderboard?.findIndex((p: any) => p.id === selectedPlayer.id) + 1 || 0}</span>
+                    <span>{selectedPlayer.username}</span>
+                    {selectedPlayer.title && (
+                      <span className={getTitleComponent(selectedPlayer.title, "sm").className}>
+                        {selectedPlayer.title}
+                      </span>
+                    )}
+                  </>
+                )}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedPlayer && (
+            <div className="space-y-6">
+              {/* Avatar Display */}
+              <div className="flex justify-center">
+                <div className="relative">
+                  <Avatar2D 
+                    playerStats={selectedPlayer}
+                    size={200}
+                    className="mx-auto"
+                  />
+                </div>
+              </div>
+              
+              {/* Player Stats */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Level</span>
+                  <Badge variant="outline" className="text-sm">
+                    {selectedPlayer.level}
+                  </Badge>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Experience</span>
+                  <Badge variant="outline" className="text-sm">
+                    {selectedPlayer.experience.toLocaleString()} XP
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3 pt-2">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <Dumbbell className="w-4 h-4 text-red-400" />
+                      <span className="text-xs font-medium">STR</span>
+                    </div>
+                    <div className="text-lg font-bold text-red-400">{selectedPlayer.strength || 0}</div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <Heart className="w-4 h-4 text-yellow-400" />
+                      <span className="text-xs font-medium">STA</span>
+                    </div>
+                    <div className="text-lg font-bold text-yellow-400">{selectedPlayer.stamina || 0}</div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-1 mb-1">
+                      <Zap className="w-4 h-4 text-green-400" />
+                      <span className="text-xs font-medium">AGI</span>
+                    </div>
+                    <div className="text-lg font-bold text-green-400">{selectedPlayer.agility || 0}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
