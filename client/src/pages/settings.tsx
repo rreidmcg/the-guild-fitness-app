@@ -222,14 +222,14 @@ export default function Settings() {
                 <h4 className="text-sm font-semibold text-foreground mb-3">Title Progression</h4>
                 <div className="grid grid-cols-1 gap-2 text-xs">
                   {[
-                    { title: "Recruit", requirement: "Default", available: true, rarity: "common" },
-                    { title: "E-Rank Survivor", requirement: "Complete E-Rank Dungeons", available: false, rarity: "common" },
-                    { title: "D-Rank Conqueror", requirement: "Complete D-Rank Dungeons", available: false, rarity: "uncommon" },
-                    { title: "C-Rank Vanquisher", requirement: "Complete C-Rank Dungeons", available: false, rarity: "rare" },
-                    { title: "B-Rank Champion", requirement: "Complete B-Rank Dungeons", available: false, rarity: "epic", locked: true },
-                    { title: "A-Rank Legend", requirement: "Complete A-Rank Dungeons", available: false, rarity: "legendary", locked: true },
-                    { title: "S-Rank Dominator", requirement: "Complete S-Rank Dungeons", available: false, rarity: "mythic", locked: true },
-                  ].map(({ title, requirement, available, rarity, locked }) => {
+                    { title: "Recruit", requirement: "Default", levelRange: "Any Level", available: true, rarity: "common" },
+                    { title: "E-Rank Survivor", requirement: "Complete E-Rank Dungeons", levelRange: "Lv 1-5", available: false, rarity: "common" },
+                    { title: "D-Rank Conqueror", requirement: "Complete D-Rank Dungeons", levelRange: "Lv 6-13", available: false, rarity: "uncommon" },
+                    { title: "C-Rank Vanquisher", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 14-23", available: false, rarity: "rare" },
+                    { title: "B-Rank Champion", requirement: "Complete B-Rank Dungeons", levelRange: "Lv 24-36", available: false, rarity: "epic", locked: true },
+                    { title: "A-Rank Legend", requirement: "Complete A-Rank Dungeons", levelRange: "Lv 37-43", available: false, rarity: "legendary", locked: true },
+                    { title: "S-Rank Dominator", requirement: "Complete S-Rank Dungeons", levelRange: "Lv 44+", available: false, rarity: "mythic", locked: true },
+                  ].map(({ title, requirement, levelRange, available, rarity, locked }) => {
                     const isCurrent = (userStats as any)?.currentTitle === title;
                     const rarityColors = {
                       common: 'text-gray-300',
@@ -253,6 +253,7 @@ export default function Settings() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
                             <span className={`font-medium ${rarityColors[rarity]}`}>{title}</span>
+                            <span className="text-xs px-2 py-1 bg-muted/30 text-muted-foreground rounded">{levelRange}</span>
                             {locked && (
                               <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
                                 In Development
