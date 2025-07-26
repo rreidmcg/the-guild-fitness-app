@@ -67,49 +67,79 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
   const explosiveness = Math.min(agility / 20, 1);
   const overallFitness = (strength + stamina + agility) / 60;
 
+  // Helper function to convert hex color to CSS filter for avatar recoloring
+  const getColorFilter = (playerData: any) => {
+    if (!playerData || playerData.customAvatarUrl || playerData.title === "<G.M.>") {
+      return '';
+    }
+
+    let filters = [];
+    
+    // Apply skin color tint if specified and different from default
+    if (playerData.skinColor && playerData.skinColor !== "#FFDDAA") {
+      const skinHue = hexToHue(playerData.skinColor);
+      const skinSaturation = hexToSaturation(playerData.skinColor);
+      filters.push(`hue-rotate(${skinHue - 35}deg) saturate(${100 + skinSaturation}%)`);
+    }
+    
+    return filters.join(' ');
+  };
+
+  // Convert hex color to hue value (0-360)
+  const hexToHue = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const diff = max - min;
+    
+    if (diff === 0) return 0;
+    
+    let hue;
+    if (max === r) {
+      hue = ((g - b) / diff) % 6;
+    } else if (max === g) {
+      hue = (b - r) / diff + 2;
+    } else {
+      hue = (r - g) / diff + 4;
+    }
+    
+    return Math.round(hue * 60);
+  };
+
+  // Convert hex color to saturation percentage
+  const hexToSaturation = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const diff = max - min;
+    
+    if (max === 0) return 0;
+    return Math.round((diff / max) * 50); // Scale for filter effect
+  };
+
   return (
     <div className={`flex justify-center items-center relative ${className || ""}`}>
       <div 
         className="relative rounded-lg overflow-hidden shadow-lg"
         style={{ width, height }}
       >
-        {/* Main character image */}
+        {/* Main character image with color customization */}
         <img 
           src={avatarImage}
           alt="Character Avatar"
           className="w-full h-full object-contain"
           style={{
-            filter: `brightness(${0.95 + overallFitness * 0.1}) contrast(${1 + muscleDefinition * 0.1})`,
+            filter: `brightness(${0.95 + overallFitness * 0.1}) contrast(${1 + muscleDefinition * 0.1}) ${getColorFilter(playerData)}`,
             imageRendering: 'pixelated',
             transform: playerData?.gender === "female" ? 'scale(0.9)' : 'scale(1)'
           }}
         />
-
-        {/* Color customization overlay for default avatars (non-custom avatars) */}
-        {!playerData?.customAvatarUrl && playerData?.title !== "<G.M.>" && (playerData?.skinColor || playerData?.hairColor) && (
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Skin color tint */}
-            {playerData?.skinColor && (
-              <div 
-                className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(135deg, ${playerData.skinColor}30 0%, transparent 40%, transparent 60%, ${playerData.skinColor}20 100%)`,
-                  mixBlendMode: 'multiply'
-                }}
-              />
-            )}
-            {/* Hair color accent */}
-            {playerData?.hairColor && (
-              <div 
-                className="absolute top-0 left-0 right-0 h-1/3"
-                style={{
-                  background: `linear-gradient(180deg, ${playerData.hairColor}25 0%, transparent 70%)`,
-                  mixBlendMode: 'overlay'
-                }}
-              />
-            )}
-          </div>
-        )}
         
         {/* Glow effect overlay based on fitness level */}
         <div 
