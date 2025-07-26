@@ -654,6 +654,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user profile (email, personal info)
+  app.patch("/api/user/profile", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const { email, height, weight, fitnessGoal, measurementUnit } = req.body;
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Validate email if provided
+      if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return res.status(400).json({ error: "Invalid email format" });
+        }
+
+        // Check if email is already taken by another user
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ error: "Email already in use by another account" });
+        }
+      }
+
+      const updates: any = {};
+      if (email !== undefined) updates.email = email;
+      if (height !== undefined) updates.height = height;
+      if (weight !== undefined) updates.weight = weight;
+      if (fitnessGoal !== undefined) updates.fitnessGoal = fitnessGoal;
+      if (measurementUnit !== undefined) updates.measurementUnit = measurementUnit;
+
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      res.json({ 
+        success: true, 
+        message: "Profile updated successfully",
+        user: {
+          email: updatedUser.email,
+          height: updatedUser.height,
+          weight: updatedUser.weight,
+          fitnessGoal: updatedUser.fitnessGoal,
+          measurementUnit: updatedUser.measurementUnit
+        }
+      });
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
   // Update user stats (for battle rewards and workouts)
   app.patch("/api/user/stats", async (req, res) => {
     try {
