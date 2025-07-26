@@ -223,12 +223,12 @@ export default function Settings() {
                 <div className="grid grid-cols-1 gap-2 text-xs">
                   {[
                     { title: "Recruit", requirement: "Default", levelRange: "Any Level", available: true, rarity: "common" },
-                    { title: "E-Rank Survivor", requirement: "Complete E-Rank Dungeons", levelRange: "Lv 1-5", available: false, rarity: "common" },
-                    { title: "D-Rank Conqueror", requirement: "Complete D-Rank Dungeons", levelRange: "Lv 6-13", available: false, rarity: "uncommon" },
-                    { title: "C-Rank Vanquisher", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 14-23", available: false, rarity: "rare" },
-                    { title: "B-Rank Champion", requirement: "Complete B-Rank Dungeons", levelRange: "Lv 24-36", available: false, rarity: "epic", locked: true },
-                    { title: "A-Rank Legend", requirement: "Complete A-Rank Dungeons", levelRange: "Lv 37-43", available: false, rarity: "legendary", locked: true },
-                    { title: "S-Rank Dominator", requirement: "Complete S-Rank Dungeons", levelRange: "Lv 44+", available: false, rarity: "mythic", locked: true },
+                    { title: "E-Rank Survivor", requirement: "Complete E-Rank Dungeons", levelRange: "Lv 1-10", available: false, rarity: "common" },
+                    { title: "D-Rank Conqueror", requirement: "Complete D-Rank Dungeons", levelRange: "Lv 11-20", available: false, rarity: "uncommon" },
+                    { title: "C-Rank Vanquisher", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 21-30", available: false, rarity: "rare" },
+                    { title: "B-Rank Champion", requirement: "Complete B-Rank Dungeons", levelRange: "Lv 31-40", available: false, rarity: "epic", locked: true },
+                    { title: "A-Rank Legend", requirement: "Complete A-Rank Dungeons", levelRange: "Lv 41-50", available: false, rarity: "legendary", locked: true },
+                    { title: "S-Rank Dominator", requirement: "Complete S-Rank Dungeons", levelRange: "Lv 51+", available: false, rarity: "mythic", locked: true },
                   ].map(({ title, requirement, levelRange, available, rarity, locked }) => {
                     const isCurrent = (userStats as any)?.currentTitle === title;
                     const rarityColors = {

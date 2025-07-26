@@ -1151,7 +1151,7 @@ export default function Battle() {
                   <Skull className="w-6 h-6 text-gray-300" />
                   <span>E-rank Dungeons</span>
                   <span className="text-xs bg-gray-600/20 text-gray-300 px-2 py-1 rounded">COMMON</span>
-                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 1-5</span>
+                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 1-10</span>
                 </div>
                 {isMonsterListOpen ? (
                   <ChevronDown className="w-5 h-5" />
@@ -1277,7 +1277,7 @@ export default function Battle() {
                 <Skull className="w-6 h-6 text-green-300" />
                 <span>D-rank Dungeons</span>
                 <span className="text-xs bg-green-600/20 text-green-300 px-2 py-1 rounded">UNCOMMON</span>
-                <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 6-13</span>
+                <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 11-20</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1308,7 +1308,7 @@ export default function Battle() {
                 <Skull className="w-6 h-6 text-blue-300" />
                 <span>C-rank Dungeons</span>
                 <span className="text-xs bg-blue-600/20 text-blue-300 px-2 py-1 rounded">RARE</span>
-                <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 14-23</span>
+                <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 21-30</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1340,7 +1340,7 @@ export default function Battle() {
                 <span>B-rank Dungeons</span>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded">EPIC</span>
-                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 24-36</span>
+                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 31-40</span>
                   <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
                     In Development
                   </span>
@@ -1375,7 +1375,7 @@ export default function Battle() {
                 <span>A-rank Dungeons</span>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs bg-yellow-600/20 text-yellow-300 px-2 py-1 rounded">LEGENDARY</span>
-                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 37-43</span>
+                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 41-50</span>
                   <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
                     In Development
                   </span>
@@ -1411,7 +1411,7 @@ export default function Battle() {
                 <span>S-rank Dungeons</span>
                 <div className="flex items-center space-x-2">
                   <span className="text-xs bg-orange-600/20 text-orange-300 px-2 py-1 rounded">MYTHIC</span>
-                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 44+</span>
+                  <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 51+</span>
                   <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
                     In Development
                   </span>

@@ -187,9 +187,10 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - S-rank: Orange/Mythic (was Red/Relic) + "In Development" lock
   - Removed Relic tier completely for now, preserving expansion room
 - **Updated Battle Page and Settings**: Consistent rarity display across all dungeon progression systems
-  - Battle page shows new color scheme and development status
-  - Settings page shows title progression with dungeon completion requirements
+  - Battle page shows new color scheme and development status with level ranges (E-rank: Lv 1-10, D-rank: Lv 11-20, etc.)
+  - Settings page shows title progression with dungeon completion requirements and level ranges
   - All higher-tier content clearly marked as "In Development"
+  - Level ranges follow clean 10-level increments for each dungeon rank
 
 **January 27, 2025 - Performance & Polish + Progression Rebalance:**
 - **Rebalanced XP Progression System**: Exponential leveling curve for long-term engagement
