@@ -79,22 +79,26 @@ export default function Settings() {
     signOutMutation.mutate();
   };
 
-  // Available titles based on level progression
-  const getAvailableTitles = (level: number, currentTitle: string) => {
+  // Available titles based on dungeon rank completion
+  const getAvailableTitles = (userProgress: any, currentTitle: string) => {
     const titleRequirements = [
-      { title: "Recruit", level: 1 },
-      { title: "Novice", level: 2 },
-      { title: "Apprentice", level: 5 }, 
-      { title: "Journeyman", level: 10 },
-      { title: "Expert", level: 15 },
-      { title: "Master", level: 20 },
-      { title: "Champion", level: 25 },
-      { title: "Legend", level: 30 },
-      { title: "Mythic", level: 40 },
+      { title: "Recruit", requirement: "default" },
+      { title: "E-Rank Survivor", requirement: "e_rank_complete" },
+      { title: "Novice Adventurer", requirement: "e_rank_complete" },
+      { title: "D-Rank Conqueror", requirement: "d_rank_complete" },
+      { title: "Dungeon Walker", requirement: "d_rank_complete" },
+      { title: "C-Rank Vanquisher", requirement: "c_rank_complete" },
+      { title: "Monster Hunter", requirement: "c_rank_complete" },
+      { title: "Fitness Warrior", requirement: "c_rank_complete" },
+      // B, A, S rank titles are locked for now
     ];
 
     const unlockedTitles = titleRequirements
-      .filter(req => level >= req.level)
+      .filter(req => {
+        if (req.requirement === "default") return true;
+        // For now, all dungeon ranks are in development, so only basic titles available
+        return false;
+      })
       .map(req => req.title);
 
     // Add special admin title if user already has it
@@ -105,7 +109,7 @@ export default function Settings() {
     return unlockedTitles;
   };
 
-  const availableTitles = getAvailableTitles((userStats as any)?.level || 1, (userStats as any)?.currentTitle || "");
+  const availableTitles = getAvailableTitles(userStats, (userStats as any)?.currentTitle || "");
 
   // Title update mutation
   const updateTitleMutation = useMutation({
@@ -216,47 +220,53 @@ export default function Settings() {
               {/* Title Progression Display */}
               <div className="mt-4 p-4 bg-muted/30 rounded-lg">
                 <h4 className="text-sm font-semibold text-foreground mb-3">Title Progression</h4>
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-1 gap-2 text-xs">
                   {[
-                    { title: "Recruit", level: 1 },
-                    { title: "Novice", level: 2 },
-                    { title: "Apprentice", level: 5 }, 
-                    { title: "Journeyman", level: 10 },
-                    { title: "Expert", level: 15 },
-                    { title: "Master", level: 20 },
-                    { title: "Champion", level: 25 },
-                    { title: "Legend", level: 30 },
-                    { title: "Mythic", level: 40 },
-                  ].map(({ title, level }) => {
-                    const isUnlocked = ((userStats as any)?.level || 1) >= level;
+                    { title: "Recruit", requirement: "Default", available: true, rarity: "common" },
+                    { title: "E-Rank Survivor", requirement: "Complete E-Rank Dungeons", available: false, rarity: "common" },
+                    { title: "D-Rank Conqueror", requirement: "Complete D-Rank Dungeons", available: false, rarity: "uncommon" },
+                    { title: "C-Rank Vanquisher", requirement: "Complete C-Rank Dungeons", available: false, rarity: "rare" },
+                    { title: "B-Rank Champion", requirement: "Complete B-Rank Dungeons", available: false, rarity: "epic", locked: true },
+                    { title: "A-Rank Legend", requirement: "Complete A-Rank Dungeons", available: false, rarity: "legendary", locked: true },
+                    { title: "S-Rank Dominator", requirement: "Complete S-Rank Dungeons", available: false, rarity: "mythic", locked: true },
+                  ].map(({ title, requirement, available, rarity, locked }) => {
                     const isCurrent = (userStats as any)?.currentTitle === title;
+                    const rarityColors = {
+                      common: 'text-gray-300',
+                      uncommon: 'text-green-300', 
+                      rare: 'text-blue-300',
+                      epic: 'text-purple-300',
+                      legendary: 'text-yellow-300',
+                      mythic: 'text-orange-300'
+                    };
                     return (
                       <div 
                         key={title}
-                        className={`flex items-center justify-between p-2 rounded ${
+                        className={`flex items-center justify-between p-3 rounded ${
                           isCurrent 
                             ? 'bg-yellow-500/20 border border-yellow-500/30' 
-                            : isUnlocked 
+                            : available 
                               ? 'bg-green-500/10 border border-green-500/20' 
                               : 'bg-gray-500/10 border border-gray-500/20 opacity-60'
                         }`}
                       >
-                        <span className={`font-medium ${getTitleComponent(title, "sm").className} ${
-                          !isUnlocked ? 'opacity-50' : ''
-                        }`}>
-                          {title}
-                        </span>
-                        <span className={`text-xs ${
-                          isUnlocked ? 'text-green-400' : 'text-gray-500'
-                        }`}>
-                          Lv. {level}
-                        </span>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className={`font-medium ${rarityColors[rarity]}`}>{title}</span>
+                            {locked && (
+                              <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
+                                In Development
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs text-muted-foreground">{requirement}</span>
+                        </div>
                       </div>
                     );
                   })}
                 </div>
                 <p className="text-xs text-muted-foreground mt-3">
-                  Current Level: {(userStats as any)?.level || 1} • Complete workouts and battles to level up and unlock new titles!
+                  Complete dungeon ranks to unlock new titles! E/D/C ranks coming soon, B/A/S ranks in development.
                 </p>
               </div>
             </div>

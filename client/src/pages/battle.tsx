@@ -1148,8 +1148,9 @@ export default function Battle() {
                 onClick={() => setIsMonsterListOpen(!isMonsterListOpen)}
               >
                 <div className="flex items-center space-x-2">
-                  <Skull className="w-6 h-6 text-green-400" />
+                  <Skull className="w-6 h-6 text-gray-300" />
                   <span>E-rank Dungeons</span>
+                  <span className="text-xs bg-gray-600/20 text-gray-300 px-2 py-1 rounded">COMMON</span>
                 </div>
                 {isMonsterListOpen ? (
                   <ChevronDown className="w-5 h-5" />
@@ -1272,9 +1273,9 @@ export default function Battle() {
           <Card className="bg-card border-border mt-6">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-6 h-6 text-blue-400" />
+                <Skull className="w-6 h-6 text-green-300" />
                 <span>D-rank Dungeons</span>
-                <span className="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded">LOCKED</span>
+                <span className="text-xs bg-green-600/20 text-green-300 px-2 py-1 rounded">UNCOMMON</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1302,9 +1303,9 @@ export default function Battle() {
           <Card className="bg-card border-border mt-6">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-6 h-6 text-purple-400" />
+                <Skull className="w-6 h-6 text-blue-300" />
                 <span>C-rank Dungeons</span>
-                <span className="text-xs bg-purple-600/20 text-purple-400 px-2 py-1 rounded">LOCKED</span>
+                <span className="text-xs bg-blue-600/20 text-blue-300 px-2 py-1 rounded">RARE</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1329,12 +1330,17 @@ export default function Battle() {
           </Card>
 
           {/* B-rank Dungeons - Locked Preview */}
-          <Card className="bg-card/50 border-yellow-600/20 mt-6">
+          <Card className="bg-card/50 border-purple-600/20 mt-6">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-6 h-6 text-yellow-400" />
+                <Skull className="w-6 h-6 text-purple-300" />
                 <span>B-rank Dungeons</span>
-                <span className="text-xs bg-yellow-600/20 text-yellow-400 px-2 py-1 rounded">LOCKED</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-1 rounded">EPIC</span>
+                  <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
+                    In Development
+                  </span>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1358,12 +1364,17 @@ export default function Battle() {
           </Card>
 
           {/* A-rank Dungeons - Locked Preview */}
-          <Card className="bg-card/50 border-orange-600/20 mt-6">
+          <Card className="bg-card/50 border-yellow-600/20 mt-6">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-6 h-6 text-orange-400" />
+                <Skull className="w-6 h-6 text-yellow-300" />
                 <span>A-rank Dungeons</span>
-                <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded">LOCKED</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs bg-yellow-600/20 text-yellow-300 px-2 py-1 rounded">LEGENDARY</span>
+                  <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
+                    In Development
+                  </span>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1387,30 +1398,30 @@ export default function Battle() {
           </Card>
 
           {/* S-rank Dungeons - Coming Soon */}
-          <Card className="bg-card/30 border-red-600/30 mt-6 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-900/10 to-red-800/5"></div>
+          <Card className="bg-card/30 border-orange-600/30 mt-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-900/10 to-orange-800/5"></div>
             <CardHeader className="relative">
               <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-6 h-6 text-red-400" />
+                <Skull className="w-6 h-6 text-orange-300" />
                 <span>S-rank Dungeons</span>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">LOCKED</span>
-                  <span className="text-xs bg-gradient-to-r from-red-600 to-red-500 text-white px-3 py-1 rounded-full font-semibold animate-pulse">
-                    COMING SOON
+                  <span className="text-xs bg-orange-600/20 text-orange-300 px-2 py-1 rounded">MYTHIC</span>
+                  <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full border border-red-500/30">
+                    In Development
                   </span>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="relative">
               <p className="text-muted-foreground text-sm italic mb-4">
-                The legendary apex of all challenges. Reserved for the most elite fitness warriors who have transcended mortal limits. Details shrouded in mystery...
+                The mythic apex of all challenges. Reserved for the most elite fitness warriors who have transcended mortal limits. Details shrouded in mystery...
               </p>
               <div className="flex items-center justify-center py-12 opacity-60">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-red-600/20 flex items-center justify-center mx-auto mb-4">
-                    <Skull className="w-8 h-8 text-red-400" />
+                  <div className="w-16 h-16 rounded-full bg-orange-600/20 flex items-center justify-center mx-auto mb-4">
+                    <Skull className="w-8 h-8 text-orange-300" />
                   </div>
-                  <h3 className="text-lg font-bold text-red-400 mb-2">Secrets Await</h3>
+                  <h3 className="text-lg font-bold text-orange-300 mb-2">Secrets Await</h3>
                   <p className="text-sm text-muted-foreground max-w-md">
                     The ultimate dungeons are being forged in the fires of legend. Only those who master A-rank content will be deemed worthy...
                   </p>

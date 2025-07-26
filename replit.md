@@ -173,6 +173,24 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 27, 2025 - Title System Overhaul + Rarity Rebalance:**
+- **Replaced Level-Based Titles with Dungeon Rank Completion System**: Future-proofed for expansion content
+  - New titles tied to completing specific dungeon ranks (E/D/C/B/A/S-rank completion)
+  - Removed dependency on character level to prevent title inflation with level cap increases
+  - Added visual distinction between available titles and locked "In Development" content
+- **Dungeon Rarity Color Rebalance**: Dropped all rarity tiers down one level for future S+ content
+  - E-rank: White/Common (was Green/Uncommon)
+  - D-rank: Green/Uncommon (was Blue/Rare) 
+  - C-rank: Blue/Rare (was Purple/Epic)
+  - B-rank: Purple/Epic (was Yellow/Legendary) + "In Development" lock
+  - A-rank: Yellow/Legendary (was Orange/Mythic) + "In Development" lock
+  - S-rank: Orange/Mythic (was Red/Relic) + "In Development" lock
+  - Removed Relic tier completely for now, preserving expansion room
+- **Updated Battle Page and Settings**: Consistent rarity display across all dungeon progression systems
+  - Battle page shows new color scheme and development status
+  - Settings page shows title progression with dungeon completion requirements
+  - All higher-tier content clearly marked as "In Development"
+
 **January 27, 2025 - Performance & Polish + Progression Rebalance:**
 - **Rebalanced XP Progression System**: Exponential leveling curve for long-term engagement
   - Level 50 now takes exactly 52 weeks (1 year) of consistent training (3 workouts/week)
