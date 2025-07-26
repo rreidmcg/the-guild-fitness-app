@@ -74,6 +74,11 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
       return '';
     }
 
+    // Don't apply color filters to the variant avatar since it already has the desired colors
+    if (playerData.hairColor === "#000000") {
+      return '';
+    }
+
     let filters = [];
     
     // Apply skin color tint if specified and different from default
@@ -139,6 +144,13 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
             filter: `brightness(${0.95 + overallFitness * 0.1}) contrast(${1 + muscleDefinition * 0.1}) ${getColorFilter(playerData)}`,
             imageRendering: 'pixelated',
             transform: playerData?.gender === "female" ? 'scale(0.9)' : 'scale(1)'
+          }}
+          onError={(e) => {
+            console.error('Avatar image failed to load:', avatarImage);
+            // Fallback to default male avatar if variant fails
+            if (avatarImage === maleAvatarVariant) {
+              (e.target as HTMLImageElement).src = maleAvatarImage;
+            }
           }}
         />
         
