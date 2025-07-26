@@ -26,6 +26,8 @@ import Leaderboard from "@/pages/leaderboard";
 import Checkout from "@/pages/checkout";
 import PaymentSuccess from "@/pages/payment-success";
 import WorkoutRecommendationsPage from "@/pages/workout-recommendations";
+import Subscribe from "@/pages/subscribe";
+import MailPage from "@/pages/mail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -47,6 +49,8 @@ function Router() {
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/subscribe" component={Subscribe} />
+      <Route path="/mail" component={MailPage} />
       <Route path="/payment-success" component={PaymentSuccess} />
       <Route component={NotFound} />
     </Switch>

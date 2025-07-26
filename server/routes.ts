@@ -24,10 +24,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Workout recommendations route
+  // Workout recommendations route (premium feature)
   app.get("/api/workout-recommendations", async (req, res) => {
     try {
       const userId = currentUserId;
+      
+      // Check if user has active subscription
+      const user = await storage.getUser(userId);
+      if (!user || user.subscriptionStatus !== 'active') {
+        return res.status(403).json({ 
+          error: "Premium subscription required",
+          message: "AI workout recommendations are a premium feature. Subscribe to unlock personalized training plans!" 
+        });
+      }
+      
       const recommendations = await workoutRecommendationEngine.getRecommendationsForUser(userId);
       res.json(recommendations);
     } catch (error) {
@@ -1430,6 +1440,176 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error setting timezone:", error);
       res.status(500).json({ error: "Failed to set timezone" });
+    }
+  });
+
+  // Subscription routes
+  app.post('/api/get-or-create-subscription', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      let user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (user.stripeSubscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        
+        res.json({
+          subscriptionId: subscription.id,
+          clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        });
+        return;
+      }
+      
+      if (!user.email) {
+        return res.status(400).json({ error: 'No user email on file' });
+      }
+
+      const customer = await stripe.customers.create({
+        email: user.email,
+        name: user.username,
+      });
+
+      user = await storage.updateStripeCustomerId(user.id, customer.id);
+
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [{
+          // Use a test price for now - in production, this would be your actual price ID
+          price: 'price_1QSjWmI6D2ht7N9GdFKQZBJZ', // Test price
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+      });
+
+      await storage.updateUserStripeInfo(user.id, {
+        customerId: customer.id, 
+        subscriptionId: subscription.id
+      });
+  
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+      });
+    } catch (error: any) {
+      console.error('Subscription creation error:', error);
+      return res.status(400).json({ error: { message: error.message } });
+    }
+  });
+
+  // Check subscription status
+  app.get('/api/subscription-status', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const hasActiveSubscription = user.subscriptionStatus === 'active';
+      
+      res.json({
+        hasActiveSubscription,
+        subscriptionStatus: user.subscriptionStatus || 'inactive',
+        subscriptionEndDate: user.subscriptionEndDate
+      });
+    } catch (error: any) {
+      console.error('Subscription status error:', error);
+      res.status(500).json({ error: "Failed to check subscription status" });
+    }
+  });
+
+  // Mail system routes
+  app.get('/api/mail', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const mail = await storage.getPlayerMail(userId);
+      res.json(mail);
+    } catch (error: any) {
+      console.error('Get mail error:', error);
+      res.status(500).json({ error: "Failed to fetch mail" });
+    }
+  });
+
+  app.post('/api/mail/:id/read', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const mailId = parseInt(req.params.id);
+      
+      if (!mailId || isNaN(mailId)) {
+        return res.status(400).json({ error: "Invalid mail ID" });
+      }
+
+      await storage.markMailAsRead(mailId, userId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Mark mail read error:', error);
+      res.status(500).json({ error: "Failed to mark mail as read" });
+    }
+  });
+
+  app.post('/api/mail/:id/claim', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const mailId = parseInt(req.params.id);
+      
+      if (!mailId || isNaN(mailId)) {
+        return res.status(400).json({ error: "Invalid mail ID" });
+      }
+
+      const result = await storage.claimMailRewards(mailId, userId);
+      
+      if (result.success) {
+        res.json({ success: true, rewards: result.rewards });
+      } else {
+        res.status(400).json({ error: "Unable to claim rewards" });
+      }
+    } catch (error: any) {
+      console.error('Claim mail rewards error:', error);
+      res.status(500).json({ error: "Failed to claim mail rewards" });
+    }
+  });
+
+  // Admin mail routes (only for G.M. users)
+  app.post('/api/admin/send-mail', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      // Check if user is admin (has G.M. title)
+      if (!user || user.currentTitle !== '<G.M.>') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { subject, content, mailType, rewards, targetUserIds, expiresAt } = req.body;
+
+      if (!subject || !content || !mailType) {
+        return res.status(400).json({ error: "Subject, content, and mail type are required" });
+      }
+
+      const mailData = {
+        senderType: 'admin' as const,
+        senderName: 'Developer Team',
+        subject,
+        content,
+        mailType,
+        rewards: rewards || null,
+        expiresAt: expiresAt ? new Date(expiresAt) : null
+      };
+
+      const sentCount = await storage.sendBulkMail(mailData, targetUserIds);
+      
+      res.json({ 
+        success: true, 
+        message: `Mail sent to ${sentCount} players`,
+        sentCount 
+      });
+    } catch (error: any) {
+      console.error('Send admin mail error:', error);
+      res.status(500).json({ error: "Failed to send mail" });
     }
   });
 

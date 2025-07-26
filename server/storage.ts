@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -8,7 +8,8 @@ import {
   type ProgramWorkout, type InsertProgramWorkout,
   type WardrobeItem, type InsertWardrobeItem,
   type UserWardrobe, type InsertUserWardrobe,
-  type DailyProgress, type InsertDailyProgress
+  type DailyProgress, type InsertDailyProgress,
+  type PlayerMail, type InsertPlayerMail
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -23,6 +24,8 @@ export interface IStorage {
   getUserByResetToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
+  updateStripeCustomerId(userId: number, customerId: string): Promise<User>;
+  updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User>;
 
   // Exercise operations
   getAllExercises(): Promise<Exercise[]>;
@@ -73,6 +76,13 @@ export interface IStorage {
   updateDailyProgress(userId: number, date: string, updates: Partial<DailyProgress>): Promise<DailyProgress>;
   toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }>;
   completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }>;
+
+  // Mail system operations
+  getPlayerMail(userId: number): Promise<PlayerMail[]>;
+  createPlayerMail(mail: InsertPlayerMail): Promise<PlayerMail>;
+  markMailAsRead(mailId: number, userId: number): Promise<void>;
+  claimMailRewards(mailId: number, userId: number): Promise<{ success: boolean; rewards?: any }>;
+  sendBulkMail(mail: Omit<InsertPlayerMail, 'userId'>, targetUserIds?: number[]): Promise<number>; // Returns count of mails sent
   
   // Streak system operations
   updateStreak(userId: number): Promise<void>;
@@ -805,6 +815,157 @@ export class DatabaseStorage implements IStorage {
       totalWorkouts,
       averageLevel
     };
+  }
+
+  async updateStripeCustomerId(userId: number, customerId: string): Promise<User> {
+    await this.ensureInitialized();
+    
+    const [user] = await db
+      .update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  async updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User> {
+    await this.ensureInitialized();
+    
+    const [user] = await db
+      .update(users)
+      .set({ 
+        stripeCustomerId: stripeInfo.customerId,
+        stripeSubscriptionId: stripeInfo.subscriptionId,
+        subscriptionStatus: 'active'
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  // Mail system operations
+  async getPlayerMail(userId: number): Promise<PlayerMail[]> {
+    await this.ensureInitialized();
+    
+    return await db
+      .select()
+      .from(playerMail)
+      .where(eq(playerMail.userId, userId))
+      .orderBy(desc(playerMail.createdAt));
+  }
+
+  async createPlayerMail(mail: InsertPlayerMail): Promise<PlayerMail> {
+    await this.ensureInitialized();
+    
+    const [createdMail] = await db
+      .insert(playerMail)
+      .values(mail)
+      .returning();
+    return createdMail;
+  }
+
+  async markMailAsRead(mailId: number, userId: number): Promise<void> {
+    await this.ensureInitialized();
+    
+    await db
+      .update(playerMail)
+      .set({ isRead: true })
+      .where(and(eq(playerMail.id, mailId), eq(playerMail.userId, userId)));
+  }
+
+  async claimMailRewards(mailId: number, userId: number): Promise<{ success: boolean; rewards?: any }> {
+    await this.ensureInitialized();
+    
+    // Get the mail with rewards
+    const [mail] = await db
+      .select()
+      .from(playerMail)
+      .where(and(eq(playerMail.id, mailId), eq(playerMail.userId, userId)));
+    
+    if (!mail || mail.rewardsClaimed || !mail.rewards) {
+      return { success: false };
+    }
+
+    const rewards = mail.rewards;
+    
+    // Update user with rewards (if any)
+    if (rewards.gold || rewards.xp) {
+      const user = await this.getUser(userId);
+      if (user) {
+        await this.updateUser(userId, {
+          gold: (user.gold || 0) + (rewards.gold || 0),
+          experience: (user.experience || 0) + (rewards.xp || 0)
+        });
+      }
+    }
+
+    // Add items to inventory
+    if (rewards.items && rewards.items.length > 0) {
+      const { playerInventory } = await import("@shared/schema");
+      for (const item of rewards.items) {
+        // Check if item already exists in inventory
+        const [existingItem] = await db
+          .select()
+          .from(playerInventory)
+          .where(and(
+            eq(playerInventory.userId, userId),
+            eq(playerInventory.itemType, item.itemType),
+            eq(playerInventory.itemName, item.itemName)
+          ));
+
+        if (existingItem) {
+          // Update quantity
+          await db
+            .update(playerInventory)
+            .set({ 
+              quantity: (existingItem.quantity || 0) + item.quantity 
+            })
+            .where(eq(playerInventory.id, existingItem.id));
+        } else {
+          // Create new inventory item
+          await db
+            .insert(playerInventory)
+            .values({
+              userId,
+              itemType: item.itemType,
+              itemName: item.itemName,
+              quantity: item.quantity
+            });
+        }
+      }
+    }
+
+    // Mark rewards as claimed
+    await db
+      .update(playerMail)
+      .set({ rewardsClaimed: true })
+      .where(eq(playerMail.id, mailId));
+
+    return { success: true, rewards };
+  }
+
+  async sendBulkMail(mail: Omit<InsertPlayerMail, 'userId'>, targetUserIds?: number[]): Promise<number> {
+    await this.ensureInitialized();
+    
+    let userIds: number[];
+    
+    if (targetUserIds && targetUserIds.length > 0) {
+      userIds = targetUserIds;
+    } else {
+      // Send to all users if no specific targets
+      const allUsers = await db.select({ id: users.id }).from(users);
+      userIds = allUsers.map(u => u.id);
+    }
+
+    // Create mail for each user
+    const mailEntries = userIds.map(userId => ({
+      ...mail,
+      userId
+    }));
+
+    await db.insert(playerMail).values(mailEntries);
+    
+    return mailEntries.length;
   }
 }
 

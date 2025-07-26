@@ -57,6 +57,11 @@ export const users = pgTable("users", {
   fitnessGoal: text("fitness_goal"), // "lose_weight", "gain_muscle", "improve_endurance", "general_fitness"
   measurementUnit: text("measurement_unit").default("metric"), // "metric" or "imperial"
   timezone: text("timezone"), // User's timezone for daily quest resets (e.g., "America/New_York")
+  // Subscription fields
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  subscriptionStatus: text("subscription_status").default("inactive"), // "active", "inactive", "canceled", "past_due"
+  subscriptionEndDate: timestamp("subscription_end_date"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -391,3 +396,37 @@ export type PlayerInventory = typeof playerInventory.$inferSelect;
 export type InsertPlayerInventory = z.infer<typeof insertPlayerInventorySchema>;
 export type DailyProgress = typeof dailyProgress.$inferSelect;
 export type InsertDailyProgress = z.infer<typeof insertDailyProgressSchema>;
+
+// Player mail system
+export const playerMail = pgTable("player_mail", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  senderType: text("sender_type").notNull(), // "admin", "system", "event"
+  senderName: text("sender_name").notNull(), // "Developer Team", "System", etc.
+  subject: text("subject").notNull(),
+  content: text("content").notNull(),
+  mailType: text("mail_type").notNull(), // "news", "reward", "announcement", "event"
+  isRead: boolean("is_read").default(false),
+  rewards: json("rewards").$type<{
+    gold?: number;
+    xp?: number;
+    items?: Array<{
+      itemType: string;
+      itemName: string;
+      quantity: number;
+    }>;
+  }>(),
+  rewardsClaimed: boolean("rewards_claimed").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at"), // Optional expiry date
+});
+
+export const insertPlayerMailSchema = createInsertSchema(playerMail).omit({
+  id: true,
+  isRead: true,
+  rewardsClaimed: true,
+  createdAt: true,
+});
+
+export type PlayerMail = typeof playerMail.$inferSelect;
+export type InsertPlayerMail = z.infer<typeof insertPlayerMailSchema>;

@@ -54,8 +54,9 @@ export default function WorkoutRecommendationsPage() {
   const [expandedRecommendation, setExpandedRecommendation] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const { data: recommendations, isLoading, refetch } = useQuery({
+  const { data: recommendations, isLoading, error, refetch } = useQuery({
     queryKey: ["/api/workout-recommendations"],
+    retry: false, // Don't retry on 403 subscription errors
   });
 
   const createWorkoutMutation = useMutation({

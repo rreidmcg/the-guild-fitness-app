@@ -1,6 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLocation } from "wouter";
 import { 
   Users, 
@@ -9,8 +13,13 @@ import {
   Calendar,
   TrendingUp,
   Dumbbell,
-  Crown
+  Crown,
+  Mail,
+  Send,
+  Gift
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getTitleComponent } from "@/lib/title-rarity";
 
 interface UserData {
@@ -29,6 +38,19 @@ interface UserData {
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
+  const [currentTab, setCurrentTab] = useState<'overview' | 'mail'>('overview');
+  const { toast } = useToast();
+
+  // Mail form state
+  const [mailForm, setMailForm] = useState({
+    subject: '',
+    content: '',
+    mailType: 'news',
+    goldReward: '',
+    xpReward: '',
+    itemRewards: '',
+    expiresAt: ''
+  });
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -43,6 +65,78 @@ export default function AdminDashboard() {
     queryKey: ["/api/admin/system-stats"],
     enabled: userStats?.currentTitle === "<G.M.>",
   });
+
+  const sendMailMutation = useMutation({
+    mutationFn: async (mailData: any) => {
+      return apiRequest("/api/admin/send-mail", {
+        method: "POST",
+        body: JSON.stringify(mailData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Mail Sent Successfully",
+        description: `Mail sent to ${data.sentCount} players`,
+      });
+      // Reset form
+      setMailForm({
+        subject: '',
+        content: '',
+        mailType: 'news',
+        goldReward: '',
+        xpReward: '',
+        itemRewards: '',
+        expiresAt: ''
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Send Mail",
+        description: error.message || "An error occurred while sending mail",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSendMail = () => {
+    if (!mailForm.subject || !mailForm.content) {
+      toast({
+        title: "Missing Information",
+        description: "Subject and content are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const rewards: any = {};
+    if (mailForm.goldReward) rewards.gold = parseInt(mailForm.goldReward);
+    if (mailForm.xpReward) rewards.xp = parseInt(mailForm.xpReward);
+    if (mailForm.itemRewards) {
+      try {
+        rewards.items = JSON.parse(mailForm.itemRewards);
+      } catch (e) {
+        toast({
+          title: "Invalid Item Format",
+          description: "Items must be valid JSON format",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    const mailData = {
+      subject: mailForm.subject,
+      content: mailForm.content,
+      mailType: mailForm.mailType,
+      rewards: Object.keys(rewards).length > 0 ? rewards : null,
+      expiresAt: mailForm.expiresAt || null,
+    };
+
+    sendMailMutation.mutate(mailData);
+  };
 
   // Check if user has admin access
   if (userStats && userStats.currentTitle !== "<G.M.>") {
@@ -111,8 +205,30 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-6">
-        {/* System Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Navigation Tabs */}
+        <div className="flex space-x-4">
+          <Button
+            variant={currentTab === 'overview' ? 'default' : 'outline'}
+            onClick={() => setCurrentTab('overview')}
+            className="flex items-center space-x-2"
+          >
+            <Users className="w-4 h-4" />
+            <span>Overview</span>
+          </Button>
+          <Button
+            variant={currentTab === 'mail' ? 'default' : 'outline'}
+            onClick={() => setCurrentTab('mail')}
+            className="flex items-center space-x-2"
+          >
+            <Mail className="w-4 h-4" />
+            <span>Send Mail</span>
+          </Button>
+        </div>
+
+        {currentTab === 'overview' && (
+          <div>
+            {/* System Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="bg-card border-border">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -228,6 +344,129 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
+          </div>
+        )}
+
+        {currentTab === 'mail' && (
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Mail className="w-5 h-5 text-blue-500" />
+                <span>Send Mail to All Players</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Subject</label>
+                  <Input
+                    value={mailForm.subject}
+                    onChange={(e) => setMailForm(prev => ({ ...prev, subject: e.target.value }))}
+                    placeholder="Welcome to the new update!"
+                    className="bg-background border-border"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Mail Type</label>
+                  <Select value={mailForm.mailType} onValueChange={(value) => setMailForm(prev => ({ ...prev, mailType: value }))}>
+                    <SelectTrigger className="bg-background border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="news">News</SelectItem>
+                      <SelectItem value="reward">Reward</SelectItem>
+                      <SelectItem value="announcement">Announcement</SelectItem>
+                      <SelectItem value="event">Event</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Content</label>
+                <Textarea
+                  value={mailForm.content}
+                  onChange={(e) => setMailForm(prev => ({ ...prev, content: e.target.value }))}
+                  placeholder="Dear adventurers, we have exciting news to share..."
+                  rows={4}
+                  className="bg-background border-border"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Gold Reward (Optional)</label>
+                  <Input
+                    type="number"
+                    value={mailForm.goldReward}
+                    onChange={(e) => setMailForm(prev => ({ ...prev, goldReward: e.target.value }))}
+                    placeholder="100"
+                    className="bg-background border-border"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">XP Reward (Optional)</label>
+                  <Input
+                    type="number"
+                    value={mailForm.xpReward}
+                    onChange={(e) => setMailForm(prev => ({ ...prev, xpReward: e.target.value }))}
+                    placeholder="50"
+                    className="bg-background border-border"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Expires At (Optional)</label>
+                  <Input
+                    type="datetime-local"
+                    value={mailForm.expiresAt}
+                    onChange={(e) => setMailForm(prev => ({ ...prev, expiresAt: e.target.value }))}
+                    className="bg-background border-border"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Item Rewards (Optional JSON)</label>
+                <Textarea
+                  value={mailForm.itemRewards}
+                  onChange={(e) => setMailForm(prev => ({ ...prev, itemRewards: e.target.value }))}
+                  placeholder='[{"itemType": "potion", "itemName": "Health Potion", "quantity": 2}]'
+                  rows={2}  
+                  className="bg-background border-border"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Format: JSON array with itemType, itemName, and quantity fields
+                </p>
+              </div>
+
+              <div className="flex space-x-3">
+                <Button
+                  onClick={handleSendMail}
+                  disabled={sendMailMutation.isPending || !mailForm.subject || !mailForm.content}
+                  className="flex items-center space-x-2"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>{sendMailMutation.isPending ? 'Sending...' : 'Send Mail to All Players'}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setMailForm({
+                    subject: '',
+                    content: '',
+                    mailType: 'news',
+                    goldReward: '',
+                    xpReward: '',
+                    itemRewards: '',
+                    expiresAt: ''
+                  })}
+                  className="flex items-center space-x-2"
+                >
+                  <span>Clear Form</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
