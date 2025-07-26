@@ -100,12 +100,6 @@ export default function LeaderboardPage() {
                           <span className="text-sm text-muted-foreground">
                             Level {player.level}
                           </span>
-                          <div className="flex items-center space-x-1">
-                            <Star className="w-3 h-3 text-yellow-500" />
-                            <span className="text-sm text-muted-foreground">
-                              {player.experience} XP
-                            </span>
-                          </div>
                         </div>
                         <div className="flex items-center space-x-4 mt-2">
                           <div className="flex items-center space-x-1">
