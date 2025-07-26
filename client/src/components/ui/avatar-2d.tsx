@@ -4,6 +4,7 @@ import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753
 import gmAvatarImage from "@assets/B2F9A210-A9F6-446D-8599-3F94975381BA_1753500652794.png";
 import robCustomAvatar1 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753558358031.jpeg";
 import robCustomAvatar2 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753559527359.jpeg";
+import robCustomAvatar3 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753560953692.jpeg";
 
 interface Avatar2DProps {
   user?: User;
@@ -39,8 +40,10 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
   // Map custom avatar URLs to imported assets (only for Rob)
   const getCustomAvatar = (customAvatarUrl: string) => {
     switch (customAvatarUrl) {
+      case "/src/assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753560953692.jpeg":  
+        return robCustomAvatar3; // Rob's latest custom avatar
       case "/src/assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753559527359.jpeg":  
-        return robCustomAvatar2; // Rob's custom avatar
+        return robCustomAvatar2; // Rob's previous custom avatar
       default:
         return null;
     }
