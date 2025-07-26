@@ -2,7 +2,8 @@ import { User } from "@shared/schema";
 import maleAvatarImage from "@assets/IMG_3682_1753213695174.png";
 import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
 import gmAvatarImage from "@assets/B2F9A210-A9F6-446D-8599-3F94975381BA_1753500652794.png";
-import robCustomAvatar from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753558358031.jpeg";
+import robCustomAvatar1 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753558358031.jpeg";
+import robCustomAvatar2 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753559527359.jpeg";
 
 interface Avatar2DProps {
   user?: User;
@@ -35,9 +36,21 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
     ({ width, height } = sizes[size]);
   }
 
+  // Map custom avatar URLs to imported assets
+  const getCustomAvatar = (customAvatarUrl: string) => {
+    switch (customAvatarUrl) {
+      case "/src/assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753558358031.jpeg":
+        return robCustomAvatar1;
+      case "/src/assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753559527359.jpeg":  
+        return robCustomAvatar2;
+      default:
+        return null;
+    }
+  };
+
   // Get the appropriate avatar image based on custom avatar, title, and gender
   const avatarImage = playerData?.customAvatarUrl
-    ? playerData.customAvatarUrl
+    ? getCustomAvatar(playerData.customAvatarUrl) || maleAvatarImage
     : playerData?.title === "<G.M.>" 
       ? gmAvatarImage 
       : playerData?.gender === "female" 
