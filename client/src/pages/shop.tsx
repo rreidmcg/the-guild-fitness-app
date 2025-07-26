@@ -19,7 +19,8 @@ import {
   ChevronDown,
   Coffee,
   Beef,
-  Zap
+  Zap,
+  Shield
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useNavigate } from "@/hooks/use-navigate";
@@ -34,7 +35,7 @@ import armorImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_17531514904
 import characterMaleImage from "@assets/IMG_3682_1753213695174.png";
 import bluePotion1 from "@assets/09037B89-CDBD-4EFA-966C-3794F4AC7E9D_1752966596818.png";
 import bluePotion2 from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
-import fullHealPotionImage from "@assets/A4BC9DED-ED3B-4E46-9964-3A41A15D2B38_1752965718128.png";
+import megaHealPotionImage from "@assets/08789489-C26E-40BE-BA19-1471C66163E2_1753500783697.png";
 
 interface ShopItem {
   id: number;
@@ -360,7 +361,7 @@ export default function Shop() {
     },
     {
       id: "full_healing",
-      name: "Full Healing Potion",
+      name: "Mega Healing Potion",
       description: "Restores 100% of maximum HP",
       price: 50,
       healing: "100%",
@@ -521,8 +522,8 @@ export default function Shop() {
                         />
                       ) : potion.id === 'full_healing' ? (
                         <img 
-                          src={fullHealPotionImage} 
-                          alt="Full Healing Potion"
+                          src={megaHealPotionImage} 
+                          alt="Mega Healing Potion"
                           className="w-16 h-16 object-contain"
                           style={{ 
                             imageRendering: 'pixelated',
