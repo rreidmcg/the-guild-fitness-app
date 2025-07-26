@@ -37,16 +37,16 @@ export function CurrencyHeader() {
           </div>
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
-              <Coins className="w-3.5 h-3.5 text-yellow-500" />
-              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gold || 0}</span>
-            </div>
-            <div className="flex items-center space-x-2">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.currentStreak || 0}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Shield className="w-3.5 h-3.5 text-blue-500" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.streakFreezeCount || 0}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Coins className="w-3.5 h-3.5 text-yellow-500" />
+              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gold || 0}</span>
             </div>
             <button
               onClick={() => navigate('/inventory')}
