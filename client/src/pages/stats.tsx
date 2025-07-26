@@ -468,13 +468,16 @@ export default function Stats() {
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
-              {safeUserStats.currentTitle && (
-                <div className="mb-2">
-                  <span className={getTitleComponent(safeUserStats.currentTitle, "md").className}>
-                    {safeUserStats.currentTitle}
-                  </span>
-                </div>
-              )}
+              {(() => {
+                const titleComponent = getTitleComponent(safeUserStats.currentTitle, "md");
+                return titleComponent.displayTitle ? (
+                  <div className="mb-2">
+                    <span className={titleComponent.className}>
+                      {titleComponent.displayTitle}
+                    </span>
+                  </div>
+                ) : null;
+              })()}
               <h3 className="text-2xl font-bold mb-6 text-foreground">{safeUserStats.username || 'Player'}</h3>
             </div>
 

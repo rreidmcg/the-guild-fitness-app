@@ -176,11 +176,11 @@ export default function Settings() {
                   <h3 className="text-lg font-semibold text-foreground">{(userStats as any)?.username || 'Fitness Warrior'}</h3>
                   {(() => {
                     const titleComponent = getTitleComponent((userStats as any)?.currentTitle, "sm");
-                    return (
+                    return titleComponent.displayTitle ? (
                       <span className={titleComponent.className}>
                         {titleComponent.displayTitle}
                       </span>
-                    );
+                    ) : null;
                   })()}
                 </div>
                 <p className="text-muted-foreground">Level {(userStats as any)?.level || 1} • {(userStats as any)?.experience || 0} XP</p>
@@ -214,8 +214,8 @@ export default function Settings() {
                         const titleComponent = getTitleComponent(title, "sm");
                         return (
                           <SelectItem key={title} value={title}>
-                            <span className={titleComponent.className}>
-                              {titleComponent.displayTitle}
+                            <span className={title === "No Title" ? "text-gray-500" : titleComponent.className}>
+                              {title === "No Title" ? "No Title" : titleComponent.displayTitle}
                             </span>
                           </SelectItem>
                         );

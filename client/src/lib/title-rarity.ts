@@ -140,9 +140,16 @@ export const getTitleRarity = (title: string): TitleRarity => {
 };
 
 export const getTitleComponent = (title: string | null, size: "sm" | "md" | "lg" = "sm") => {
-  // Handle null/empty title case
-  const displayTitle = title || "No Title";
-  const rarity = getTitleRarity(displayTitle);
+  // Handle null/empty title case - return empty display for no title
+  if (!title || title === "No Title") {
+    return {
+      className: "",
+      rarity: "none",
+      displayTitle: ""
+    };
+  }
+  
+  const rarity = getTitleRarity(title);
   
   const sizeClasses = {
     sm: "text-xs px-2 py-1",
@@ -153,6 +160,6 @@ export const getTitleComponent = (title: string | null, size: "sm" | "md" | "lg"
   return {
     className: `${sizeClasses[size]} ${rarity.color} ${rarity.bgColor} rounded-full border ${rarity.borderColor} font-medium`,
     rarity: rarity.rarity,
-    displayTitle
+    displayTitle: title
   };
 };
