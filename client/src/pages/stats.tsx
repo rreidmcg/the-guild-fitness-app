@@ -666,12 +666,7 @@ export default function Stats() {
             </div>
             <div className="text-2xl font-bold text-orange-400">{streak}</div>
             <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
-            {(safeUserStats.streakFreezeCount || 0) > 0 && (
-              <div className="flex items-center justify-center gap-1 mt-2">
-                <Shield className="w-3 h-3 text-blue-500" />
-                <span className="text-xs text-blue-500">{safeUserStats.streakFreezeCount} Auto-Freeze{safeUserStats.streakFreezeCount !== 1 ? 's' : ''}</span>
-              </div>
-            )}
+
           </div>
 
           <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">

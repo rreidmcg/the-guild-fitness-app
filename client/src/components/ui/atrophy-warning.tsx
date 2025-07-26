@@ -50,10 +50,7 @@ export function AtrophyWarning() {
               {atrophyStatus.daysInactive} day(s) inactive. Losing 1% XP/stats daily.
             </div>
           </div>
-          <div className="text-xs text-blue-400 bg-blue-900/30 px-2 py-1 rounded">
-            <Zap className="w-3 h-3 mr-1 inline" />
-            Auto-Protected
-          </div>
+
         </div>
       </AlertDescription>
     </Alert>
