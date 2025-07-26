@@ -122,6 +122,7 @@ export default function Settings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/leaderboard"] });
       toast({
         title: "Title Updated",
         description: "Your title has been changed successfully!",
