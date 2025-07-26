@@ -421,6 +421,41 @@ export const playerMail = pgTable("player_mail", {
   expiresAt: timestamp("expires_at"), // Optional expiry date
 });
 
+// Social sharing system
+export const socialShares = pgTable("social_shares", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  shareType: text("share_type").notNull(), // "workout", "achievement", "pr", "level_up"
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  shareData: json("share_data").$type<{
+    workoutName?: string;
+    duration?: number;
+    xpEarned?: number;
+    achievementName?: string;
+    prExercise?: string;
+    prValue?: number;
+    levelReached?: number;
+    statsGained?: {
+      strength?: number;
+      stamina?: number;
+      agility?: number;
+    };
+  }>(),
+  likesCount: integer("likes_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Social share likes
+export const socialShareLikes = pgTable("social_share_likes", {
+  id: serial("id").primaryKey(),
+  shareId: integer("share_id").references(() => socialShares.id, { onDelete: "cascade" }),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  userShareLikeUnique: uniqueIndex("user_share_like_idx").on(table.userId, table.shareId),
+}));
+
 export const insertPlayerMailSchema = createInsertSchema(playerMail).omit({
   id: true,
   isRead: true,
@@ -428,5 +463,20 @@ export const insertPlayerMailSchema = createInsertSchema(playerMail).omit({
   createdAt: true,
 });
 
+export const insertSocialShareSchema = createInsertSchema(socialShares).omit({
+  id: true,
+  createdAt: true,
+  likesCount: true,
+});
+
+export const insertSocialShareLikeSchema = createInsertSchema(socialShareLikes).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type PlayerMail = typeof playerMail.$inferSelect;
 export type InsertPlayerMail = z.infer<typeof insertPlayerMailSchema>;
+export type SocialShare = typeof socialShares.$inferSelect;
+export type InsertSocialShare = z.infer<typeof insertSocialShareSchema>;
+export type SocialShareLike = typeof socialShareLikes.$inferSelect;
+export type InsertSocialShareLike = z.infer<typeof insertSocialShareLikeSchema>;

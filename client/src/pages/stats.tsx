@@ -31,6 +31,7 @@ import {
   Calculator,
   Droplets
 } from "lucide-react";
+import { AchievementCard } from "@/components/ui/achievement-card";
 
 export default function Stats() {
   const [, setLocation] = useLocation();
@@ -146,6 +147,15 @@ export default function Stats() {
     queryKey: ["/api/inventory"],
   });
 
+  // Achievement queries
+  const { data: achievements, isLoading: achievementsLoading } = useQuery({
+    queryKey: ["/api/achievements"],
+  });
+
+  const { data: userAchievements, isLoading: userAchievementsLoading } = useQuery({
+    queryKey: ["/api/user-achievements"],
+  });
+
   const usePotionMutation = useMutation({
     mutationFn: async (potionType: string) => {
       return apiRequest("/api/use-potion", {
@@ -212,7 +222,7 @@ export default function Stats() {
     return titles[titleIndex];
   };
 
-  if (userStatsLoading || workoutSessionsLoading || personalRecordsLoading || inventoryLoading) {
+  if (userStatsLoading || workoutSessionsLoading || personalRecordsLoading || inventoryLoading || achievementsLoading || userAchievementsLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
         <CurrencyHeader />
@@ -643,6 +653,47 @@ export default function Stats() {
         </Card>
 
         {/* Quick Stats Overview - Hidden since info is now in currency header */}
+
+        {/* Achievements Section */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl font-bold text-foreground">Achievements</CardTitle>
+              <Trophy className="w-5 h-5 text-yellow-500" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {achievements && Array.isArray(achievements) ? achievements.map((achievement: any) => {
+                const userAchievement = Array.isArray(userAchievements) 
+                  ? userAchievements.find((ua: any) => ua.achievementId === achievement.id)
+                  : undefined;
+                
+                return (
+                  <AchievementCard
+                    key={achievement.id}
+                    achievement={achievement}
+                    userAchievement={userAchievement}
+                    userStats={{
+                      level: safeUserStats.level || 1,
+                      strength: safeUserStats.strength || 0,
+                      stamina: safeUserStats.stamina || 0,
+                      agility: safeUserStats.agility || 0,
+                      currentStreak: safeUserStats.currentStreak || 0,
+                      totalWorkouts: Array.isArray(workoutSessions) ? workoutSessions.length : 0,
+                      gold: safeUserStats.gold || 0
+                    }}
+                  />
+                );
+              }) : (
+                <div className="col-span-2 text-center py-8 text-muted-foreground">
+                  <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No achievements available yet.</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Personal Records */}
         <Card className="bg-card border-border">

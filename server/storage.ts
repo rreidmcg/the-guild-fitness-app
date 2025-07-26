@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -9,7 +9,11 @@ import {
   type WardrobeItem, type InsertWardrobeItem,
   type UserWardrobe, type InsertUserWardrobe,
   type DailyProgress, type InsertDailyProgress,
-  type PlayerMail, type InsertPlayerMail
+  type PlayerMail, type InsertPlayerMail,
+  type Achievement, type InsertAchievement,
+  type UserAchievement, type InsertUserAchievement,
+  type SocialShare, type InsertSocialShare,
+  type SocialShareLike, type InsertSocialShareLike
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -69,7 +73,16 @@ export interface IStorage {
   purchaseShopItem(userId: number, itemId: number): Promise<any>;
 
   // Achievement operations
-  getUserAchievements(userId: number): Promise<any[]>;
+  getAllAchievements(): Promise<Achievement[]>;
+  getUserAchievements(userId: number): Promise<UserAchievement[]>;
+  unlockAchievement(userId: number, achievementId: number): Promise<UserAchievement>;
+
+  // Social sharing operations
+  createSocialShare(share: InsertSocialShare): Promise<SocialShare>;
+  getSocialShares(limit?: number): Promise<any[]>;
+  getUserSocialShares(userId: number): Promise<SocialShare[]>;
+  likeSocialShare(shareId: number, userId: number): Promise<SocialShareLike>;
+  unlikeSocialShare(shareId: number, userId: number): Promise<void>;
 
   // Daily quest operations
   getDailyProgress(userId: number, date: string): Promise<DailyProgress | undefined>;
@@ -973,6 +986,160 @@ export class DatabaseStorage implements IStorage {
     await db.insert(playerMail).values(mailEntries);
     
     return mailEntries.length;
+  }
+
+  // Achievement operations
+  async getAllAchievements(): Promise<Achievement[]> {
+    await this.ensureInitialized();
+    return await db.select().from(achievements);
+  }
+
+  async getUserAchievements(userId: number): Promise<UserAchievement[]> {
+    await this.ensureInitialized();
+    return await db
+      .select()
+      .from(userAchievements)
+      .where(eq(userAchievements.userId, userId));
+  }
+
+  async unlockAchievement(userId: number, achievementId: number): Promise<UserAchievement> {
+    await this.ensureInitialized();
+    
+    // Check if already unlocked
+    const existing = await db
+      .select()
+      .from(userAchievements)
+      .where(and(
+        eq(userAchievements.userId, userId),
+        eq(userAchievements.achievementId, achievementId)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    // Unlock achievement
+    const [userAchievement] = await db
+      .insert(userAchievements)
+      .values({ userId, achievementId })
+      .returning();
+
+    // Award gold reward
+    const achievement = await db
+      .select()
+      .from(achievements)
+      .where(eq(achievements.id, achievementId))
+      .limit(1);
+
+    if (achievement.length > 0 && achievement[0].goldReward > 0) {
+      const user = await this.getUser(userId);
+      if (user) {
+        await this.updateUser(userId, {
+          gold: (user.gold || 0) + achievement[0].goldReward
+        });
+      }
+    }
+
+    return userAchievement;
+  }
+
+  // Social sharing operations
+  async createSocialShare(share: InsertSocialShare): Promise<SocialShare> {
+    await this.ensureInitialized();
+    
+    const [newShare] = await db
+      .insert(socialShares)
+      .values(share)
+      .returning();
+    
+    return newShare;
+  }
+
+  async getSocialShares(limit: number = 20): Promise<any[]> {
+    await this.ensureInitialized();
+    
+    return await db
+      .select({
+        id: socialShares.id,
+        shareType: socialShares.shareType,
+        title: socialShares.title,
+        description: socialShares.description,
+        shareData: socialShares.shareData,
+        likesCount: socialShares.likesCount,
+        createdAt: socialShares.createdAt,
+        username: users.username,
+        level: users.level,
+        currentTitle: users.currentTitle
+      })
+      .from(socialShares)
+      .leftJoin(users, eq(socialShares.userId, users.id))
+      .orderBy(desc(socialShares.createdAt))
+      .limit(limit);
+  }
+
+  async getUserSocialShares(userId: number): Promise<SocialShare[]> {
+    await this.ensureInitialized();
+    
+    return await db
+      .select()
+      .from(socialShares)
+      .where(eq(socialShares.userId, userId))
+      .orderBy(desc(socialShares.createdAt));
+  }
+
+  async likeSocialShare(shareId: number, userId: number): Promise<SocialShareLike> {
+    await this.ensureInitialized();
+    
+    // Check if already liked
+    const existing = await db
+      .select()
+      .from(socialShareLikes)
+      .where(and(
+        eq(socialShareLikes.shareId, shareId),
+        eq(socialShareLikes.userId, userId)
+      ))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    // Add like
+    const [like] = await db
+      .insert(socialShareLikes)
+      .values({ shareId, userId })
+      .returning();
+
+    // Update likes count
+    await db
+      .update(socialShares)
+      .set({ 
+        likesCount: sql`${socialShares.likesCount} + 1`
+      })
+      .where(eq(socialShares.id, shareId));
+
+    return like;
+  }
+
+  async unlikeSocialShare(shareId: number, userId: number): Promise<void> {
+    await this.ensureInitialized();
+    
+    // Remove like
+    await db
+      .delete(socialShareLikes)
+      .where(and(
+        eq(socialShareLikes.shareId, shareId),
+        eq(socialShareLikes.userId, userId)
+      ));
+
+    // Update likes count
+    await db
+      .update(socialShares)
+      .set({ 
+        likesCount: sql`${socialShares.likesCount} - 1`
+      })
+      .where(eq(socialShares.id, shareId));
   }
 }
 

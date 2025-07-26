@@ -1614,6 +1614,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Achievement routes
+  app.get('/api/achievements', async (req, res) => {
+    try {
+      const achievements = await storage.getAllAchievements();
+      res.json(achievements);
+    } catch (error: any) {
+      console.error('Get achievements error:', error);
+      res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
+  app.get('/api/user-achievements', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const userAchievements = await storage.getUserAchievements(userId);
+      res.json(userAchievements);
+    } catch (error: any) {
+      console.error('Get user achievements error:', error);
+      res.status(500).json({ error: "Failed to fetch user achievements" });
+    }
+  });
+
+  // Social sharing routes
+  app.post('/api/social-shares', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const { shareType, title, description, shareData } = req.body;
+
+      if (!shareType || !title || !description) {
+        return res.status(400).json({ error: "Share type, title, and description are required" });
+      }
+
+      const share = await storage.createSocialShare({
+        userId,
+        shareType,
+        title,
+        description,
+        shareData: shareData || null
+      });
+
+      res.json(share);
+    } catch (error: any) {
+      console.error('Create social share error:', error);
+      res.status(500).json({ error: "Failed to create social share" });
+    }
+  });
+
+  app.get('/api/social-shares', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 20;
+      const shares = await storage.getSocialShares(limit);
+      res.json(shares);
+    } catch (error: any) {
+      console.error('Get social shares error:', error);
+      res.status(500).json({ error: "Failed to fetch social shares" });
+    }
+  });
+
+  app.post('/api/social-shares/:id/like', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const shareId = parseInt(req.params.id);
+
+      if (!shareId || isNaN(shareId)) {
+        return res.status(400).json({ error: "Invalid share ID" });
+      }
+
+      const like = await storage.likeSocialShare(shareId, userId);
+      res.json(like);
+    } catch (error: any) {
+      console.error('Like social share error:', error);
+      res.status(500).json({ error: "Failed to like share" });
+    }
+  });
+
+  app.delete('/api/social-shares/:id/like', async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const shareId = parseInt(req.params.id);
+
+      if (!shareId || isNaN(shareId)) {
+        return res.status(400).json({ error: "Invalid share ID" });
+      }
+
+      await storage.unlikeSocialShare(shareId, userId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error('Unlike social share error:', error);
+      res.status(500).json({ error: "Failed to unlike share" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
