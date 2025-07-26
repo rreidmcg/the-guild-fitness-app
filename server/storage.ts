@@ -649,6 +649,13 @@ export class DatabaseStorage implements IStorage {
           streakFreezeAwarded = true;
         }
       }
+      
+      // Record daily quest activity to prevent atrophy when 2+ quests are completed
+      if (twoOrMoreCompleted) {
+        await import("./atrophy-system.js").then(module => {
+          module.AtrophySystem.recordActivity(userId);
+        });
+      }
     } else {
       // UNCHECKING A QUEST
       const user = await this.getUser(userId);

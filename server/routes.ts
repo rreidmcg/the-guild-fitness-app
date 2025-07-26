@@ -691,7 +691,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         skinColor: user.skinColor,
         hairColor: user.hairColor,
         gender: user.gender,
-        measurementUnit: user.measurementUnit
+        measurementUnit: user.measurementUnit,
+        streakFreezeCount: user.streakFreezeCount || 0
       });
     } catch (error) {
       console.error("Error fetching user stats:", error);
