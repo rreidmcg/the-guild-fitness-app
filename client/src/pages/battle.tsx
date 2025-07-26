@@ -1348,21 +1348,14 @@ export default function Battle() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground text-sm italic">
-                Master C-rank content to face primordial forces, quantum mechanics, and meta-reality entities. The ultimate test of long-term dedication.
-              </p>
-              <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mt-4 opacity-50">
-                {BRANK_DUNGEON_ZONES.map((zone) => (
-                  <Card key={zone.id} className="bg-muted/30 border-muted">
-                    <CardContent className="p-2 text-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mx-auto mb-1"
-                        style={{ backgroundColor: zone.background }}
-                      />
-                      <p className="text-xs text-muted-foreground truncate">{zone.name}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="flex items-center justify-center py-8 opacity-60">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-purple-600/20 flex items-center justify-center mx-auto mb-4">
+                    <Skull className="w-8 h-8 text-purple-300" />
+                  </div>
+                  <h3 className="text-lg font-bold text-purple-300 mb-2">Secrets Await</h3>
+                  <p className="text-muted-foreground text-sm">Epic challenges hidden until unlocked</p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1383,21 +1376,14 @@ export default function Battle() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground text-sm italic">
-                The ultimate endgame content for the most dedicated fitness adventurers. Face primordial chaos, divine forges, and perfect symmetry.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-2 mt-4 opacity-50">
-                {ARANK_DUNGEON_ZONES.map((zone) => (
-                  <Card key={zone.id} className="bg-muted/30 border-muted">
-                    <CardContent className="p-2 text-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mx-auto mb-1"
-                        style={{ backgroundColor: zone.background }}
-                      />
-                      <p className="text-xs text-muted-foreground truncate">{zone.name}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="flex items-center justify-center py-8 opacity-60">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-full bg-yellow-600/20 flex items-center justify-center mx-auto mb-4">
+                    <Skull className="w-8 h-8 text-yellow-300" />
+                  </div>
+                  <h3 className="text-lg font-bold text-yellow-300 mb-2">Secrets Await</h3>
+                  <p className="text-muted-foreground text-sm">Legendary trials shrouded in mystery</p>
+                </div>
               </div>
             </CardContent>
           </Card>
