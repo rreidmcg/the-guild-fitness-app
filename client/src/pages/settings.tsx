@@ -204,11 +204,16 @@ export default function Settings() {
                       <SelectValue placeholder="Select title" />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableTitles.map((title) => (
-                        <SelectItem key={title} value={title}>
-                          {title}
-                        </SelectItem>
-                      ))}
+                      {availableTitles.map((title) => {
+                        const titleComponent = getTitleComponent(title, "sm");
+                        return (
+                          <SelectItem key={title} value={title}>
+                            <span className={titleComponent.className}>
+                              {title}
+                            </span>
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
@@ -216,59 +221,6 @@ export default function Settings() {
               {updateTitleMutation.isPending && (
                 <p className="text-xs text-muted-foreground mt-2">Updating title...</p>
               )}
-              
-              {/* Title Progression Display */}
-              <div className="mt-4 p-4 bg-muted/30 rounded-lg">
-                <h4 className="text-sm font-semibold text-foreground mb-3">Title Progression</h4>
-                <div className="grid grid-cols-1 gap-2 text-xs">
-                  {[
-                    { title: "Recruit", requirement: "Default", available: true, rarity: "common" },
-                    { title: "Broodmother Slayer", requirement: "Complete E-Rank Dungeons", available: false, rarity: "common" },
-                    { title: "Earth Lord Vanquisher", requirement: "Complete D-Rank Dungeons", available: false, rarity: "uncommon" },
-                    { title: "Light Sovereign Destroyer", requirement: "Complete C-Rank Dungeons", available: false, rarity: "rare" },
-                    { title: "Genesis Prime Conqueror", requirement: "Complete B-Rank Dungeons", available: false, rarity: "epic", locked: true },
-                    { title: "Symmetry Lord Transcendent", requirement: "Complete A-Rank Dungeons", available: false, rarity: "legendary", locked: true },
-                    { title: "Omega Void Master", requirement: "Complete S-Rank Dungeons", available: false, rarity: "mythic", locked: true },
-                  ].map(({ title, requirement, available, rarity, locked }) => {
-                    const isCurrent = (userStats as any)?.currentTitle === title;
-                    const rarityColors = {
-                      common: 'text-gray-200',
-                      uncommon: 'text-green-300', 
-                      rare: 'text-blue-300',
-                      epic: 'text-purple-300',
-                      legendary: 'text-yellow-300',
-                      mythic: 'text-orange-300'
-                    };
-                    return (
-                      <div 
-                        key={title}
-                        className={`flex items-center justify-between p-3 rounded ${
-                          isCurrent 
-                            ? 'bg-yellow-500/20 border border-yellow-500/30' 
-                            : available 
-                              ? 'bg-green-500/10 border border-green-500/20' 
-                              : 'bg-gray-500/10 border border-gray-500/20 opacity-60'
-                        }`}
-                      >
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2">
-                            <span className={`font-medium ${rarityColors[rarity]}`}>{title}</span>
-                            {locked && (
-                              <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
-                                In Development
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-xs text-muted-foreground">{requirement}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="text-xs text-muted-foreground mt-3">
-                  Complete dungeon ranks to unlock new titles! E/D/C ranks coming soon, B/A/S ranks in development.
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
