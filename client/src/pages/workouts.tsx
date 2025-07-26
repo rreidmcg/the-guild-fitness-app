@@ -176,19 +176,19 @@ export default function Workouts() {
         {/* Daily Quest Rewards */}
         <Card className="bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-yellow-700">
           <CardContent className="p-4">
-            <div className="flex items-center justify-center space-x-4">
-              <Gift className="w-6 h-6 text-yellow-500" />
-              <div className="text-center">
+            <div className="text-center">
+              <div className="flex items-center justify-center space-x-2 mb-2">
+                <Gift className="w-6 h-6 text-yellow-500" />
                 <h3 className="font-bold text-yellow-400">Daily Quest Rewards</h3>
-                <div className="flex items-center justify-center space-x-6 mt-2 text-sm">
-                  <div className="flex items-center space-x-1">
-                    <Snowflake className="w-4 h-4 text-blue-500" />
-                    <span className="text-foreground">2+ Quests: Streak Freeze</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 text-yellow-500" />
-                    <span className="text-foreground">All 4: +5 XP</span>
-                  </div>
+              </div>
+              <div className="flex items-center justify-center space-x-6 text-sm">
+                <div className="flex items-center space-x-1">
+                  <Snowflake className="w-4 h-4 text-blue-500" />
+                  <span className="text-foreground">2+ Quests: Streak Freeze</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  <span className="text-foreground">All 4: +5 XP</span>
                 </div>
               </div>
             </div>
