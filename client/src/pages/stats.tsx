@@ -642,41 +642,7 @@ export default function Stats() {
           </CardContent>
         </Card>
 
-        {/* Quick Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center justify-center mb-2">
-              <Coins className="w-6 h-6 text-yellow-400" />
-            </div>
-            <div className="text-2xl font-bold text-primary">{safeUserStats.gold || 0}</div>
-            <div className="text-xs font-semibold text-muted-foreground">Gold Coins</div>
-          </div>
-          
-          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center justify-center mb-2">
-              <Trophy className="w-5 h-5 text-yellow-400" />
-            </div>
-            <div className="text-2xl font-bold text-primary">{currentLevel}</div>
-            <p className="text-xs font-semibold text-muted-foreground">Current Level</p>
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center justify-center mb-2">
-              <Flame className="w-5 h-5 text-orange-400" />
-            </div>
-            <div className="text-2xl font-bold text-orange-400">{streak}</div>
-            <p className="text-xs font-semibold text-muted-foreground">Day Streak</p>
-
-          </div>
-
-          <div className="bg-card border border-border rounded-lg p-4 text-center transition-all duration-300 hover:shadow-lg">
-            <div className="flex items-center justify-center mb-2">
-              <ChartLine className="w-5 h-5 text-green-400" />
-            </div>
-            <div className="text-2xl font-bold text-primary">{currentXP}</div>
-            <p className="text-xs font-semibold text-muted-foreground">Total XP</p>
-          </div>
-        </div>
+        {/* Quick Stats Overview - Hidden since info is now in currency header */}
 
         {/* Personal Records */}
         <Card className="bg-card border-border">
