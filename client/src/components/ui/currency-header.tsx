@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Coins, Backpack, Settings, Volume2, VolumeX, Flame, Shield } from "lucide-react";
+import { Coins, Backpack, Settings, Volume2, VolumeX, Flame, Snowflake } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 
@@ -41,7 +41,7 @@ export function CurrencyHeader() {
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.currentStreak || 0}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Shield className="w-3.5 h-3.5 text-blue-500" />
+              <Snowflake className="w-3.5 h-3.5 text-blue-500" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.streakFreezeCount || 0}</span>
             </div>
             <div className="flex items-center space-x-2">

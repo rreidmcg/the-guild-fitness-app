@@ -27,7 +27,7 @@ import {
   Calendar,
   Coins,
   Plus,
-  Shield,
+  // Shield removed - now using Snowflake in currency header
   Calculator,
   Droplets
 } from "lucide-react";
