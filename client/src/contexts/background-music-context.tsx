@@ -8,6 +8,7 @@ interface BackgroundMusicContextType {
   isMuted: boolean;
   toggleMusic: () => void;
   startMusic: () => void;
+  setInCombat: (inCombat: boolean) => void;
 }
 
 const BackgroundMusicContext = createContext<BackgroundMusicContextType | undefined>(undefined);
@@ -21,19 +22,20 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true); // Default to muted/off
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
+  const [inCombat, setInCombat] = useState(false);
   const [location] = useLocation();
   const wasPlayingBeforeHidden = useRef(false);
   const hasTriedAutoplay = useRef(false);
 
-  // Determine which music track to use based on current page
+  // Determine which music track to use based on combat state
   const getMusicTrack = () => {
-    if (location.startsWith('/battle')) {
+    if (inCombat) {
       return battleMusicFile;
     }
     return defaultMusicFile;
   };
 
-  // Initialize or change audio track
+  // Initialize or change audio track when combat state or location changes
   useEffect(() => {
     const requiredTrack = getMusicTrack();
     
@@ -78,7 +80,7 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
         });
       }
     }
-  }, [location, isPlaying, isMuted]);
+  }, [inCombat, currentTrack]);
 
   // Handle visibility changes
   useEffect(() => {
@@ -153,7 +155,8 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
     isPlaying,
     isMuted,
     toggleMusic,
-    startMusic
+    startMusic,
+    setInCombat
   };
 
   return (

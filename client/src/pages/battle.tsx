@@ -29,6 +29,7 @@ import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { CurrencyHeader } from "@/components/ui/currency-header";
+import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { queryClient } from "@/lib/queryClient";
 
 
@@ -669,6 +670,7 @@ const ALL_MONSTERS: Monster[] = [...ERANK_MONSTERS, ...DRANK_MONSTERS, ...CRANK_
 export default function Battle() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { setInCombat } = useBackgroundMusic();
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [isMonsterListOpen, setIsMonsterListOpen] = useState(true);
   const [monsterCooldowns, setMonsterCooldowns] = useState<{[key: number]: number}>({});
@@ -692,6 +694,19 @@ export default function Battle() {
 
   // Initialize battle state
   const [battleState, setBattleState] = useState<BattleState | null>(null);
+
+  // Manage combat music based on battle state
+  useEffect(() => {
+    const inCombat = battleState !== null;
+    setInCombat(inCombat);
+  }, [battleState, setInCombat]);
+
+  // Cleanup combat state when leaving the battle page
+  useEffect(() => {
+    return () => {
+      setInCombat(false);
+    };
+  }, [setInCombat]);
 
   // Health regeneration effect - 1% per minute
   useEffect(() => {
