@@ -1335,13 +1335,13 @@ export default function Battle() {
           </Card>
 
           {/* B-rank Dungeons - Locked Preview */}
-          <Card className="bg-card/50 border-orange-600/20 mt-6">
+          <Card className="bg-card/50 border-yellow-600/20 mt-6">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-6 h-6 text-orange-400" />
+                <Skull className="w-6 h-6 text-yellow-400" />
                 <span>B-rank Dungeons</span>
                 <span className="text-sm text-muted-foreground">(32 weeks - 12 dungeons)</span>
-                <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded">LOCKED</span>
+                <span className="text-xs bg-yellow-600/20 text-yellow-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1365,13 +1365,13 @@ export default function Battle() {
           </Card>
 
           {/* A-rank Dungeons - Locked Preview */}
-          <Card className="bg-card/50 border-red-600/20 mt-6">
+          <Card className="bg-card/50 border-orange-600/20 mt-6">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Skull className="w-6 h-6 text-red-400" />
+                <Skull className="w-6 h-6 text-orange-400" />
                 <span>A-rank Dungeons</span>
                 <span className="text-sm text-muted-foreground">(64 weeks - 5 dungeons)</span>
-                <span className="text-xs bg-red-600/20 text-red-400 px-2 py-1 rounded">LOCKED</span>
+                <span className="text-xs bg-orange-600/20 text-orange-400 px-2 py-1 rounded">LOCKED</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
