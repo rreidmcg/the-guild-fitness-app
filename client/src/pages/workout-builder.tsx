@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter } from "lucide-react";
+import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Exercise } from "@shared/schema";
 
 interface WorkoutSection {
@@ -60,6 +61,10 @@ export default function WorkoutBuilder() {
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
   const [exerciseSearch, setExerciseSearch] = useState("");
   const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
+  
+  // Modal states
+  const [showFormatSelector, setShowFormatSelector] = useState(false);
+  const [showTypeSelector, setShowTypeSelector] = useState(false);
 
   const { data: exercises } = useQuery({
     queryKey: ["/api/exercises"],
@@ -317,7 +322,7 @@ export default function WorkoutBuilder() {
             <Button 
               variant="outline"
               className="w-full justify-between text-left font-normal"
-              onClick={() => {}} // TODO: Add format selector
+              onClick={() => setShowFormatSelector(true)}
             >
               <span className="capitalize">{currentSection?.format || 'Regular'}</span>
               <span>{'>'}</span>
@@ -329,7 +334,7 @@ export default function WorkoutBuilder() {
             <Button 
               variant="outline"
               className="w-full justify-between text-left font-normal capitalize"
-              onClick={() => {}} // TODO: Add type selector
+              onClick={() => setShowTypeSelector(true)}
             >
               <span className="capitalize">{currentSection?.type || 'Workout'}</span>
               <span>{'>'}</span>
@@ -584,17 +589,158 @@ export default function WorkoutBuilder() {
     createWorkoutMutation.mutate(workoutData);
   };
 
+  // Format selector modal
+  const renderFormatSelector = () => (
+    <Dialog open={showFormatSelector} onOpenChange={setShowFormatSelector}>
+      <DialogContent className="max-w-md mx-auto bg-background border-border">
+        <DialogHeader className="pb-4">
+          <div className="flex items-center justify-center relative">
+            <ChevronDown className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <DialogTitle className="text-center text-lg font-semibold">
+            Select section format
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4 pb-4">
+          {/* Regular */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, format: 'regular'} : null);
+              setShowFormatSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Regular</h3>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+              {currentSection?.format === 'regular' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
+          
+          {/* AMRAP */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, format: 'amrap'} : null);
+              setShowFormatSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">AMRAP</h3>
+              <p className="text-sm text-muted-foreground">
+                AMRAP format tracks total rounds completed based on time assigned and only allows 1 set per exercise
+              </p>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-3 flex-shrink-0">
+              {currentSection?.format === 'amrap' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
+          
+          {/* Timed */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, format: 'timed'} : null);
+              setShowFormatSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Timed</h3>
+              <p className="text-sm text-muted-foreground">
+                Timed format tracks total duration based on rounds assigned and only allows 1 set per exercise
+              </p>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-3 flex-shrink-0">
+              {currentSection?.format === 'timed' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
+          
+          {/* Interval */}
+          <div 
+            className="flex items-center justify-between cursor-pointer py-3"
+            onClick={() => {
+              setCurrentSection(prev => prev ? {...prev, format: 'interval'} : null);
+              setShowFormatSelector(false);
+            }}
+          >
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground mb-1">Interval</h3>
+              <p className="text-sm text-muted-foreground">
+                Interval format autoplays a timer on the client app. This format requires a duration and rest time for each exercise. Can be used for HIIT, TABATA, and more
+              </p>
+            </div>
+            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center ml-3 flex-shrink-0">
+              {currentSection?.format === 'interval' && (
+                <Check className="w-4 h-4 text-white" />
+              )}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  // Type selector modal  
+  const renderTypeSelector = () => (
+    <Dialog open={showTypeSelector} onOpenChange={setShowTypeSelector}>
+      <DialogContent className="max-w-md mx-auto bg-background border-border">
+        <DialogHeader className="pb-4">
+          <div className="flex items-center justify-center relative">
+            <ChevronDown className="w-6 h-6 text-muted-foreground" />
+          </div>
+          <DialogTitle className="text-center text-lg font-semibold">
+            Select section type
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4 pb-4">
+          {['workout', 'warmup', 'cooldown', 'recovery'].map((type) => (
+            <div 
+              key={type}
+              className="flex items-center justify-between cursor-pointer py-3"
+              onClick={() => {
+                setCurrentSection(prev => prev ? {...prev, type: type as any} : null);
+                setShowTypeSelector(false);
+              }}
+            >
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground mb-1 capitalize">
+                  {type === 'warmup' ? 'Warm-up' : 
+                   type === 'cooldown' ? 'Cool down' : 
+                   type.charAt(0).toUpperCase() + type.slice(1)}
+                </h3>
+              </div>
+              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                {currentSection?.type === type && (
+                  <Check className="w-4 h-4 text-white" />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   // Main render based on step
-  switch (step) {
-    case 'details':
-      return renderDetailsStep();
-    case 'sections':
-      return renderSectionsStep();
-    case 'section-form':
-      return renderSectionForm();
-    case 'exercise-selection':
-      return renderExerciseSelection();
-    default:
-      return renderDetailsStep();
-  }
+  return (
+    <>
+      {step === 'details' && renderDetailsStep()}
+      {step === 'sections' && renderSectionsStep()}
+      {step === 'section-form' && renderSectionForm()}
+      {step === 'exercise-selection' && renderExerciseSelection()}
+      
+      {/* Modals */}
+      {renderFormatSelector()}
+      {renderTypeSelector()}
+    </>
+  );
 }
