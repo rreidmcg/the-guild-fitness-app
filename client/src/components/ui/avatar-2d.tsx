@@ -59,7 +59,7 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
           alt="Character Avatar"
           className="w-full h-full object-contain"
           style={{
-            filter: `brightness(${0.9 + overallFitness * 0.3}) contrast(${1 + muscleDefinition * 0.2})`,
+            filter: `brightness(${0.95 + overallFitness * 0.1}) contrast(${1 + muscleDefinition * 0.1})`,
             imageRendering: 'pixelated',
             transform: playerData?.gender === "female" ? 'scale(0.9)' : 'scale(1)'
           }}
