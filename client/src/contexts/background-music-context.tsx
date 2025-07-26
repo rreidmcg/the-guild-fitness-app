@@ -19,7 +19,7 @@ interface BackgroundMusicProviderProps {
 export function BackgroundMusicProvider({ children }: BackgroundMusicProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // Default to muted/off
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [location] = useLocation();
   const wasPlayingBeforeHidden = useRef(false);
@@ -69,9 +69,8 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
       audio.addEventListener('ended', handleEnded);
       audio.addEventListener('error', handleError);
 
-      // Auto-start music on first load or resume if it was playing before track change
-      if (wasCurrentlyPlaying || !hasTriedAutoplay.current) {
-        hasTriedAutoplay.current = true;
+      // Only resume music if it was playing before track change (no auto-start on first load)
+      if (wasCurrentlyPlaying) {
         audio.play().catch(() => {
           setIsPlaying(false);
           setIsMuted(true);
