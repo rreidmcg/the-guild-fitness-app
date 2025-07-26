@@ -28,7 +28,7 @@ export function BottomNav() {
                 key={item.path}
                 variant="ghost"
                 onClick={() => navigate(item.path)}
-                className={`justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-14 w-14 flex flex-col items-center justify-center space-y-1 px-3 py-2 min-w-0 ${
+                className={`justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-14 flex flex-col items-center justify-center space-y-1 px-2 py-2 flex-1 max-w-[80px] ${
                   isActive 
                     ? 'text-blue-400 bg-blue-900/20 border border-blue-700' 
                     : 'text-muted-foreground hover:text-foreground'
