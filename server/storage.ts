@@ -1204,6 +1204,22 @@ export class DatabaseStorage implements IStorage {
     
     return newUnlocks;
   }
+
+  // Analytics helper methods
+  async getAllExercises() {
+    const exercises = await db.select().from(exercisesTable);
+    return exercises;
+  }
+
+  async getAllMonsters() {
+    const monsters = await db.select().from(monstersTable);
+    return monsters;
+  }
+
+  async getAllAchievements() {
+    const achievements = await db.select().from(achievementsTable);
+    return achievements;
+  }
 }
 
 export const storage = new DatabaseStorage();

@@ -1,0 +1,74 @@
+{
+  "name": "Dumbbells & Dragons - RPG Fitness Tracker",
+  "short_name": "D&D Fitness",
+  "description": "Gamified fitness tracking with RPG progression and monster battles",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F1419",
+  "theme_color": "#22D3EE",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["fitness", "games", "health"],
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Workout",
+      "short_name": "Workout",
+      "description": "Begin a new workout session",
+      "url": "/workouts",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Battle Monsters",
+      "short_name": "Battle",
+      "description": "Fight monsters in dungeons",
+      "url": "/battle",
+      "icons": [
+        {
+          "src": "/icon-192x192.png", 
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "View Stats",
+      "short_name": "Stats",
+      "description": "Check character progression",
+      "url": "/stats",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/social",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

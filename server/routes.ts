@@ -1685,6 +1685,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes (restricted to G.M. users)
+  const isAdmin = async (req: any, res: any, next: any) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.currentTitle !== '<G.M.>') {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+      
+      next();
+    } catch (error) {
+      res.status(500).json({ error: 'Authentication failed' });
+    }
+  };
+
+  app.get("/api/admin/analytics", isAdmin, async (req, res) => {
+    try {
+      const { analyticsService } = await import("./analytics.js");
+      const analytics = await analyticsService.getFullAnalytics();
+      res.json(analytics);
+    } catch (error) {
+      console.error("Analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  app.get("/api/admin/exercises", isAdmin, async (req, res) => {
+    try {
+      const exercises = await storage.getAllExercises();
+      res.json(exercises);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch exercises" });
+    }
+  });
+
+  app.get("/api/admin/monsters", isAdmin, async (req, res) => {
+    try {
+      const monsters = await storage.getAllMonsters();
+      res.json(monsters);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch monsters" });
+    }
+  });
+
+  // Push notification routes
+  app.post("/api/push/subscribe", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const subscription = req.body;
+      
+      // Store push subscription in database (would need to add table)
+      // For now, just acknowledge the subscription
+      console.log(`User ${userId} subscribed to push notifications`);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to subscribe to push notifications" });
+    }
+  });
+
+  app.post("/api/push/unsubscribe", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      console.log(`User ${userId} unsubscribed from push notifications`);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to unsubscribe from push notifications" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

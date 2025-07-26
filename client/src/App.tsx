@@ -63,6 +63,21 @@ function AppContent() {
   // Initialize timezone detection for daily quest resets
   useTimezone();
 
+  // Register service worker for PWA functionality
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+  }, []);
+
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-background text-foreground">
