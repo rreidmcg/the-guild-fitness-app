@@ -66,7 +66,7 @@ export default function WorkoutBuilder() {
   const [showFormatSelector, setShowFormatSelector] = useState(false);
   const [showTypeSelector, setShowTypeSelector] = useState(false);
 
-  const { data: exercises } = useQuery({
+  const { data: exercises = [] } = useQuery({
     queryKey: ["/api/exercises"],
   });
 
@@ -393,7 +393,7 @@ export default function WorkoutBuilder() {
                       className="text-primary text-sm"
                       onClick={() => {
                         // Add new set
-                        if (currentSection) {
+                        if (currentSection && currentSection.exercises) {
                           const updatedExercises = currentSection.exercises.map(ex => 
                             ex.id === exercise.id 
                               ? {...ex, sets: [...ex.sets, {id: Date.now().toString()}]}
@@ -447,10 +447,10 @@ export default function WorkoutBuilder() {
 
   // Step 4: Exercise Selection
   const renderExerciseSelection = () => {
-    const filteredExercises = exercises?.filter(exercise => 
+    const filteredExercises = exercises.filter((exercise: Exercise) => 
       exercise.name.toLowerCase().includes(exerciseSearch.toLowerCase()) ||
-      exercise.muscleGroups.some(mg => mg.toLowerCase().includes(exerciseSearch.toLowerCase()))
-    ) || [];
+      exercise.muscleGroups.some((mg: string) => mg.toLowerCase().includes(exerciseSearch.toLowerCase()))
+    );
 
     return (
       <div className="min-h-screen bg-background text-foreground">
@@ -492,7 +492,7 @@ export default function WorkoutBuilder() {
 
           {/* Exercise List */}
           <div className="space-y-3 mb-20">
-            {filteredExercises.map(exercise => (
+            {filteredExercises.map((exercise: Exercise) => (
               <div 
                 key={exercise.id}
                 className="flex items-center space-x-3 cursor-pointer"
@@ -533,7 +533,7 @@ export default function WorkoutBuilder() {
 
     // Add selected exercises to current section
     const exercisesToAdd = selectedExercises.map(exerciseId => {
-      const exercise = exercises?.find(ex => ex.id === exerciseId);
+      const exercise = exercises.find((ex: Exercise) => ex.id === exerciseId);
       return {
         id: Date.now().toString() + Math.random(),
         exerciseId,
@@ -592,12 +592,12 @@ export default function WorkoutBuilder() {
   // Format selector modal
   const renderFormatSelector = () => (
     <Dialog open={showFormatSelector} onOpenChange={setShowFormatSelector}>
-      <DialogContent className="max-w-md mx-auto bg-background border-border">
+      <DialogContent className="max-w-md mx-auto bg-card border-border text-foreground">
         <DialogHeader className="pb-4">
           <div className="flex items-center justify-center relative">
             <ChevronDown className="w-6 h-6 text-muted-foreground" />
           </div>
-          <DialogTitle className="text-center text-lg font-semibold">
+          <DialogTitle className="text-center text-lg font-semibold text-foreground">
             Select section format
           </DialogTitle>
         </DialogHeader>
@@ -691,12 +691,12 @@ export default function WorkoutBuilder() {
   // Type selector modal  
   const renderTypeSelector = () => (
     <Dialog open={showTypeSelector} onOpenChange={setShowTypeSelector}>
-      <DialogContent className="max-w-md mx-auto bg-background border-border">
+      <DialogContent className="max-w-md mx-auto bg-card border-border text-foreground">
         <DialogHeader className="pb-4">
           <div className="flex items-center justify-center relative">
             <ChevronDown className="w-6 h-6 text-muted-foreground" />
           </div>
-          <DialogTitle className="text-center text-lg font-semibold">
+          <DialogTitle className="text-center text-lg font-semibold text-foreground">
             Select section type
           </DialogTitle>
         </DialogHeader>
