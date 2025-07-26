@@ -24,7 +24,8 @@ import {
   Gift,
   Coins,
   Shield,
-  Sparkles
+  Sparkles,
+  Snowflake
 } from "lucide-react";
 
 export default function Workouts() {
@@ -181,7 +182,7 @@ export default function Workouts() {
                 <h3 className="font-bold text-yellow-400">Daily Quest Rewards</h3>
                 <div className="flex items-center justify-center space-x-6 mt-2 text-sm">
                   <div className="flex items-center space-x-1">
-                    <Shield className="w-4 h-4 text-blue-500" />
+                    <Snowflake className="w-4 h-4 text-blue-500" />
                     <span className="text-foreground">2+ Quests: Streak Freeze</span>
                   </div>
                   <div className="flex items-center space-x-1">
