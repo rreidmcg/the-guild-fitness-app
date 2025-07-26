@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Coins, Backpack, Settings, Volume2 } from "lucide-react";
+import { Coins, Backpack, Settings, Volume2, VolumeX } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 
@@ -28,7 +28,11 @@ export function CurrencyHeader() {
               className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
               title="Toggle Music"
             >
-              <Volume2 className="w-4 h-4 text-muted-foreground" />
+              {isMuted || !isPlaying ? (
+                <VolumeX className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-muted-foreground" />
+              )}
             </button>
           </div>
           <div className="flex items-center space-x-3">
