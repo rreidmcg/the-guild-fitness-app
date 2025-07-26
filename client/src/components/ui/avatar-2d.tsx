@@ -1,6 +1,7 @@
 import { User } from "@shared/schema";
 import maleAvatarImage from "@assets/IMG_3682_1753213695174.png";
 import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
+import gmAvatarImage from "@assets/1B61F2BD-609C-4B01-80C0-BD180A694F44_1753497777473.png";
 
 interface Avatar2DProps {
   user?: User;
@@ -33,8 +34,12 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
     ({ width, height } = sizes[size]);
   }
 
-  // Get the appropriate avatar image based on gender
-  const avatarImage = playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage;
+  // Get the appropriate avatar image based on title and gender
+  const avatarImage = playerData?.title === "<G.M.>" 
+    ? gmAvatarImage 
+    : playerData?.gender === "female" 
+      ? femaleAvatarImage 
+      : maleAvatarImage;
 
   // Calculate fitness effects for visual overlays
   const muscleDefinition = Math.min(strength / 20, 1);

@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap, X } from "lucide-react";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { getTitleComponent } from "@/lib/title-rarity";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { Badge } from "@/components/ui/badge";
 
@@ -165,6 +165,9 @@ export default function LeaderboardPage() {
       <Dialog open={isPlayerModalOpen} onOpenChange={setIsPlayerModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
+            <DialogDescription className="sr-only">
+              Player profile showing avatar, stats, and ranking information
+            </DialogDescription>
             <DialogTitle className="flex items-center space-x-2">
               <div className="flex items-center space-x-2">
                 {selectedPlayer && (
