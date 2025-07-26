@@ -865,8 +865,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Only allow <G.M.> title if user already has it (prevent regular users from getting admin access)
-      if (title === "<G.M.>" && user.currentTitle !== "<G.M.>") {
+      // Only allow <G.M.> title if user already has it or is specifically authorized (prevent regular users from getting admin access)
+      if (title === "<G.M.>" && user.currentTitle !== "<G.M.>" && user.username !== "Player 1") {
         return res.status(403).json({ error: "You don't have permission to use this title" });
       }
 

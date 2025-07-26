@@ -117,7 +117,7 @@ export default function Settings() {
     mutationFn: async (newTitle: string) => {
       return apiRequest("/api/user/update-title", {
         method: "PATCH",
-        body: JSON.stringify({ title: newTitle })
+        body: { title: newTitle }
       });
     },
     onSuccess: () => {
