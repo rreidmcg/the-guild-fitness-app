@@ -36,19 +36,19 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
   };
 
   return (
-    <Card className="bg-gray-900/80 backdrop-blur-sm border-yellow-500/30">
+    <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-yellow-400">Exercise Library</CardTitle>
+        <CardTitle className="text-foreground">Exercise Library</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search exercises..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-500"
+            className="pl-10 bg-background border-border text-foreground placeholder:text-muted-foreground"
           />
         </div>
 
@@ -58,10 +58,7 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
             variant={selectedCategory === null ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory(null)}
-            className={selectedCategory === null 
-              ? "text-xs bg-yellow-600 hover:bg-yellow-700 text-black" 
-              : "text-xs border-gray-600 text-gray-300 hover:bg-gray-700"
-            }
+            className="text-xs"
           >
             All
           </Button>
@@ -71,10 +68,7 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
               variant={selectedCategory === category ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedCategory(category)}
-              className={selectedCategory === category 
-                ? "text-xs bg-yellow-600 hover:bg-yellow-700 text-black capitalize" 
-                : "text-xs border-gray-600 text-gray-300 hover:bg-gray-700 capitalize"
-              }
+              className="text-xs capitalize"
             >
               {category}
             </Button>
@@ -90,8 +84,8 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
                 key={exercise.id} 
                 className={`cursor-pointer transition-colors ${
                   isSelected 
-                    ? 'bg-yellow-500/20 border-yellow-500' 
-                    : 'bg-gray-800/70 border-gray-600 hover:bg-gray-700/80 hover:border-yellow-500/50'
+                    ? 'bg-primary/20 border-primary' 
+                    : 'bg-background border-border hover:bg-muted hover:border-primary/50'
                 }`}
                 onClick={() => !isSelected && onSelectExercise(exercise)}
               >
@@ -99,20 +93,20 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <h3 className="font-semibold text-white text-sm">{exercise.name}</h3>
+                        <h3 className="font-semibold text-foreground text-sm">{exercise.name}</h3>
                         <Badge className={`${getCategoryColor(exercise.category)} text-white text-xs`}>
                           {exercise.category}
                         </Badge>
                       </div>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-muted-foreground">
                         {exercise.muscleGroups.join(', ')}
                       </p>
                     </div>
                     <div className="ml-2">
                       {isSelected ? (
-                        <Check className="w-4 h-4 text-yellow-400" />
+                        <Check className="w-4 h-4 text-primary" />
                       ) : (
-                        <Plus className="w-4 h-4 text-gray-400 hover:text-yellow-400 transition-colors" />
+                        <Plus className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
                       )}
                     </div>
                   </div>
@@ -123,7 +117,7 @@ export function ExerciseSelector({ exercises, onSelectExercise, selectedExercise
         </div>
 
         {filteredExercises.length === 0 && (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-muted-foreground">
             <p>No exercises found matching your criteria</p>
           </div>
         )}
