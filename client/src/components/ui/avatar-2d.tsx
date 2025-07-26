@@ -36,23 +36,21 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
     ({ width, height } = sizes[size]);
   }
 
-  // Map custom avatar URLs to imported assets
+  // Map custom avatar URLs to imported assets (only for Rob)
   const getCustomAvatar = (customAvatarUrl: string) => {
     switch (customAvatarUrl) {
-      case "/src/assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753558358031.jpeg":
-        return robCustomAvatar1;
       case "/src/assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753559527359.jpeg":  
-        return robCustomAvatar2;
+        return robCustomAvatar2; // Rob's custom avatar
       default:
         return null;
     }
   };
 
-  // Get the appropriate avatar image based on custom avatar, title, and gender
-  const avatarImage = playerData?.customAvatarUrl
-    ? getCustomAvatar(playerData.customAvatarUrl) || maleAvatarImage
-    : playerData?.title === "<G.M.>" 
-      ? gmAvatarImage 
+  // Get the appropriate avatar image based on title, custom avatar, and gender
+  const avatarImage = playerData?.title === "<G.M.>" 
+    ? (playerData?.customAvatarUrl ? getCustomAvatar(playerData.customAvatarUrl) || gmAvatarImage : gmAvatarImage)
+    : playerData?.customAvatarUrl
+      ? getCustomAvatar(playerData.customAvatarUrl) || (playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage)
       : playerData?.gender === "female" 
         ? femaleAvatarImage 
         : maleAvatarImage;
