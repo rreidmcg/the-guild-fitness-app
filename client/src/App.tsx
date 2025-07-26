@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { useBackgroundMusic } from "@/hooks/use-background-music";
+import { BackgroundMusicProvider } from "@/contexts/background-music-context";
 import { useTimezone } from "@/hooks/use-timezone";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX } from "lucide-react";
@@ -52,31 +52,8 @@ function Router() {
 }
 
 function AppContent() {
-  const { isPlaying, isMuted, toggleMusic, startMusic } = useBackgroundMusic();
-  
   // Initialize timezone detection for daily quest resets
   useTimezone();
-
-  // Auto-start music on first user interaction
-  useEffect(() => {
-    const handleFirstInteraction = () => {
-      if (isMuted && !isPlaying) {
-        startMusic();
-      }
-    };
-
-    // Add event listeners for first user interaction
-    document.addEventListener('click', handleFirstInteraction, { once: true });
-    document.addEventListener('keydown', handleFirstInteraction, { once: true });
-    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
-
-    return () => {
-      // Cleanup in case component unmounts before interaction
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('keydown', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
-    };
-  }, [isMuted, isPlaying, startMusic]);
 
   return (
     <TooltipProvider>
@@ -84,22 +61,6 @@ function AppContent() {
         <Toaster />
         
         {/* Music Controls - Hidden per user request */}
-        {false && (
-          <div className="fixed top-4 right-4 z-50">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleMusic}
-              className="bg-background/80 backdrop-blur-sm border-border/50"
-            >
-              {isMuted || !isPlaying ? (
-                <VolumeX className="h-4 w-4" />
-              ) : (
-                <Volume2 className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        )}
 
         <Router />
         <BottomNav />
@@ -111,7 +72,9 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppContent />
+      <BackgroundMusicProvider>
+        <AppContent />
+      </BackgroundMusicProvider>
     </QueryClientProvider>
   );
 }

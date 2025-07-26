@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
-import { useBackgroundMusic } from "@/hooks/use-background-music";
+import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";

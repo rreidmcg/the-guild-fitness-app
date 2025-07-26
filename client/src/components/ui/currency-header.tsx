@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Coins, Backpack, Settings, Volume2 } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
-import { useBackgroundMusic } from "@/hooks/use-background-music";
+import { useBackgroundMusic } from "@/contexts/background-music-context";
 
 export function CurrencyHeader() {
   const navigate = useNavigate();

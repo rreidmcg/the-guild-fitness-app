@@ -1,12 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import defaultMusicFile from '@assets/Pixelated Dreams ext v1.2_1753061935579.mp3';
 import battleMusicFile from '@assets/finale_1753453869533.mp3';
 
-export function useBackgroundMusic() {
+interface BackgroundMusicContextType {
+  isPlaying: boolean;
+  isMuted: boolean;
+  toggleMusic: () => void;
+  startMusic: () => void;
+}
+
+const BackgroundMusicContext = createContext<BackgroundMusicContextType | undefined>(undefined);
+
+interface BackgroundMusicProviderProps {
+  children: ReactNode;
+}
+
+export function BackgroundMusicProvider({ children }: BackgroundMusicProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false); // Start unmuted
+  const [isMuted, setIsMuted] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<string | null>(null);
   const [location] = useLocation();
   const wasPlayingBeforeHidden = useRef(false);
@@ -61,26 +74,22 @@ export function useBackgroundMusic() {
         hasTriedAutoplay.current = true;
         audio.play().catch(() => {
           setIsPlaying(false);
-          setIsMuted(true); // Fall back to muted if autoplay fails
+          setIsMuted(true);
           console.warn('Background music autoplay blocked by browser');
         });
       }
     }
-  }, [location]);
+  }, [location, isPlaying, isMuted]);
 
-  // Handle visibility changes to prevent music from stopping when switching tabs
+  // Handle visibility changes
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!audioRef.current) return;
 
       if (document.hidden) {
-        // Store playing state before hiding
         wasPlayingBeforeHidden.current = !audioRef.current.paused;
-        // Don't pause the audio - let it continue playing in background
       } else {
-        // Tab became visible again
         if (wasPlayingBeforeHidden.current && !isMuted && audioRef.current.paused) {
-          // Resume if it was playing before and user hasn't muted it
           audioRef.current.play().catch(() => {
             setIsPlaying(false);
           });
@@ -115,7 +124,7 @@ export function useBackgroundMusic() {
     toggleMusic();
   };
 
-  // Try to start music immediately with a small delay for better browser compatibility
+  // Try to start music with delay
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasTriedAutoplay.current && audioRef.current && !isPlaying && !isMuted) {
@@ -125,10 +134,10 @@ export function useBackgroundMusic() {
           console.warn('Background music autoplay blocked by browser - will start on user interaction');
         });
       }
-    }, 500); // 500ms delay to allow everything to initialize
+    }, 500);
 
     return () => clearTimeout(timer);
-  }, []); // Only run once on mount
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -141,10 +150,24 @@ export function useBackgroundMusic() {
     };
   }, []);
 
-  return {
+  const contextValue: BackgroundMusicContextType = {
     isPlaying,
     isMuted,
     toggleMusic,
     startMusic
   };
+
+  return (
+    <BackgroundMusicContext.Provider value={contextValue}>
+      {children}
+    </BackgroundMusicContext.Provider>
+  );
+}
+
+export function useBackgroundMusic(): BackgroundMusicContextType {
+  const context = useContext(BackgroundMusicContext);
+  if (context === undefined) {
+    throw new Error('useBackgroundMusic must be used within a BackgroundMusicProvider');
+  }
+  return context;
 }
