@@ -222,17 +222,17 @@ export default function Settings() {
                 <h4 className="text-sm font-semibold text-foreground mb-3">Title Progression</h4>
                 <div className="grid grid-cols-1 gap-2 text-xs">
                   {[
-                    { title: "Recruit", requirement: "Default", levelRange: "Any Level", available: true, rarity: "common" },
-                    { title: "Broodmother Slayer", requirement: "Complete E-Rank Dungeons", levelRange: "Lv 1-10", available: false, rarity: "common" },
-                    { title: "Earth Lord Vanquisher", requirement: "Complete D-Rank Dungeons", levelRange: "Lv 10-20", available: false, rarity: "uncommon" },
-                    { title: "Light Sovereign Destroyer", requirement: "Complete C-Rank Dungeons", levelRange: "Lv 20-30", available: false, rarity: "rare" },
-                    { title: "Genesis Prime Conqueror", requirement: "Complete B-Rank Dungeons", levelRange: "Lv 30-50", available: false, rarity: "epic", locked: true },
-                    { title: "Symmetry Lord Transcendent", requirement: "Complete A-Rank Dungeons", levelRange: "Lv 50-75", available: false, rarity: "legendary", locked: true },
-                    { title: "Omega Void Master", requirement: "Complete S-Rank Dungeons", levelRange: "Lv 75-100", available: false, rarity: "mythic", locked: true },
-                  ].map(({ title, requirement, levelRange, available, rarity, locked }) => {
+                    { title: "Recruit", requirement: "Default", available: true, rarity: "common" },
+                    { title: "Broodmother Slayer", requirement: "Complete E-Rank Dungeons", available: false, rarity: "common" },
+                    { title: "Earth Lord Vanquisher", requirement: "Complete D-Rank Dungeons", available: false, rarity: "uncommon" },
+                    { title: "Light Sovereign Destroyer", requirement: "Complete C-Rank Dungeons", available: false, rarity: "rare" },
+                    { title: "Genesis Prime Conqueror", requirement: "Complete B-Rank Dungeons", available: false, rarity: "epic", locked: true },
+                    { title: "Symmetry Lord Transcendent", requirement: "Complete A-Rank Dungeons", available: false, rarity: "legendary", locked: true },
+                    { title: "Omega Void Master", requirement: "Complete S-Rank Dungeons", available: false, rarity: "mythic", locked: true },
+                  ].map(({ title, requirement, available, rarity, locked }) => {
                     const isCurrent = (userStats as any)?.currentTitle === title;
                     const rarityColors = {
-                      common: 'text-white',
+                      common: 'text-gray-200',
                       uncommon: 'text-green-300', 
                       rare: 'text-blue-300',
                       epic: 'text-purple-300',
@@ -253,7 +253,6 @@ export default function Settings() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2">
                             <span className={`font-medium ${rarityColors[rarity]}`}>{title}</span>
-                            <span className="text-xs px-2 py-1 bg-muted/30 text-muted-foreground rounded">{levelRange}</span>
                             {locked && (
                               <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
                                 In Development
