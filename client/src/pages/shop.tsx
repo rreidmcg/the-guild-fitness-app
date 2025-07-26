@@ -388,7 +388,7 @@ export default function Shop() {
     },
     {
       id: "full_mana",
-      name: "Full Mana Potion",
+      name: "Mega Mana Potion",
       description: "Restores 100% of maximum MP",
       price: 40,
       healing: "100%",
