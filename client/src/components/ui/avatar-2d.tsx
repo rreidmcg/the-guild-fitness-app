@@ -84,6 +84,32 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
             transform: playerData?.gender === "female" ? 'scale(0.9)' : 'scale(1)'
           }}
         />
+
+        {/* Color customization overlay for default avatars (non-custom avatars) */}
+        {!playerData?.customAvatarUrl && playerData?.title !== "<G.M.>" && (playerData?.skinColor || playerData?.hairColor) && (
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Skin color tint */}
+            {playerData?.skinColor && (
+              <div 
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(135deg, ${playerData.skinColor}30 0%, transparent 40%, transparent 60%, ${playerData.skinColor}20 100%)`,
+                  mixBlendMode: 'multiply'
+                }}
+              />
+            )}
+            {/* Hair color accent */}
+            {playerData?.hairColor && (
+              <div 
+                className="absolute top-0 left-0 right-0 h-1/3"
+                style={{
+                  background: `linear-gradient(180deg, ${playerData.hairColor}25 0%, transparent 70%)`,
+                  mixBlendMode: 'overlay'
+                }}
+              />
+            )}
+          </div>
+        )}
         
         {/* Glow effect overlay based on fitness level */}
         <div 
