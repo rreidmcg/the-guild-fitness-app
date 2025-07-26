@@ -101,6 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           height: users.height,
           weight: users.weight,
           fitnessGoal: users.fitnessGoal,
+          customAvatarUrl: users.customAvatarUrl,
         })
         .from(users)
         .orderBy(desc(users.experience))

@@ -207,8 +207,8 @@ export default function LeaderboardPage() {
               <div className="flex justify-center">
                 <div className="relative">
                   <Avatar2D 
-                    playerStats={selectedPlayer}
-                    size={200}
+                    user={selectedPlayer}
+                    size="lg"
                     className="mx-auto"
                   />
                 </div>
