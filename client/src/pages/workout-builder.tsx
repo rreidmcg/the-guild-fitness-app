@@ -129,8 +129,8 @@ export default function WorkoutBuilder() {
       
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-col space-y-4">
+            <div className="flex items-center justify-between">
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation("/workouts")}
@@ -138,30 +138,31 @@ export default function WorkoutBuilder() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Create Workout</h1>
-                <p className="text-muted-foreground mt-0.5 text-sm">Build your custom workout routine</p>
+              
+              <div className="flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  onClick={handleSaveWorkout}
+                  disabled={createWorkoutMutation.isPending}
+                  size="sm"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                </Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={handleStartWorkout}
+                  size="sm"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Start
+                </Button>
               </div>
             </div>
             
-            <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={handleSaveWorkout}
-                disabled={createWorkoutMutation.isPending}
-                size="sm"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save
-              </Button>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={handleStartWorkout}
-                size="sm"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Start
-              </Button>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-foreground">Create Workout</h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">Build your custom workout routine</p>
             </div>
           </div>
         </div>
