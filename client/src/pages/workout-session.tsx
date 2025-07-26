@@ -50,7 +50,7 @@ export default function WorkoutSession() {
       queryClient.invalidateQueries({ queryKey: ["/api/workout-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       
-      // Show victory modal with the session data
+      // Show victory modal with the session data including new achievements
       setCompletedSession(result);
       setShowVictoryModal(true);
     },
@@ -230,6 +230,7 @@ export default function WorkoutSession() {
           duration={completedSession.duration || 0}
           totalVolume={completedSession.totalVolume}
           validation={completedSession.validation}
+          newAchievements={completedSession.newAchievements || []}
         />
       )}
 

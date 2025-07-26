@@ -484,6 +484,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Record activity to prevent atrophy
       await AtrophySystem.recordActivity(userId);
       
+      // Check and unlock achievements after workout completion
+      const newAchievements = await storage.checkAndUnlockAchievements(userId);
+      
       // Return session data with calculated rewards and validation info for the victory screen
       res.json({
         ...session,
@@ -498,7 +501,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           stamina: staminaXp,
           agility: agilityXp
         },
-        name: sessionData.name || "Workout Session"
+        name: sessionData.name || "Workout Session",
+        newAchievements: newAchievements
       });
     } catch (error) {
       res.status(400).json({ error: "Invalid session data" });
@@ -726,7 +730,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         battlesWon: newBattlesWon,
       });
       
-      res.json(updatedUser);
+      // Check for achievements after stat/gold gains
+      const newAchievements = await storage.checkAndUnlockAchievements(userId);
+      
+      res.json({
+        ...updatedUser,
+        newAchievements: newAchievements
+      });
     } catch (error) {
       res.status(500).json({ error: "Failed to update user stats" });
     }
@@ -946,13 +956,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Achievements routes
-  app.get("/api/user/achievements", async (req, res) => {
+  app.get("/api/achievements", async (req, res) => {
+    try {
+      const achievements = await storage.getAllAchievements();
+      res.json(achievements);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch achievements" });
+    }
+  });
+
+  app.get("/api/user-achievements", async (req, res) => {
     try {
       const userId = currentUserId; // Use the current logged-in user
       const achievements = await storage.getUserAchievements(userId);
       res.json(achievements);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch achievements" });
+      res.status(500).json({ error: "Failed to fetch user achievements" });
+    }
+  });
+
+  app.post("/api/check-achievements", async (req, res) => {
+    try {
+      const userId = currentUserId; // Use the current logged-in user
+      const newAchievements = await storage.checkAndUnlockAchievements(userId);
+      res.json({ newAchievements });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check achievements" });
     }
   });
 

@@ -16,7 +16,7 @@ import {
   type SocialShareLike, type InsertSocialShareLike
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, desc } from "drizzle-orm";
 import { dailyResetService } from "./daily-reset-system.js";
 
 export interface IStorage {
@@ -76,6 +76,7 @@ export interface IStorage {
   getAllAchievements(): Promise<Achievement[]>;
   getUserAchievements(userId: number): Promise<UserAchievement[]>;
   unlockAchievement(userId: number, achievementId: number): Promise<UserAchievement>;
+  checkAndUnlockAchievements(userId: number): Promise<UserAchievement[]>;
 
   // Social sharing operations
   createSocialShare(share: InsertSocialShare): Promise<SocialShare>;
@@ -1140,6 +1141,68 @@ export class DatabaseStorage implements IStorage {
         likesCount: sql`${socialShares.likesCount} - 1`
       })
       .where(eq(socialShares.id, shareId));
+  }
+
+  async checkAndUnlockAchievements(userId: number): Promise<UserAchievement[]> {
+    await this.ensureInitialized();
+    
+    const newUnlocks: UserAchievement[] = [];
+    
+    // Get user stats and data
+    const user = await this.getUser(userId);
+    if (!user) return newUnlocks;
+    
+    // Get user's workout sessions count
+    const workoutSessions = await this.getUserWorkoutSessions(userId);
+    const totalWorkouts = workoutSessions.length;
+    
+    // Get all achievements
+    const allAchievements = await this.getAllAchievements();
+    
+    // Get already unlocked achievements
+    const userAchievements = await this.getUserAchievements(userId);
+    const unlockedIds = new Set(userAchievements.map(ua => ua.achievementId));
+    
+    // Check each achievement
+    for (const achievement of allAchievements) {
+      // Skip if already unlocked
+      if (unlockedIds.has(achievement.id)) continue;
+      
+      let shouldUnlock = false;
+      
+      // Check based on achievement type
+      switch (achievement.type) {
+        case 'workout_count':
+          shouldUnlock = totalWorkouts >= achievement.requirement;
+          break;
+        case 'workout_streak':
+          shouldUnlock = (user.currentStreak || 0) >= achievement.requirement;
+          break;
+        case 'strength_level':
+          shouldUnlock = (user.strength || 0) >= achievement.requirement;
+          break;
+        case 'stamina_level':
+          shouldUnlock = (user.stamina || 0) >= achievement.requirement;
+          break;
+        case 'agility_level':
+          shouldUnlock = (user.agility || 0) >= achievement.requirement;
+          break;
+        case 'character_level':
+          shouldUnlock = (user.level || 0) >= achievement.requirement;
+          break;
+        case 'gold_earned':
+          shouldUnlock = (user.gold || 0) >= achievement.requirement;
+          break;
+      }
+      
+      // Unlock if conditions are met
+      if (shouldUnlock) {
+        const newUnlock = await this.unlockAchievement(userId, achievement.id);
+        newUnlocks.push(newUnlock);
+      }
+    }
+    
+    return newUnlocks;
   }
 }
 

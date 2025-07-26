@@ -19,6 +19,7 @@ interface WorkoutVictoryModalProps {
     suspicious: string[];
     confidence: "high" | "medium" | "low";
   };
+  newAchievements?: any[];
 }
 
 export function WorkoutVictoryModal({
@@ -29,7 +30,8 @@ export function WorkoutVictoryModal({
   statsGained,
   duration,
   totalVolume,
-  validation
+  validation,
+  newAchievements = []
 }: WorkoutVictoryModalProps) {
   const formatDuration = (minutes: number) => {
     const hrs = Math.floor(minutes / 60);
@@ -131,6 +133,30 @@ export function WorkoutVictoryModal({
                   Note: {validation.suspicious[0]}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* New Achievements Section */}
+          {newAchievements && newAchievements.length > 0 && (
+            <div className="bg-yellow-900/30 rounded-lg p-4 border border-yellow-400/50">
+              <div className="flex items-center justify-center space-x-2 mb-3">
+                <Trophy className="w-5 h-5 text-yellow-400" />
+                <span className="text-lg font-bold text-yellow-100">Achievement Unlocked!</span>
+              </div>
+              <div className="space-y-2">
+                {newAchievements.map((achievement, index) => (
+                  <div key={index} className="text-center p-2 bg-yellow-800/20 rounded">
+                    <div className="font-semibold text-yellow-200">{achievement.name || 'Achievement'}</div>
+                    <div className="text-xs text-yellow-300">{achievement.description || 'Great job!'}</div>
+                    {achievement.goldReward > 0 && (
+                      <div className="text-xs text-yellow-400 mt-1">
+                        <Coins className="w-3 h-3 inline mr-1" />
+                        +{achievement.goldReward} gold
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
