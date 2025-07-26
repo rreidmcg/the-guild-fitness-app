@@ -16,10 +16,10 @@ export interface StatGains {
 // Calculate XP required for a specific level using exponential formula
 function getXpRequiredForLevel(level: number): number {
   if (level <= 1) return 0;
-  // Exponential formula: level^1.8 * 100
+  // Exponential formula: level^1.8 * 82
   // This creates a curve where early levels are fast, later levels take much longer
-  // Tuned so level 100 takes ~5 years of consistent training (3 workouts/week)
-  return Math.floor(Math.pow(level - 1, 1.8) * 100);
+  // Tuned so level 50 = exactly 52 weeks, level 100 = ~4.5 years (3 workouts/week)
+  return Math.floor(Math.pow(level - 1, 1.8) * 82);
 }
 
 // Calculate level from total XP
