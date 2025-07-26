@@ -21,7 +21,9 @@ const LEETSPEAK_MAP: { [key: string]: string } = {
 function normalizeLeetspeak(text: string): string {
   let normalized = text.toLowerCase();
   for (const [leet, normal] of Object.entries(LEETSPEAK_MAP)) {
-    normalized = normalized.replace(new RegExp(leet, 'g'), normal);
+    // Escape special regex characters in the leet string
+    const escapedLeet = leet.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    normalized = normalized.replace(new RegExp(escapedLeet, 'g'), normal);
   }
   return normalized;
 }
@@ -33,8 +35,9 @@ function containsProfanity(username: string): boolean {
     // Direct match
     if (normalized.includes(profanity)) return true;
     
-    // Match with numbers inserted (since spaces are no longer allowed)
-    const spaced = profanity.split('').join('[\\d]*');
+    // Match with numbers inserted - escape special regex characters
+    const escapedProfanity = profanity.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const spaced = escapedProfanity.split('').join('[\\d]*');
     const regex = new RegExp(spaced, 'i');
     return regex.test(normalized);
   });
