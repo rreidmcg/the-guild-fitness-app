@@ -1,7 +1,7 @@
 import { User } from "@shared/schema";
 import maleAvatarImage from "@assets/IMG_3682_1753213695174.png";
 import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
-import gmAvatarImage from "@assets/1B61F2BD-609C-4B01-80C0-BD180A694F44_1753497777473.png";
+import gmAvatarImage from "@assets/B2F9A210-A9F6-446D-8599-3F94975381BA_1753500652794.png";
 
 interface Avatar2DProps {
   user?: User;
