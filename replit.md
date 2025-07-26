@@ -173,6 +173,24 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 27, 2025:**
+- **Implemented Interactive Storage Menu**: Complete item management system for player inventory
+  - Added tap-to-interact functionality for all inventory items
+  - Created action dialogs with Use/Delete options for enhanced user control
+  - Integrated potion usage with health/mana validation preventing waste
+  - Added confirmation dialogs for item deletion to prevent accidents
+  - Backend API endpoints for secure item deletion and potion consumption
+- **Enhanced Leaderboard with Player Avatar Previews**: Community-focused social features
+  - Added interactive player profile popups when tapping leaderboard entries
+  - Displays full 2D avatars with custom appearance (skin, hair, gender)
+  - Shows detailed player stats, rank icons, titles, and experience points
+  - Creates admiration system for strong players and character customization showcase
+- **Exclusive G.M. Avatar System**: Special visual representation for admin users
+  - Added unique dark armored avatar with glowing red eyes for "<G.M.>" title holders
+  - Avatar2D component intelligently selects appropriate avatar based on user title
+  - Maintains standard male/female avatars for regular players
+  - Creates clear visual distinction for administrative users
+
 **January 26, 2025:**
 - **Implemented Auto Streak Freeze System**: Streak freezes now automatically apply at 12:00 AM local time
   - Players with available streak freezes who didn't meet daily requirements (2/4 quests OR 1 workout) get automatic protection
