@@ -659,11 +659,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/profile", async (req, res) => {
     try {
       const userId = currentUserId;
-      const { email, height, weight, fitnessGoal, measurementUnit } = req.body;
+      const { username, email, height, weight, fitnessGoal, measurementUnit, skinColor, hairColor, gender } = req.body;
       
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
+      }
+
+      // Validate username if provided
+      if (username !== undefined) {
+        const { validateUsername } = await import('./username-validation');
+        const validation = validateUsername(username);
+        if (!validation.isValid) {
+          return res.status(400).json({ error: validation.error });
+        }
+
+        // Check if username is already taken by another user
+        const existingUser = await storage.getUserByUsername(username);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ error: "Username already taken" });
+        }
       }
 
       // Validate email if provided
@@ -681,11 +696,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const updates: any = {};
+      if (username !== undefined) updates.username = username;
       if (email !== undefined) updates.email = email;
       if (height !== undefined) updates.height = height;
       if (weight !== undefined) updates.weight = weight;
       if (fitnessGoal !== undefined) updates.fitnessGoal = fitnessGoal;
       if (measurementUnit !== undefined) updates.measurementUnit = measurementUnit;
+      if (skinColor !== undefined) updates.skinColor = skinColor;
+      if (hairColor !== undefined) updates.hairColor = hairColor;
+      if (gender !== undefined) updates.gender = gender;
+
+      // Check if there are any updates to make
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ error: "No valid fields provided for update" });
+      }
 
       const updatedUser = await storage.updateUser(userId, updates);
       
@@ -693,11 +717,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true, 
         message: "Profile updated successfully",
         user: {
+          username: updatedUser.username,
           email: updatedUser.email,
           height: updatedUser.height,
           weight: updatedUser.weight,
           fitnessGoal: updatedUser.fitnessGoal,
-          measurementUnit: updatedUser.measurementUnit
+          measurementUnit: updatedUser.measurementUnit,
+          skinColor: updatedUser.skinColor,
+          hairColor: updatedUser.hairColor,
+          gender: updatedUser.gender
         }
       });
     } catch (error) {
