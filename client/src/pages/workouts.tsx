@@ -23,7 +23,8 @@ import {
   Settings,
   Gift,
   Coins,
-  Shield
+  Shield,
+  Sparkles
 } from "lucide-react";
 
 export default function Workouts() {
