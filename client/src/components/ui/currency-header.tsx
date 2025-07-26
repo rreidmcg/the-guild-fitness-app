@@ -5,7 +5,12 @@ import { useBackgroundMusic } from "@/hooks/use-background-music";
 
 export function CurrencyHeader() {
   const navigate = useNavigate();
-  const { toggleMusic } = useBackgroundMusic();
+  const { toggleMusic, isPlaying, isMuted } = useBackgroundMusic();
+  
+  const handleMusicToggle = () => {
+    console.log('Speaker button clicked, current state:', { isPlaying, isMuted });
+    toggleMusic();
+  };
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -19,7 +24,7 @@ export function CurrencyHeader() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <button
-              onClick={toggleMusic}
+              onClick={handleMusicToggle}
               className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
               title="Toggle Music"
             >
