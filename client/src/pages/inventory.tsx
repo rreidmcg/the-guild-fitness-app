@@ -229,10 +229,13 @@ export default function Inventory() {
       setItemActionDialog({ open: false, item: null });
     },
     onError: (error: any) => {
+      const message = error.message || "Could not use the potion";
+      const isFullHealthOrMana = message.includes("full health") || message.includes("full mana");
+      
       toast({
-        title: "Failed to Use Potion",
-        description: error.message || "Could not use the potion",
-        variant: "destructive",
+        title: isFullHealthOrMana ? "Potion Not Needed" : "Failed to Use Potion",
+        description: message,
+        variant: isFullHealthOrMana ? "default" : "destructive",
       });
     }
   });
