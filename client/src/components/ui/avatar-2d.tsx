@@ -4,25 +4,37 @@ import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753
 
 interface Avatar2DProps {
   user?: User;
-  size?: "sm" | "md" | "lg";
+  playerStats?: any; // For leaderboard data that may have different structure
+  size?: number | "sm" | "md" | "lg";
+  className?: string;
 }
 
-export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
-  const level = user?.level || 1;
-  const strength = user?.strength || 0;
-  const stamina = user?.stamina || 0;
-  const agility = user?.agility || 0;
+export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2DProps) {
+  // Use playerStats if provided (for leaderboard), otherwise use user
+  const playerData = playerStats || user;
+  
+  const level = playerData?.level || 1;
+  const strength = playerData?.strength || 0;
+  const stamina = playerData?.stamina || 0;
+  const agility = playerData?.agility || 0;
 
-  const sizes = {
-    sm: { width: 120, height: 180 },
-    md: { width: 160, height: 240 },
-    lg: { width: 200, height: 300 }
-  };
-
-  const { width, height } = sizes[size];
+  // Handle both string and number sizes
+  let width: number, height: number;
+  
+  if (typeof size === "number") {
+    width = size;
+    height = Math.floor(size * 1.5); // Maintain aspect ratio
+  } else {
+    const sizes = {
+      sm: { width: 120, height: 180 },
+      md: { width: 160, height: 240 },
+      lg: { width: 200, height: 300 }
+    };
+    ({ width, height } = sizes[size]);
+  }
 
   // Get the appropriate avatar image based on gender
-  const avatarImage = user?.gender === "female" ? femaleAvatarImage : maleAvatarImage;
+  const avatarImage = playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage;
 
   // Calculate fitness effects for visual overlays
   const muscleDefinition = Math.min(strength / 20, 1);
@@ -31,7 +43,7 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
   const overallFitness = (strength + stamina + agility) / 60;
 
   return (
-    <div className="flex justify-center items-center relative">
+    <div className={`flex justify-center items-center relative ${className || ""}`}>
       <div 
         className="relative rounded-lg overflow-hidden shadow-lg"
         style={{ width, height }}
@@ -44,7 +56,7 @@ export function Avatar2D({ user, size = "md" }: Avatar2DProps) {
           style={{
             filter: `brightness(${0.9 + overallFitness * 0.3}) contrast(${1 + muscleDefinition * 0.2})`,
             imageRendering: 'pixelated',
-            transform: user?.gender === "female" ? 'scale(0.9)' : 'scale(1)'
+            transform: playerData?.gender === "female" ? 'scale(0.9)' : 'scale(1)'
           }}
         />
         
