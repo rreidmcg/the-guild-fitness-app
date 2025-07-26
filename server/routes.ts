@@ -888,6 +888,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/user/update-avatar", async (req, res) => {
+    try {
+      const { customAvatarUrl } = req.body;
+      const userId = currentUserId; // Use the current logged-in user
+      
+      const updatedUser = await storage.updateUser(userId, { customAvatarUrl });
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user avatar" });
+    }
+  });
+
   // Shop routes
   app.get("/api/shop/items", async (req, res) => {
     try {

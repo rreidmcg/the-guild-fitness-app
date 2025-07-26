@@ -51,6 +51,7 @@ export const users = pgTable("users", {
   skinColor: text("skin_color").default("#F5C6A0"),
   hairColor: text("hair_color").default("#8B4513"),
   gender: text("gender").default("male"),
+  customAvatarUrl: text("custom_avatar_url"), // URL to custom avatar image
   // Personal fitness information
   height: integer("height_cm"), // Height in centimeters
   weight: integer("weight_kg"), // Weight in kilograms
