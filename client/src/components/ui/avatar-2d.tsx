@@ -1,6 +1,5 @@
 import { User } from "@shared/schema";
 import maleAvatarImage from "@assets/IMG_3682_1753213695174.png";
-import maleAvatarSpiky from "@assets/male-avatar-spiky.png";
 import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
 import gmAvatarImage from "@assets/B2F9A210-A9F6-446D-8599-3F94975381BA_1753500652794.png";
 import robCustomAvatar1 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753558358031.jpeg";
@@ -60,7 +59,7 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
       ? getCustomAvatar(playerData.customAvatarUrl) || (playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage)
       : playerData?.gender === "female" 
         ? femaleAvatarImage 
-        : (playerData?.hairColor === "#000000" ? maleAvatarSpiky : maleAvatarImage); // Use spiky hair for black hair
+        : maleAvatarImage;
 
   // Calculate fitness effects for visual overlays
   const muscleDefinition = Math.min(strength / 20, 1);
@@ -68,89 +67,21 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
   const explosiveness = Math.min(agility / 20, 1);
   const overallFitness = (strength + stamina + agility) / 60;
 
-  // Helper function to convert hex color to CSS filter for avatar recoloring
-  const getColorFilter = (playerData: any) => {
-    if (!playerData || playerData.customAvatarUrl || playerData.title === "<G.M.>") {
-      return '';
-    }
-
-    // Don't apply color filters to the variant avatar since it already has the desired colors
-    if (playerData.hairColor === "#000000") {
-      return '';
-    }
-
-    let filters = [];
-    
-    // Apply skin color tint if specified and different from default
-    if (playerData.skinColor && playerData.skinColor !== "#FFDDAA") {
-      const skinHue = hexToHue(playerData.skinColor);
-      const skinSaturation = hexToSaturation(playerData.skinColor);
-      filters.push(`hue-rotate(${skinHue - 35}deg) saturate(${100 + skinSaturation}%)`);
-    }
-    
-    return filters.join(' ');
-  };
-
-  // Convert hex color to hue value (0-360)
-  const hexToHue = (hex: string) => {
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
-    
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const diff = max - min;
-    
-    if (diff === 0) return 0;
-    
-    let hue;
-    if (max === r) {
-      hue = ((g - b) / diff) % 6;
-    } else if (max === g) {
-      hue = (b - r) / diff + 2;
-    } else {
-      hue = (r - g) / diff + 4;
-    }
-    
-    return Math.round(hue * 60);
-  };
-
-  // Convert hex color to saturation percentage
-  const hexToSaturation = (hex: string) => {
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
-    
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const diff = max - min;
-    
-    if (max === 0) return 0;
-    return Math.round((diff / max) * 50); // Scale for filter effect
-  };
-
   return (
     <div className={`flex justify-center items-center relative ${className || ""}`}>
       <div 
         className="relative rounded-lg overflow-hidden shadow-lg"
         style={{ width, height }}
       >
-        {/* Main character image with color customization */}
+        {/* Main character image */}
         <img 
           src={avatarImage}
           alt="Character Avatar"
           className="w-full h-full object-contain"
           style={{
-            filter: `brightness(${0.95 + overallFitness * 0.1}) contrast(${1 + muscleDefinition * 0.1}) ${getColorFilter(playerData)}`,
+            filter: `brightness(${0.95 + overallFitness * 0.1}) contrast(${1 + muscleDefinition * 0.1})`,
             imageRendering: 'pixelated',
             transform: playerData?.gender === "female" ? 'scale(0.9)' : 'scale(1)'
-          }}
-          onError={(e) => {
-            console.error('Avatar image failed to load:', avatarImage);
-            // Fallback to default male avatar if spiky variant fails
-            if (avatarImage === maleAvatarSpiky) {
-              (e.target as HTMLImageElement).src = maleAvatarImage;
-            }
           }}
         />
         
