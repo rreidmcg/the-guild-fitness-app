@@ -530,7 +530,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/stats", async (req, res) => {
     try {
       const userId = currentUserId; // Use the current logged-in user
+      
+      // Check for daily reset and auto streak freeze before getting stats
       const user = await storage.getUser(userId);
+      const userTimezone = user?.timezone || undefined;
+      const { dailyResetService } = await import("./daily-reset-system.js");
+      await dailyResetService.checkAndResetDailyQuests(userId, userTimezone);
       
       if (!user) {
         return res.status(404).json({ error: "User not found" });
@@ -904,18 +909,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = currentUserId; // Use the current logged-in user
       
-      // Get progress with automatic daily reset based on user's timezone
+      // Get user's timezone
+      const user = await storage.getUser(userId);
+      const userTimezone = user?.timezone || undefined;
+      
+      // Import the daily reset service and check for daily reset/auto streak freeze
+      const { dailyResetService } = await import("./daily-reset-system.js");
+      await dailyResetService.checkAndResetDailyQuests(userId, userTimezone);
+      
+      // Get progress after potential reset
       const progress = await storage.getDailyProgress(userId);
       
       if (progress) {
         res.json(progress);
       } else {
-        // Get user's timezone for current date
-        const user = await storage.getUser(userId);
-        const userTimezone = user?.timezone || undefined;
-        
-        // Import the daily reset service properly
-        const { dailyResetService } = await import("./daily-reset-system.js");
         const today = dailyResetService.getCurrentDateForUser(userTimezone);
         
         res.json({

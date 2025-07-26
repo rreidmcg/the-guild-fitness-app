@@ -42,6 +42,7 @@ Preferred communication style: Simple, everyday language.
 - **Activity Tracking**: Workouts, battles, and streak freezes count as activity to prevent atrophy
 - **New User Protection**: 7-day immunity period for new players to learn the system
 - **Streak Freeze Integration**: Existing streak freezes can be used to prevent atrophy
+- **Auto Streak Freeze**: Automatically applies streak freeze at 12:00 AM local time if player has freezes and didn't meet daily requirements
 - **Real-time Warnings**: UI components alert players when they're at risk of stat loss
 
 ### Authentication & User Management
@@ -171,6 +172,20 @@ Preferred communication style: Simple, everyday language.
 The application follows a monorepo structure with shared TypeScript schemas between frontend and backend, ensuring type safety across the entire stack. The gaming theme is implemented through custom CSS variables and a comprehensive UI component system built on Radix UI primitives.
 
 # Recent Changes
+
+**January 26, 2025:**
+- **Implemented Auto Streak Freeze System**: Streak freezes now automatically apply at 12:00 AM local time
+  - Players with available streak freezes who didn't meet daily requirements (2/4 quests OR 1 workout) get automatic protection
+  - Integrated with existing daily reset system for timezone-aware midnight processing
+  - Auto freeze maintains streak continuity without manual intervention
+  - Reduces penalty for players who invest in streak freeze items
+- **Enhanced Background Music System**: Fixed multiple audio instances playing simultaneously
+  - Converted from multiple hook instances to single context provider
+  - Speaker button now shows VolumeX when muted, Volume2 when playing
+  - Positioned speaker control in currency header left side
+- **UI Improvements**: Made atrophy warning more compact and less intrusive
+  - Reduced padding, text sizes, and icon dimensions
+  - Shortened warning text while preserving essential information
 
 **January 25, 2025:**
 - Fixed critical application startup errors and undefined data access issues

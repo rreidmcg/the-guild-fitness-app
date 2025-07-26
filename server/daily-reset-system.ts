@@ -4,13 +4,14 @@
  */
 
 import { db } from "./db.js";
-import { dailyProgress, users } from "../shared/schema.js";
-import { eq, and } from "drizzle-orm";
+import { dailyProgress, users, workoutSessions } from "../shared/schema.js";
+import { eq, and, sql } from "drizzle-orm";
 
 export interface DailyResetService {
   checkAndResetDailyQuests(userId: number, userTimezone?: string): Promise<boolean>;
   getCurrentDateForUser(userTimezone?: string): string;
   shouldResetForUser(userId: number, userTimezone?: string): Promise<boolean>;
+  checkAndApplyAutoStreakFreeze(userId: number, userTimezone?: string): Promise<boolean>;
 }
 
 export class DailyResetSystem implements DailyResetService {
@@ -86,6 +87,9 @@ export class DailyResetSystem implements DailyResetService {
       const shouldReset = await this.shouldResetForUser(userId, userTimezone);
       
       if (shouldReset) {
+        // Before creating new day, check if auto streak freeze should be applied
+        await this.checkAndApplyAutoStreakFreeze(userId, userTimezone);
+        
         // Create a fresh daily progress entry for today
         await db.insert(dailyProgress).values({
           userId,
@@ -103,6 +107,81 @@ export class DailyResetSystem implements DailyResetService {
     }
 
     return false; // No reset needed
+  }
+
+  /**
+   * Check if player failed to meet streak requirements yesterday and auto-apply streak freeze if available
+   * Returns true if a streak freeze was automatically applied
+   */
+  async checkAndApplyAutoStreakFreeze(userId: number, userTimezone?: string): Promise<boolean> {
+    try {
+      // Get yesterday's date
+      const now = new Date();
+      now.setDate(now.getDate() - 1);
+      const yesterdayDate = this.getCurrentDateForUser(userTimezone).split('T')[0];
+      
+      // Calculate yesterday properly using user timezone
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      // Get user info
+      const user = await db.select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      
+      if (!user[0] || (user[0].streakFreezeCount ?? 0) <= 0) {
+        return false; // No user or no streak freezes available
+      }
+
+      // Get yesterday's progress
+      const yesterdayProgress = await db.select()
+        .from(dailyProgress)
+        .where(and(
+          eq(dailyProgress.userId, userId),
+          eq(dailyProgress.date, yesterdayStr)
+        ))
+        .limit(1);
+
+      // Get yesterday's workouts
+      const yesterdayWorkouts = await db.select()
+        .from(workoutSessions)
+        .where(and(
+          eq(workoutSessions.userId, userId),
+          eq(sql`DATE(${workoutSessions.completedAt})`, yesterdayStr)
+        ));
+
+      // Check if streak requirements were met yesterday
+      const completedQuests = yesterdayProgress[0] ? [
+        yesterdayProgress[0].hydration,
+        yesterdayProgress[0].steps,
+        yesterdayProgress[0].protein,
+        yesterdayProgress[0].sleep
+      ].filter(Boolean).length : 0;
+
+      const streakRequirementMet = completedQuests >= 2 || yesterdayWorkouts.length > 0;
+
+      // If requirements weren't met and user has an active streak, auto-apply freeze
+      if (!streakRequirementMet && user[0].currentStreak && user[0].currentStreak > 0) {
+        // Apply streak freeze automatically
+        await db.update(users)
+          .set({
+            streakFreezeCount: (user[0].streakFreezeCount ?? 0) - 1,
+            lastActivityDate: yesterdayStr, // Mark activity for yesterday to maintain streak
+            lastStreakDate: yesterdayStr  // Maintain streak date
+          })
+          .where(eq(users.id, userId));
+
+        console.log(`Auto-applied streak freeze for user ${userId} to maintain ${user[0].currentStreak}-day streak`);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error(`Error in auto streak freeze for user ${userId}:`, error);
+      return false;
+    }
   }
 
   /**
