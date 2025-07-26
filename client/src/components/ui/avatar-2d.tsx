@@ -1,6 +1,6 @@
 import { User } from "@shared/schema";
 import maleAvatarImage from "@assets/IMG_3682_1753213695174.png";
-const maleAvatarVariant = "/male-avatar-variant.svg";
+import maleAvatarSpiky from "@assets/male-avatar-spiky.png";
 import femaleAvatarImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
 import gmAvatarImage from "@assets/B2F9A210-A9F6-446D-8599-3F94975381BA_1753500652794.png";
 import robCustomAvatar1 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753558358031.jpeg";
@@ -60,7 +60,7 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
       ? getCustomAvatar(playerData.customAvatarUrl) || (playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage)
       : playerData?.gender === "female" 
         ? femaleAvatarImage 
-        : (playerData?.hairColor === "#000000" ? maleAvatarVariant : maleAvatarImage); // Use variant for black hair
+        : (playerData?.hairColor === "#000000" ? maleAvatarSpiky : maleAvatarImage); // Use spiky hair for black hair
 
   // Calculate fitness effects for visual overlays
   const muscleDefinition = Math.min(strength / 20, 1);
@@ -147,8 +147,8 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
           }}
           onError={(e) => {
             console.error('Avatar image failed to load:', avatarImage);
-            // Fallback to default male avatar if variant fails
-            if (avatarImage === maleAvatarVariant) {
+            // Fallback to default male avatar if spiky variant fails
+            if (avatarImage === maleAvatarSpiky) {
               (e.target as HTMLImageElement).src = maleAvatarImage;
             }
           }}
