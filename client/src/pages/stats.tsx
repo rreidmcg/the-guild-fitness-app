@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { StatBar } from "@/components/ui/stat-bar";
-import { EnhancedStatBar } from "@/components/ui/enhanced-stat-bar";
+
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { AtrophyWarning } from "@/components/ui/atrophy-warning";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -628,29 +628,61 @@ export default function Stats() {
               </div>
             </div>
 
-            {/* Character Stats - XP Progress Bars */}
-            <div className="space-y-4">
-              <EnhancedStatBar
-                label="Strength"
-                statLevel={safeUserStats.strength || 0}
-                totalXp={safeUserStats.strengthXp || 0}
-                color="text-red-400"
-                icon={<Dumbbell className="w-5 h-5" />}
-              />
-              <EnhancedStatBar
-                label="Stamina"
-                statLevel={safeUserStats.stamina || 0}
-                totalXp={safeUserStats.staminaXp || 0}
-                color="text-yellow-400"
-                icon={<Heart className="w-5 h-5" />}
-              />
-              <EnhancedStatBar
-                label="Agility"
-                statLevel={safeUserStats.agility || 0}
-                totalXp={safeUserStats.agilityXp || 0}
-                color="text-green-400"
-                icon={<Zap className="w-5 h-5" />}
-              />
+            {/* Character Stats - Simple Display */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="bg-card border border-border rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-red-400">
+                      <Dumbbell className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Strength</h4>
+                      <p className="text-sm text-muted-foreground">Physical power and lifting ability</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-red-400">{safeUserStats.strength || 0}</div>
+                    <div className="text-xs text-muted-foreground">Current Level</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-card border border-border rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-yellow-400">
+                      <Heart className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Stamina</h4>
+                      <p className="text-sm text-muted-foreground">Endurance and cardiovascular fitness</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-yellow-400">{safeUserStats.stamina || 0}</div>
+                    <div className="text-xs text-muted-foreground">Current Level</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-card border border-border rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="text-green-400">
+                      <Zap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Agility</h4>
+                      <p className="text-sm text-muted-foreground">Speed, balance, and coordination</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-green-400">{safeUserStats.agility || 0}</div>
+                    <div className="text-xs text-muted-foreground">Current Level</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
