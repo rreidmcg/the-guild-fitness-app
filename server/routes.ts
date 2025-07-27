@@ -592,8 +592,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .where(eq(users.id, userId));
           
         if (userWithStats && userWithStats.currentHp !== null) {
-          currentHp = userWithStats.currentHp;
-          currentMp = userWithStats.currentMp || maxMp;
+          // Fix legacy data: ensure current HP/MP doesn't exceed new max values
+          // This handles cases where stats were reduced (like after stat squish)
+          currentHp = Math.min(userWithStats.currentHp, maxHp);
+          currentMp = Math.min(userWithStats.currentMp || maxMp, maxMp);
+          
+          // If values were capped, update database with corrected values
+          const needsHpUpdate = userWithStats.currentHp > maxHp;
+          const needsMpUpdate = (userWithStats.currentMp || 0) > maxMp;
+          
+          if (needsHpUpdate || needsMpUpdate) {
+            console.log(`Fixing legacy HP/MP data: HP ${userWithStats.currentHp} -> ${currentHp}, MP ${userWithStats.currentMp} -> ${currentMp}`);
+            const updateData: any = {};
+            if (needsHpUpdate) updateData.currentHp = currentHp;
+            if (needsMpUpdate) updateData.currentMp = currentMp;
+            
+            await db.update(users)
+              .set(updateData)
+              .where(eq(users.id, userId));
+          }
           
           const currentTime = Date.now();
           
