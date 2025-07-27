@@ -305,7 +305,7 @@ export default function WorkoutBuilder() {
         </div>
       </div>
 
-      <div className="p-6 max-w-4xl mx-auto space-y-6 pb-24">
+      <div className="p-6 max-w-4xl mx-auto space-y-6 pb-32">
         <div>
           <Label className="text-sm font-medium text-muted-foreground mb-2 block">SECTION NAME</Label>
           <Input
@@ -420,8 +420,8 @@ export default function WorkoutBuilder() {
           </div>
         )}
 
-        {/* Fixed bottom buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 z-50">
+        {/* Fixed bottom buttons - Always visible above bottom nav */}
+        <div className="fixed bottom-16 left-0 right-0 bg-background border-t border-border p-4 z-50">
           <div className="max-w-4xl mx-auto flex space-x-3">
             <Button 
               onClick={() => {
@@ -440,13 +440,10 @@ export default function WorkoutBuilder() {
               className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
               disabled={!currentSection?.name?.trim()}
             >
-              Save
+              Save Section
             </Button>
           </div>
         </div>
-        
-        {/* Bottom padding to prevent content from being hidden behind fixed buttons */}
-        <div className="h-20"></div>
       </div>
     </div>
   );
@@ -522,8 +519,8 @@ export default function WorkoutBuilder() {
           </div>
         </div>
 
-        {/* Fixed Add Exercise Button */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 z-50">
+        {/* Fixed Add Exercise Button - Above bottom nav */}
+        <div className="fixed bottom-16 left-0 right-0 bg-background border-t border-border p-4 z-50">
           <div className="max-w-4xl mx-auto">
             <Button 
               onClick={handleAddSelectedExercises}
