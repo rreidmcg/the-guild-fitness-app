@@ -26,13 +26,13 @@ export function useTimezone() {
     // Auto-detect and set user's timezone on first app load
     const detectAndSetTimezone = async () => {
       try {
-        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        // Only set timezone if we haven't set it before (check localStorage)
+        const hasSetTimezone = localStorage.getItem('timezoneSet');
         
-        if (userTimezone) {
-          // Only set timezone if we haven't set it before (check localStorage)
-          const hasSetTimezone = localStorage.getItem('timezoneSet');
+        if (!hasSetTimezone) {
+          const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           
-          if (!hasSetTimezone) {
+          if (userTimezone) {
             await setTimezoneMutation.mutateAsync(userTimezone);
             localStorage.setItem('timezoneSet', 'true');
             console.log(`Timezone automatically set to: ${userTimezone}`);
@@ -44,7 +44,7 @@ export function useTimezone() {
     };
 
     detectAndSetTimezone();
-  }, [setTimezoneMutation]);
+  }, []); // Remove setTimezoneMutation dependency to prevent infinite loops
 
   return {
     setTimezone: setTimezoneMutation.mutateAsync,

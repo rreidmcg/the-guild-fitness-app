@@ -96,12 +96,7 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
 
         
 
-        {/* Fitness accessories based on level */}
-        {level >= 5 && (
-          <div className="absolute bottom-2 left-2">
-            <div className="w-2 h-2 bg-red-500 rounded-full shadow-lg animate-pulse" title="Fitness Gear Unlocked" />
-          </div>
-        )}
+        {/* Fitness accessories based on level - REMOVED red dot indicator */}
 
         {level >= 10 && (
           <div className="absolute top-2 left-2">

@@ -35,6 +35,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Stats} />
+      <Route path="/stats" component={Stats} />
       <Route path="/workouts" component={Workouts} />
       <Route path="/workout-recommendations" component={WorkoutRecommendationsPage} />
       <Route path="/inventory" component={Inventory} />
