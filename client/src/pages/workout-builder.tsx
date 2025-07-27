@@ -72,7 +72,10 @@ export default function WorkoutBuilder() {
 
   const createWorkoutMutation = useMutation({
     mutationFn: async (workoutData: any) => {
-      const response = await apiRequest("POST", "/api/workouts", workoutData);
+      const response = await apiRequest("/api/workouts", {
+        method: "POST",
+        body: JSON.stringify(workoutData)
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -450,7 +453,7 @@ export default function WorkoutBuilder() {
 
   // Step 4: Exercise Selection
   const renderExerciseSelection = () => {
-    const filteredExercises = exercises.filter((exercise: Exercise) => 
+    const filteredExercises = (exercises as Exercise[]).filter((exercise: Exercise) => 
       exercise.name.toLowerCase().includes(exerciseSearch.toLowerCase()) ||
       exercise.muscleGroups.some((mg: string) => mg.toLowerCase().includes(exerciseSearch.toLowerCase()))
     );
@@ -553,7 +556,7 @@ export default function WorkoutBuilder() {
 
     // Add selected exercises to current section
     const exercisesToAdd = selectedExercises.map(exerciseId => {
-      const exercise = exercises.find((ex: Exercise) => ex.id === exerciseId);
+      const exercise = (exercises as Exercise[]).find((ex: Exercise) => ex.id === exerciseId);
       return {
         id: Date.now().toString() + Math.random(),
         exerciseId,
