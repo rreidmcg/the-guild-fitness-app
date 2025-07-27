@@ -30,6 +30,7 @@ import Subscribe from "@/pages/subscribe";
 import MailPage from "@/pages/mail";
 import Social from "@/pages/social";
 import NotFound from "@/pages/not-found";
+import Achievements from "@/pages/achievements";
 
 function Router() {
   return (
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/shop" component={Shop} />
       <Route path="/profile" component={Profile} />
       <Route path="/leaderboard" component={Leaderboard} />
+      <Route path="/achievements" component={Achievements} />
       <Route path="/signup" component={SignupPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AdminDashboard} />

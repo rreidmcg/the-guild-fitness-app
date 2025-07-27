@@ -16,6 +16,11 @@ export function CurrencyHeader() {
     queryKey: ["/api/user/stats"],
   });
 
+  // Fetch mail to check for unread count  
+  const { data: mail } = useQuery({
+    queryKey: ["/api/mail"],
+  });
+
 
 
   return (
@@ -58,10 +63,13 @@ export function CurrencyHeader() {
               </button>
               <button
                 onClick={() => navigate('/mail')}
-                className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"
+                className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors relative"
                 title="Mail"
               >
                 <Mail className="w-4 h-4 text-muted-foreground" />
+                {Array.isArray(mail) && mail.filter((m: any) => !m.isRead).length > 0 && (
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                )}
               </button>
               <button
                 onClick={() => navigate('/settings')}
