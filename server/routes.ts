@@ -1920,6 +1920,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add endpoint to recalculate user level with new XP formula
+  app.post("/api/recalculate-level", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Recalculate level based on current XP using new formula
+      const newLevel = calculateLevel(user.experience || 0);
+      
+      // Update user's level in database
+      await storage.updateUser(userId, { level: newLevel });
+      
+      res.json({ 
+        message: "Level recalculated successfully",
+        oldLevel: user.level,
+        newLevel: newLevel,
+        experience: user.experience 
+      });
+    } catch (error) {
+      console.error("Level recalculation error:", error);
+      res.status(500).json({ error: "Failed to recalculate level" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
@@ -1964,3 +1991,5 @@ function calculateLevel(experience: number): number {
   
   return level - 1;
 }
+
+export { calculateLevel };
