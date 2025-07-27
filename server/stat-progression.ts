@@ -57,10 +57,10 @@ export function calculateStatXpGains(sessionData: any): {
   const baseDuration = sessionData.duration || 30; // minutes
   const baseVolume = sessionData.totalVolume || 1000; // total weight lifted
   
-  // Calculate base XP from workout effort (balanced for proper progression)
-  // Duration: 1 XP per minute, Volume: 0.01 XP per pound lifted
-  const durationXp = baseDuration * 8; // 8 XP per minute (240 XP for 30 min workout)
-  const volumeXp = Math.floor(baseVolume * 0.05); // 50 XP for 1000 lbs total volume
+  // Calculate base XP from workout effort (reduced for slower, more realistic progression)
+  // Duration: reduced XP per minute, Volume: reduced XP per pound lifted
+  const durationXp = baseDuration * 3; // 3 XP per minute (90 XP for 30 min workout)
+  const volumeXp = Math.floor(baseVolume * 0.02); // 20 XP for 1000 lbs total volume
   const baseXp = durationXp + volumeXp;
   
   // Distribute XP based on workout type with realistic athletic focus

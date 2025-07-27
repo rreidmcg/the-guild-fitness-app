@@ -179,7 +179,10 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - Formula: level^2.5 × 50 creates strong diminishing returns mimicking real strength gains
   - Early levels are fast (noob gains), later levels require exponentially more effort
 - **Balanced XP Distribution**: Realistic workout focus with 50% Strength, 30% Stamina, 20% Agility XP gains
-- **Athletic Realism**: Level 12 strength after 1 year vs old system's unrealistic 2,350 stat points
+- **Reduced Progression Rate**: Decreased XP gains by 62% for slower, more satisfying progression
+  - Strength: 60 XP per workout, Stamina: 36 XP, Agility: 24 XP
+  - Level 10 strength now takes ~68 weeks (1.3 years) instead of being trivial
+- **Athletic Realism**: Level 9 strength after 1 year vs old system's unrealistic 2,350 stat points
 - **Database Integration**: Utilizes existing strengthXp, staminaXp, agilityXp fields for proper progression tracking
 
 **January 27, 2025 - MailerLite Integration & Liability Protection:**
