@@ -228,9 +228,9 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 - **Rebalanced XP Progression System**: Exponential leveling curve for long-term engagement
   - Level 50 now takes exactly 52 weeks (1 year) of consistent training (3 workouts/week)
   - Level 100 takes ~3.6 years, creating meaningful long-term progression
-  - Reduced per-workout XP from ~2,880 to ~576 to slow progression appropriately
+  - **Complete XP Stat Squish**: Reduced all XP numbers by 80% for cleaner, more readable progression
+  - Character XP: Formula `level^1.8 × 16` (was 82) - Level 5 now needs 194 XP instead of 994 XP
   - Early levels still progress quickly for new user satisfaction
-  - Formula: `level^1.8 × 82` creates perfect balance of early satisfaction and long-term goals
 - **Enhanced Performance & Error Handling**: Complete loading states and error boundaries system
   - Added comprehensive loading spinner and loading state components
   - Implemented error boundary with fallback UI and retry functionality
