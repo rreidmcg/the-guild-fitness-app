@@ -630,36 +630,33 @@ export default function Stats() {
 
             {/* Character Stats - Simple Display */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-card border border-border rounded-lg p-3">
+              <div className="bg-card border border-border rounded-lg p-4">
                 <div className="text-center">
-                  <div className="text-red-400 mb-2">
+                  <div className="text-red-400 mb-3">
                     <Dumbbell className="w-8 h-8 mx-auto" />
                   </div>
-                  <h4 className="font-semibold text-foreground mb-1">Strength</h4>
-                  <div className="text-2xl font-bold text-red-400 mb-1">{safeUserStats.strength || 0}</div>
-                  <div className="text-xs text-muted-foreground">Current Level</div>
+                  <h4 className="font-semibold text-foreground mb-2">Strength</h4>
+                  <div className="text-3xl font-bold text-red-400">{safeUserStats.strength || 0}</div>
                 </div>
               </div>
               
-              <div className="bg-card border border-border rounded-lg p-3">
+              <div className="bg-card border border-border rounded-lg p-4">
                 <div className="text-center">
-                  <div className="text-yellow-400 mb-2">
+                  <div className="text-yellow-400 mb-3">
                     <Heart className="w-8 h-8 mx-auto" />
                   </div>
-                  <h4 className="font-semibold text-foreground mb-1">Stamina</h4>
-                  <div className="text-2xl font-bold text-yellow-400 mb-1">{safeUserStats.stamina || 0}</div>
-                  <div className="text-xs text-muted-foreground">Current Level</div>
+                  <h4 className="font-semibold text-foreground mb-2">Stamina</h4>
+                  <div className="text-3xl font-bold text-yellow-400">{safeUserStats.stamina || 0}</div>
                 </div>
               </div>
               
-              <div className="bg-card border border-border rounded-lg p-3">
+              <div className="bg-card border border-border rounded-lg p-4">
                 <div className="text-center">
-                  <div className="text-green-400 mb-2">
+                  <div className="text-green-400 mb-3">
                     <Zap className="w-8 h-8 mx-auto" />
                   </div>
-                  <h4 className="font-semibold text-foreground mb-1">Agility</h4>
-                  <div className="text-2xl font-bold text-green-400 mb-1">{safeUserStats.agility || 0}</div>
-                  <div className="text-xs text-muted-foreground">Current Level</div>
+                  <h4 className="font-semibold text-foreground mb-2">Agility</h4>
+                  <div className="text-3xl font-bold text-green-400">{safeUserStats.agility || 0}</div>
                 </div>
               </div>
             </div>
