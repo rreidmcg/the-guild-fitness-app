@@ -210,10 +210,10 @@ export default function Stats() {
   const currentXP = safeUserStats.experience || 0;
   const currentLevel = safeUserStats.level || 1;
   
-  // Calculate XP for next level using squished formula
+  // Use the EXACT same formula as backend: level^1.8 * 16
   const getXpRequiredForLevel = (level: number): number => {
     if (level <= 1) return 0;
-    return Math.floor(Math.pow(level - 1, 1.8) * 16);
+    return Math.floor(Math.pow(level, 1.8) * 16);
   };
   
   const xpForCurrentLevel = getXpRequiredForLevel(currentLevel);

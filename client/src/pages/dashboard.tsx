@@ -36,16 +36,16 @@ export default function Dashboard() {
     queryKey: ["/api/personal-records"],
   });
 
-  const recentSessions = workoutSessions?.slice(0, 3) || [];
-  const topRecords = personalRecords?.slice(0, 4) || [];
+  const recentSessions = Array.isArray(workoutSessions) ? workoutSessions.slice(0, 3) : [];
+  const topRecords = Array.isArray(personalRecords) ? personalRecords.slice(0, 4) : [];
 
   // Calculate active days
   const calculateActiveDays = () => {
-    if (!workoutSessions || workoutSessions.length === 0) return 0;
+    if (!Array.isArray(workoutSessions) || workoutSessions.length === 0) return 0;
     
     // Get unique dates from workout sessions
     const uniqueDates = new Set(
-      workoutSessions.map(session => {
+      workoutSessions.map((session: any) => {
         const date = new Date(session.completedAt);
         return date.toDateString(); // This gives us "Mon Oct 09 2023" format
       })
@@ -60,11 +60,26 @@ export default function Dashboard() {
   const streak = 7; // TODO: Calculate actual streak
   const totalVolumeThisMonth = 45280; // TODO: Calculate actual volume
 
-  // Calculate XP progress
-  const currentXP = userStats?.experience || 0;
-  const currentLevel = userStats?.level || 1;
-  const xpForNextLevel = currentLevel * 1000;
-  const xpProgress = (currentXP % 1000) / 1000 * 100;
+  // Calculate XP progress using correct formula
+  const safeUserStats = (userStats as any) || {};
+  const currentXP = safeUserStats.experience || 0;
+  const currentLevel = safeUserStats.level || 1;
+  
+  // Use the EXACT same formula as backend: level^1.8 * 16
+  const getXpForLevel = (level: number) => {
+    if (level <= 1) return 0;
+    return Math.floor(Math.pow(level, 1.8) * 16);
+  };
+  // Calculate progress using BACKEND logic
+  // Backend uses: if (experience < nextLevelXP) return currentLevel
+  // So Level 9 means: 675 <= XP < 835
+  const xpForCurrentLevel = getXpForLevel(currentLevel); // XP needed to START current level
+  const xpForNextLevel = getXpForLevel(currentLevel + 1); // XP needed to START next level
+  
+  // Progress within current level (this is what the progress bar shows)
+  const xpInCurrentLevel = currentXP - xpForCurrentLevel;
+  const xpNeededForLevel = xpForNextLevel - xpForCurrentLevel;
+  const xpProgress = xpNeededForLevel > 0 ? (xpInCurrentLevel / xpNeededForLevel) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -230,26 +245,20 @@ export default function Dashboard() {
                   <StatBar 
                     icon={<Dumbbell className="w-4 h-4 text-red-400" />}
                     name="Strength"
-                    value={userStats?.strength || 0}
+                    value={safeUserStats.strength || 0}
                     color="from-red-500 to-red-400"
                   />
                   <StatBar 
                     icon={<Heart className="w-4 h-4 text-green-400" />}
                     name="Stamina"
-                    value={userStats?.stamina || 0}
+                    value={safeUserStats.stamina || 0}
                     color="from-green-500 to-green-400"
                   />
                   <StatBar 
                     icon={<Zap className="w-4 h-4 text-purple-400" />}
-                    name="Flexibility"
-                    value={userStats?.flexibility || 0}
+                    name="Agility"
+                    value={safeUserStats.agility || 0}
                     color="from-purple-500 to-purple-400"
-                  />
-                  <StatBar 
-                    icon={<Target className="w-4 h-4 text-blue-400" />}
-                    name="Endurance"
-                    value={userStats?.endurance || 0}
-                    color="from-blue-500 to-blue-400"
                   />
                 </div>
               </CardContent>
