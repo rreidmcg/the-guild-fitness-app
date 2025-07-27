@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { validateUsername, formatUsernameInput } from "@/utils/username-validation";
+import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -40,6 +41,8 @@ export default function SignupPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [step, setStep] = useState(1);
+  const [showLiabilityWaiver, setShowLiabilityWaiver] = useState(false);
+  const [pendingSignupData, setPendingSignupData] = useState<SignupForm | null>(null);
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -83,26 +86,10 @@ export default function SignupPage() {
       
       return result;
     },
-    onSuccess: (data) => {
-      queryClient.clear();
-      
-      if (data.emailVerificationSent) {
-        toast({
-          title: "Account created successfully!",
-          description: "Please check your email to verify your account before logging in.",
-        });
-        setLocation("/login");
-      } else {
-        // If no email verification was sent, proceed to login directly
-        if (data.user) {
-          localStorage.setItem('user_data', JSON.stringify(data.user));
-        }
-        toast({
-          title: "Account created successfully!",
-          description: "Welcome to Dumbbells & Dragons! You can now start your fitness journey.",
-        });
-        setLocation("/");
-      }
+    onSuccess: (data, variables) => {
+      // Show liability waiver instead of proceeding directly
+      setPendingSignupData(variables);
+      setShowLiabilityWaiver(true);
     },
     onError: (error: any) => {
       toast({
@@ -112,6 +99,27 @@ export default function SignupPage() {
       });
     },
   });
+
+  const handleLiabilityWaiverAccept = () => {
+    setShowLiabilityWaiver(false);
+    queryClient.clear();
+    
+    toast({
+      title: "Account created successfully!",
+      description: "Welcome to Dumbbells & Dragons! Your liability waiver has been accepted.",
+    });
+    setLocation("/");
+  };
+
+  const handleLiabilityWaiverDecline = () => {
+    setShowLiabilityWaiver(false);
+    setPendingSignupData(null);
+    toast({
+      title: "Account creation cancelled",
+      description: "You must accept the liability waiver to use Dumbbells & Dragons.",
+      variant: "destructive",
+    });
+  };
 
   const onSubmit = (data: SignupForm) => {
     signupMutation.mutate(data);
@@ -398,6 +406,17 @@ export default function SignupPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Liability Waiver Modal */}
+      {showLiabilityWaiver && pendingSignupData && (
+        <LiabilityWaiverModal
+          isOpen={showLiabilityWaiver}
+          onAccept={handleLiabilityWaiverAccept}
+          onDecline={handleLiabilityWaiverDecline}
+          userName={pendingSignupData.username}
+          userEmail={pendingSignupData.email}
+        />
+      )}
     </div>
   );
 }

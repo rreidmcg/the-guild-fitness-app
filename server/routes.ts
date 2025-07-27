@@ -10,6 +10,7 @@ import { AtrophySystem } from "./atrophy-system";
 import { calculateStatXpGains, calculateStatLevel } from "./stat-progression";
 import { workoutValidator } from "./workout-validation";
 import { workoutRecommendationEngine } from "./workout-recommendations";
+import { sendEmail, generateLiabilityWaiverEmail, generateAdminWaiverNotification } from "./email-service";
 import Stripe from "stripe";
 
 // Simple in-memory session storage (in production, use proper session management)
@@ -1824,6 +1825,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(monsters);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch monsters" });
+    }
+  });
+
+  // Liability waiver acceptance route
+  app.post("/api/accept-liability-waiver", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const { fullName, email, ipAddress, userAgent } = req.body;
+
+      if (!fullName || !email) {
+        return res.status(400).json({ error: "Full name and email are required" });
+      }
+
+      // Create liability waiver record
+      await storage.createLiabilityWaiver({
+        userId,
+        fullName,
+        email,
+        ipAddress: ipAddress || 'unknown',
+        userAgent: userAgent || 'unknown',
+        waiverVersion: '1.0'
+      });
+
+      // Update user's liability waiver status
+      await storage.updateUserLiabilityWaiverStatus(userId, true, ipAddress);
+
+      // Send confirmation email to user
+      try {
+        const userEmailHtml = generateLiabilityWaiverEmail(fullName, email);
+        await sendEmail({
+          to: email,
+          subject: "Liability Waiver Confirmation - Dumbbells & Dragons",
+          html: userEmailHtml
+        });
+
+        // Send notification to admin
+        const adminEmailHtml = generateAdminWaiverNotification(fullName, email, ipAddress || 'unknown', userAgent || 'unknown');
+        await sendEmail({
+          to: "coachreidmcg@gmail.com",
+          subject: "New Liability Waiver Signed - Dumbbells & Dragons",
+          html: adminEmailHtml
+        });
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
+        // Don't fail the waiver acceptance if email fails
+      }
+
+      res.json({ success: true, message: "Liability waiver accepted successfully" });
+    } catch (error) {
+      console.error("Liability waiver acceptance error:", error);
+      res.status(500).json({ error: "Failed to process liability waiver" });
     }
   });
 

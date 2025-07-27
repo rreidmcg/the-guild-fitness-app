@@ -173,6 +173,21 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 27, 2025 - MailerLite Integration & Liability Protection:**
+- **MailerLite Email Service Integration**: Replaced SendGrid with MailerLite for all email communications
+  - Comprehensive liability waiver system with professional HTML email templates
+  - User confirmation emails with medical disclaimers and physician consultation requirements
+  - Admin notification emails to coachreidmcg@gmail.com with detailed waiver acceptance records
+  - Integrated into signup flow requiring waiver acceptance before account activation
+  - Graceful handling when API key not configured (development mode)
+- **Enhanced Legal Protection**: Complete liability waiver system with database storage
+  - Medical disclaimers requiring physician approval before starting any exercise program
+  - Entertainment-only purpose clauses protecting against medical liability
+  - Comprehensive assumption of risk and release language
+  - IP address and user agent tracking for legal documentation
+  - Required acceptance during account creation process
+- **DEPLOYMENT REMINDER**: Set up MailerLite API key before deploying the application
+
 **January 27, 2025 - Title System Overhaul + Rarity Rebalance:**
 - **Replaced Level-Based Titles with Dungeon Rank Completion System**: Future-proofed for expansion content
   - New titles tied to completing specific dungeon ranks (E/D/C/B/A/S-rank completion)
