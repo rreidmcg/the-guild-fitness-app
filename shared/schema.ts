@@ -63,6 +63,10 @@ export const users = pgTable("users", {
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionStatus: text("subscription_status").default("inactive"), // "active", "inactive", "canceled", "past_due"
   subscriptionEndDate: timestamp("subscription_end_date"),
+  // Liability waiver fields
+  liabilityWaiverAccepted: boolean("liability_waiver_accepted").default(false),
+  liabilityWaiverAcceptedAt: timestamp("liability_waiver_accepted_at"),
+  liabilityWaiverIpAddress: text("liability_waiver_ip_address"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -475,9 +479,28 @@ export const insertSocialShareLikeSchema = createInsertSchema(socialShareLikes).
   createdAt: true,
 });
 
+// Liability waivers table for record keeping
+export const liabilityWaivers = pgTable("liability_waivers", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  acceptedAt: timestamp("accepted_at").defaultNow(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  waiverVersion: text("waiver_version").default("1.0"),
+});
+
+export const insertLiabilityWaiverSchema = createInsertSchema(liabilityWaivers).omit({
+  id: true,
+  acceptedAt: true,
+});
+
 export type PlayerMail = typeof playerMail.$inferSelect;
 export type InsertPlayerMail = z.infer<typeof insertPlayerMailSchema>;
 export type SocialShare = typeof socialShares.$inferSelect;
 export type InsertSocialShare = z.infer<typeof insertSocialShareSchema>;
 export type SocialShareLike = typeof socialShareLikes.$inferSelect;
 export type InsertSocialShareLike = z.infer<typeof insertSocialShareLikeSchema>;
+export type LiabilityWaiver = typeof liabilityWaivers.$inferSelect;
+export type InsertLiabilityWaiver = z.infer<typeof insertLiabilityWaiverSchema>;

@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -13,7 +13,8 @@ import {
   type Achievement, type InsertAchievement,
   type UserAchievement, type InsertUserAchievement,
   type SocialShare, type InsertSocialShare,
-  type SocialShareLike, type InsertSocialShareLike
+  type SocialShareLike, type InsertSocialShareLike,
+  type LiabilityWaiver, type InsertLiabilityWaiver
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -110,6 +111,11 @@ export interface IStorage {
     totalWorkouts: number;
     averageLevel: number;
   }>;
+
+  // Liability waiver operations
+  createLiabilityWaiver(waiver: InsertLiabilityWaiver): Promise<LiabilityWaiver>;
+  getUserLiabilityWaiver(userId: number): Promise<LiabilityWaiver | undefined>;
+  updateUserLiabilityWaiverStatus(userId: number, accepted: boolean, ipAddress?: string): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1204,6 +1210,35 @@ export class DatabaseStorage implements IStorage {
   async getAllMonsters() {
     // Note: monsters table not defined in current schema
     return [];
+  }
+
+  // Liability waiver operations
+  async createLiabilityWaiver(waiver: InsertLiabilityWaiver): Promise<LiabilityWaiver> {
+    const [result] = await db.insert(liabilityWaivers).values(waiver).returning();
+    return result;
+  }
+
+  async getUserLiabilityWaiver(userId: number): Promise<LiabilityWaiver | undefined> {
+    const [waiver] = await db.select().from(liabilityWaivers).where(eq(liabilityWaivers.userId, userId));
+    return waiver || undefined;
+  }
+
+  async updateUserLiabilityWaiverStatus(userId: number, accepted: boolean, ipAddress?: string): Promise<User> {
+    const updates: Partial<User> = {
+      liabilityWaiverAccepted: accepted,
+      liabilityWaiverAcceptedAt: new Date(),
+    };
+    
+    if (ipAddress) {
+      updates.liabilityWaiverIpAddress = ipAddress;
+    }
+
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
   }
 }
 
