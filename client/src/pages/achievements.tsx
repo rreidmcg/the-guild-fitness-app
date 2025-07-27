@@ -4,9 +4,15 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Trophy } from "lucide-react";
 import { useLocation } from "wouter";
 import { AchievementCard } from "@/components/ui/achievement-card";
+import { useEffect } from "react";
 
 export default function Achievements() {
   const [, setLocation] = useLocation();
+
+  // Scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Fetch user stats
   const { data: userStats } = useQuery({
@@ -30,10 +36,17 @@ export default function Achievements() {
 
   const safeUserStats = (userStats as any) || {};
 
-  // Sort achievements: unlocked first, then by difficulty (requirement)
+  // Sort achievements: most recently achieved first, then unlocked, then by difficulty
   const sortedAchievements = achievements ? [...achievements].sort((a: any, b: any) => {
     const aUnlocked = Array.isArray(userAchievements) ? userAchievements.find((ua: any) => ua.achievementId === a.id) : undefined;
     const bUnlocked = Array.isArray(userAchievements) ? userAchievements.find((ua: any) => ua.achievementId === b.id) : undefined;
+    
+    // Both unlocked: sort by most recent achievement date
+    if (aUnlocked && bUnlocked) {
+      const aDate = new Date(aUnlocked.unlockedAt || 0).getTime();
+      const bDate = new Date(bUnlocked.unlockedAt || 0).getTime();
+      return bDate - aDate; // Most recent first
+    }
     
     // Unlocked achievements first
     if (aUnlocked && !bUnlocked) return -1;
