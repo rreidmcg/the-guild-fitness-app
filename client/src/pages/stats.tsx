@@ -629,58 +629,37 @@ export default function Stats() {
             </div>
 
             {/* Character Stats - Simple Display */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-red-400">
-                      <Dumbbell className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Strength</h4>
-                      <p className="text-sm text-muted-foreground">Physical power and lifting ability</p>
-                    </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-card border border-border rounded-lg p-3">
+                <div className="text-center">
+                  <div className="text-red-400 mb-2">
+                    <Dumbbell className="w-8 h-8 mx-auto" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-red-400">{safeUserStats.strength || 0}</div>
-                    <div className="text-xs text-muted-foreground">Current Level</div>
-                  </div>
+                  <h4 className="font-semibold text-foreground mb-1">Strength</h4>
+                  <div className="text-2xl font-bold text-red-400 mb-1">{safeUserStats.strength || 0}</div>
+                  <div className="text-xs text-muted-foreground">Current Level</div>
                 </div>
               </div>
               
-              <div className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-yellow-400">
-                      <Heart className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Stamina</h4>
-                      <p className="text-sm text-muted-foreground">Endurance and cardiovascular fitness</p>
-                    </div>
+              <div className="bg-card border border-border rounded-lg p-3">
+                <div className="text-center">
+                  <div className="text-yellow-400 mb-2">
+                    <Heart className="w-8 h-8 mx-auto" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-yellow-400">{safeUserStats.stamina || 0}</div>
-                    <div className="text-xs text-muted-foreground">Current Level</div>
-                  </div>
+                  <h4 className="font-semibold text-foreground mb-1">Stamina</h4>
+                  <div className="text-2xl font-bold text-yellow-400 mb-1">{safeUserStats.stamina || 0}</div>
+                  <div className="text-xs text-muted-foreground">Current Level</div>
                 </div>
               </div>
               
-              <div className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-green-400">
-                      <Zap className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Agility</h4>
-                      <p className="text-sm text-muted-foreground">Speed, balance, and coordination</p>
-                    </div>
+              <div className="bg-card border border-border rounded-lg p-3">
+                <div className="text-center">
+                  <div className="text-green-400 mb-2">
+                    <Zap className="w-8 h-8 mx-auto" />
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-green-400">{safeUserStats.agility || 0}</div>
-                    <div className="text-xs text-muted-foreground">Current Level</div>
-                  </div>
+                  <h4 className="font-semibold text-foreground mb-1">Agility</h4>
+                  <div className="text-2xl font-bold text-green-400 mb-1">{safeUserStats.agility || 0}</div>
+                  <div className="text-xs text-muted-foreground">Current Level</div>
                 </div>
               </div>
             </div>
