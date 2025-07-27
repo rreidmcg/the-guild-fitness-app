@@ -206,10 +206,21 @@ export default function Stats() {
 
   const totalBattles = calculateTotalBattles();
   const totalVolumeThisMonth = Array.isArray(workoutSessions) ? workoutSessions.reduce((total: number, session: any) => total + (session.totalVolume || 0), 0) : 0;
+  // Import proper level calculation from game mechanics
   const currentXP = safeUserStats.experience || 0;
   const currentLevel = safeUserStats.level || 1;
-  const xpForNextLevel = currentLevel * 1000;
-  const xpProgress = (currentXP % 1000) / 1000 * 100;
+  
+  // Calculate XP for next level using squished formula
+  const getXpRequiredForLevel = (level: number): number => {
+    if (level <= 1) return 0;
+    return Math.floor(Math.pow(level - 1, 1.8) * 16);
+  };
+  
+  const xpForCurrentLevel = getXpRequiredForLevel(currentLevel);
+  const xpForNextLevel = getXpRequiredForLevel(currentLevel + 1);
+  const xpInCurrentLevel = currentXP - xpForCurrentLevel;
+  const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
+  const xpProgress = xpNeededForNextLevel > 0 ? (xpInCurrentLevel / xpNeededForNextLevel) * 100 : 0;
 
   // Calculate level title
   const getLevelTitle = (level: number) => {

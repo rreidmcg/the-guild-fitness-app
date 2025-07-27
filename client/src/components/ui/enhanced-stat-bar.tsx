@@ -18,7 +18,8 @@ interface EnhancedStatBarProps {
 // Calculate XP required for a specific stat level
 function getStatXpRequiredForLevel(level: number): number {
   if (level <= 1) return 0;
-  return Math.floor(Math.pow(level - 1, 2) * 100);
+  // Exponential formula with stat squish: level^2.5 * 10 (reduced from 50)
+  return Math.floor(Math.pow(level - 1, 2.5) * 10);
 }
 
 // Calculate stat level from total XP
