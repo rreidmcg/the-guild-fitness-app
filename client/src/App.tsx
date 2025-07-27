@@ -32,7 +32,6 @@ import MailPage from "@/pages/mail";
 import Social from "@/pages/social";
 import NotFound from "@/pages/not-found";
 import Achievements from "@/pages/achievements";
-import WorkoutHistory from "@/pages/workout-history";
 
 function Router() {
   return (
@@ -51,7 +50,6 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/achievements" component={Achievements} />
-      <Route path="/workout-history" component={WorkoutHistory} />
       <Route path="/signup" component={SignupPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AdminDashboard} />
