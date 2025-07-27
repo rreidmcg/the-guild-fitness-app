@@ -173,6 +173,15 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 27, 2025 - Realistic Stat Progression with Diminishing Returns:**
+- **Implemented XP-Based Stat Progression**: Replaced linear stat growth with realistic athletic development curve
+  - Each stat (Strength, Stamina, Agility) now uses individual XP pools with exponential level requirements
+  - Formula: level^2.5 × 50 creates strong diminishing returns mimicking real strength gains
+  - Early levels are fast (noob gains), later levels require exponentially more effort
+- **Balanced XP Distribution**: Realistic workout focus with 50% Strength, 30% Stamina, 20% Agility XP gains
+- **Athletic Realism**: Level 12 strength after 1 year vs old system's unrealistic 2,350 stat points
+- **Database Integration**: Utilizes existing strengthXp, staminaXp, agilityXp fields for proper progression tracking
+
 **January 27, 2025 - MailerLite Integration & Liability Protection:**
 - **MailerLite Email Service Integration**: Replaced SendGrid with MailerLite for all email communications
   - Comprehensive liability waiver system with professional HTML email templates

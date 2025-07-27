@@ -412,21 +412,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const session = await storage.createWorkoutSession(sessionData);
       
-      // Update user stats with the XP and stat gains
+      // Update user stats with the XP and stat gains using proper progression system
       const newExperience = (user.experience || 0) + sessionData.xpEarned;
       const newLevel = calculateLevel(newExperience);
       
-      const statsEarned = sessionData.statsEarned || {};
-      const strengthGain = statsEarned.strength || 0;
-      const staminaGain = statsEarned.stamina || 0;
-      const agilityGain = statsEarned.agility || 0;
+      // Calculate XP gains for each stat based on workout
+      const statXpGains = calculateStatXpGains(sessionData);
+      
+      // Update stat XP and recalculate actual stat levels
+      const newStrengthXp = (user.strengthXp || 0) + statXpGains.strengthXp;
+      const newStaminaXp = (user.staminaXp || 0) + statXpGains.staminaXp;
+      const newAgilityXp = (user.agilityXp || 0) + statXpGains.agilityXp;
+      
+      // Calculate new stat levels from XP using diminishing returns
+      const newStrength = calculateStatLevel(newStrengthXp);
+      const newStamina = calculateStatLevel(newStaminaXp);
+      const newAgility = calculateStatLevel(newAgilityXp);
       
       await storage.updateUser(userId, {
         experience: newExperience,
         level: newLevel,
-        strength: (user.strength || 0) + strengthGain,
-        stamina: (user.stamina || 0) + staminaGain,
-        agility: (user.agility || 0) + agilityGain,
+        // Update both XP and calculated stat levels
+        strengthXp: newStrengthXp,
+        staminaXp: newStaminaXp,
+        agilityXp: newAgilityXp,
+        strength: newStrength,
+        stamina: newStamina,
+        agility: newAgility,
       });
       
       // Update streak after completing workout
@@ -447,7 +459,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           suspicious: [],
           confidence: "high"
         },
-        statsEarned: sessionData.statsEarned,
+        statsEarned: {
+          strength: statXpGains.strengthXp,
+          stamina: statXpGains.staminaXp,
+          agility: statXpGains.agilityXp
+        },
         name: sessionData.name || "Workout Session",
         newAchievements: newAchievements
       });
