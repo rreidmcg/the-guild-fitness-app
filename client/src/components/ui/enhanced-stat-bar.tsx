@@ -51,7 +51,15 @@ function getStatProgress(totalXp: number): StatProgress {
 }
 
 export function EnhancedStatBar({ label, statLevel, totalXp, color, icon }: EnhancedStatBarProps) {
-  const progress = getStatProgress(totalXp);
+  // Use statLevel directly if totalXp is 0 (for backward compatibility)
+  const actualLevel = totalXp > 0 ? calculateStatLevel(totalXp) : statLevel;
+  const progress = totalXp > 0 ? getStatProgress(totalXp) : {
+    level: statLevel,
+    currentXp: 0,
+    xpToNextLevel: getStatXpRequiredForLevel(statLevel + 1) - getStatXpRequiredForLevel(statLevel),
+    totalXpForCurrentLevel: getStatXpRequiredForLevel(statLevel + 1) - getStatXpRequiredForLevel(statLevel)
+  };
+  
   const progressPercentage = progress.totalXpForCurrentLevel > 0 
     ? (progress.currentXp / progress.totalXpForCurrentLevel) * 100 
     : 0;
@@ -66,9 +74,13 @@ export function EnhancedStatBar({ label, statLevel, totalXp, color, icon }: Enha
           <span className="font-semibold text-foreground">{label}</span>
         </div>
         <div className="text-right">
-          <div className="text-lg font-bold text-foreground">Lv.{progress.level}</div>
+          <div className="text-lg font-bold text-foreground">Lv.{actualLevel}</div>
           <div className="text-xs text-muted-foreground">
-            {progress.currentXp.toLocaleString()} / {(progress.currentXp + progress.xpToNextLevel).toLocaleString()} XP
+            {totalXp > 0 ? (
+              `${progress.currentXp.toLocaleString()} / ${(progress.currentXp + progress.xpToNextLevel).toLocaleString()} XP`
+            ) : (
+              `Level ${actualLevel} (Legacy System)`
+            )}
           </div>
         </div>
       </div>
@@ -82,8 +94,17 @@ export function EnhancedStatBar({ label, statLevel, totalXp, color, icon }: Enha
           }}
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{progress.currentXp.toLocaleString()} XP</span>
-          <span>{progress.xpToNextLevel.toLocaleString()} to next level</span>
+          {totalXp > 0 ? (
+            <>
+              <span>{progress.currentXp.toLocaleString()} XP</span>
+              <span>{progress.xpToNextLevel.toLocaleString()} to next level</span>
+            </>
+          ) : (
+            <>
+              <span>Current Level: {actualLevel}</span>
+              <span>Complete workouts to gain XP</span>
+            </>
+          )}
         </div>
       </div>
     </div>
