@@ -76,10 +76,9 @@ export default function Dashboard() {
   const xpForCurrentLevel = getXpForLevel(currentLevel); // XP needed to START current level
   const xpForNextLevel = getXpForLevel(currentLevel + 1); // XP needed to START next level
   
-  // Progress within current level (this is what the progress bar shows)
-  const xpInCurrentLevel = currentXP - xpForCurrentLevel;
-  const xpNeededForLevel = xpForNextLevel - xpForCurrentLevel;
-  const xpProgress = xpNeededForLevel > 0 ? (xpInCurrentLevel / xpNeededForLevel) * 100 : 0;
+  // Progress bar should match the displayed ratio: currentXP / xpForNextLevel
+  // This makes the visual progress match what the user expects
+  const xpProgress = xpForNextLevel > 0 ? (currentXP / xpForNextLevel) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background text-foreground">

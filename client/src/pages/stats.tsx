@@ -218,9 +218,10 @@ export default function Stats() {
   
   const xpForCurrentLevel = getXpRequiredForLevel(currentLevel);
   const xpForNextLevel = getXpRequiredForLevel(currentLevel + 1);
-  const xpInCurrentLevel = currentXP - xpForCurrentLevel;
-  const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
-  const xpProgress = xpNeededForNextLevel > 0 ? (xpInCurrentLevel / xpNeededForNextLevel) * 100 : 0;
+  
+  // Progress bar should match the displayed ratio: currentXP / xpForNextLevel
+  // This makes the visual progress match what the user expects
+  const xpProgress = xpForNextLevel > 0 ? (currentXP / xpForNextLevel) * 100 : 0;
 
   // Calculate level title
   const getLevelTitle = (level: number) => {
