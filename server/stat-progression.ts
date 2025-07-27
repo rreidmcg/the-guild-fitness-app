@@ -64,11 +64,24 @@ export function calculateStatXpGains(sessionData: any): {
   const baseXp = durationXp + volumeXp;
   
   // Distribute XP based on workout type with realistic athletic focus
-  // Strength training: 50% strength, 30% stamina, 20% agility
-  // This mimics how real strength training primarily builds strength with secondary benefits
-  const strengthXp = Math.floor(baseXp * 0.50);
-  const staminaXp = Math.floor(baseXp * 0.30);
-  const agilityXp = Math.floor(baseXp * 0.20);
+  // Detect workout type based on volume vs duration ratio
+  const isCardioWorkout = baseVolume < (baseDuration * 20); // Less than 20 lbs per minute = cardio
+  
+  let strengthXp, staminaXp, agilityXp;
+  
+  if (isCardioWorkout) {
+    // Cardio workout: Running, cycling, swimming, etc.
+    // 10% strength, 70% stamina, 20% agility
+    strengthXp = Math.floor(baseXp * 0.10);
+    staminaXp = Math.floor(baseXp * 0.70);
+    agilityXp = Math.floor(baseXp * 0.20);
+  } else {
+    // Strength training: Weight lifting, resistance training
+    // 50% strength, 30% stamina, 20% agility
+    strengthXp = Math.floor(baseXp * 0.50);
+    staminaXp = Math.floor(baseXp * 0.30);
+    agilityXp = Math.floor(baseXp * 0.20);
+  }
   
   return {
     strengthXp,

@@ -180,8 +180,12 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - Early levels are fast (noob gains), later levels require exponentially more effort
 - **Balanced XP Distribution**: Realistic workout focus with 50% Strength, 30% Stamina, 20% Agility XP gains
 - **Reduced Progression Rate**: Decreased XP gains by 62% for slower, more satisfying progression
-  - Strength: 60 XP per workout, Stamina: 36 XP, Agility: 24 XP
+  - Strength training: 60 STR/36 STA/24 AGI XP per workout
+  - Cardio training: 9 STR/62 STA/18 AGI XP per workout (auto-detected by volume)
   - Level 10 strength now takes ~68 weeks (1.3 years) instead of being trivial
+- **Smart Workout Type Detection**: Automatically detects cardio vs strength training
+  - Cardio (volume < 20 lbs/min): 10% Strength, 70% Stamina, 20% Agility XP
+  - Strength (volume ≥ 20 lbs/min): 50% Strength, 30% Stamina, 20% Agility XP
 - **Athletic Realism**: Level 9 strength after 1 year vs old system's unrealistic 2,350 stat points
 - **Database Integration**: Utilizes existing strengthXp, staminaXp, agilityXp fields for proper progression tracking
 
