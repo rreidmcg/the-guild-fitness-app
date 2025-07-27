@@ -13,9 +13,9 @@ export interface StatProgress {
 // Early levels are fast (noob gains), later levels require exponentially more XP
 export function getStatXpRequiredForLevel(level: number): number {
   if (level <= 1) return 0;
-  // Exponential formula mimicking real strength gains: level^2.5 * 50
+  // Exponential formula with stat squish: level^2.5 * 10 (reduced from 50)
   // This creates strong diminishing returns like real athletic development
-  return Math.floor(Math.pow(level - 1, 2.5) * 50);
+  return Math.floor(Math.pow(level - 1, 2.5) * 10);
 }
 
 // Calculate stat level from total XP
@@ -57,10 +57,10 @@ export function calculateStatXpGains(sessionData: any): {
   const baseDuration = sessionData.duration || 30; // minutes
   const baseVolume = sessionData.totalVolume || 1000; // total weight lifted
   
-  // Calculate base XP from workout effort (reduced for slower, more realistic progression)
-  // Duration: reduced XP per minute, Volume: reduced XP per pound lifted
-  const durationXp = baseDuration * 3; // 3 XP per minute (90 XP for 30 min workout)
-  const volumeXp = Math.floor(baseVolume * 0.02); // 20 XP for 1000 lbs total volume
+  // Calculate base XP from workout effort (stat squish: smaller numbers, same progression)
+  // Duration: 0.6 XP per minute, Volume: 0.004 XP per pound lifted
+  const durationXp = baseDuration * 0.6; // 0.6 XP per minute (18 XP for 30 min workout)
+  const volumeXp = Math.floor(baseVolume * 0.004); // 4 XP for 1000 lbs total volume
   const baseXp = durationXp + volumeXp;
   
   // Distribute XP based on workout type with realistic athletic focus
