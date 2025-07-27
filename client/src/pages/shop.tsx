@@ -26,7 +26,7 @@ import { useLocation } from "wouter";
 import { useNavigate } from "@/hooks/use-navigate";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import minorHealingPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753214477623.png";
 import majorHealingPotionImage from "@assets/1860C3F1-AEFB-419D-BAB2-306C00CA6321_1753215117108.png";
 import characterImage from "@assets/263F10D0-DF8C-4E30-8FAE-9A934B3A8CB7_1753324678577.png";
@@ -399,8 +399,6 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
-      
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">

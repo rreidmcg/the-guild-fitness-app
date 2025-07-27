@@ -19,7 +19,7 @@ import {
   Lock,
   Check
 } from "lucide-react";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -177,7 +177,7 @@ export default function Wardrobe() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
+      
       
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">

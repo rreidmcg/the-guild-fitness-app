@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -362,8 +362,6 @@ export default function Inventory() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
-      
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">

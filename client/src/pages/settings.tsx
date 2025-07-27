@@ -10,7 +10,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { getTitleComponent } from "@/lib/title-rarity";
 import { 
   User, 
@@ -142,7 +142,7 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
+      
       
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">

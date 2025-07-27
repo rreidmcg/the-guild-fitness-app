@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { StatBar } from "@/components/ui/stat-bar";
 
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { AtrophyWarning } from "@/components/ui/atrophy-warning";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -237,7 +237,6 @@ export default function Stats() {
   if (userStatsLoading || workoutSessionsLoading || personalRecordsLoading || inventoryLoading || achievementsLoading || userAchievementsLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
-        <CurrencyHeader />
         <div className="max-w-4xl mx-auto p-6 flex items-center justify-center">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -250,8 +249,6 @@ export default function Stats() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
-      
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">

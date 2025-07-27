@@ -28,7 +28,7 @@ import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { queryClient } from "@/lib/queryClient";
 
@@ -1050,7 +1050,7 @@ export default function Battle() {
   if (!battleState) {
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
-        <CurrencyHeader />
+        
         
         {/* Header */}
         <div className="bg-card border-b border-border px-4 py-6">

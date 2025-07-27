@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap, X } from "lucide-react";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { getTitleComponent } from "@/lib/title-rarity";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Avatar2D } from "@/components/ui/avatar-2d";
@@ -43,7 +43,7 @@ export default function LeaderboardPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
+      
       
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">

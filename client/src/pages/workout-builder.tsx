@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown } from "lucide-react";
@@ -95,7 +95,7 @@ export default function WorkoutBuilder() {
   // Step 1: Workout Details
   const renderDetailsStep = () => (
     <div className="min-h-screen bg-background text-foreground">
-      <CurrencyHeader />
+      
       
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -147,7 +147,7 @@ export default function WorkoutBuilder() {
   // Step 2: Sections Overview
   const renderSectionsStep = () => (
     <div className="min-h-screen bg-background text-foreground">
-      <CurrencyHeader />
+      
       
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -287,7 +287,7 @@ export default function WorkoutBuilder() {
   // Step 3: Section Form
   const renderSectionForm = () => (
     <div className="min-h-screen bg-background text-foreground">
-      <CurrencyHeader />
+      
       
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -457,7 +457,7 @@ export default function WorkoutBuilder() {
 
     return (
       <div className="min-h-screen bg-background text-foreground">
-        <CurrencyHeader />
+        
         
         <div className="bg-card border-b border-border px-4 py-4">
           <div className="max-w-4xl mx-auto flex items-center justify-between">

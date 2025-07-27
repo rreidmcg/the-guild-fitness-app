@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { BackgroundMusicProvider } from "@/contexts/background-music-context";
 import { useTimezone } from "@/hooks/use-timezone";
+import { CurrencyHeader } from "@/components/ui/currency-header";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX } from "lucide-react";
 import { useEffect } from "react";
@@ -86,9 +87,15 @@ function AppContent() {
       <div className="min-h-screen bg-background text-foreground">
         <Toaster />
         
+        {/* Fixed Currency Header */}
+        <CurrencyHeader />
+        
         {/* Music Controls - Hidden per user request */}
 
-        <Router />
+        {/* Main content with top padding to account for fixed header */}
+        <div className="pt-12">
+          <Router />
+        </div>
         <BottomNav />
       </div>
     </TooltipProvider>

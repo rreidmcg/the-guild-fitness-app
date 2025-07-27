@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { NavBar } from "@/components/ui/nav-bar";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AvatarDisplay } from "@/components/ui/avatar-display";
@@ -82,7 +82,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <CurrencyHeader />
+      
       <NavBar />
       
       <div className="max-w-7xl mx-auto p-6">

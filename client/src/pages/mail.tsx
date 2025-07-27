@@ -13,7 +13,7 @@ import {
   Coins,
   Sparkles
 } from "lucide-react";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -137,7 +137,6 @@ export default function MailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
-        <CurrencyHeader />
         <div className="pt-16 space-y-4 p-4">
           {[...Array(3)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -154,8 +153,6 @@ export default function MailPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
-      
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">

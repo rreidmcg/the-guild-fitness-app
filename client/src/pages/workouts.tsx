@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { useToast } from "@/hooks/use-toast";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { apiRequest } from "@/lib/queryClient";
 import type { WorkoutSession, WorkoutProgram, DailyProgress, User } from "@shared/schema";
 import { 
@@ -147,7 +147,7 @@ export default function Workouts() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
+      
       
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { Badge } from "@/components/ui/badge";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -122,7 +122,7 @@ export default function Social() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background text-foreground pb-20">
-        <CurrencyHeader />
+        
         <div className="max-w-4xl mx-auto p-6 flex items-center justify-center">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -135,7 +135,7 @@ export default function Social() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <CurrencyHeader />
+      
       
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">

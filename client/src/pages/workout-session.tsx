@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
-import { CurrencyHeader } from "@/components/ui/currency-header";
+
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Play, Pause, Square, Check, Target } from "lucide-react";
@@ -129,7 +129,7 @@ export default function WorkoutSession() {
 
   return (
     <div className="min-h-screen bg-game-dark text-white pb-20">
-      <CurrencyHeader />
+      
       
       <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
         <div className="max-w-4xl mx-auto">
