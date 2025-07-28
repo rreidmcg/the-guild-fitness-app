@@ -334,8 +334,8 @@ export default function Shop() {
 
 
   const consumableCategories = [
-    { id: "health", name: "Health Potions", icon: Heart },
-    { id: "mana", name: "Mana Potions", icon: Sparkles },
+    { id: "health", name: "Health", icon: Heart },
+    { id: "mana", name: "Mana", icon: Sparkles },
     { id: "food", name: "Food", icon: Beef },
     { id: "drink", name: "Drink", icon: Coffee },
   ];
@@ -343,8 +343,8 @@ export default function Shop() {
   const potions = [
     {
       id: "minor_healing",
-      name: "Minor Healing Potion",
-      description: "Restores 25% of maximum HP",
+      name: "Minor Health",
+      description: "Restores 25% HP",
       price: 10,
       healing: "25%",
       color: "from-red-500 to-red-600",
@@ -352,8 +352,8 @@ export default function Shop() {
     },
     {
       id: "major_healing", 
-      name: "Major Healing Potion",
-      description: "Restores 50% of maximum HP",
+      name: "Major Health",
+      description: "Restores 50% HP",
       price: 25,
       healing: "50%",
       color: "from-red-600 to-red-700",
@@ -361,8 +361,8 @@ export default function Shop() {
     },
     {
       id: "full_healing",
-      name: "Mega Healing Potion",
-      description: "Restores 100% of maximum HP",
+      name: "Mega Health",
+      description: "Restores 100% HP",
       price: 50,
       healing: "100%",
       color: "from-red-700 to-red-800",
@@ -370,8 +370,8 @@ export default function Shop() {
     },
     {
       id: "minor_mana",
-      name: "Minor Mana Potion",
-      description: "Restores 25% of maximum MP",
+      name: "Minor Mana",
+      description: "Restores 25% MP",
       price: 8,
       healing: "25%",
       color: "from-blue-500 to-blue-600",
@@ -379,8 +379,8 @@ export default function Shop() {
     },
     {
       id: "major_mana", 
-      name: "Major Mana Potion",
-      description: "Restores 50% of maximum MP",
+      name: "Major Mana",
+      description: "Restores 50% MP",
       price: 20,
       healing: "50%",
       color: "from-blue-600 to-blue-700",
@@ -388,8 +388,8 @@ export default function Shop() {
     },
     {
       id: "full_mana",
-      name: "Mega Mana Potion",
-      description: "Restores 100% of maximum MP",
+      name: "Mega Mana",
+      description: "Restores 100% MP",
       price: 40,
       healing: "100%",
       color: "from-blue-700 to-blue-800",
@@ -621,9 +621,9 @@ export default function Shop() {
                 <div className="text-center mb-6">
                   <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
                     <Coins className="w-6 h-6 text-yellow-500" />
-                    <span>Purchase Gold Coins</span>
+                    <span>Gold Coins</span>
                   </h2>
-                  <p className="text-muted-foreground">Get more gold coins to purchase items and potions</p>
+                  <p className="text-muted-foreground">Buy items and potions</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 max-w-4xl mx-auto">
@@ -664,7 +664,7 @@ export default function Shop() {
                             ${goldPackage.price}
                           </div>
                           <div className="text-muted-foreground text-sm">
-                            ${(goldPackage.price / goldPackage.amount).toFixed(4)} per gold
+                            ${(goldPackage.price / goldPackage.amount).toFixed(3)}/gold
                           </div>
                         </div>
 
@@ -696,9 +696,9 @@ export default function Shop() {
                 <div className="text-center mb-6">
                   <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
                     <Sparkles className="w-6 h-6 text-blue-400" />
-                    <span>Purchase Premium Gems</span>
+                    <span>Premium Gems</span>
                   </h2>
-                  <p className="text-muted-foreground">Premium currency for exclusive items and streak freezes</p>
+                  <p className="text-muted-foreground">Exclusive items & streak freezes</p>
                   <div className="mt-2 flex items-center justify-center space-x-2">
                     <span className="text-lg">💎</span>
                     <span className="text-lg font-semibold">Your Gems: {(userStats as any)?.gems || 0}</span>
