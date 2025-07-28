@@ -493,7 +493,7 @@ export default function Stats() {
             {/* 2D Avatar Display */}
             <div className="flex flex-col items-center mb-6">
               <div className={`rounded-lg p-1 ${
-                safeUserStats.currentTitle === "<G.M.>" || safeUserStats.currentTitle === "G.M." 
+                (safeUserStats.currentTitle === "<G.M.>" || safeUserStats.currentTitle === "G.M.") && safeUserStats.username === "Player 1"
                   ? "border-4 border-red-500 bg-red-500/10" 
                   : "border-4 border-gray-500 bg-gray-500/10"
               }`}>
