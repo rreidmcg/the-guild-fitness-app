@@ -27,7 +27,7 @@ import {
 import minorPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753331144145.png";
 import majorPotionImage from "@assets/E411AC73-DD9A-4E21-A550-8BC4020515A1_1753054064391.jpeg";
 import fullPotionImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
-import manaPotionImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
+import manaPotionImage from "@assets/A78C5316-EC32-40FF-8919-E20BF97740B3_1753733597516.png";
 
 interface InventoryItem {
   id: number;
