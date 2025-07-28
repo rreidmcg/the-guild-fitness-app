@@ -1549,9 +1549,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Valid gender is required" });
       }
       
-      // Validate gender value
-      if (!['male', 'female', 'legendary_hunter'].includes(gender)) {
+      // Validate gender value - allow gm_avatar for Zero and Rob
+      const validGenders = ['male', 'female', 'legendary_hunter', 'gm_avatar'];
+      if (!validGenders.includes(gender)) {
         return res.status(400).json({ error: "Invalid gender value" });
+      }
+      
+      // Restrict gm_avatar to Zero and Rob only
+      if (gender === 'gm_avatar') {
+        const user = await storage.getUser(userId);
+        const username = user?.username?.toLowerCase();
+        if (username !== "zero" && username !== "rob") {
+          return res.status(403).json({ error: "G.M. avatar is restricted to admin users" });
+        }
       }
       
       const updatedUser = await storage.updateUser(userId, { gender });

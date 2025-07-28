@@ -55,12 +55,17 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
 
   // Get the appropriate avatar image based on title, skin ownership, custom avatar, and gender
   const avatarImage = (() => {
+    // Check for G.M. avatar selection (when user explicitly selects gm_avatar skin)
+    if (playerData?.gender === "gm_avatar" || playerData?.customAvatarUrl === "/src/assets/IMG_3731_1753561497035.png") {
+      return getCustomAvatar("/src/assets/IMG_3731_1753561497035.png") || gmAvatarImage;
+    }
+    
     // Check for Legendary Hunter skin (Founders Pack exclusive)
     if (playerData?.title === "The First Flame" || playerData?.hasLegendaryHunterSkin) {
       return legendaryHunterSkin;
     }
     
-    // G.M. users get special avatars
+    // G.M. users get special avatars by default
     if (playerData?.title === "<G.M.>") {
       return playerData?.customAvatarUrl ? getCustomAvatar(playerData.customAvatarUrl) || gmAvatarImage : gmAvatarImage;
     }

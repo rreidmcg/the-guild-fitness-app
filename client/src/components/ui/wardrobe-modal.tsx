@@ -35,6 +35,7 @@ const AVAILABLE_SKINS = [
   { name: "Default Male", id: "male", requirement: "Default", preview: "male" },
   { name: "Default Female", id: "female", requirement: "Default", preview: "female" },
   { name: "The Legendary Hunter", id: "legendary_hunter", requirement: "Founders Pack Exclusive", preview: "legendary_hunter" },
+  { name: "G.M. Avatar", id: "gm_avatar", requirement: "Admin Only", preview: "gm_avatar" },
 ];
 
 export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
@@ -94,11 +95,15 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
 
   // Check if user has earned a title based on dungeon progression
   const hasEarnedTitle = (title: string) => {
+    const username = user?.username?.toLowerCase();
+    
+    // Zero has access to ALL titles
+    if (username === "zero") return true;
+    
     if (title === "Recruit") return true; // Starting title
     // G.M. title is only available to Zero and Rob
     if (title === "<G.M.>") {
-      const username = user?.username?.toLowerCase();
-      return username === "zero" || username === "rob";
+      return username === "rob";
     }
     if (title === "The First Flame" && (user?.currentTitle === "The First Flame" || user?.hasLegendaryHunterSkin)) return true;
     
@@ -118,8 +123,16 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
 
   // Check if user has earned a skin
   const hasEarnedSkin = (skinId: string) => {
+    const username = user?.username?.toLowerCase();
+    
+    // Zero has access to ALL skins
+    if (username === "zero") return true;
+    
     if (skinId === "male" || skinId === "female") return true;
     if (skinId === "legendary_hunter" && (user?.currentTitle === "The First Flame" || user?.hasLegendaryHunterSkin)) return true;
+    if (skinId === "gm_avatar") {
+      return username === "rob";
+    }
     return false;
   };
 
@@ -233,9 +246,10 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
                           <Avatar2D 
                             user={{ 
                               ...user, 
-                              gender: skin.preview === "legendary_hunter" ? user?.gender : skin.preview,
-                              title: skin.id === "legendary_hunter" ? "The First Flame" : user?.title,
-                              hasLegendaryHunterSkin: skin.id === "legendary_hunter"
+                              gender: skin.id === "gm_avatar" ? "gm_avatar" : (skin.preview === "legendary_hunter" ? user?.gender : skin.preview),
+                              title: skin.id === "legendary_hunter" ? "The First Flame" : skin.id === "gm_avatar" ? "<G.M.>" : user?.title,
+                              hasLegendaryHunterSkin: skin.id === "legendary_hunter",
+                              customAvatarUrl: skin.id === "gm_avatar" ? "/src/assets/IMG_3731_1753561497035.png" : undefined
                             }} 
                             size="md" 
                           />
