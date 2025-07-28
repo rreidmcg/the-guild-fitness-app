@@ -222,8 +222,9 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
                           <Avatar2D 
                             user={{ 
                               ...user, 
-                              gender: skin.preview,
-                              currentTitle: skin.id === "legendary_hunter" ? "The First Flame" : user?.currentTitle
+                              gender: skin.preview === "legendary_hunter" ? user?.gender : skin.preview,
+                              title: skin.id === "legendary_hunter" ? "The First Flame" : user?.title,
+                              hasLegendaryHunterSkin: skin.id === "legendary_hunter"
                             }} 
                             size="md" 
                           />
