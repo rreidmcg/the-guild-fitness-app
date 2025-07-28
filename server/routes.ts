@@ -1490,18 +1490,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Define title requirements based on level and progression
+      // Define title requirements based on dungeon progression system
       const titleRequirements = [
         { title: "Recruit", level: 1 },
-        { title: "Fitness Novice", level: 1 },
-        { title: "Fitness Apprentice", level: 5 },
-        { title: "Fitness Warrior", level: 8 },
-        { title: "Fitness Veteran", level: 15 },
-        { title: "Fitness Champion", level: 20 },
-        { title: "Fitness Master", level: 25 },
-        { title: "Fitness Grandmaster", level: 30 },
-        { title: "Fitness Legend", level: 35 },
-        { title: "Fitness Mythic", level: 40 },
+        { title: "E-rank Conqueror", level: 10 },
+        { title: "D-rank Conqueror", level: 20 },
+        { title: "C-rank Conqueror", level: 30 },
+        { title: "B-rank Conqueror", level: 40 }, // In Development
+        { title: "A-rank Conqueror", level: 50 }, // In Development
+        { title: "S-rank Conqueror", level: 60 }, // In Development
         { title: "The First Flame", level: 1 }, // Special Founders Pack title
       ];
 

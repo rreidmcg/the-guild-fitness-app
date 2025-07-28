@@ -17,18 +17,15 @@ interface WardrobeModalProps {
   user: any;
 }
 
-// Define available titles based on progression system
+// Define available titles based on dungeon progression system
 const AVAILABLE_TITLES = [
-  { name: "Recruit", rarity: "common", requirement: "Starting title" },
-  { name: "Fitness Novice", rarity: "common", requirement: "Reach Level 1" },
-  { name: "Fitness Apprentice", rarity: "uncommon", requirement: "Complete E-rank dungeon" },
-  { name: "Fitness Warrior", rarity: "rare", requirement: "Complete D-rank dungeon" },
-  { name: "Fitness Veteran", rarity: "rare", requirement: "Reach Level 15" },
-  { name: "Fitness Champion", rarity: "epic", requirement: "Complete C-rank dungeon" },
-  { name: "Fitness Master", rarity: "epic", requirement: "Reach Level 25" },
-  { name: "Fitness Grandmaster", rarity: "legendary", requirement: "Complete B-rank dungeon" },
-  { name: "Fitness Legend", rarity: "legendary", requirement: "Reach Level 35" },
-  { name: "Fitness Mythic", rarity: "mythic", requirement: "Complete A-rank dungeon" },
+  { name: "Recruit", rarity: "common", requirement: "Starting title (E-rank: Lv 1-10)" },
+  { name: "E-rank Conqueror", rarity: "common", requirement: "Complete E-rank dungeon (Lv 1-10)" },
+  { name: "D-rank Conqueror", rarity: "uncommon", requirement: "Complete D-rank dungeon (Lv 11-20)" },
+  { name: "C-rank Conqueror", rarity: "rare", requirement: "Complete C-rank dungeon (Lv 21-30)" },
+  { name: "B-rank Conqueror", rarity: "epic", requirement: "Complete B-rank dungeon (Lv 31-40) - In Development" },
+  { name: "A-rank Conqueror", rarity: "legendary", requirement: "Complete A-rank dungeon (Lv 41-50) - In Development" },
+  { name: "S-rank Conqueror", rarity: "mythic", requirement: "Complete S-rank dungeon (Lv 51+) - In Development" },
   { name: "The First Flame", rarity: "legendary", requirement: "Founders Pack Exclusive" },
   { name: "<G.M.>", rarity: "relic", requirement: "Admin Only" },
 ];
@@ -95,22 +92,22 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
     },
   });
 
-  // Check if user has earned a title
+  // Check if user has earned a title based on dungeon progression
   const hasEarnedTitle = (title: string) => {
-    if (title === "Recruit" || title === "Fitness Novice") return true;
+    if (title === "Recruit") return true; // Starting title
     if (title === "<G.M.>" && user?.currentTitle === "<G.M.>") return true;
     if (title === "The First Flame" && (user?.currentTitle === "The First Flame" || user?.hasLegendaryHunterSkin)) return true;
     
-    // For now, allow most titles for testing - in production, check actual progression
+    // Dungeon-based progression titles - based on level ranges
     const userLevel = user?.level || 1;
-    if (title === "Fitness Apprentice" && userLevel >= 5) return true;
-    if (title === "Fitness Warrior" && userLevel >= 8) return true;
-    if (title === "Fitness Veteran" && userLevel >= 15) return true;
-    if (title === "Fitness Champion" && userLevel >= 20) return true;
-    if (title === "Fitness Master" && userLevel >= 25) return true;
-    if (title === "Fitness Grandmaster" && userLevel >= 30) return true;
-    if (title === "Fitness Legend" && userLevel >= 35) return true;
-    if (title === "Fitness Mythic" && userLevel >= 40) return true;
+    if (title === "E-rank Conqueror" && userLevel >= 10) return true; // Complete E-rank (Lv 1-10)
+    if (title === "D-rank Conqueror" && userLevel >= 20) return true; // Complete D-rank (Lv 11-20)  
+    if (title === "C-rank Conqueror" && userLevel >= 30) return true; // Complete C-rank (Lv 21-30)
+    
+    // Higher rank titles are locked for future development
+    if (title === "B-rank Conqueror" || title === "A-rank Conqueror" || title === "S-rank Conqueror") {
+      return false; // In Development
+    }
     
     return false;
   };
