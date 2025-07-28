@@ -1490,15 +1490,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Define title requirements based on dungeon progression system
+      // Define title requirements based on dungeon boss progression system
       const titleRequirements = [
         { title: "Recruit", level: 1 },
-        { title: "E-rank Conqueror", level: 10 },
-        { title: "D-rank Conqueror", level: 20 },
-        { title: "C-rank Conqueror", level: 30 },
-        { title: "B-rank Conqueror", level: 40 }, // In Development
-        { title: "A-rank Conqueror", level: 50 }, // In Development
-        { title: "S-rank Conqueror", level: 60 }, // In Development
+        { title: "Goblin Slayer", level: 10 },
+        { title: "Orc Crusher", level: 20 },
+        { title: "Dragon Vanquisher", level: 30 },
+        { title: "Demon Hunter", level: 40 }, // In Development
+        { title: "Titan Slayer", level: 50 }, // In Development
+        { title: "God Killer", level: 60 }, // In Development
         { title: "The First Flame", level: 1 }, // Special Founders Pack title
       ];
 

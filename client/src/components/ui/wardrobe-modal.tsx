@@ -17,15 +17,15 @@ interface WardrobeModalProps {
   user: any;
 }
 
-// Define available titles based on dungeon progression system
+// Define available titles based on dungeon boss progression system
 const AVAILABLE_TITLES = [
   { name: "Recruit", rarity: "common", requirement: "Starting title (E-rank: Lv 1-10)" },
-  { name: "E-rank Conqueror", rarity: "common", requirement: "Complete E-rank dungeon (Lv 1-10)" },
-  { name: "D-rank Conqueror", rarity: "uncommon", requirement: "Complete D-rank dungeon (Lv 11-20)" },
-  { name: "C-rank Conqueror", rarity: "rare", requirement: "Complete C-rank dungeon (Lv 21-30)" },
-  { name: "B-rank Conqueror", rarity: "epic", requirement: "Complete B-rank dungeon (Lv 31-40) - In Development" },
-  { name: "A-rank Conqueror", rarity: "legendary", requirement: "Complete A-rank dungeon (Lv 41-50) - In Development" },
-  { name: "S-rank Conqueror", rarity: "mythic", requirement: "Complete S-rank dungeon (Lv 51+) - In Development" },
+  { name: "Goblin Slayer", rarity: "common", requirement: "Defeat Goblin King (E-rank: Lv 1-10)" },
+  { name: "Orc Crusher", rarity: "uncommon", requirement: "Defeat Orc Warlord (D-rank: Lv 11-20)" },
+  { name: "Dragon Vanquisher", rarity: "rare", requirement: "Defeat Ancient Wyrm (C-rank: Lv 21-30)" },
+  { name: "Demon Hunter", rarity: "epic", requirement: "Defeat Demon Lord (B-rank: Lv 31-40) - In Development" },
+  { name: "Titan Slayer", rarity: "legendary", requirement: "Defeat Primordial Titan (A-rank: Lv 41-50) - In Development" },
+  { name: "God Killer", rarity: "mythic", requirement: "Defeat Fallen God (S-rank: Lv 51+) - In Development" },
   { name: "The First Flame", rarity: "legendary", requirement: "Founders Pack Exclusive" },
   { name: "<G.M.>", rarity: "relic", requirement: "Admin Only" },
 ];
@@ -98,14 +98,14 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
     if (title === "<G.M.>" && user?.currentTitle === "<G.M.>") return true;
     if (title === "The First Flame" && (user?.currentTitle === "The First Flame" || user?.hasLegendaryHunterSkin)) return true;
     
-    // Dungeon-based progression titles - based on level ranges
+    // Boss-based progression titles - based on level ranges
     const userLevel = user?.level || 1;
-    if (title === "E-rank Conqueror" && userLevel >= 10) return true; // Complete E-rank (Lv 1-10)
-    if (title === "D-rank Conqueror" && userLevel >= 20) return true; // Complete D-rank (Lv 11-20)  
-    if (title === "C-rank Conqueror" && userLevel >= 30) return true; // Complete C-rank (Lv 21-30)
+    if (title === "Goblin Slayer" && userLevel >= 10) return true; // Defeat Goblin King (Lv 1-10)
+    if (title === "Orc Crusher" && userLevel >= 20) return true; // Defeat Orc Warlord (Lv 11-20)  
+    if (title === "Dragon Vanquisher" && userLevel >= 30) return true; // Defeat Ancient Wyrm (Lv 21-30)
     
-    // Higher rank titles are locked for future development
-    if (title === "B-rank Conqueror" || title === "A-rank Conqueror" || title === "S-rank Conqueror") {
+    // Higher rank boss titles are locked for future development
+    if (title === "Demon Hunter" || title === "Titan Slayer" || title === "God Killer") {
       return false; // In Development
     }
     

@@ -173,6 +173,18 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 28, 2025 - Boss-Themed Title System:**
+- **Updated Title System with Boss Names**: Replaced generic "Conqueror" titles with boss-themed progression titles
+  - E-rank: "Goblin Slayer" (defeat Goblin King, Lv 1-10)
+  - D-rank: "Orc Crusher" (defeat Orc Warlord, Lv 11-20)
+  - C-rank: "Dragon Vanquisher" (defeat Ancient Wyrm, Lv 21-30)
+  - B-rank: "Demon Hunter" (defeat Demon Lord, Lv 31-40) - In Development
+  - A-rank: "Titan Slayer" (defeat Primordial Titan, Lv 41-50) - In Development
+  - S-rank: "God Killer" (defeat Fallen God, Lv 51+) - In Development
+- **Enhanced Wardrobe Modal**: Updated title progression display with boss-themed requirements
+- **Backend Validation**: Updated server-side title validation to match new boss titles
+- **Maintained Special Titles**: Preserved "The First Flame" (Founders Pack) and "<G.M.>" (Admin) titles
+
 **January 28, 2025 - Legendary Hunter Skin Integration & Shop Reorganization:**
 - **Legendary Hunter Skin for Founders Pack**: Integrated custom pixel art skin "The Legendary Hunter" with yellow border styling
   - Added skin asset to Avatar2D component with special rarity detection for "The First Flame" title holders
