@@ -75,6 +75,11 @@ export interface IStorage {
   purchaseShopItem(userId: number, itemId: number): Promise<{ success: boolean; message: string }>;
   addGems(userId: number, amount: number): Promise<User>;
   purchaseStreakFreeze(userId: number): Promise<{ success: boolean; message: string }>;
+  
+  // Founders pack
+  getFoundersPackClaimCount(): Promise<number>;
+  canUserClaimFoundersPack(userId: number): Promise<boolean>;
+  claimFoundersPack(userId: number, paymentIntentId: string): Promise<{ success: boolean; message: string; claimNumber?: number }>;
 
   // Wardrobe operations
   getWardrobeItemsWithOwnership(userId: number): Promise<any[]>;
@@ -1483,6 +1488,72 @@ export class DatabaseStorage implements IStorage {
     }).where(eq(users.id, userId));
 
     return { success: true, message: "Streak freeze purchased!" };
+  }
+
+  // Founders pack operations
+  async getFoundersPackClaimCount(): Promise<number> {
+    const { foundersPackClaims } = await import("@shared/schema");
+    const { sql } = await import("drizzle-orm");
+    const result = await db.select({ count: sql<number>`count(*)` }).from(foundersPackClaims);
+    return result[0]?.count || 0;
+  }
+
+  async canUserClaimFoundersPack(userId: number): Promise<boolean> {
+    const { foundersPackClaims } = await import("@shared/schema");
+    
+    // Check if user already claimed
+    const [existingClaim] = await db.select().from(foundersPackClaims).where(eq(foundersPackClaims.userId, userId));
+    if (existingClaim) {
+      return false; // User already claimed
+    }
+
+    // Check if we're under 100 claims
+    const claimCount = await this.getFoundersPackClaimCount();
+    return claimCount < 100;
+  }
+
+  async claimFoundersPack(userId: number, paymentIntentId: string): Promise<{ success: boolean; message: string; claimNumber?: number }> {
+    const { foundersPackClaims } = await import("@shared/schema");
+    
+    // Double-check eligibility
+    if (!(await this.canUserClaimFoundersPack(userId))) {
+      return { success: false, message: "Founders Pack no longer available or already claimed" };
+    }
+
+    // Get next claim number
+    const claimCount = await this.getFoundersPackClaimCount();
+    const claimNumber = claimCount + 1;
+
+    // Create claim record
+    const [claim] = await db.insert(foundersPackClaims).values({
+      userId,
+      claimNumber,
+      paymentIntentId
+    }).returning();
+
+    // Add rewards to user
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Add gold, gems, title, and purchased program
+    const newGold = (user.gold || 0) + 1000;
+    const newGems = (user.gems || 0) + 200;
+    const newPurchasedPrograms = [...(user.purchasedPrograms || []), "founders-at-home-12week"];
+
+    await db.update(users).set({
+      gold: newGold,
+      gems: newGems,
+      currentTitle: "The First Flame",
+      purchasedPrograms: newPurchasedPrograms
+    }).where(eq(users.id, userId));
+
+    return { 
+      success: true, 
+      message: `Founders Pack #${claimNumber} claimed! Welcome, First Flame!`,
+      claimNumber 
+    };
   }
 }
 

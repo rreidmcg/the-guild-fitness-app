@@ -12,7 +12,9 @@ import {
   Snowflake,
   Coins,
   Crown,
-  Sparkles
+  Sparkles,
+  Flame,
+  Star
 } from "lucide-react";
 import { Elements, useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -261,6 +263,222 @@ function ShopItemCard({ item, userGems }: { item: ShopItem; userGems: number }) 
   );
 }
 
+function FoundersPackCard() {
+  const [showPayment, setShowPayment] = useState(false);
+  const [clientSecret, setClientSecret] = useState("");
+  const { toast } = useToast();
+
+  const { data: foundersStatus } = useQuery({
+    queryKey: ["/api/founders-pack/status"],
+  });
+
+  const purchaseFoundersPackMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/purchase-founders-pack");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setClientSecret(data.clientSecret);
+      setShowPayment(true);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Purchase Failed",
+        description: error.message || "Failed to initialize purchase",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handlePurchase = () => {
+    purchaseFoundersPackMutation.mutate();
+  };
+
+  const handlePurchaseSuccess = () => {
+    setShowPayment(false);
+    setClientSecret("");
+    queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/founders-pack/status"] });
+  };
+
+  if (showPayment && clientSecret) {
+    return (
+      <Card className="bg-gradient-to-br from-orange-900/30 to-red-900/30 border-orange-500/50">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="text-orange-400">Complete Founders Pack Purchase</span>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowPayment(false)}
+            >
+              Cancel
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4 text-center">
+            <div className="text-4xl mb-2">🔥</div>
+            <h3 className="font-semibold text-orange-400">Founders Pack</h3>
+            <p className="text-sm text-muted-foreground">Limited to first 100 users</p>
+          </div>
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <FoundersPackPurchaseForm onSuccess={handlePurchaseSuccess} />
+          </Elements>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!foundersStatus?.isAvailable) {
+    return (
+      <Card className="bg-muted/50 border-muted-foreground/20 opacity-60">
+        <CardHeader className="text-center">
+          <div className="text-4xl mb-2">🔥</div>
+          <CardTitle className="text-muted-foreground">Founders Pack</CardTitle>
+          <div className="text-sm text-muted-foreground">Sold Out</div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground text-center">
+            All 100 Founders Packs have been claimed!
+          </p>
+          <div className="text-center text-sm text-muted-foreground">
+            Thank you to our first 100 supporters ❤️
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="bg-gradient-to-br from-orange-900/30 to-red-900/30 border-orange-500/50 hover:shadow-xl transition-shadow">
+      <CardHeader className="text-center">
+        <div className="text-4xl mb-2">🔥</div>
+        <CardTitle className="flex items-center justify-center space-x-2">
+          <span className="text-orange-400">Founders Pack</span>
+          <Crown className="w-5 h-5 text-yellow-500" />
+        </CardTitle>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-400">$29.97</div>
+          <div className="text-sm text-orange-300">
+            Limited: {foundersStatus?.claimsRemaining || 0} remaining
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-muted-foreground text-center">
+          Exclusive pack for the first 100 users! Get premium rewards and legendary status.
+        </p>
+        
+        <div className="space-y-3">
+          <div className="flex items-center space-x-3 text-sm">
+            <Star className="w-4 h-4 text-blue-400" />
+            <span>12-Week At-Home Workout Plan</span>
+          </div>
+          <div className="flex items-center space-x-3 text-sm">
+            <Coins className="w-4 h-4 text-yellow-400" />
+            <span>1,000 Gold Coins</span>
+          </div>
+          <div className="flex items-center space-x-3 text-sm">
+            <Gem className="w-4 h-4 text-blue-400" />
+            <span>200 Premium Gems</span>
+          </div>
+          <div className="flex items-center space-x-3 text-sm">
+            <Flame className="w-4 h-4 text-orange-400" />
+            <span className="text-orange-400 font-medium">"The First Flame" Legendary Title</span>
+          </div>
+          <div className="flex items-center space-x-3 text-sm">
+            <Crown className="w-4 h-4 text-purple-400" />
+            <span>Exclusive Founder Avatar (Coming Soon)</span>
+          </div>
+        </div>
+
+        <div className="pt-4">
+          <Button 
+            className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
+            onClick={handlePurchase}
+            disabled={purchaseFoundersPackMutation.isPending || !foundersStatus?.canClaim}
+          >
+            <CreditCard className="w-4 h-4 mr-2" />
+            {purchaseFoundersPackMutation.isPending ? (
+              "Processing..."
+            ) : !foundersStatus?.canClaim ? (
+              "Already Claimed"
+            ) : (
+              "Claim Founders Pack"
+            )}
+          </Button>
+        </div>
+        
+        <div className="text-xs text-center text-muted-foreground">
+          Only {foundersStatus?.claimsRemaining || 0} packs remaining!
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function FoundersPackPurchaseForm({ onSuccess }: { onSuccess: () => void }) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const { toast } = useToast();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: window.location.origin + "/gem-shop",
+      },
+      redirect: "if_required"
+    });
+
+    if (error) {
+      toast({
+        title: "Payment Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      // Confirm the founders pack purchase on our backend
+      try {
+        const response = await apiRequest("POST", "/api/confirm-founders-pack", {
+          paymentIntentId: paymentIntent.id
+        });
+        const data = await response.json();
+        
+        toast({
+          title: "Welcome, First Flame! 🔥",
+          description: data.message,
+        });
+        
+        onSuccess();
+      } catch (confirmError) {
+        toast({
+          title: "Purchase Confirmation Failed",
+          description: "Payment succeeded but confirmation failed. Contact support.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <PaymentElement />
+      <Button type="submit" disabled={!stripe} className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700">
+        <CreditCard className="w-4 h-4 mr-2" />
+        Complete Founders Pack Purchase - $29.97
+      </Button>
+    </form>
+  );
+}
+
 export default function GemShop() {
   const { data: shopItems, isLoading } = useQuery({
     queryKey: ["/api/shop"],
@@ -268,6 +486,10 @@ export default function GemShop() {
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
+  });
+
+  const { data: foundersStatus } = useQuery({
+    queryKey: ["/api/founders-pack/status"],
   });
 
   if (isLoading) {
@@ -288,6 +510,7 @@ export default function GemShop() {
   const gemPacks = shopItems?.filter((item: ShopItem) => item.category === 'gems') || [];
   const gemItems = shopItems?.filter((item: ShopItem) => item.currency === 'gems') || [];
   const userGems = (userStats as any)?.gems || 0;
+  const showFoundersPack = foundersStatus?.isAvailable;
 
   return (
     <div className="min-h-screen bg-background p-6 pb-24">
@@ -305,6 +528,19 @@ export default function GemShop() {
             <span className="text-lg font-semibold">Your Gems: {userGems}</span>
           </div>
         </div>
+
+        {/* Founders Pack Section */}
+        {showFoundersPack && (
+          <div>
+            <h2 className="text-2xl font-bold mb-4 flex items-center space-x-2">
+              <Flame className="w-6 h-6 text-orange-500" />
+              <span className="text-orange-400">Limited Time - Founders Pack</span>
+            </h2>
+            <div className="mb-8">
+              <FoundersPackCard />
+            </div>
+          </div>
+        )}
 
         {/* Gem Packs Section */}
         <div>

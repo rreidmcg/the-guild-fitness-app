@@ -115,6 +115,14 @@ export const getTitleRarity = (title: string): TitleRarity => {
       rarity: "legendary"
     },
 
+    // Special Founders Pack Title (Yellow/Legendary)
+    "The First Flame": {
+      color: "text-yellow-300",
+      bgColor: "bg-yellow-500/20",
+      borderColor: "border-yellow-400/40",
+      rarity: "legendary"
+    },
+
     // S-Rank Dungeon Completion Titles (Orange/Mythic) - Locked
     "S-Rank Dominator": {
       color: "text-orange-300",

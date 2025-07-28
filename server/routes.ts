@@ -402,6 +402,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Founders pack routes
+  app.get("/api/founders-pack/status", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const claimCount = await storage.getFoundersPackClaimCount();
+      const canClaim = await storage.canUserClaimFoundersPack(userId);
+      
+      res.json({
+        claimsRemaining: Math.max(0, 100 - claimCount),
+        totalClaims: claimCount,
+        canClaim,
+        isAvailable: claimCount < 100
+      });
+    } catch (error: any) {
+      console.error("Error checking founders pack status:", error);
+      res.status(500).json({ error: "Failed to check status" });
+    }
+  });
+
+  // Purchase founders pack
+  app.post("/api/purchase-founders-pack", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      
+      // Check if user can claim
+      const canClaim = await storage.canUserClaimFoundersPack(userId);
+      if (!canClaim) {
+        return res.status(400).json({ error: "Founders Pack no longer available or already claimed" });
+      }
+      
+      // Create Stripe payment intent for founders pack
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 2997, // $29.97 in cents
+        currency: "usd",
+        metadata: {
+          userId: userId.toString(),
+          type: "founders_pack"
+        }
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        itemName: "Founders Pack",
+        price: 2997
+      });
+    } catch (error: any) {
+      console.error("Error creating founders pack purchase:", error);
+      res.status(500).json({ error: "Failed to create payment intent" });
+    }
+  });
+
+  // Confirm founders pack purchase
+  app.post("/api/confirm-founders-pack", async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      const userId = currentUserId;
+      
+      // Retrieve the payment intent from Stripe to verify it was successful
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status === 'succeeded') {
+        // Claim the founders pack
+        const result = await storage.claimFoundersPack(userId, paymentIntentId);
+        
+        if (result.success) {
+          res.json({ 
+            success: true, 
+            message: result.message,
+            claimNumber: result.claimNumber
+          });
+        } else {
+          res.status(400).json({ error: result.message });
+        }
+      } else {
+        res.status(400).json({ error: "Payment not completed" });
+      }
+    } catch (error: any) {
+      console.error("Error confirming founders pack purchase:", error);
+      res.status(500).json({ error: "Failed to confirm purchase" });
+    }
+  });
+
   app.post("/api/create-subscription", async (req, res) => {
     try {
       const userId = currentUserId;

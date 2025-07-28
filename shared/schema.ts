@@ -637,3 +637,20 @@ export const insertShopItemSchema = createInsertSchema(shopItems).omit({
 
 export type ShopItem = typeof shopItems.$inferSelect;
 export type InsertShopItem = z.infer<typeof insertShopItemSchema>;
+
+// Founders pack claims tracking
+export const foundersPackClaims = pgTable("founders_pack_claims", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  claimNumber: integer("claim_number").notNull(), // 1-100 for first 100 claims
+  claimedAt: timestamp("claimed_at").defaultNow(),
+  paymentIntentId: text("payment_intent_id"),
+});
+
+export const insertFoundersPackClaimSchema = createInsertSchema(foundersPackClaims).omit({
+  id: true,
+  claimedAt: true,
+});
+
+export type FoundersPackClaim = typeof foundersPackClaims.$inferSelect;
+export type InsertFoundersPackClaim = z.infer<typeof insertFoundersPackClaimSchema>;
