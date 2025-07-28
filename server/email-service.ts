@@ -1,4 +1,4 @@
-// Email service using MailerLite API
+// Email service using MailerSend API
 interface EmailParams {
   to: string;
   subject: string;
@@ -7,32 +7,66 @@ interface EmailParams {
 }
 
 export async function sendEmail(params: EmailParams): Promise<boolean> {
-  const apiKey = process.env.MAILERLITE_API_KEY;
+  const apiKey = process.env.MAILERSEND_API_KEY;
   
   if (!apiKey) {
-    console.warn("MailerLite API key not configured. Email would be sent in production.");
+    console.warn("MailerSend API key not configured. Email would be sent in production.");
     return false;
   }
 
   try {
-    // MailerLite doesn't support direct email sending - it's campaign-based
-    // For now, we'll log the email that would be sent and return true for testing
-    console.log('=== EMAIL NOTIFICATION ===');
+    const response = await fetch('https://api.mailersend.com/v1/email', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({
+        from: {
+          email: "guildmasterreid@gmail.com",
+          name: "The Guild: Gamified Fitness"
+        },
+        to: [
+          {
+            email: params.to,
+            name: "User"
+          }
+        ],
+        subject: params.subject,
+        html: params.html,
+        text: params.text || params.html.replace(/<[^>]*>/g, ''), // Strip HTML for text version
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('MailerSend API error:', response.status, error);
+      
+      // Log the email details for manual processing until API is fully activated
+      console.log('=== EMAIL NOTIFICATION (API Key Needs Activation) ===');
+      console.log(`To: ${params.to}`);
+      console.log(`Subject: ${params.subject}`);
+      console.log('HTML Content Preview:', params.html.substring(0, 300) + '...');
+      console.log('=====================================================');
+      console.log('Note: Please verify your domain in MailerSend dashboard and ensure API key is activated');
+      
+      return false;
+    }
+
+    const result = await response.json();
+    console.log(`Email sent successfully to ${params.to} (Message ID: ${result.message || 'unknown'})`);
+    return true;
+  } catch (error) {
+    console.error('Email sending error:', error);
+    
+    // Log the email details for manual processing
+    console.log('=== EMAIL NOTIFICATION (Fallback) ===');
     console.log(`To: ${params.to}`);
     console.log(`Subject: ${params.subject}`);
-    console.log('HTML Content:', params.html.substring(0, 200) + '...');
-    console.log('========================');
+    console.log('HTML Content Preview:', params.html.substring(0, 300) + '...');
+    console.log('=====================================');
     
-    // In a real implementation, you would either:
-    // 1. Use MailerSend (MailerLite's transactional email service)
-    // 2. Switch to SendGrid, Postmark, or similar transactional email service
-    // 3. Set up SMTP with nodemailer
-    
-    console.log(`Email notification logged for ${params.to} - In production, this would be sent via transactional email service`);
-    return true;
-    
-  } catch (error) {
-    console.error('Email service error:', error);
     return false;
   }
 }
