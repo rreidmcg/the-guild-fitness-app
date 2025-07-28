@@ -36,6 +36,7 @@ import characterMaleImage from "@assets/IMG_3682_1753213695174.png";
 import minorManaPotionImage from "@assets/A78C5316-EC32-40FF-8919-E20BF97740B3_1753733597516.png";
 import majorManaPotionImage from "@assets/B3B92435-50B3-4B4F-BF95-30E009AA81EB_1753733641186.png";
 import megaHealPotionImage from "@assets/08789489-C26E-40BE-BA19-1471C66163E2_1753500783697.png";
+import megaManaPotionImage from "@assets/E87E3B27-6376-4A57-93C6-2CE3FE0EF645_1753733707898.png";
 
 interface ShopItem {
   id: number;
@@ -550,8 +551,8 @@ export default function Shop() {
                         />
                       ) : potion.id === 'full_mana' ? (
                         <img 
-                          src={majorManaPotionImage} 
-                          alt="Full Mana Potion"
+                          src={megaManaPotionImage} 
+                          alt="Mega Mana Potion"
                           className="w-16 h-16 object-contain"
                           style={{ 
                             imageRendering: 'pixelated',

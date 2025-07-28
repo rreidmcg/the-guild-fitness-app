@@ -27,6 +27,7 @@ import {
 import minorPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753331144145.png";
 import majorManaPotionImage from "@assets/B3B92435-50B3-4B4F-BF95-30E009AA81EB_1753733641186.png";
 import fullPotionImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
+import megaManaPotionImage from "@assets/E87E3B27-6376-4A57-93C6-2CE3FE0EF645_1753733707898.png";
 import manaPotionImage from "@assets/A78C5316-EC32-40FF-8919-E20BF97740B3_1753733597516.png";
 
 interface InventoryItem {
@@ -106,11 +107,11 @@ const getItemVisual = (item: InventoryItem) => {
         />
       );
     }
-    if (itemName.toLowerCase().includes('full') && itemName.toLowerCase().includes('mana')) {
+    if ((itemName.toLowerCase().includes('full') || itemName.toLowerCase().includes('mega')) && itemName.toLowerCase().includes('mana')) {
       return (
         <img 
-          src={majorManaPotionImage} 
-          alt="Full Mana Potion"
+          src={megaManaPotionImage} 
+          alt="Mega Mana Potion"
           className="w-full h-full object-contain"
           style={{ 
             imageRendering: 'pixelated',
