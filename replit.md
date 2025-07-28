@@ -173,6 +173,19 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 28, 2025 - Founders Pack Exclusive Limited Edition:**
+- **Exclusive Founders Pack**: Limited to first 100 users at $29.97 with comprehensive reward system
+  - 1,000 gold coins + 200 premium gems + legendary "The First Flame" title + 12-week workout plan
+  - Complete tracking system with claim numbers (1-100) and duplicate purchase prevention
+  - Built scalable 12-week at-home workout program with beginner/intermediate/advanced variations
+  - Added "The First Flame" as exclusive legendary title in the rarity system with proper yellow/legendary styling
+  - Founders Pack prominently featured in Quest page and Gem Shop for maximum visibility
+- **Avatar Rarity Borders**: Added colored borders around avatars on stats page to display rarity
+  - Red border with glow for G.M. users (Rob's exclusive avatar)
+  - Grey border with glow for basic male/female avatars
+  - Creates visual distinction and exclusive status recognition
+- **Business Strategy**: Three-tier monetization complete - workout programs ($9.97) + gems ($1.99-$19.99) + exclusive Founders Pack ($29.97)
+
 **January 28, 2025 - Gems Currency System & Dual Monetization:**
 - **Complete Gems Currency System**: Implemented premium currency for in-app purchases
   - Gems displayed in currency header alongside gold coins

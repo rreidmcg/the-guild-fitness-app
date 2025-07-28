@@ -492,7 +492,13 @@ export default function Stats() {
 
             {/* 2D Avatar Display */}
             <div className="flex flex-col items-center mb-6">
-              <Avatar2D user={safeUserStats} size="lg" />
+              <div className={`rounded-lg p-1 ${
+                safeUserStats.currentTitle === "<G.M.>" || safeUserStats.currentTitle === "G.M." 
+                  ? "border-4 border-red-500 bg-red-500/10" 
+                  : "border-4 border-gray-500 bg-gray-500/10"
+              }`}>
+                <Avatar2D user={safeUserStats} size="lg" />
+              </div>
               
               {/* Character Stats Below Avatar */}
               <div className="text-center mt-6">
