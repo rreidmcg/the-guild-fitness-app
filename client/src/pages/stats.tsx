@@ -182,16 +182,17 @@ export default function Stats() {
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
-              {/* Wardrobe Button Above Title */}
-              <div className="w-full flex justify-end mb-2">
+              {/* Wardrobe Button Above Title - Mobile Optimized */}
+              <div className="w-full flex justify-center mb-3">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => setShowWardrobe(true)}
-                  className="text-xs border-purple-500 text-purple-400 hover:bg-purple-900/30 flex items-center gap-1"
+                  className="text-xs border-purple-500 text-purple-400 hover:bg-purple-900/30 flex items-center gap-1 px-3 py-1.5"
                 >
                   <Shirt className="w-3 h-3" />
-                  Wardrobe
+                  <span className="hidden sm:inline">Wardrobe</span>
+                  <span className="sm:hidden">Style</span>
                 </Button>
               </div>
               
