@@ -25,6 +25,7 @@ import { dailyResetService } from "./daily-reset-system.js";
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByVerificationToken(token: string): Promise<User | undefined>;
@@ -35,6 +36,7 @@ export interface IStorage {
   updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User>;
 
   // Exercise operations
+  getExercises(): Promise<Exercise[]>;
   getAllExercises(): Promise<Exercise[]>;
   getExercise(id: number): Promise<Exercise | undefined>;
   createExercise(exercise: InsertExercise): Promise<Exercise>;
@@ -48,6 +50,7 @@ export interface IStorage {
 
   // Workout session operations
   getUserWorkoutSessions(userId: number): Promise<WorkoutSession[]>;
+  getAllWorkoutSessions(): Promise<WorkoutSession[]>;
   getWorkoutSession(id: number): Promise<WorkoutSession | undefined>;
   createWorkoutSession(session: InsertWorkoutSession): Promise<WorkoutSession>;
 
@@ -361,6 +364,20 @@ export class DatabaseStorage implements IStorage {
       .values(insertSession as any)
       .returning();
     return session;
+  }
+
+  async getAllWorkoutSessions(): Promise<WorkoutSession[]> {
+    await this.ensureInitialized();
+    return await db.select().from(workoutSessions);
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    await this.ensureInitialized();
+    return await db.select().from(users);
+  }
+
+  async getExercises(): Promise<Exercise[]> {
+    return await this.getAllExercises();
   }
 
   // Exercise performance operations

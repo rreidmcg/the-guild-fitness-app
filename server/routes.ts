@@ -87,7 +87,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   */
 
-  // 3-Month Premium Subscription Routes
+  // Analytics routes - Admin only
+  app.get("/api/analytics/users", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      // Check if user has G.M. title (admin access)
+      if (!user || user.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { analyticsService } = await import("./analytics-service");
+      const metrics = await analyticsService.getUserMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching user metrics:", error);
+      res.status(500).json({ error: "Failed to fetch user metrics" });
+    }
+  });
+
+  app.get("/api/analytics/retention", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { analyticsService } = await import("./analytics-service");
+      const metrics = await analyticsService.getRetentionMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching retention metrics:", error);
+      res.status(500).json({ error: "Failed to fetch retention metrics" });
+    }
+  });
+
+  app.get("/api/analytics/engagement", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { analyticsService } = await import("./analytics-service");
+      const metrics = await analyticsService.getEngagementMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching engagement metrics:", error);
+      res.status(500).json({ error: "Failed to fetch engagement metrics" });
+    }
+  });
+
+  app.get("/api/analytics/revenue", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      if (!user || user.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { analyticsService } = await import("./analytics-service");
+      const metrics = await analyticsService.getRevenueMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching revenue metrics:", error);
+      res.status(500).json({ error: "Failed to fetch revenue metrics" });
+    }
+  });
+
   app.post("/api/create-subscription", async (req, res) => {
     try {
       const userId = currentUserId;
