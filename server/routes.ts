@@ -1511,11 +1511,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Only allow <G.M.> title if user already has it or is specifically authorized (prevent regular users from getting admin access)
-      const isAuthorized = user.username === "Player 1" || user.currentTitle === "<G.M.>";
+      // Only allow <G.M.> title for Zero and Rob (prevent regular users from getting admin access)
+      const username = user.username.toLowerCase();
+      const isAuthorized = username === "zero" || username === "rob";
       
       if (title === "<G.M.>" && !isAuthorized) {
-        return res.status(403).json({ error: "You don't have permission to use this title" });
+        return res.status(403).json({ error: "G.M. title is restricted to admin users" });
       }
 
       // Handle "No Title" option (set to null)

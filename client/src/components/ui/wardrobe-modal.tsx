@@ -95,7 +95,11 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
   // Check if user has earned a title based on dungeon progression
   const hasEarnedTitle = (title: string) => {
     if (title === "Recruit") return true; // Starting title
-    if (title === "<G.M.>" && user?.currentTitle === "<G.M.>") return true;
+    // G.M. title is only available to Zero and Rob
+    if (title === "<G.M.>") {
+      const username = user?.username?.toLowerCase();
+      return username === "zero" || username === "rob";
+    }
     if (title === "The First Flame" && (user?.currentTitle === "The First Flame" || user?.hasLegendaryHunterSkin)) return true;
     
     // Boss-based progression titles - based on level ranges
@@ -163,7 +167,14 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {AVAILABLE_TITLES.map((title) => {
+              {AVAILABLE_TITLES.filter(title => {
+                // Hide G.M. title from everyone except Zero and Rob
+                if (title.name === "<G.M.>") {
+                  const username = user?.username?.toLowerCase();
+                  return username === "zero" || username === "rob";
+                }
+                return true;
+              }).map((title) => {
                 const isEarned = hasEarnedTitle(title.name);
                 const isSelected = selectedTitle === title.name;
                 const titleComponent = getTitleComponent(title.name, "sm");
