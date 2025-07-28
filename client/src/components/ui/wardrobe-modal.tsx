@@ -47,7 +47,7 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
     mutationFn: async (newTitle: string) => {
       const response = await apiRequest("/api/user/update-title", {
         method: "PATCH",
-        body: JSON.stringify({ title: newTitle }),
+        body: { title: newTitle },
       });
       return response;
     },
@@ -72,7 +72,7 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
     mutationFn: async (newSkin: string) => {
       const response = await apiRequest("/api/user/update-avatar", {
         method: "PATCH",
-        body: JSON.stringify({ gender: newSkin }),
+        body: { gender: newSkin },
       });
       return response;
     },
