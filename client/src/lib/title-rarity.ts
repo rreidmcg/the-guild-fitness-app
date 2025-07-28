@@ -1,5 +1,5 @@
 /**
- * Title rarity system for Dumbbells & Dragons
+ * Title rarity system for The Guild: Gamified Fitness
  * Defines color coding for titles based on rarity tiers
  */
 

@@ -1,6 +1,6 @@
 {
-  "name": "Dumbbells & Dragons - RPG Fitness Tracker",
-  "short_name": "D&D Fitness",
+  "name": "The Guild: Gamified Fitness",
+  "short_name": "The Guild",
   "description": "Gamified fitness tracking with RPG progression and monster battles",
   "start_url": "/",
   "display": "standalone",
