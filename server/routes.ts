@@ -1490,17 +1490,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Define title requirements based on level
+      // Define title requirements based on level and progression
       const titleRequirements = [
         { title: "Recruit", level: 1 },
-        { title: "Novice", level: 2 },
-        { title: "Apprentice", level: 5 }, 
-        { title: "Journeyman", level: 10 },
-        { title: "Expert", level: 15 },
-        { title: "Master", level: 20 },
-        { title: "Champion", level: 25 },
-        { title: "Legend", level: 30 },
-        { title: "Mythic", level: 40 },
+        { title: "Fitness Novice", level: 1 },
+        { title: "Fitness Apprentice", level: 5 },
+        { title: "Fitness Warrior", level: 8 },
+        { title: "Fitness Veteran", level: 15 },
+        { title: "Fitness Champion", level: 20 },
+        { title: "Fitness Master", level: 25 },
+        { title: "Fitness Grandmaster", level: 30 },
+        { title: "Fitness Legend", level: 35 },
+        { title: "Fitness Mythic", level: 40 },
+        { title: "The First Flame", level: 1 }, // Special Founders Pack title
       ];
 
       // Check if title is available for user's level
@@ -1522,6 +1524,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle "No Title" option (set to null)
       const titleToSet = title === "No Title" ? null : title;
       
+      // Special handling for exclusive titles
+      if (title === "The First Flame" && user.currentTitle !== "The First Flame") {
+        return res.status(403).json({ error: "This title is exclusive to Founders Pack members" });
+      }
+      
       // Validate title exists in our requirements or is the special admin title or is "No Title"
       const validTitles = titleRequirements.map(req => req.title).concat(["<G.M.>", "No Title"]);
       if (!validTitles.includes(title)) {
@@ -1537,10 +1544,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/user/update-avatar", async (req, res) => {
     try {
-      const { customAvatarUrl } = req.body;
+      const { gender } = req.body;
       const userId = currentUserId; // Use the current logged-in user
       
-      const updatedUser = await storage.updateUser(userId, { customAvatarUrl });
+      if (!gender || typeof gender !== 'string') {
+        return res.status(400).json({ error: "Valid gender is required" });
+      }
+      
+      // Validate gender value
+      if (!['male', 'female', 'legendary_hunter'].includes(gender)) {
+        return res.status(400).json({ error: "Invalid gender value" });
+      }
+      
+      const updatedUser = await storage.updateUser(userId, { gender });
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user avatar" });
