@@ -1066,6 +1066,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/user-achievements/:achievementId/mark-viewed", async (req, res) => {
+    try {
+      const userId = currentUserId; // Use the current logged-in user
+      const achievementId = parseInt(req.params.achievementId);
+      
+      if (isNaN(achievementId)) {
+        return res.status(400).json({ error: "Invalid achievement ID" });
+      }
+      
+      const result = await storage.markAchievementAsViewed(userId, achievementId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mark achievement as viewed" });
+    }
+  });
+
   // Daily quest routes
   app.get("/api/daily-progress", async (req, res) => {
     try {

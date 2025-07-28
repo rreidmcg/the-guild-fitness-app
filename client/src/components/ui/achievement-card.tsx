@@ -3,7 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, Star, Crown, Zap, Target, Heart, Coins, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { AchievementDetailModal } from "@/components/ui/achievement-detail-modal";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 interface Achievement {
   id: number;
@@ -20,6 +23,7 @@ interface UserAchievement {
   userId: number;
   achievementId: number;
   unlockedAt: string;
+  isViewed?: boolean;
 }
 
 interface AchievementCardProps {
@@ -81,9 +85,31 @@ const getProgressValue = (achievement: Achievement, userStats?: any): number => 
 
 export function AchievementCard({ achievement, userAchievement, userStats }: AchievementCardProps) {
   const { toast } = useToast();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const isUnlocked = !!userAchievement;
   const currentProgress = getProgressValue(achievement, userStats);
   const progressPercentage = Math.min((currentProgress / achievement.requirement) * 100, 100);
+  const isNew = userAchievement && !userAchievement.isViewed;
+
+  const markAsViewedMutation = useMutation({
+    mutationFn: async (achievementId: number) => {
+      return apiRequest(`/api/user-achievements/${achievementId}/mark-viewed`, {
+        method: "POST"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user-achievements"] });
+    }
+  });
+
+  const handleCardClick = () => {
+    setIsModalOpen(true);
+    
+    // Mark as viewed if it's a new achievement
+    if (userAchievement && !userAchievement.isViewed) {
+      markAsViewedMutation.mutate(userAchievement.achievementId);
+    }
+  };
 
   const handleShare = async () => {
     try {
@@ -124,20 +150,28 @@ export function AchievementCard({ achievement, userAchievement, userStats }: Ach
   };
 
   return (
-    <Card className={`transition-all duration-300 ${
-      isUnlocked 
-        ? 'bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-800' 
-        : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-    }`}>
+    <>
+      <Card 
+        onClick={handleCardClick}
+        className={`transition-all duration-300 cursor-pointer hover:shadow-md ${
+          isUnlocked 
+            ? 'bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-800' 
+            : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+        }`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${
-              isUnlocked 
-                ? 'bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200' 
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-            }`}>
-              {getAchievementIcon(achievement.type)}
+            <div className="relative">
+              <div className={`p-2 rounded-lg ${
+                isUnlocked 
+                  ? 'bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200' 
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+              }`}>
+                {getAchievementIcon(achievement.type)}
+              </div>
+              {isNew && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+              )}
             </div>
             <div>
               <CardTitle className={`text-lg ${
@@ -162,7 +196,10 @@ export function AchievementCard({ achievement, userAchievement, userStats }: Ach
               <Button
                 size="sm"
                 variant="outline"
-                onClick={handleShare}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShare();
+                }}
                 className="border-yellow-300 hover:bg-yellow-50 dark:border-yellow-700 dark:hover:bg-yellow-900/20"
               >
                 <Share2 className="h-3 w-3" />
@@ -214,5 +251,13 @@ export function AchievementCard({ achievement, userAchievement, userStats }: Ach
         </div>
       </CardContent>
     </Card>
+    
+    <AchievementDetailModal
+      achievement={achievement}
+      userAchievement={userAchievement}
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+    />
+    </>
   );
 }

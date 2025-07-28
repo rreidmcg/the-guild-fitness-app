@@ -2,6 +2,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Star, Crown, Zap, Target, Heart, Coins, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
+import { AchievementDetailModal } from "@/components/ui/achievement-detail-modal";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface Achievement {
   id: number;
@@ -78,6 +82,20 @@ const getProgressValue = (achievement: Achievement, userStats: any): number => {
 
 export function CompactAchievementCard({ achievements, userAchievements, userStats }: CompactAchievementCardProps) {
   const [, setLocation] = useLocation();
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [selectedUserAchievement, setSelectedUserAchievement] = useState<UserAchievement | undefined>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const markAsViewedMutation = useMutation({
+    mutationFn: async (achievementId: number) => {
+      return apiRequest(`/api/user-achievements/${achievementId}/mark-viewed`, {
+        method: "POST"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user-achievements"] });
+    }
+  });
 
   // Sort achievements: unlocked first, then by difficulty (requirement)
   const sortedAchievements = [...achievements].sort((a, b) => {
@@ -100,6 +118,17 @@ export function CompactAchievementCard({ achievements, userAchievements, userSta
 
   const handleViewAll = () => {
     setLocation('/achievements');
+  };
+
+  const handleAchievementClick = (achievement: Achievement, userAchievement?: UserAchievement) => {
+    setSelectedAchievement(achievement);
+    setSelectedUserAchievement(userAchievement);
+    setIsModalOpen(true);
+    
+    // Mark as viewed if it's a new achievement
+    if (userAchievement && !userAchievement.isViewed) {
+      markAsViewedMutation.mutate(userAchievement.achievementId);
+    }
   };
 
   return (
@@ -137,9 +166,10 @@ export function CompactAchievementCard({ achievements, userAchievements, userSta
           return (
             <div
               key={achievement.id}
-              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+              onClick={() => handleAchievementClick(achievement, userAchievement)}
+              className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${
                 isUnlocked 
-                  ? 'bg-gradient-to-r from-yellow-50/50 to-orange-50/50 dark:from-yellow-900/10 dark:to-orange-900/10 border border-yellow-200/50 dark:border-yellow-800/50' 
+                  ? 'bg-gradient-to-r from-yellow-50/50 to-orange-50/50 dark:from-yellow-900/10 dark:to-orange-900/10 border border-yellow-200/50 dark:border-yellow-800/50 hover:from-yellow-100/50 hover:to-orange-100/50' 
                   : 'bg-muted/30 hover:bg-muted/50'
               }`}
             >
@@ -208,6 +238,13 @@ export function CompactAchievementCard({ achievements, userAchievements, userSta
           </div>
         )}
       </CardContent>
+      
+      <AchievementDetailModal
+        achievement={selectedAchievement}
+        userAchievement={selectedUserAchievement}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </Card>
   );
 }

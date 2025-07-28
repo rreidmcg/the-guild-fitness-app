@@ -78,6 +78,7 @@ export interface IStorage {
   getUserAchievements(userId: number): Promise<UserAchievement[]>;
   unlockAchievement(userId: number, achievementId: number): Promise<UserAchievement>;
   checkAndUnlockAchievements(userId: number): Promise<UserAchievement[]>;
+  markAchievementAsViewed(userId: number, achievementId: number): Promise<UserAchievement>;
 
   // Social sharing operations
   createSocialShare(share: InsertSocialShare): Promise<SocialShare>;
@@ -1204,6 +1205,33 @@ export class DatabaseStorage implements IStorage {
     }
     
     return newUnlocks;
+  }
+
+  async markAchievementAsViewed(userId: number, achievementId: number): Promise<UserAchievement> {
+    await this.ensureInitialized();
+    
+    try {
+      // Update the user achievement to mark as viewed
+      const [updatedAchievement] = await db
+        .update(userAchievements)
+        .set({ isViewed: true })
+        .where(
+          and(
+            eq(userAchievements.userId, userId),
+            eq(userAchievements.achievementId, achievementId)
+          )
+        )
+        .returning();
+
+      if (!updatedAchievement) {
+        throw new Error(`Achievement ${achievementId} not found for user ${userId}`);
+      }
+
+      return updatedAchievement;
+    } catch (error) {
+      console.error(`Error marking achievement as viewed:`, error);
+      throw error;
+    }
   }
 
   // Analytics helper methods - removed duplicates and fixed table references

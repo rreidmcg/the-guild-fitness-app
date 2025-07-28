@@ -256,6 +256,7 @@ export const userAchievements = pgTable("user_achievements", {
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
   achievementId: integer("achievement_id").references(() => achievements.id, { onDelete: "cascade" }),
   unlockedAt: timestamp("unlocked_at").defaultNow(),
+  isViewed: boolean("is_viewed").default(false),
 }, (table) => ({
   userAchievementUnique: uniqueIndex("user_achievement_idx").on(table.userId, table.achievementId),
 }));
