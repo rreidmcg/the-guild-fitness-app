@@ -120,11 +120,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         items: [{ 
           price_data: {
             currency: 'usd',
-            product_data: {
-              name: 'Premium AI Fitness Coach - 3 Month Plan',
-              description: 'Personalized AI workout recommendations, adaptive training plans, and premium features',
-            },
-            unit_amount: 2997, // $29.97 total ($9.99/month x 3 months)
+            product: 'prod_premium_ai_fitness', // Using a simple product ID
+            unit_amount: 999, // $9.99/month
             recurring: {
               interval: 'month',
               interval_count: 1,

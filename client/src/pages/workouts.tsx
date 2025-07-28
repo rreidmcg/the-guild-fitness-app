@@ -403,7 +403,14 @@ export default function Workouts() {
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-foreground">{program.name}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">{program.name}</h3>
+                          {program.name === "Novice Program" && (
+                            <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-2 py-0.5 rounded text-xs font-medium">
+                              Free
+                            </span>
+                          )}
+                        </div>
                         <div className="flex space-x-2">
                           <Button 
                             size="sm" 
@@ -418,10 +425,10 @@ export default function Workouts() {
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span className="bg-game-primary/20 text-game-primary px-2 py-1 rounded">{program.difficultyLevel}</span>
-                        <span>{program.durationWeeks} weeks</span>
+                      <p className="text-sm text-foreground/80 mb-3">{program.description}</p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="bg-game-primary/20 text-game-primary px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
+                        <span className="text-foreground/70 font-medium">{program.durationWeeks} weeks</span>
                       </div>
                     </CardContent>
                   </Card>

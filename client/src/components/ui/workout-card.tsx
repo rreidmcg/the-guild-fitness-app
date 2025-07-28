@@ -25,7 +25,7 @@ export function WorkoutCard({ session }: WorkoutCardProps) {
   };
 
   return (
-    <Card className="bg-gray-800 border-gray-600 hover:border-game-primary transition-colors cursor-pointer">
+    <Card className="bg-card border-border hover:border-game-primary transition-colors cursor-pointer">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-3">
@@ -33,8 +33,8 @@ export function WorkoutCard({ session }: WorkoutCardProps) {
               <Dumbbell className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">{session.name}</h3>
-              <p className="text-sm text-gray-400">
+              <h3 className="font-semibold text-foreground">{session.name}</h3>
+              <p className="text-sm text-foreground/70">
                 {session.completedAt && formatDate(session.completedAt)} • {session.duration} min
               </p>
             </div>
@@ -46,7 +46,7 @@ export function WorkoutCard({ session }: WorkoutCardProps) {
           </div>
         </div>
         
-        <div className="flex items-center space-x-4 text-sm text-gray-300">
+        <div className="flex items-center space-x-4 text-sm text-foreground/60">
           <span className="flex items-center">
             <Dumbbell className="w-3 h-3 mr-1" />
             {session.totalVolume || 0} lbs
