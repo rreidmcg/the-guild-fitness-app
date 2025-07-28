@@ -214,3 +214,34 @@ export function generateAdminWaiverNotification(userName: string, userEmail: str
     </html>
   `;
 }
+// Send admin notification about new liability waiver
+export async function sendAdminNotification(userName: string, userEmail: string, ipAddress: string, userAgent: string): Promise<boolean> {
+  const adminHtml = generateAdminWaiverNotification(userName, userEmail, ipAddress, userAgent);
+  
+  return await sendEmail({
+    to: "guildmasterreid@gmail.com", // Dedicated business email for all admin notifications
+    subject: `🔔 New Liability Waiver Signed - ${userName}`,
+    html: adminHtml
+  });
+}
+
+// Send liability waiver confirmation to new user
+export async function sendLiabilityWaiverConfirmation(userData: { username: string, email: string }, ip: string, userAgent: string): Promise<void> {
+  try {
+    // Send user confirmation email
+    const userHtml = generateLiabilityWaiverEmail(userData.username, userData.email);
+    await sendEmail({
+      to: userData.email,
+      subject: "✅ Liability Waiver Confirmation - The Guild: Gamified Fitness",
+      html: userHtml
+    });
+
+    // Send admin notification to dedicated business email
+    await sendAdminNotification(userData.username, userData.email, ip, userAgent);
+    
+    console.log(`📧 Liability waiver emails processed for user: ${userData.username}`);
+  } catch (error) {
+    console.error("Failed to send liability waiver emails:", error);
+    throw error;
+  }
+}

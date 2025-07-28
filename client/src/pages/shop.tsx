@@ -38,6 +38,7 @@ import armorImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_17531514904
 import characterMaleImage from "@assets/IMG_3682_1753213695174.png";
 import minorManaPotionImage from "@assets/A78C5316-EC32-40FF-8919-E20BF97740B3_1753733597516.png";
 import majorManaPotionImage from "@assets/B3B92435-50B3-4B4F-BF95-30E009AA81EB_1753733641186.png";
+import legendaryHunterSkin from "@assets/IMG_3775_1753737253422.png";
 import megaHealPotionImage from "@assets/08789489-C26E-40BE-BA19-1471C66163E2_1753500783697.png";
 import megaManaPotionImage from "@assets/E87E3B27-6376-4A57-93C6-2CE3FE0EF645_1753733707898.png";
 
@@ -291,6 +292,26 @@ export default function Shop() {
           <p className="text-muted-foreground text-center">
             Exclusive pack for the first 100 users! Get premium rewards and legendary status.
           </p>
+
+          {/* Legendary Hunter Skin Preview */}
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <div className="w-24 h-36 rounded-lg overflow-hidden border-4 border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 shadow-lg shadow-yellow-500/25">
+                <img 
+                  src={legendaryHunterSkin}
+                  alt="The Legendary Hunter Skin"
+                  className="w-full h-full object-contain"
+                  style={{
+                    imageRendering: 'pixelated',
+                    filter: 'drop-shadow(0 0 8px rgba(234, 179, 8, 0.5))'
+                  }}
+                />
+              </div>
+              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-bold">
+                Legendary
+              </div>
+            </div>
+          </div>
           
           <div className="space-y-3">
             <div className="flex items-center space-x-3 text-sm">
@@ -308,6 +329,10 @@ export default function Shop() {
             <div className="flex items-center space-x-3 text-sm">
               <Crown className="w-4 h-4 text-yellow-500" />
               <span>Legendary "The First Flame" Title</span>
+            </div>
+            <div className="flex items-center space-x-3 text-sm">
+              <Shield className="w-4 h-4 text-yellow-500" />
+              <span className="text-yellow-400 font-semibold">"The Legendary Hunter" Exclusive Skin</span>
             </div>
           </div>
 

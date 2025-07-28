@@ -492,7 +492,13 @@ export default function Stats() {
 
             {/* 2D Avatar Display */}
             <div className="flex flex-col items-center mb-6">
-              <div className="border-4 border-gray-500 rounded-lg p-1">
+              <div className={`border-4 rounded-lg p-1 ${
+                (safeUserStats?.title === "<G.M.>" 
+                  ? "border-red-500 shadow-lg shadow-red-500/50" 
+                  : safeUserStats?.title === "The First Flame"
+                    ? "border-yellow-500 shadow-lg shadow-yellow-500/50"
+                    : "border-gray-500")
+              }`}>
                 <Avatar2D user={safeUserStats} size="lg" />
               </div>
               

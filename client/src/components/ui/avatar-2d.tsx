@@ -6,6 +6,7 @@ import robCustomAvatar1 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_17535
 import robCustomAvatar2 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753559527359.jpeg";
 import robCustomAvatar3 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753560953692.jpeg";
 import robGMAvatar from "@assets/IMG_3731_1753561497035.png";
+import legendaryHunterSkin from "@assets/IMG_3775_1753737253422.png";
 
 interface Avatar2DProps {
   user?: User;
@@ -52,14 +53,26 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
     }
   };
 
-  // Get the appropriate avatar image based on title, custom avatar, and gender
-  const avatarImage = playerData?.title === "<G.M.>" 
-    ? (playerData?.customAvatarUrl ? getCustomAvatar(playerData.customAvatarUrl) || gmAvatarImage : gmAvatarImage)
-    : playerData?.customAvatarUrl
-      ? getCustomAvatar(playerData.customAvatarUrl) || (playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage)
-      : playerData?.gender === "female" 
-        ? femaleAvatarImage 
-        : maleAvatarImage;
+  // Get the appropriate avatar image based on title, skin ownership, custom avatar, and gender
+  const avatarImage = (() => {
+    // Check for Legendary Hunter skin (Founders Pack exclusive)
+    if (playerData?.title === "The First Flame" || playerData?.hasLegendaryHunterSkin) {
+      return legendaryHunterSkin;
+    }
+    
+    // G.M. users get special avatars
+    if (playerData?.title === "<G.M.>") {
+      return playerData?.customAvatarUrl ? getCustomAvatar(playerData.customAvatarUrl) || gmAvatarImage : gmAvatarImage;
+    }
+    
+    // Custom avatars for specific users (Rob)
+    if (playerData?.customAvatarUrl) {
+      return getCustomAvatar(playerData.customAvatarUrl) || (playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage);
+    }
+    
+    // Default gender-based avatars
+    return playerData?.gender === "female" ? femaleAvatarImage : maleAvatarImage;
+  })();
 
   // Calculate fitness effects for visual overlays
   const muscleDefinition = Math.min(strength / 20, 1);

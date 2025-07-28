@@ -173,6 +173,22 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 28, 2025 - Legendary Hunter Skin Integration & Shop Reorganization:**
+- **Legendary Hunter Skin for Founders Pack**: Integrated custom pixel art skin "The Legendary Hunter" with yellow border styling
+  - Added skin asset to Avatar2D component with special rarity detection for "The First Flame" title holders
+  - Enhanced Founders Pack display in shop with skin preview and yellow legendary border
+  - Updated stats page to show yellow border for Founders Pack users (matching G.M. red border system)
+  - Skin automatically displays for users with "The First Flame" title or hasLegendaryHunterSkin property
+- **Shop Reorganization Complete**: Streamlined shop structure with 4-tab layout
+  - Removed Gem Shop and Founders Pack buttons from Quest page header for cleaner UI
+  - Created dedicated "Bundles" tab with Gift icon and orange legendary styling
+  - Moved Founders Pack to its own section with proper skin preview and features list
+  - Added "Coming Soon" section for future bundle offers and seasonal packages
+- **Email Service Enhancement**: Updated to use dedicated business email guildmasterreid@gmail.com for all admin notifications
+  - Centralized all liability waiver and admin notifications to professional business email
+  - Maintained MailerSend integration with proper error handling and logging
+  - Admin notifications now route to dedicated business email instead of previous addresses
+
 **January 28, 2025 - App Rebranding & MailerLite Integration:**
 - **Complete App Rebranding**: Updated app name from "Dumbbells & Dragons" to "The Guild: Gamified Fitness"
   - Updated PWA manifest with new name and short name "The Guild"
