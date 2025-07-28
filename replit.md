@@ -184,6 +184,10 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - Red border with glow for G.M. users (Rob's exclusive avatar)
   - Grey border with glow for basic male/female avatars
   - Creates visual distinction and exclusive status recognition
+- **Enhanced User Experience**: Improved error messaging for potion usage at full health
+  - Clear "Full Health. Cannot use potion" message for healing potions
+  - Clear "Full Mana. Cannot use potion" message for mana potions
+  - Prevents confusion and provides specific feedback to users
 - **Business Strategy**: Three-tier monetization complete - workout programs ($9.97) + gems ($1.99-$19.99) + exclusive Founders Pack ($29.97)
 
 **January 28, 2025 - Gems Currency System & Dual Monetization:**

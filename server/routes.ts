@@ -1875,7 +1875,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const actualHealing = newHp - (user.currentHp || maxHp);
         
         if (actualHealing <= 0) {
-          return res.status(400).json({ error: "You are already at full health" });
+          return res.status(400).json({ error: "Full Health. Cannot use potion" });
         }
         
         updateData.currentHp = newHp;
@@ -1907,7 +1907,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const actualRestoration = newMp - currentMp;
         
         if (actualRestoration <= 0) {
-          return res.status(400).json({ error: "You are already at full mana" });
+          return res.status(400).json({ error: "Full Mana. Cannot use potion" });
         }
         
         updateData.currentMp = newMp;
