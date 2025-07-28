@@ -482,7 +482,7 @@ export default function Shop() {
 
           {/* Consumables Tab */}
           <TabsContent value="consumables">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               {filterPotionsByCategory(selectedConsumableCategory).map((potion) => (
                 <Card key={potion.id} className="bg-card border-border relative overflow-hidden">
                   <CardHeader className="pb-2">
@@ -626,7 +626,7 @@ export default function Shop() {
                   <p className="text-muted-foreground">Get more gold coins to purchase items and potions</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                <div className="grid grid-cols-3 gap-4 max-w-4xl mx-auto">
                   {[
                     { amount: 100, price: 0.99, bonus: 0, popular: false },
                     { amount: 500, price: 4.99, bonus: 50, popular: true },
@@ -705,7 +705,7 @@ export default function Shop() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                <div className="grid grid-cols-3 gap-4 max-w-4xl mx-auto">
                   {[
                     { amount: 100, price: 1.99, popular: false },
                     { amount: 250, price: 4.99, popular: true },
