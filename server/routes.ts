@@ -862,9 +862,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(`
         <html><body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
           <h2 style="color: #2563eb;">Email Verified Successfully!</h2>
-          <p>Your Dumbbells & Dragons account has been verified. You can now log in.</p>
+          <p>Your The Guild: Gamified Fitness account has been verified. You can now log in.</p>
           <a href="/" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">
-            Go to Dumbbells & Dragons
+            Go to The Guild
           </a>
         </body></html>
       `);
@@ -2489,7 +2489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const userEmailHtml = generateLiabilityWaiverEmail(fullName, email);
         await sendEmail({
           to: email,
-          subject: "Liability Waiver Confirmation - Dumbbells & Dragons",
+          subject: "Liability Waiver Confirmation - The Guild: Gamified Fitness",
           html: userEmailHtml
         });
 
@@ -2497,7 +2497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const adminEmailHtml = generateAdminWaiverNotification(fullName, email, ipAddress || 'unknown', userAgent || 'unknown');
         await sendEmail({
           to: "coachreidmcg@gmail.com",
-          subject: "New Liability Waiver Signed - Dumbbells & Dragons",
+          subject: "New Liability Waiver Signed - The Guild: Gamified Fitness",
           html: adminEmailHtml
         });
       } catch (emailError) {

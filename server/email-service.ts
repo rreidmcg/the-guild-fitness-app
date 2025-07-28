@@ -49,7 +49,7 @@ export function generateLiabilityWaiverEmail(userName: string, userEmail: string
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Liability Waiver Confirmation - Dumbbells & Dragons</title>
+      <title>Liability Waiver Confirmation - The Guild: Gamified Fitness</title>
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: #4f46e5; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
@@ -63,7 +63,7 @@ export function generateLiabilityWaiverEmail(userName: string, userEmail: string
     </head>
     <body>
       <div class="header">
-        <h1>🏋️ Dumbbells & Dragons</h1>
+        <h1>🏋️ The Guild: Gamified Fitness</h1>
         <p>Liability Waiver Confirmation</p>
       </div>
       
@@ -72,7 +72,7 @@ export function generateLiabilityWaiverEmail(userName: string, userEmail: string
         
         <p>Dear ${userName},</p>
         
-        <p>Thank you for completing the liability waiver for Dumbbells & Dragons. This email serves as confirmation that you have read, understood, and agreed to the terms outlined in our liability waiver and release agreement.</p>
+        <p>Thank you for completing the liability waiver for The Guild: Gamified Fitness. This email serves as confirmation that you have read, understood, and agreed to the terms outlined in our liability waiver and release agreement.</p>
         
         <div class="warning">
           <strong>Important Reminders:</strong>
@@ -97,12 +97,12 @@ export function generateLiabilityWaiverEmail(userName: string, userEmail: string
         <p>If you have any questions or concerns, please don't hesitate to contact us.</p>
         
         <p>Best regards,<br>
-        The Dumbbells & Dragons Team</p>
+        The Guild: Gamified Fitness Team</p>
       </div>
       
       <div class="footer">
         <p>This is an automated confirmation email. Please save this for your records.</p>
-        <p>© 2025 Dumbbells & Dragons. All rights reserved.</p>
+        <p>© 2025 The Guild: Gamified Fitness. All rights reserved.</p>
       </div>
     </body>
     </html>
@@ -115,7 +115,7 @@ export function generateAdminWaiverNotification(userName: string, userEmail: str
     <html>
     <head>
       <meta charset="utf-8">
-      <title>New Liability Waiver Signed - Dumbbells & Dragons</title>
+      <title>New Liability Waiver Signed - The Guild: Gamified Fitness</title>
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: #dc2626; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
@@ -137,7 +137,7 @@ export function generateAdminWaiverNotification(userName: string, userEmail: str
       <div class="content">
         <h2>Liability Waiver Acceptance</h2>
         
-        <p>A new user has signed the liability waiver for Dumbbells & Dragons.</p>
+        <p>A new user has signed the liability waiver for The Guild: Gamified Fitness.</p>
         
         <div class="details">
           <h3>User Information:</h3>
@@ -176,8 +176,8 @@ export function generateAdminWaiverNotification(userName: string, userEmail: str
       </div>
       
       <div class="footer">
-        <p>This is an automated legal notification from Dumbbells & Dragons.</p>
-        <p>© 2025 Dumbbells & Dragons. All rights reserved.</p>
+        <p>This is an automated legal notification from The Guild: Gamified Fitness.</p>
+        <p>© 2025 The Guild: Gamified Fitness. All rights reserved.</p>
       </div>
     </body>
     </html>
