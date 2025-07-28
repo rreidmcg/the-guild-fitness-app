@@ -86,45 +86,7 @@ export default function Achievements() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-6 space-y-6">
-        {/* Achievement Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-card border-border">
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">
-                  {Array.isArray(userAchievements) ? userAchievements.length : 0}
-                </div>
-                <div className="text-sm text-muted-foreground">Unlocked</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card border-border">
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">
-                  {Array.isArray(achievements) ? achievements.length : 0}
-                </div>
-                <div className="text-sm text-muted-foreground">Total</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card border-border">
-            <CardContent className="p-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-foreground">
-                  {Array.isArray(achievements) && Array.isArray(userAchievements) 
-                    ? Math.round((userAchievements.length / achievements.length) * 100) 
-                    : 0}%
-                </div>
-                <div className="text-sm text-muted-foreground">Complete</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
+      <div className="max-w-4xl mx-auto p-6">
         {/* All Achievements */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {sortedAchievements.length > 0 ? sortedAchievements.map((achievement: any) => {
