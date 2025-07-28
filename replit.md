@@ -173,7 +173,7 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
-**January 28, 2025 - Boss-Themed Title System:**
+**January 28, 2025 - Boss-Themed Title System & Avatar Border Separation:**
 - **Updated Title System with Boss Names**: Replaced generic "Conqueror" titles with boss-themed progression titles
   - E-rank: "Goblin Slayer" (defeat Goblin King, Lv 1-10)
   - D-rank: "Orc Crusher" (defeat Orc Warlord, Lv 11-20)
@@ -181,9 +181,14 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - B-rank: "Demon Hunter" (defeat Demon Lord, Lv 31-40) - In Development
   - A-rank: "Titan Slayer" (defeat Primordial Titan, Lv 41-50) - In Development
   - S-rank: "God Killer" (defeat Fallen God, Lv 51+) - In Development
+- **G.M. Title Access**: Unlocked G.M. title for Zero alongside Rob, hidden from all other users
+- **Avatar Border System**: Separated avatar borders from user status - now based on avatar rarity only
+  - Yellow border for legendary avatars (Founders Pack "The First Flame" or Legendary Hunter skin)
+  - Gray border for common/default avatars
+  - User status (G.M.) only displayed through title text, not avatar borders
 - **Enhanced Wardrobe Modal**: Updated title progression display with boss-themed requirements
 - **Backend Validation**: Updated server-side title validation to match new boss titles
-- **Maintained Special Titles**: Preserved "The First Flame" (Founders Pack) and "<G.M.>" (Admin) titles
+- **Fixed JSON Parsing**: Resolved double encoding issue in wardrobe title/avatar updates
 
 **January 28, 2025 - Legendary Hunter Skin Integration & Shop Reorganization:**
 - **Legendary Hunter Skin for Founders Pack**: Integrated custom pixel art skin "The Legendary Hunter" with yellow border styling
