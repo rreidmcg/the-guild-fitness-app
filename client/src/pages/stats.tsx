@@ -182,6 +182,19 @@ export default function Stats() {
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
+              {/* Wardrobe Button Above Title */}
+              <div className="w-full flex justify-end mb-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowWardrobe(true)}
+                  className="text-xs border-purple-500 text-purple-400 hover:bg-purple-900/30 flex items-center gap-1"
+                >
+                  <Shirt className="w-3 h-3" />
+                  Wardrobe
+                </Button>
+              </div>
+              
               {(() => {
                 const titleComponent = getTitleComponent(safeUserStats.currentTitle, "md");
                 return titleComponent.displayTitle ? (
@@ -197,18 +210,6 @@ export default function Stats() {
 
             {/* 2D Avatar Display */}
             <div className="flex flex-col items-center mb-6">
-              {/* Wardrobe Button */}
-              <div className="w-full flex justify-end mb-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowWardrobe(true)}
-                  className="text-xs border-purple-500 text-purple-400 hover:bg-purple-900/30 flex items-center gap-1"
-                >
-                  <Shirt className="w-3 h-3" />
-                  Wardrobe
-                </Button>
-              </div>
 
               <div className={`border-4 rounded-lg p-1 ${
                 (safeUserStats?.currentTitle === "<G.M.>" 
