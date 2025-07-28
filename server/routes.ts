@@ -297,6 +297,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Shop routes
+  app.get("/api/shop", async (req, res) => {
+    try {
+      const items = await storage.getAllShopItems();
+      
+      // Format items for display
+      const formattedItems = items.map(item => ({
+        ...item,
+        priceFormatted: item.currency === 'usd' 
+          ? `$${(item.price / 100).toFixed(2)}`
+          : `${item.price} 💎`
+      }));
+      
+      res.json(formattedItems);
+    } catch (error) {
+      console.error("Error fetching shop items:", error);
+      res.status(500).json({ error: "Failed to fetch shop items" });
+    }
+  });
+
+  // Purchase gem pack with real money
+  app.post("/api/purchase-gems/:id", async (req, res) => {
+    try {
+      const itemId = parseInt(req.params.id);
+      const userId = currentUserId;
+      
+      const items = await storage.getAllShopItems();
+      const item = items.find(i => i.id === itemId);
+      
+      if (!item || item.currency !== 'usd' || item.itemType !== 'gems') {
+        return res.status(404).json({ error: "Gem pack not found" });
+      }
+      
+      // Create Stripe payment intent for gem purchase
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: item.price, // Already in cents
+        currency: "usd",
+        metadata: {
+          userId: userId.toString(),
+          itemId: itemId.toString(),
+          gemAmount: item.gemAmount?.toString() || "0",
+          type: "gem_purchase"
+        }
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        itemName: item.name,
+        price: item.price,
+        gemAmount: item.gemAmount
+      });
+    } catch (error: any) {
+      console.error("Error creating gem purchase:", error);
+      res.status(500).json({ error: "Failed to create payment intent" });
+    }
+  });
+
+  // Confirm gem purchase after successful payment
+  app.post("/api/confirm-gem-purchase", async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      const userId = currentUserId;
+      
+      // Retrieve the payment intent from Stripe to verify it was successful
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status === 'succeeded') {
+        const gemAmount = parseInt(paymentIntent.metadata.gemAmount || "0");
+        
+        // Add gems to user account
+        await storage.addGems(userId, gemAmount);
+        
+        res.json({ 
+          success: true, 
+          gemAmount: gemAmount,
+          message: `${gemAmount} gems added to your account!` 
+        });
+      } else {
+        res.status(400).json({ error: "Payment not completed" });
+      }
+    } catch (error: any) {
+      console.error("Error confirming gem purchase:", error);
+      res.status(500).json({ error: "Failed to confirm purchase" });
+    }
+  });
+
+  // Purchase item with gems
+  app.post("/api/purchase-with-gems/:id", async (req, res) => {
+    try {
+      const itemId = parseInt(req.params.id);
+      const userId = currentUserId;
+      
+      const result = await storage.purchaseShopItem(userId, itemId);
+      
+      if (result.success) {
+        res.json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error: any) {
+      console.error("Error purchasing with gems:", error);
+      res.status(500).json({ error: "Failed to purchase item" });
+    }
+  });
+
   app.post("/api/create-subscription", async (req, res) => {
     try {
       const userId = currentUserId;

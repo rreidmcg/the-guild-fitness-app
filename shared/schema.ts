@@ -21,6 +21,7 @@ export const users = pgTable("users", {
   agility: integer("agility").default(0),
   agilityXp: integer("agility_xp").default(0),
   gold: integer("gold").default(0),
+  gems: integer("gems").default(0), // Premium currency
   battlesWon: integer("battles_won").default(0),
   // Health system
   currentHp: integer("current_hp").default(40), // Default HP for starting character
@@ -613,3 +614,26 @@ export type SocialShareLike = typeof socialShareLikes.$inferSelect;
 export type InsertSocialShareLike = z.infer<typeof insertSocialShareLikeSchema>;
 export type LiabilityWaiver = typeof liabilityWaivers.$inferSelect;
 export type InsertLiabilityWaiver = z.infer<typeof insertLiabilityWaiverSchema>;
+
+// Shop items for real money and gem purchases
+export const shopItems = pgTable("shop_items", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category").notNull(), // "gems", "streak_freeze", "consumables"
+  price: integer("price").notNull(), // Price in cents for USD, or gem amount
+  currency: text("currency").notNull(), // "usd", "gems"
+  gemAmount: integer("gem_amount"), // For gem packs, how many gems this gives
+  itemType: text("item_type"), // "gems", "streak_freeze", "potion"
+  iconPath: text("icon_path"), // Path to item icon
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertShopItemSchema = createInsertSchema(shopItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ShopItem = typeof shopItems.$inferSelect;
+export type InsertShopItem = z.infer<typeof insertShopItemSchema>;

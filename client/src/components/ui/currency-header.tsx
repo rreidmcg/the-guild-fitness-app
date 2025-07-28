@@ -54,6 +54,10 @@ export function CurrencyHeader() {
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gold || 0}</span>
             </div>
             <div className="flex items-center space-x-2">
+              <span className="text-blue-400 text-sm">💎</span>
+              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gems || 0}</span>
+            </div>
+            <div className="flex items-center space-x-2">
               <button
                 onClick={() => navigate('/inventory')}
                 className="flex items-center hover:bg-muted/50 px-2 py-0.5 rounded transition-colors"

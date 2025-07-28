@@ -70,6 +70,12 @@ export interface IStorage {
   getUserPurchasedPrograms(userId: number): Promise<string[]>;
   purchaseWorkoutProgram(userId: number, programId: string): Promise<User>;
 
+  // Shop system
+  getAllShopItems(): Promise<any[]>;
+  purchaseShopItem(userId: number, itemId: number): Promise<{ success: boolean; message: string }>;
+  addGems(userId: number, amount: number): Promise<User>;
+  purchaseStreakFreeze(userId: number): Promise<{ success: boolean; message: string }>;
+
   // Wardrobe operations
   getWardrobeItemsWithOwnership(userId: number): Promise<any[]>;
   purchaseWardrobeItem(userId: number, itemId: number): Promise<any>;
@@ -1381,6 +1387,102 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return updatedUser;
+  }
+
+  // Shop system operations
+  async getAllShopItems(): Promise<any[]> {
+    const { shopItems } = await import("@shared/schema");
+    return await db.select().from(shopItems).where(eq(shopItems.isActive, true));
+  }
+
+  async purchaseShopItem(userId: number, itemId: number): Promise<{ success: boolean; message: string }> {
+    const { shopItems } = await import("@shared/schema");
+    
+    // Get the shop item
+    const [item] = await db.select().from(shopItems).where(eq(shopItems.id, itemId));
+    if (!item) {
+      return { success: false, message: "Item not found" };
+    }
+
+    // Get user's current stats
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Handle gem purchases (USD currency)
+    if (item.currency === 'usd' && item.itemType === 'gems') {
+      // This would be handled by Stripe payment - just add gems
+      const newGemAmount = (user.gems || 0) + (item.gemAmount || 0);
+      await db.update(users).set({ gems: newGemAmount }).where(eq(users.id, userId));
+      return { success: true, message: `Added ${item.gemAmount} gems to your account!` };
+    }
+
+    // Handle gem-based purchases
+    if (item.currency === 'gems') {
+      if ((user.gems || 0) < item.price) {
+        return { success: false, message: "Not enough gems" };
+      }
+
+      if (item.itemType === 'streak_freeze') {
+        // Add streak freeze and deduct gems
+        const newGems = (user.gems || 0) - item.price;
+        const newFreezes = (user.streakFreezeCount || 0) + 1;
+        
+        // Cap at 2 streak freezes
+        if (newFreezes > 2) {
+          return { success: false, message: "You already have the maximum streak freezes (2)" };
+        }
+
+        await db.update(users).set({ 
+          gems: newGems, 
+          streakFreezeCount: newFreezes 
+        }).where(eq(users.id, userId));
+        
+        return { success: true, message: "Streak freeze purchased!" };
+      }
+    }
+
+    return { success: false, message: "Unknown item type" };
+  }
+
+  async addGems(userId: number, amount: number): Promise<User> {
+    const [user] = await db.select({ gems: users.gems }).from(users).where(eq(users.id, userId));
+    const newGemAmount = (user?.gems || 0) + amount;
+    
+    const [updatedUser] = await db
+      .update(users)
+      .set({ gems: newGemAmount })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return updatedUser;
+  }
+
+  async purchaseStreakFreeze(userId: number): Promise<{ success: boolean; message: string }> {
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    const gemCost = 25;
+    if ((user.gems || 0) < gemCost) {
+      return { success: false, message: "Not enough gems (need 25)" };
+    }
+
+    if ((user.streakFreezeCount || 0) >= 2) {
+      return { success: false, message: "You already have the maximum streak freezes (2)" };
+    }
+
+    const newGems = (user.gems || 0) - gemCost;
+    const newFreezes = (user.streakFreezeCount || 0) + 1;
+
+    await db.update(users).set({ 
+      gems: newGems, 
+      streakFreezeCount: newFreezes 
+    }).where(eq(users.id, userId));
+
+    return { success: true, message: "Streak freeze purchased!" };
   }
 }
 
