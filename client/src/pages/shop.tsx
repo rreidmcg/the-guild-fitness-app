@@ -20,7 +20,10 @@ import {
   Coffee,
   Beef,
   Zap,
-  Shield
+  Shield,
+  Gift,
+  Crown,
+  Flame
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useNavigate } from "@/hooks/use-navigate";
@@ -80,6 +83,12 @@ interface InventoryItem {
   quantity: number;
 }
 
+interface FoundersStatus {
+  isAvailable: boolean;
+  canClaim: boolean;
+  claimsRemaining: number;
+}
+
 const rarityColors = {
   common: "bg-gray-500",
   rare: "bg-blue-500", 
@@ -108,6 +117,10 @@ export default function Shop() {
 
   const { data: inventory } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory"],
+  });
+
+  const { data: foundersStatus } = useQuery<FoundersStatus>({
+    queryKey: ["/api/founders-pack/status"],
   });
 
   const purchaseItemMutation = useMutation({
@@ -231,6 +244,90 @@ export default function Shop() {
 
   const getInventoryQuantity = (itemName: string) => {
     return inventory?.find((item: any) => item.itemName === itemName)?.quantity || 0;
+  };
+
+  // Simple Founders Pack Card Component
+  const FoundersPackCard = () => {
+    const handlePurchase = () => {
+      navigate("/gem-shop");
+    };
+
+    if (!foundersStatus?.isAvailable) {
+      return (
+        <Card className="bg-muted/50 border-muted-foreground/20 opacity-60">
+          <CardHeader className="text-center">
+            <div className="text-4xl mb-2">🔥</div>
+            <CardTitle className="text-muted-foreground">Founders Pack</CardTitle>
+            <div className="text-sm text-muted-foreground">Sold Out</div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground text-center">
+              All 100 Founders Packs have been claimed!
+            </p>
+            <div className="text-center text-sm text-muted-foreground">
+              Thank you to our first 100 supporters ❤️
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <Card className="bg-gradient-to-br from-orange-900/30 to-red-900/30 border-orange-500/50 hover:shadow-xl transition-shadow">
+        <CardHeader className="text-center">
+          <div className="text-4xl mb-2">🔥</div>
+          <CardTitle className="flex items-center justify-center space-x-2">
+            <span className="text-orange-400">Founders Pack</span>
+            <Crown className="w-5 h-5 text-yellow-500" />
+          </CardTitle>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-400">$29.97</div>
+            <div className="text-sm text-orange-300">
+              Limited: {foundersStatus?.claimsRemaining || 0} remaining
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-muted-foreground text-center">
+            Exclusive pack for the first 100 users! Get premium rewards and legendary status.
+          </p>
+          
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3 text-sm">
+              <Star className="w-4 h-4 text-blue-400" />
+              <span>12-Week At-Home Workout Plan</span>
+            </div>
+            <div className="flex items-center space-x-3 text-sm">
+              <Coins className="w-4 h-4 text-yellow-400" />
+              <span>1,000 Gold Coins</span>
+            </div>
+            <div className="flex items-center space-x-3 text-sm">
+              <Sparkles className="w-4 h-4 text-blue-400" />
+              <span>200 Premium Gems</span>
+            </div>
+            <div className="flex items-center space-x-3 text-sm">
+              <Crown className="w-4 h-4 text-yellow-500" />
+              <span>Legendary "The First Flame" Title</span>
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <Button 
+              className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white"
+              onClick={handlePurchase}
+              disabled={!foundersStatus?.canClaim}
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              {!foundersStatus?.canClaim ? "Already Claimed" : "Claim Founders Pack"}
+            </Button>
+          </div>
+          
+          <div className="text-xs text-center text-muted-foreground">
+            Only {foundersStatus?.claimsRemaining || 0} packs remaining!
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   const getEquipmentImage = (item: ShopItem) => {
@@ -418,9 +515,13 @@ export default function Shop() {
           setActiveTab(value);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="consumables">Consumables</TabsTrigger>
             <TabsTrigger value="equipment">Equipment</TabsTrigger>
+            <TabsTrigger value="bundles" className="text-orange-600 font-semibold data-[state=active]:bg-orange-100 data-[state=active]:text-orange-800 dark:text-orange-400 dark:data-[state=active]:bg-orange-900/30 dark:data-[state=active]:text-orange-200">
+              <Gift className="w-4 h-4 mr-1" />
+              Bundles
+            </TabsTrigger>
             <TabsTrigger value="gold" className="text-yellow-600 font-semibold data-[state=active]:bg-yellow-100 data-[state=active]:text-yellow-800 dark:text-yellow-400 dark:data-[state=active]:bg-yellow-900/30 dark:data-[state=active]:text-yellow-200">
               <Coins className="w-4 h-4 mr-1" />
               Currency
@@ -611,6 +712,46 @@ export default function Shop() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </TabsContent>
+
+          {/* Bundles Tab */}
+          <TabsContent value="bundles">
+            <div className="space-y-8">
+              {/* Founders Pack Section */}
+              {foundersStatus?.isAvailable && (
+                <div>
+                  <div className="text-center mb-6">
+                    <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
+                      <Flame className="w-6 h-6 text-orange-500" />
+                      <span className="text-orange-400">Limited Time - Founders Pack</span>
+                    </h2>
+                    <p className="text-muted-foreground">Exclusive pack for the first 100 users!</p>
+                  </div>
+                  
+                  <div className="max-w-2xl mx-auto">
+                    <FoundersPackCard />
+                  </div>
+                </div>
+              )}
+
+              {/* Coming Soon Section */}
+              <div className="flex items-center justify-center py-20">
+                <div className="text-center">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-600/20 to-red-600/20 flex items-center justify-center mx-auto mb-6">
+                    <Gift className="w-10 h-10 text-orange-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">More Bundles Coming Soon</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto mb-4">
+                    Special seasonal packages, training bundles, and exclusive offers are being prepared for future releases.
+                  </p>
+                  <div className="inline-flex items-center space-x-2 text-sm text-orange-400">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
+                    <span>In Development</span>
+                    <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </TabsContent>
 

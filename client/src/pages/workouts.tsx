@@ -177,22 +177,7 @@ export default function Workouts() {
                 <Plus className="w-4 h-4 mr-1" />
                 New Workout
               </Button>
-              <Button 
-                onClick={() => navigate("/gem-shop")}
-                size="sm"
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                <Sparkles className="w-4 h-4 mr-1" />
-                Gem Shop
-              </Button>
-              <Button 
-                onClick={() => navigate("/gem-shop")}
-                size="sm"
-                className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white border border-orange-400/50"
-              >
-                <Star className="w-4 h-4 mr-1" />
-                Founders Pack
-              </Button>
+
             </div>
           </div>
         </div>
