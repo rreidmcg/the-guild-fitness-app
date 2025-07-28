@@ -59,29 +59,27 @@ export default function Achievements() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-purple-600 to-blue-600 text-white">
-        <div className="max-w-4xl mx-auto p-6">
+      <div className="bg-card border-b border-border px-4 py-4">
+        <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLocation('/stats')}
-                className="text-white hover:bg-white/20"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Stats
-              </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                All Achievements
+              </h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">
+                Track your fitness journey and unlock rewards for your dedication
+              </p>
             </div>
-          </div>
-          <div className="mt-4">
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <Trophy className="w-8 h-8" />
-              All Achievements
-            </h1>
-            <p className="mt-2 text-white/80">
-              Track your fitness journey and unlock rewards for your dedication
-            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation('/stats')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Stats
+            </Button>
           </div>
         </div>
       </div>
