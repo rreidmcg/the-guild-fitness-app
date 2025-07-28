@@ -128,8 +128,8 @@ export default function Workouts() {
       title: "Program Selected",
       description: `Opening ${program.name} program details...`,
     });
-    // Navigate to workout builder
-    navigate("/workout-builder");
+    // Navigate to workout programs page to see program details
+    navigate("/workout-programs");
   };
 
   const handleStartProgram = (program: WorkoutProgram) => {

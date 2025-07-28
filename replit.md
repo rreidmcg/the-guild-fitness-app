@@ -173,6 +173,23 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 28, 2025 - Gems Currency System & Dual Monetization:**
+- **Complete Gems Currency System**: Implemented premium currency for in-app purchases
+  - Gems displayed in currency header alongside gold coins
+  - Four gem pack tiers: 100 gems ($1.99), 250 gems ($4.99), 500 gems ($9.99), 1000 gems ($19.99)
+  - Full Stripe payment integration for real money gem purchases with secure backend validation
+  - Comprehensive gem shop page with modern UI and payment flow
+- **Consumable Item System**: Streak freezes purchasable with gems only (25 gems each, max 2)
+  - Prevents monetizing essential game mechanics with real money
+  - Creates sustainable gem economy for consumable items
+  - Integrated with existing streak protection and atrophy systems
+- **Dual Revenue Model**: Two distinct monetization streams
+  - One-time workout program purchases ($9.97 each) for premium content access
+  - Recurring gem purchases for consumable items and future premium features
+  - Gem Shop button prominently placed in Quest page header for discovery
+- **Enhanced Navigation**: Fixed program navigation from Quest page to properly show workout program details
+- **Business Strategy**: Sustainable revenue requiring only 5-10 workout program sales for break-even vs 1000+ subscription users
+
 **January 28, 2025 - Workout Program Monetization System:**
 - **Complete Workout Program Purchase System**: Implemented three-tier workout program structure at $9.97 each
   - Novice Fitness Foundation: Beginner-friendly 4-week program with bodyweight exercises
