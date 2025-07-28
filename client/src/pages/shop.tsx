@@ -422,7 +422,7 @@ export default function Shop() {
             <TabsTrigger value="equipment">Equipment</TabsTrigger>
             <TabsTrigger value="gold" className="text-yellow-600 font-semibold data-[state=active]:bg-yellow-100 data-[state=active]:text-yellow-800 dark:text-yellow-400 dark:data-[state=active]:bg-yellow-900/30 dark:data-[state=active]:text-yellow-200">
               <Coins className="w-4 h-4 mr-1" />
-              Buy Gold
+              Currency
             </TabsTrigger>
           </TabsList>
 
@@ -613,80 +613,159 @@ export default function Shop() {
             </div>
           </TabsContent>
 
-          {/* Gold Purchase Tab */}
+          {/* Currency Purchase Tab */}
           <TabsContent value="gold">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Purchase Gold Coins</h2>
-              <p className="text-muted-foreground">Get more gold coins to purchase items and potions</p>
-            </div>
+            <div className="space-y-8">
+              {/* Gold Section */}
+              <div>
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
+                    <Coins className="w-6 h-6 text-yellow-500" />
+                    <span>Purchase Gold Coins</span>
+                  </h2>
+                  <p className="text-muted-foreground">Get more gold coins to purchase items and potions</p>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-              {[
-                { amount: 100, price: 0.99, bonus: 0, popular: false },
-                { amount: 500, price: 4.99, bonus: 50, popular: true },
-                { amount: 1000, price: 9.99, bonus: 150, popular: false },
-                { amount: 2500, price: 19.99, bonus: 500, popular: false },
-                { amount: 5000, price: 39.99, bonus: 1000, popular: false },
-                { amount: 10000, price: 79.99, bonus: 2500, popular: false }
-              ].map((goldPackage) => (
-                <Card key={goldPackage.amount} className={`bg-card border-border relative overflow-hidden ${goldPackage.popular ? 'ring-2 ring-yellow-500' : ''}`}>
-                  {goldPackage.popular && (
-                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-center py-1 text-xs font-bold">
-                      MOST POPULAR
-                    </div>
-                  )}
-                  
-                  <CardHeader className={goldPackage.popular ? "pt-8" : ""}>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center mb-2">
-                        <Coins className="w-8 h-8 text-yellow-500" />
-                      </div>
-                      <CardTitle className="text-xl font-bold text-foreground">
-                        {goldPackage.amount.toLocaleString()} Gold
-                      </CardTitle>
-                      {goldPackage.bonus > 0 && (
-                        <div className="text-green-500 text-sm font-medium">
-                          +{goldPackage.bonus} Bonus Gold
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                  {[
+                    { amount: 100, price: 0.99, bonus: 0, popular: false },
+                    { amount: 500, price: 4.99, bonus: 50, popular: true },
+                    { amount: 1000, price: 9.99, bonus: 150, popular: false },
+                    { amount: 2500, price: 19.99, bonus: 500, popular: false },
+                    { amount: 5000, price: 39.99, bonus: 1000, popular: false },
+                    { amount: 10000, price: 79.99, bonus: 2500, popular: false }
+                  ].map((goldPackage) => (
+                    <Card key={goldPackage.amount} className={`bg-card border-border relative overflow-hidden ${goldPackage.popular ? 'ring-2 ring-yellow-500' : ''}`}>
+                      {goldPackage.popular && (
+                        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white text-center py-1 text-xs font-bold">
+                          MOST POPULAR
                         </div>
                       )}
-                    </div>
-                  </CardHeader>
+                      
+                      <CardHeader className={goldPackage.popular ? "pt-8" : ""}>
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-2">
+                            <Coins className="w-8 h-8 text-yellow-500" />
+                          </div>
+                          <CardTitle className="text-xl font-bold text-foreground">
+                            {goldPackage.amount.toLocaleString()} Gold
+                          </CardTitle>
+                          {goldPackage.bonus > 0 && (
+                            <div className="text-green-500 text-sm font-medium">
+                              +{goldPackage.bonus} Bonus Gold
+                            </div>
+                          )}
+                        </div>
+                      </CardHeader>
 
-                  <CardContent className="text-center">
-                    <div className="mb-4">
-                      <div className="text-3xl font-bold text-foreground">
-                        ${goldPackage.price}
-                      </div>
-                      <div className="text-muted-foreground text-sm">
-                        ${(goldPackage.price / goldPackage.amount).toFixed(4)} per gold
-                      </div>
-                    </div>
+                      <CardContent className="text-center">
+                        <div className="mb-4">
+                          <div className="text-3xl font-bold text-foreground">
+                            ${goldPackage.price}
+                          </div>
+                          <div className="text-muted-foreground text-sm">
+                            ${(goldPackage.price / goldPackage.amount).toFixed(4)} per gold
+                          </div>
+                        </div>
 
-                    <Button 
-                      onClick={() => purchaseGoldMutation.mutate(goldPackage)}
-                      disabled={purchaseGoldMutation.isPending}
-                      className={`w-full h-12 text-white font-bold text-lg ${goldPackage.popular 
-                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 shadow-lg shadow-yellow-500/25' 
-                        : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
-                      }`}
-                    >
-                      <CreditCard className="w-5 h-5 mr-2" />
-                      Purchase Now
-                    </Button>
-                  </CardContent>
+                        <Button 
+                          onClick={() => purchaseGoldMutation.mutate(goldPackage)}
+                          disabled={purchaseGoldMutation.isPending}
+                          className={`w-full h-12 text-white font-bold text-lg ${goldPackage.popular 
+                            ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 shadow-lg shadow-yellow-500/25' 
+                            : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
+                          }`}
+                        >
+                          <CreditCard className="w-5 h-5 mr-2" />
+                          Purchase Now
+                        </Button>
+                      </CardContent>
 
-                  {goldPackage.popular && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-orange-400/5 animate-pulse" />
-                    </div>
-                  )}
-                </Card>
-              ))}
-            </div>
+                      {goldPackage.popular && (
+                        <div className="absolute inset-0 pointer-events-none">
+                          <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-orange-400/5 animate-pulse" />
+                        </div>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+              </div>
 
-            <div className="mt-8 text-center text-sm text-muted-foreground">
-              <p>💳 Secure payment processing by Stripe</p>
-              <p>✨ Gold coins are added to your account instantly after payment</p>
+              {/* Gems Section */}
+              <div>
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
+                    <Sparkles className="w-6 h-6 text-blue-400" />
+                    <span>Purchase Premium Gems</span>
+                  </h2>
+                  <p className="text-muted-foreground">Premium currency for exclusive items and streak freezes</p>
+                  <div className="mt-2 flex items-center justify-center space-x-2">
+                    <span className="text-lg">💎</span>
+                    <span className="text-lg font-semibold">Your Gems: {(userStats as any)?.gems || 0}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                  {[
+                    { amount: 100, price: 1.99, popular: false },
+                    { amount: 250, price: 4.99, popular: true },
+                    { amount: 500, price: 9.99, popular: false },
+                    { amount: 1000, price: 19.99, popular: false }
+                  ].map((gemPackage) => (
+                    <Card key={gemPackage.amount} className={`bg-card border-border relative overflow-hidden ${gemPackage.popular ? 'ring-2 ring-blue-500' : ''}`}>
+                      {gemPackage.popular && (
+                        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-center py-1 text-xs font-bold">
+                          BEST VALUE
+                        </div>
+                      )}
+                      
+                      <CardHeader className={gemPackage.popular ? "pt-8" : ""}>
+                        <div className="text-center">
+                          <div className="flex items-center justify-center mb-2">
+                            <div className="text-3xl">💎</div>
+                          </div>
+                          <CardTitle className="text-xl font-bold text-foreground">
+                            {gemPackage.amount} Gems
+                          </CardTitle>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent className="text-center">
+                        <div className="mb-4">
+                          <div className="text-3xl font-bold text-foreground">
+                            ${gemPackage.price}
+                          </div>
+                          <div className="text-muted-foreground text-sm">
+                            ${(gemPackage.price / gemPackage.amount).toFixed(3)} per gem
+                          </div>
+                        </div>
+
+                        <Button 
+                          onClick={() => navigate("/gem-shop")}
+                          className={`w-full h-12 text-white font-bold text-lg ${gemPackage.popular 
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25' 
+                            : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700'
+                          }`}
+                        >
+                          <Sparkles className="w-5 h-5 mr-2" />
+                          Buy Gems
+                        </Button>
+                      </CardContent>
+
+                      {gemPackage.popular && (
+                        <div className="absolute inset-0 pointer-events-none">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/5 to-purple-400/5 animate-pulse" />
+                        </div>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8 text-center text-sm text-muted-foreground">
+                <p>💳 Secure payment processing by Stripe</p>
+                <p>✨ Currency added to your account instantly after payment</p>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
