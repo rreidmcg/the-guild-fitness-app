@@ -11,6 +11,13 @@ export default function LeaderboardPage() {
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
 
+  const getAvatarRarityClass = (user: any) => {
+    if (user?.title?.includes('<G.M.>')) {
+      return 'border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]';
+    }
+    return 'border-2 border-gray-500 shadow-[0_0_10px_rgba(107,114,128,0.5)]';
+  };
+
   const { data: leaderboard, isLoading } = useQuery({
     queryKey: ["/api/leaderboard"],
   });
@@ -205,7 +212,7 @@ export default function LeaderboardPage() {
             <div className="space-y-6">
               {/* Avatar Display */}
               <div className="flex justify-center">
-                <div className="relative">
+                <div className={`relative rounded-lg p-1 ${getAvatarRarityClass(selectedPlayer)}`}>
                   <Avatar2D 
                     user={selectedPlayer}
                     size="lg"
