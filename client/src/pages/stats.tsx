@@ -182,9 +182,8 @@ export default function Stats() {
           {/* Wardrobe Button in Corner */}
           <Button
             size="sm"
-            variant="outline"
             onClick={() => setShowWardrobe(true)}
-            className="absolute top-4 right-4 border-purple-500 text-purple-400 hover:bg-purple-900/30 p-2 z-10"
+            className="absolute top-4 right-4 bg-purple-600 text-white hover:bg-purple-700 p-2 z-10"
             title="Open Wardrobe"
           >
             <Shirt className="w-4 h-4" />
