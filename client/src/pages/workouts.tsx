@@ -155,7 +155,7 @@ export default function Workouts() {
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
+          <div className="space-y-4">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Quests</h1>
               <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
