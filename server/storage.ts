@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -14,7 +14,9 @@ import {
   type UserAchievement, type InsertUserAchievement,
   type SocialShare, type InsertSocialShare,
   type SocialShareLike, type InsertSocialShareLike,
-  type LiabilityWaiver, type InsertLiabilityWaiver
+  type LiabilityWaiver, type InsertLiabilityWaiver,
+  type WorkoutPreferences, type InsertWorkoutPreferences,
+  type WorkoutFeedback, type InsertWorkoutFeedback
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -117,6 +119,14 @@ export interface IStorage {
   createLiabilityWaiver(waiver: InsertLiabilityWaiver): Promise<LiabilityWaiver>;
   getUserLiabilityWaiver(userId: number): Promise<LiabilityWaiver | undefined>;
   updateUserLiabilityWaiverStatus(userId: number, accepted: boolean, ipAddress?: string): Promise<User>;
+
+  // AI Workout Recommendation operations
+  getUserWorkoutPreferences(userId: number): Promise<any>;
+  updateUserWorkoutPreferences(userId: number, preferences: any): Promise<any>;
+  getRecentWorkoutFeedback(userId: number, limit: number): Promise<any[]>;
+  createWorkoutFeedback(feedback: any): Promise<any>;
+  getUserStats(userId: number): Promise<any>;
+  getExercises(): Promise<Exercise[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -882,7 +892,7 @@ export class DatabaseStorage implements IStorage {
     
     const [createdMail] = await db
       .insert(playerMail)
-      .values([mail])
+      .values(mail)
       .returning();
     return createdMail;
   }
@@ -1053,7 +1063,7 @@ export class DatabaseStorage implements IStorage {
     
     const [newShare] = await db
       .insert(socialShares)
-      .values([share])
+      .values(share)
       .returning();
     
     return newShare;
@@ -1267,6 +1277,66 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, userId))
       .returning();
     return user;
+  }
+
+  // AI Workout Recommendation operations
+  async getUserWorkoutPreferences(userId: number): Promise<WorkoutPreferences | null> {
+    const [preferences] = await db
+      .select()
+      .from(workoutPreferences)
+      .where(eq(workoutPreferences.userId, userId));
+    return preferences || null;
+  }
+
+  async updateUserWorkoutPreferences(userId: number, prefs: InsertWorkoutPreferences): Promise<WorkoutPreferences> {
+    // Check if preferences exist
+    const existing = await this.getUserWorkoutPreferences(userId);
+    
+    if (existing) {
+      const [updated] = await db
+        .update(workoutPreferences)
+        .set({ ...prefs, updatedAt: new Date() })
+        .where(eq(workoutPreferences.userId, userId))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(workoutPreferences)
+        .values({ ...prefs, userId })
+        .returning();
+      return created;
+    }
+  }
+
+  async getRecentWorkoutFeedback(userId: number, limit: number): Promise<WorkoutFeedback[]> {
+    return await db
+      .select()
+      .from(workoutFeedback)
+      .where(eq(workoutFeedback.userId, userId))
+      .orderBy(desc(workoutFeedback.createdAt))
+      .limit(limit);
+  }
+
+  async createWorkoutFeedback(feedback: InsertWorkoutFeedback): Promise<WorkoutFeedback> {
+    await this.ensureInitialized();
+    const [result] = await db.insert(workoutFeedback).values(feedback).returning();
+    return result;
+  }
+
+  async getUserStats(userId: number): Promise<any> {
+    const [user] = await db.select({
+      strength: users.strength,
+      stamina: users.stamina,
+      agility: users.agility,
+      level: users.level,
+      experience: users.experience,
+      currentTier: users.currentTier,
+    }).from(users).where(eq(users.id, userId));
+    return user || { strength: 0, stamina: 0, agility: 0, level: 1, experience: 0, currentTier: 'E' };
+  }
+
+  async getExercises(): Promise<Exercise[]> {
+    return await db.select().from(exercises);
   }
 }
 

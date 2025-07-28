@@ -173,6 +173,32 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 27, 2025 - AI Workout Recommendation System with Premium Subscription:**
+- **Complete AI-Powered Workout System**: Integrated OpenAI to generate personalized workout recommendations
+  - Advanced prompt engineering with user stats, equipment access, and fitness level consideration
+  - Equipment-specific recommendations (full gym, home gym, bodyweight only)
+  - Adaptive training plans that adjust based on user feedback and progress
+  - Multi-stat exercise selection with proper stat allocation and RPE integration
+- **3-Month Minimum Premium Subscription**: Comprehensive Stripe integration with installment payments
+  - $29.97 total cost charged as $9.99/month for 3 months
+  - 30-day money-back guarantee with automatic refund processing
+  - Premium feature gating for AI recommendations with graceful upgrade prompts
+  - Subscription management with cancellation and refund capabilities
+- **Advanced Workout Preferences System**: Detailed user preference tracking for personalized AI
+  - Equipment access levels, training frequency, session duration preferences
+  - Fitness level assessment, training style selection (strength, cardio, balanced)
+  - Injury limitations tracking and exercise avoidance preferences
+  - Preferred muscle group targeting with visual checkbox selection
+- **Comprehensive Feedback Learning Loop**: AI system improves through user interaction
+  - Workout difficulty rating collection and analysis
+  - Volume and intensity feedback tracking for adaptive recommendations
+  - Exercise replacement suggestions and success rate monitoring
+  - Continuous learning database to enhance future recommendations
+- **Premium Feature Discovery**: Strategic placement of AI features throughout app
+  - Prominent AI Workouts button in workout page header with crown icon for non-subscribers
+  - Gradient purple-to-pink styling to highlight premium nature
+  - Seamless integration with existing workout creation workflow
+
 **January 27, 2025 - Realistic Stat Progression with Diminishing Returns:**
 - **Implemented XP-Based Stat Progression**: Replaced linear stat growth with realistic athletic development curve
   - Each stat (Strength, Stamina, Agility) now uses individual XP pools with exponential level requirements

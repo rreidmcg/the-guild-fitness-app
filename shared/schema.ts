@@ -261,6 +261,78 @@ export const userAchievements = pgTable("user_achievements", {
   userAchievementUnique: uniqueIndex("user_achievement_idx").on(table.userId, table.achievementId),
 }));
 
+// User workout preferences for AI recommendations
+export const workoutPreferences = pgTable("workout_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).unique(),
+  equipmentAccess: text("equipment_access").notNull().default("home_gym"), // "full_gym", "home_gym", "bodyweight_only"
+  workoutsPerWeek: integer("workouts_per_week").default(3),
+  sessionDuration: integer("session_duration").default(45), // minutes
+  fitnessLevel: text("fitness_level").default("beginner"), // "beginner", "intermediate", "advanced"
+  injuriesLimitations: text("injuries_limitations").array().default([]),
+  preferredMuscleGroups: text("preferred_muscle_groups").array().default([]),
+  avoidedExercises: text("avoided_exercises").array().default([]),
+  trainingStyle: text("training_style").default("balanced"), // "strength_focused", "cardio_focused", "balanced", "powerlifting"
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// AI-generated workout recommendations
+export const workoutRecommendations = pgTable("workout_recommendations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  difficulty: text("difficulty").notNull(), // "beginner", "intermediate", "advanced"
+  estimatedDuration: integer("estimated_duration"), // minutes
+  targetMuscleGroups: text("target_muscle_groups").array().notNull(),
+  exercises: json("exercises").$type<Array<{
+    exerciseId: number;
+    sets: number;
+    reps: number;
+    weight?: number;
+    duration?: number;
+    restTime?: number;
+    notes?: string;
+  }>>().notNull(),
+  aiReasoning: text("ai_reasoning"), // Why this workout was recommended
+  isCustomized: boolean("is_customized").default(false), // User modified the recommendation
+  generatedAt: timestamp("generated_at").defaultNow(),
+  expiresAt: timestamp("expires_at"), // Recommendations expire after 1 week
+});
+
+// User feedback on workouts for AI learning
+export const workoutFeedback = pgTable("workout_feedback", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  workoutSessionId: integer("workout_session_id").references(() => workoutSessions.id, { onDelete: "cascade" }),
+  difficultyRating: integer("difficulty_rating"), // 1-10 scale
+  volumeFeedback: text("volume_feedback"), // "too_much", "just_right", "too_little"
+  intensityFeedback: text("intensity_feedback"), // "too_hard", "just_right", "too_easy"
+  exerciseReplacements: json("exercise_replacements").$type<Array<{
+    originalExerciseId: number;
+    replacementExerciseId: number;
+    reason: string;
+  }>>().default([]),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Subscription history for analytics
+export const subscriptionHistory = pgTable("subscription_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  status: text("status").notNull(), // "active", "canceled", "past_due", "incomplete"
+  planType: text("plan_type").default("premium_quarterly"), // "premium_quarterly"
+  amount: integer("amount"), // in cents
+  currency: text("currency").default("usd"),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  canceledAt: timestamp("canceled_at"),
+  cancelationReason: text("cancelation_reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Player abilities/skills
 export const abilities = pgTable("abilities", {
   id: serial("id").primaryKey(),
@@ -367,6 +439,26 @@ export const insertProgramWorkoutSchema = createInsertSchema(programWorkouts).om
   id: true,
 });
 
+export const insertWorkoutPreferencesSchema = createInsertSchema(workoutPreferences).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export const insertWorkoutRecommendationSchema = createInsertSchema(workoutRecommendations).omit({
+  id: true,
+  generatedAt: true,
+});
+
+export const insertWorkoutFeedbackSchema = createInsertSchema(workoutFeedback).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSubscriptionHistorySchema = createInsertSchema(subscriptionHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -402,6 +494,14 @@ export type PlayerInventory = typeof playerInventory.$inferSelect;
 export type InsertPlayerInventory = z.infer<typeof insertPlayerInventorySchema>;
 export type DailyProgress = typeof dailyProgress.$inferSelect;
 export type InsertDailyProgress = z.infer<typeof insertDailyProgressSchema>;
+export type WorkoutPreferences = typeof workoutPreferences.$inferSelect;
+export type InsertWorkoutPreferences = z.infer<typeof insertWorkoutPreferencesSchema>;
+export type WorkoutRecommendation = typeof workoutRecommendations.$inferSelect;
+export type InsertWorkoutRecommendation = z.infer<typeof insertWorkoutRecommendationSchema>;
+export type WorkoutFeedback = typeof workoutFeedback.$inferSelect;
+export type InsertWorkoutFeedback = z.infer<typeof insertWorkoutFeedbackSchema>;
+export type SubscriptionHistory = typeof subscriptionHistory.$inferSelect;
+export type InsertSubscriptionHistory = z.infer<typeof insertSubscriptionHistorySchema>;
 
 // Player mail system
 export const playerMail = pgTable("player_mail", {

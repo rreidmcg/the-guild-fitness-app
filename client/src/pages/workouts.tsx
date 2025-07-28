@@ -25,8 +25,11 @@ import {
   Coins,
   Shield,
   Sparkles,
-  Snowflake
+  Snowflake,
+  Brain,
+  Crown
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Workouts() {
   const navigate = useNavigate();
@@ -158,6 +161,18 @@ export default function Workouts() {
               <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
             </div>
             <div className="flex items-center space-x-3">
+              <Link href="/ai-workouts">
+                <Button 
+                  size="sm"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                >
+                  <Brain className="w-4 h-4 mr-1" />
+                  AI Workouts
+                  {userStats?.subscriptionStatus !== 'active' && (
+                    <Crown className="w-3 h-3 ml-1" />
+                  )}
+                </Button>
+              </Link>
               <Button 
                 onClick={() => navigate("/workout-builder")}
                 size="sm"

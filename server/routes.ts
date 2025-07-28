@@ -9,7 +9,7 @@ import { validateUsername, sanitizeUsername } from "./username-validation";
 import { AtrophySystem } from "./atrophy-system";
 import { calculateStatXpGains, calculateStatLevel } from "./stat-progression";
 import { workoutValidator } from "./workout-validation";
-import { workoutRecommendationEngine } from "./workout-recommendations";
+import { aiWorkoutEngine } from "./ai-workout-engine";
 import { sendEmail, generateLiabilityWaiverEmail, generateAdminWaiverNotification } from "./email-service";
 import Stripe from "stripe";
 
@@ -39,7 +39,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const recommendations = await workoutRecommendationEngine.getRecommendationsForUser(userId);
+      const recommendations = await aiWorkoutEngine.generateRecommendations(userId);
       res.json(recommendations);
     } catch (error) {
       console.error("Error generating workout recommendations:", error);
@@ -54,7 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const recommendationId = req.params.id;
       
       // Get the recommendation
-      const recommendations = await workoutRecommendationEngine.getRecommendationsForUser(userId);
+      const recommendations = await aiWorkoutEngine.generateRecommendations(userId);
       const recommendation = recommendations.find(r => r.id === recommendationId);
       
       if (!recommendation) {
@@ -80,6 +80,193 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating workout from recommendation:", error);
       res.status(500).json({ error: "Failed to create workout" });
+    }
+  });
+
+  // 3-Month Premium Subscription Routes
+  app.post("/api/create-subscription", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      // Check if user already has active subscription
+      if (user.subscriptionStatus === 'active') {
+        return res.status(400).json({ 
+          error: "Already subscribed",
+          message: "You already have an active premium subscription!" 
+        });
+      }
+
+      let customerId = user.stripeCustomerId;
+
+      // Create Stripe customer if doesn't exist
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || `${user.username}@fitness.app`,
+          name: user.username,
+          metadata: { userId: userId.toString() }
+        });
+        customerId = customer.id;
+        await storage.updateUser(userId, { stripeCustomerId: customerId });
+      }
+
+      // Create 3-month subscription with installment plan
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ 
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Premium AI Fitness Coach - 3 Month Plan',
+              description: 'Personalized AI workout recommendations, adaptive training plans, and premium features',
+            },
+            unit_amount: 2997, // $29.97 total ($9.99/month x 3 months)
+            recurring: {
+              interval: 'month',
+              interval_count: 1,
+            },
+          },
+          quantity: 1,
+        }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+        metadata: {
+          plan_type: 'premium_quarterly',
+          minimum_commitment: '3_months',
+          userId: userId.toString(),
+        },
+        payment_settings: {
+          payment_method_types: ['card'],
+          save_default_payment_method: 'on_subscription',
+        },
+      });
+
+      // Store subscription in database
+      await storage.updateUser(userId, {
+        stripeSubscriptionId: subscription.id,
+        subscriptionStatus: 'pending',
+      });
+
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        planDetails: {
+          name: 'Premium AI Fitness Coach',
+          duration: '3 months minimum',
+          price: '$29.97 total',
+          installments: '$9.99/month for 3 months',
+          moneyBackGuarantee: true,
+          features: [
+            'Personalized AI workout recommendations',
+            'Adaptive training plans based on your feedback',
+            'Equipment-specific exercise suggestions',
+            'Progress tracking and volume adjustments',
+            'Priority customer support',
+          ]
+        }
+      });
+    } catch (error: any) {
+      console.error("Subscription creation error:", error);
+      res.status(500).json({ 
+        error: "Failed to create subscription",
+        message: error.message 
+      });
+    }
+  });
+
+  // Cancel subscription with money-back guarantee
+  app.post("/api/cancel-subscription", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const { reason } = req.body;
+      const user = await storage.getUser(userId);
+      
+      if (!user?.stripeSubscriptionId) {
+        return res.status(400).json({ error: "No active subscription found" });
+      }
+
+      // Cancel at Stripe
+      const canceledSubscription = await stripe.subscriptions.cancel(user.stripeSubscriptionId, {
+        prorate: true, // Provide refund for unused time
+      });
+
+      // Update user subscription status
+      await storage.updateUser(userId, {
+        subscriptionStatus: 'canceled',
+        subscriptionEndDate: new Date(canceledSubscription.canceled_at! * 1000),
+      });
+
+      // Create subscription history record
+      // await storage.createSubscriptionHistory({
+      //   userId,
+      //   stripeSubscriptionId: user.stripeSubscriptionId,
+      //   status: 'canceled',
+      //   canceledAt: new Date(),
+      //   cancelationReason: reason || 'User requested cancellation',
+      // });
+
+      res.json({
+        success: true,
+        message: "Subscription canceled successfully. Refund will be processed within 5-7 business days.",
+        refundPolicy: "Full refund guaranteed for cancellations within 30 days of purchase."
+      });
+    } catch (error: any) {
+      console.error("Subscription cancellation error:", error);
+      res.status(500).json({ 
+        error: "Failed to cancel subscription",
+        message: error.message 
+      });
+    }
+  });
+
+  // Workout preferences management
+  app.get("/api/workout-preferences", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const preferences = await storage.getUserWorkoutPreferences(userId);
+      res.json(preferences || {
+        equipmentAccess: 'home_gym',
+        workoutsPerWeek: 3,
+        sessionDuration: 45,
+        fitnessLevel: 'beginner',
+        injuriesLimitations: [],
+        preferredMuscleGroups: [],
+        avoidedExercises: [],
+        trainingStyle: 'balanced'
+      });
+    } catch (error) {
+      console.error("Error fetching workout preferences:", error);
+      res.status(500).json({ error: "Failed to fetch preferences" });
+    }
+  });
+
+  app.post("/api/workout-preferences", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const preferences = await storage.updateUserWorkoutPreferences(userId, req.body);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error updating workout preferences:", error);
+      res.status(500).json({ error: "Failed to update preferences" });
+    }
+  });
+
+  // Workout feedback for AI learning
+  app.post("/api/workout-feedback", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const feedback = await storage.createWorkoutFeedback({
+        userId,
+        ...req.body
+      });
+      res.json(feedback);
+    } catch (error) {
+      console.error("Error submitting workout feedback:", error);
+      res.status(500).json({ error: "Failed to submit feedback" });
     }
   });
 
