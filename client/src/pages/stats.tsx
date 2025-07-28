@@ -210,9 +210,10 @@ export default function Stats() {
             <div className="flex flex-col items-center mb-6">
 
               <div className={`border-4 rounded-lg p-1 ${
-                (safeUserStats?.currentTitle === "<G.M.>" 
+                // Avatar border based on user status, not current title
+                ((safeUserStats?.username?.toLowerCase() === "zero" || safeUserStats?.username?.toLowerCase() === "rob") 
                   ? "border-red-500 shadow-lg shadow-red-500/50" 
-                  : safeUserStats?.currentTitle === "The First Flame"
+                  : safeUserStats?.hasLegendaryHunterSkin || safeUserStats?.currentTitle === "The First Flame"
                     ? "border-yellow-500 shadow-lg shadow-yellow-500/50"
                     : "border-gray-500")
               }`}>
