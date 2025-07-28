@@ -25,7 +25,7 @@ import {
 
 // Import pixel art potion images
 import minorPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753331144145.png";
-import majorPotionImage from "@assets/E411AC73-DD9A-4E21-A550-8BC4020515A1_1753054064391.jpeg";
+import majorManaPotionImage from "@assets/B3B92435-50B3-4B4F-BF95-30E009AA81EB_1753733641186.png";
 import fullPotionImage from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
 import manaPotionImage from "@assets/A78C5316-EC32-40FF-8919-E20BF97740B3_1753733597516.png";
 
@@ -78,11 +78,39 @@ const getItemVisual = (item: InventoryItem) => {
         />
       );
     }
+    if (itemName.toLowerCase().includes('major') && itemName.toLowerCase().includes('mana')) {
+      return (
+        <img 
+          src={majorManaPotionImage} 
+          alt="Major Mana Potion"
+          className="w-full h-full object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
+            transform: 'scale(1.4)'
+          }}
+        />
+      );
+    }
     if (itemName.toLowerCase().includes('major')) {
       return (
         <img 
-          src={majorPotionImage} 
+          src={majorManaPotionImage} 
           alt="Major Potion"
+          className="w-full h-full object-contain"
+          style={{ 
+            imageRendering: 'pixelated',
+            filter: 'drop-shadow(1px 1px 2px rgba(0,0,0,0.5))',
+            transform: 'scale(1.4)'
+          }}
+        />
+      );
+    }
+    if (itemName.toLowerCase().includes('full') && itemName.toLowerCase().includes('mana')) {
+      return (
+        <img 
+          src={majorManaPotionImage} 
+          alt="Full Mana Potion"
           className="w-full h-full object-contain"
           style={{ 
             imageRendering: 'pixelated',
@@ -106,11 +134,11 @@ const getItemVisual = (item: InventoryItem) => {
         />
       );
     }
-    if (itemName.toLowerCase().includes('mana')) {
+    if (itemName.toLowerCase().includes('minor') && itemName.toLowerCase().includes('mana')) {
       return (
         <img 
           src={manaPotionImage} 
-          alt="Mana Potion"
+          alt="Minor Mana Potion"
           className="w-full h-full object-contain"
           style={{ 
             imageRendering: 'pixelated',

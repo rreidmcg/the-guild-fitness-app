@@ -34,7 +34,7 @@ import spiderMonsterImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_175
 import armorImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_1753151490494.png";
 import characterMaleImage from "@assets/IMG_3682_1753213695174.png";
 import minorManaPotionImage from "@assets/A78C5316-EC32-40FF-8919-E20BF97740B3_1753733597516.png";
-import bluePotion2 from "@assets/1E6048BE-FB34-44E6-ADA7-C01DB1832E42_1753068533574.png";
+import majorManaPotionImage from "@assets/B3B92435-50B3-4B4F-BF95-30E009AA81EB_1753733641186.png";
 import megaHealPotionImage from "@assets/08789489-C26E-40BE-BA19-1471C66163E2_1753500783697.png";
 
 interface ShopItem {
@@ -540,7 +540,7 @@ export default function Shop() {
                         />
                       ) : potion.id === 'major_mana' ? (
                         <img 
-                          src={bluePotion2} 
+                          src={majorManaPotionImage} 
                           alt="Major Mana Potion"
                           className="w-16 h-16 object-contain"
                           style={{ 
@@ -550,7 +550,7 @@ export default function Shop() {
                         />
                       ) : potion.id === 'full_mana' ? (
                         <img 
-                          src={bluePotion2} 
+                          src={majorManaPotionImage} 
                           alt="Full Mana Potion"
                           className="w-16 h-16 object-contain"
                           style={{ 
