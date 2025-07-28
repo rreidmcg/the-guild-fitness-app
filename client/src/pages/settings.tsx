@@ -26,7 +26,8 @@ import {
   Vibrate,
   Moon,
   Smartphone,
-  Crown
+  Crown,
+  BarChart3
 } from "lucide-react";
 
 
@@ -401,14 +402,24 @@ export default function Settings() {
                 Contact Support
               </Button>
               {(userStats as any)?.currentTitle === "<G.M.>" && (
-                <Button 
-                  variant="outline" 
-                  className="flex items-center justify-center"
-                  onClick={() => setLocation('/admin')}
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Admin Panel
-                </Button>
+                <>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center justify-center"
+                    onClick={() => setLocation('/admin')}
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin Panel
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center justify-center"
+                    onClick={() => setLocation('/analytics')}
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Analytics Dashboard
+                  </Button>
+                </>
               )}
             </div>
             
