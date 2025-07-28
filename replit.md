@@ -173,6 +173,13 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 28, 2025 - AI Features Temporarily Disabled:**
+- **Cost Optimization**: Disabled AI workout recommendation system to reduce OpenAI API costs during pre-revenue phase
+- **Routes Commented Out**: All AI-related API endpoints and frontend routes temporarily disabled
+- **UI Elements Removed**: AI Workouts button and premium subscription flows hidden from interface
+- **Infrastructure Preserved**: Complete AI system architecture remains intact for future activation when cash flow permits
+- **Easy Reactivation**: Simply uncomment routes and restore UI elements when ready to monetize AI features
+
 **January 27, 2025 - AI Workout Recommendation System with Premium Subscription:**
 - **Complete AI-Powered Workout System**: Integrated OpenAI to generate personalized workout recommendations
   - Advanced prompt engineering with user stats, equipment access, and fitness level consideration

@@ -374,18 +374,7 @@ export default function Workouts() {
         {/* Workout Programs */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-foreground">Workout Programs</CardTitle>
-              <Button 
-                onClick={() => navigate("/workout-recommendations")}
-                size="sm"
-                variant="outline"
-                className="bg-purple-500/10 border-purple-500/20 text-purple-600 hover:bg-purple-500/20"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                AI Recommendations
-              </Button>
-            </div>
+            <CardTitle className="text-xl font-bold text-foreground">Workout Programs</CardTitle>
           </CardHeader>
           <CardContent>
             {programs.length === 0 ? (

@@ -41,7 +41,7 @@ function Router() {
       <Route path="/" component={Stats} />
       <Route path="/stats" component={Stats} />
       <Route path="/workouts" component={Workouts} />
-      <Route path="/workout-recommendations" component={WorkoutRecommendationsPage} />
+      {/* <Route path="/workout-recommendations" component={WorkoutRecommendationsPage} /> */}
       <Route path="/inventory" component={Inventory} />
       <Route path="/settings" component={Settings} />
       <Route path="/workout-builder" component={WorkoutBuilder} />
@@ -52,8 +52,8 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/achievements" component={Achievements} />
-      <Route path="/premium" component={Premium} />
-      <Route path="/ai-workouts" component={AIWorkouts} />
+      {/* <Route path="/premium" component={Premium} />
+      <Route path="/ai-workouts" component={AIWorkouts} /> */}
       <Route path="/signup" component={SignupPage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/admin" component={AdminDashboard} />

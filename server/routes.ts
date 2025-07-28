@@ -25,7 +25,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Workout recommendations route (premium feature)
+  // Workout recommendations route (premium feature) - DISABLED to save API costs
+  /*
   app.get("/api/workout-recommendations", async (req, res) => {
     try {
       const userId = currentUserId;
@@ -46,8 +47,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate workout recommendations" });
     }
   });
+  */
 
-  // Create workout from recommendation
+  // Create workout from recommendation - DISABLED to save API costs
+  /*
   app.post("/api/workout-recommendations/:id/create", async (req, res) => {
     try {
       const userId = currentUserId;
@@ -82,6 +85,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to create workout" });
     }
   });
+  */
 
   // 3-Month Premium Subscription Routes
   app.post("/api/create-subscription", async (req, res) => {
