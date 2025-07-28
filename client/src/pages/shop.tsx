@@ -677,7 +677,7 @@ export default function Shop() {
                           }`}
                         >
                           <CreditCard className="w-5 h-5 mr-2" />
-                          Purchase Now
+                          Buy
                         </Button>
                       </CardContent>
 
@@ -736,7 +736,7 @@ export default function Shop() {
                             ${gemPackage.price}
                           </div>
                           <div className="text-muted-foreground text-sm">
-                            ${(gemPackage.price / gemPackage.amount).toFixed(3)} per gem
+                            ${(gemPackage.price / gemPackage.amount).toFixed(3)}/gem
                           </div>
                         </div>
 
@@ -748,7 +748,7 @@ export default function Shop() {
                           }`}
                         >
                           <Sparkles className="w-5 h-5 mr-2" />
-                          Buy Gems
+                          Buy
                         </Button>
                       </CardContent>
 
