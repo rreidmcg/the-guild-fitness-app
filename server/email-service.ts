@@ -1,4 +1,4 @@
-// Email service using MailerSend API
+// Email service using MailerSend API for transactional emails
 interface EmailParams {
   to: string;
   subject: string;
@@ -10,7 +10,8 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
   const apiKey = process.env.MAILERSEND_API_KEY;
   
   if (!apiKey) {
-    console.warn("MailerSend API key not configured. Email would be sent in production.");
+    console.warn("MailerSend API key not configured - logging email notification instead");
+    logEmailNotification(params);
     return false;
   }
 
@@ -40,35 +41,37 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('MailerSend API error:', response.status, error);
+      const errorText = await response.text();
+      console.error(`MailerSend API error (${response.status}):`, errorText);
       
-      // Log the email details for manual processing until API is fully activated
-      console.log('=== EMAIL NOTIFICATION (API Key Needs Activation) ===');
-      console.log(`To: ${params.to}`);
-      console.log(`Subject: ${params.subject}`);
-      console.log('HTML Content Preview:', params.html.substring(0, 300) + '...');
-      console.log('=====================================================');
-      console.log('Note: Please verify your domain in MailerSend dashboard and ensure API key is activated');
+      // API key needs activation - log details for manual processing
+      console.log('\n🔧 MAILERSEND SETUP REQUIRED:');
+      console.log('1. Go to https://app.mailersend.com/');
+      console.log('2. Verify your email address if prompted');
+      console.log('3. Check API Tokens section for key activation status');
+      console.log('4. No domain verification needed for Gmail sender\n');
       
+      logEmailNotification(params);
       return false;
     }
 
     const result = await response.json();
-    console.log(`Email sent successfully to ${params.to} (Message ID: ${result.message || 'unknown'})`);
+    console.log(`✅ Email sent successfully to ${params.to} via MailerSend`);
     return true;
+    
   } catch (error) {
-    console.error('Email sending error:', error);
-    
-    // Log the email details for manual processing
-    console.log('=== EMAIL NOTIFICATION (Fallback) ===');
-    console.log(`To: ${params.to}`);
-    console.log(`Subject: ${params.subject}`);
-    console.log('HTML Content Preview:', params.html.substring(0, 300) + '...');
-    console.log('=====================================');
-    
+    console.error('MailerSend connection error:', error);
+    logEmailNotification(params);
     return false;
   }
+}
+
+function logEmailNotification(params: EmailParams) {
+  console.log('\n📧 EMAIL NOTIFICATION LOGGED:');
+  console.log(`To: ${params.to}`);
+  console.log(`Subject: ${params.subject}`);
+  console.log(`Preview: ${params.html.replace(/<[^>]*>/g, '').substring(0, 150)}...`);
+  console.log('═══════════════════════════════════════════════════════════\n');
 }
 
 export function generateLiabilityWaiverEmail(userName: string, userEmail: string): string {
