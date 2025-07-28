@@ -178,22 +178,21 @@ export default function Stats() {
         {/* Atrophy Warning */}
         <AtrophyWarning />
         {/* Character Profile */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border relative">
+          {/* Wardrobe Button in Corner */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowWardrobe(true)}
+            className="absolute top-4 right-4 border-purple-500 text-purple-400 hover:bg-purple-900/30 p-2 z-10"
+            title="Open Wardrobe"
+          >
+            <Shirt className="w-4 h-4" />
+          </Button>
+          
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
             <div className="text-center mb-6">
-              {/* Wardrobe Button Above Title - Icon Only */}
-              <div className="w-full flex justify-center mb-3">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowWardrobe(true)}
-                  className="border-purple-500 text-purple-400 hover:bg-purple-900/30 p-2"
-                  title="Open Wardrobe"
-                >
-                  <Shirt className="w-4 h-4" />
-                </Button>
-              </div>
               
               {(() => {
                 const titleComponent = getTitleComponent(safeUserStats.currentTitle, "md");
