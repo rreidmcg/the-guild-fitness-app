@@ -2496,7 +2496,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Send notification to admin
         const adminEmailHtml = generateAdminWaiverNotification(fullName, email, ipAddress || 'unknown', userAgent || 'unknown');
         await sendEmail({
-          to: "coachreidmcg@gmail.com",
+          to: "guildmasterreid@gmail.com",
           subject: "New Liability Waiver Signed - The Guild: Gamified Fitness",
           html: adminEmailHtml
         });

@@ -173,6 +173,19 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**January 28, 2025 - App Rebranding & MailerLite Integration:**
+- **Complete App Rebranding**: Updated app name from "Dumbbells & Dragons" to "The Guild: Gamified Fitness"
+  - Updated PWA manifest with new name and short name "The Guild"
+  - Added proper HTML title and meta description for better SEO
+  - Updated all email templates and legal documentation with new branding
+  - Updated project documentation and code comments throughout codebase
+- **MailerLite Email Integration Configured**: Successfully set up MailerLite API key and email service
+  - Email service verified and working for liability waiver notifications
+  - Admin notifications configured to guildmasterreid@gmail.com (dedicated business email)
+  - Professional branded email templates for user confirmations and admin notifications
+  - API connection tested and confirmed operational
+  - Automatic liability waiver notifications sent when users create accounts
+
 **January 28, 2025 - Founders Pack Exclusive Limited Edition:**
 - **Exclusive Founders Pack**: Limited to first 100 users at $29.97 with comprehensive reward system
   - 1,000 gold coins + 200 premium gems + legendary "The First Flame" title + 12-week workout plan
