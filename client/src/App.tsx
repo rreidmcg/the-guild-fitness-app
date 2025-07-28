@@ -25,6 +25,7 @@ import LoginPage from "@/pages/login";
 import AdminDashboard from "@/pages/admin";
 import Leaderboard from "@/pages/leaderboard";
 import Analytics from "@/pages/analytics";
+import WorkoutPrograms from "@/pages/workout-programs";
 import Checkout from "@/pages/checkout";
 import PaymentSuccess from "@/pages/payment-success";
 import WorkoutRecommendationsPage from "@/pages/workout-recommendations";
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/leaderboard" component={Leaderboard} />
       <Route path="/achievements" component={Achievements} />
       <Route path="/analytics" component={Analytics} />
+      <Route path="/workout-programs" component={WorkoutPrograms} />
       {/* <Route path="/premium" component={Premium} />
       <Route path="/ai-workouts" component={AIWorkouts} /> */}
       <Route path="/signup" component={SignupPage} />

@@ -161,6 +161,14 @@ export default function Workouts() {
               <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
             </div>
             <div className="flex items-center space-x-3">
+              <Button 
+                onClick={() => navigate("/workout-programs")}
+                size="sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white"
+              >
+                <Star className="w-4 h-4 mr-1" />
+                Programs
+              </Button>
               <Link href="/ai-workouts">
                 <Button 
                   size="sm"

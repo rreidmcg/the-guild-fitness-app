@@ -161,6 +161,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Workout Program routes
+  app.get("/api/workout-programs", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const programs = await storage.getAllWorkoutPrograms();
+      const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
+      
+      // Add purchase status to each program
+      const programsWithStatus = programs.map(program => ({
+        ...program,
+        isPurchased: purchasedPrograms.includes(program.id.toString()),
+        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+      }));
+      
+      res.json(programsWithStatus);
+    } catch (error) {
+      console.error("Error fetching workout programs:", error);
+      res.status(500).json({ error: "Failed to fetch workout programs" });
+    }
+  });
+
+  app.get("/api/workout-programs/:id", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const program = await storage.getWorkoutProgram(programId);
+      
+      if (!program) {
+        return res.status(404).json({ error: "Workout program not found" });
+      }
+      
+      const userId = currentUserId;
+      const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
+      const isPurchased = purchasedPrograms.includes(programId.toString());
+      
+      res.json({
+        ...program,
+        isPurchased,
+        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+      });
+    } catch (error) {
+      console.error("Error fetching workout program:", error);
+      res.status(500).json({ error: "Failed to fetch workout program" });
+    }
+  });
+
+  app.get("/api/workout-programs/:id/workouts", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const userId = currentUserId;
+      
+      // Check if user has purchased this program
+      const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
+      const isPurchased = purchasedPrograms.includes(programId.toString());
+      
+      if (!isPurchased) {
+        return res.status(403).json({ error: "Program not purchased" });
+      }
+      
+      const workouts = await storage.getProgramWorkouts(programId);
+      res.json(workouts);
+    } catch (error) {
+      console.error("Error fetching program workouts:", error);
+      res.status(500).json({ error: "Failed to fetch program workouts" });
+    }
+  });
+
+  // Purchase workout program
+  app.post("/api/purchase-program/:id", async (req, res) => {
+    try {
+      const programId = req.params.id;
+      const userId = currentUserId;
+      
+      // Check if already purchased
+      const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
+      if (purchasedPrograms.includes(programId)) {
+        return res.status(400).json({ error: "Program already purchased" });
+      }
+      
+      // Get program details for price
+      const program = await storage.getWorkoutProgram(parseInt(programId));
+      if (!program) {
+        return res.status(404).json({ error: "Program not found" });
+      }
+      
+      // Create Stripe payment intent for one-time purchase
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: program.price, // Already in cents
+        currency: "usd",
+        metadata: {
+          userId: userId.toString(),
+          programId: programId,
+          programName: program.name,
+          type: "workout_program"
+        }
+      });
+      
+      res.json({ 
+        clientSecret: paymentIntent.client_secret,
+        programName: program.name,
+        price: program.price
+      });
+    } catch (error: any) {
+      console.error("Error creating program payment:", error);
+      res.status(500).json({ error: "Failed to create payment intent" });
+    }
+  });
+
+  // Confirm program purchase after successful payment
+  app.post("/api/confirm-program-purchase", async (req, res) => {
+    try {
+      const { paymentIntentId } = req.body;
+      const userId = currentUserId;
+      
+      // Retrieve the payment intent from Stripe to verify it was successful
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      
+      if (paymentIntent.status === 'succeeded') {
+        const programId = paymentIntent.metadata.programId;
+        
+        // Add program to user's purchased programs
+        await storage.purchaseWorkoutProgram(userId, programId);
+        
+        res.json({ 
+          success: true, 
+          programId: programId,
+          message: "Program purchased successfully!" 
+        });
+      } else {
+        res.status(400).json({ error: "Payment not completed" });
+      }
+    } catch (error: any) {
+      console.error("Error confirming program purchase:", error);
+      res.status(500).json({ error: "Failed to confirm purchase" });
+    }
+  });
+
   app.post("/api/create-subscription", async (req, res) => {
     try {
       const userId = currentUserId;

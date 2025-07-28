@@ -63,6 +63,8 @@ export const users = pgTable("users", {
   stripeSubscriptionId: text("stripe_subscription_id"),
   subscriptionStatus: text("subscription_status").default("inactive"), // "active", "inactive", "canceled", "past_due"
   subscriptionEndDate: timestamp("subscription_end_date"),
+  // Purchased workout programs
+  purchasedPrograms: text("purchased_programs").array().default([]), // Array of program IDs user has purchased
   // Liability waiver fields
   liabilityWaiverAccepted: boolean("liability_waiver_accepted").default(false),
   liabilityWaiverAcceptedAt: timestamp("liability_waiver_accepted_at"),
@@ -174,8 +176,14 @@ export const workoutPrograms = pgTable("workout_programs", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  durationWeeks: integer("duration_weeks"),
-  difficultyLevel: text("difficulty_level"),
+  durationWeeks: integer("duration_weeks").default(4),
+  difficultyLevel: text("difficulty_level").notNull(), // "novice", "intermediate", "advanced"
+  price: integer("price").default(997), // Price in cents ($9.97 = 997 cents)
+  workoutsPerWeek: integer("workouts_per_week").default(3),
+  estimatedDuration: integer("estimated_duration").default(45), // Minutes per workout
+  targetAudience: text("target_audience"), // Description of who this program is for
+  features: text("features").array().default([]), // Array of program features/benefits
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

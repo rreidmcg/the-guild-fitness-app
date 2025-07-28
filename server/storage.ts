@@ -67,6 +67,8 @@ export interface IStorage {
   getAllWorkoutPrograms(): Promise<WorkoutProgram[]>;
   getWorkoutProgram(id: number): Promise<WorkoutProgram | undefined>;
   getProgramWorkouts(programId: number): Promise<ProgramWorkout[]>;
+  getUserPurchasedPrograms(userId: number): Promise<string[]>;
+  purchaseWorkoutProgram(userId: number, programId: string): Promise<User>;
 
   // Wardrobe operations
   getWardrobeItemsWithOwnership(userId: number): Promise<any[]>;
@@ -1354,6 +1356,31 @@ export class DatabaseStorage implements IStorage {
 
   async getExercises(): Promise<Exercise[]> {
     return await db.select().from(exercises);
+  }
+
+  // Workout program purchase operations
+  async getUserPurchasedPrograms(userId: number): Promise<string[]> {
+    const [user] = await db.select({ purchasedPrograms: users.purchasedPrograms }).from(users).where(eq(users.id, userId));
+    return user?.purchasedPrograms || [];
+  }
+
+  async purchaseWorkoutProgram(userId: number, programId: string): Promise<User> {
+    // Get current purchased programs
+    const currentPrograms = await this.getUserPurchasedPrograms(userId);
+    
+    // Add new program if not already purchased
+    if (!currentPrograms.includes(programId)) {
+      currentPrograms.push(programId);
+    }
+    
+    // Update user with new purchased programs
+    const [updatedUser] = await db
+      .update(users)
+      .set({ purchasedPrograms: currentPrograms })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return updatedUser;
   }
 }
 
