@@ -210,10 +210,12 @@ export default function Stats() {
             <div className="flex flex-col items-center mb-6">
 
               <div className={`border-4 rounded-lg p-1 ${
-                // Avatar border based on avatar rarity, not user status or title
+                // Avatar border based on avatar rarity/skin selection
                 (safeUserStats?.hasLegendaryHunterSkin || safeUserStats?.currentTitle === "The First Flame"
-                  ? "border-yellow-500 shadow-lg shadow-yellow-500/50" // Legendary rarity
-                  : "border-gray-500") // Common/default rarity
+                  ? "border-yellow-500 shadow-lg shadow-yellow-500/50" // Legendary rarity (Founders Pack)
+                  : safeUserStats?.gender === "gm_avatar"
+                    ? "border-red-500 shadow-lg shadow-red-500/50" // G.M. avatar rarity
+                    : "border-gray-500") // Common/default rarity
               }`}>
                 <Avatar2D user={safeUserStats} size="lg" />
               </div>
