@@ -14,7 +14,7 @@ import { sendEmail, generateLiabilityWaiverEmail, generateAdminWaiverNotificatio
 import Stripe from "stripe";
 
 // Simple in-memory session storage (in production, use proper session management)
-let currentUserId: number = 1;
+let currentUserId: number | null = null;
 
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -821,7 +821,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/logout", async (req, res) => {
     try {
       // Clear current user session
-      currentUserId = 1; // Reset to default
+      currentUserId = null; // Clear session
       res.json({ message: "Logout successful" });
     } catch (error) {
       console.error("Error during logout:", error);
@@ -1151,6 +1151,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/stats", async (req, res) => {
     try {
       const userId = currentUserId; // Use the current logged-in user
+      
+      // Check if user is authenticated
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
       
       // Check for daily reset and auto streak freeze before getting stats
       const user = await storage.getUser(userId);

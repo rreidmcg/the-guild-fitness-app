@@ -10,6 +10,7 @@ import { CurrencyHeader } from "@/components/ui/currency-header";
 import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX } from "lucide-react";
 import { useEffect } from "react";
+import { AuthGuard, PublicRoute } from "@/components/auth-guard";
 import Stats from "@/pages/stats";
 import Workouts from "@/pages/workouts";
 import Settings from "@/pages/settings";
@@ -41,33 +42,131 @@ import AIWorkouts from "@/pages/ai-workouts";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Stats} />
-      <Route path="/stats" component={Stats} />
-      <Route path="/workouts" component={Workouts} />
-      {/* <Route path="/workout-recommendations" component={WorkoutRecommendationsPage} /> */}
-      <Route path="/inventory" component={Inventory} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/workout-builder" component={WorkoutBuilder} />
-      <Route path="/workout-session/:id" component={WorkoutSession} />
-      <Route path="/battle" component={Battle} />
-      <Route path="/wardrobe" component={Wardrobe} />
-      <Route path="/shop" component={Shop} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/leaderboard" component={Leaderboard} />
-      <Route path="/achievements" component={Achievements} />
-      <Route path="/analytics" component={Analytics} />
-      <Route path="/workout-programs" component={WorkoutPrograms} />
-      <Route path="/gem-shop" component={GemShop} />
-      {/* <Route path="/premium" component={Premium} />
-      <Route path="/ai-workouts" component={AIWorkouts} /> */}
-      <Route path="/signup" component={SignupPage} />
-      <Route path="/login" component={LoginPage} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/checkout" component={Checkout} />
-      <Route path="/subscribe" component={Subscribe} />
-      <Route path="/social" component={Social} />
-      <Route path="/mail" component={MailPage} />
-      <Route path="/payment-success" component={PaymentSuccess} />
+      {/* Public routes - redirect to /stats if already authenticated */}
+      <Route path="/signup">
+        <PublicRoute>
+          <SignupPage />
+        </PublicRoute>
+      </Route>
+      <Route path="/login">
+        <PublicRoute>
+          <LoginPage />
+        </PublicRoute>
+      </Route>
+      
+      {/* Protected routes - require authentication */}
+      <Route path="/">
+        <AuthGuard>
+          <Stats />
+        </AuthGuard>
+      </Route>
+      <Route path="/stats">
+        <AuthGuard>
+          <Stats />
+        </AuthGuard>
+      </Route>
+      <Route path="/workouts">
+        <AuthGuard>
+          <Workouts />
+        </AuthGuard>
+      </Route>
+      <Route path="/inventory">
+        <AuthGuard>
+          <Inventory />
+        </AuthGuard>
+      </Route>
+      <Route path="/settings">
+        <AuthGuard>
+          <Settings />
+        </AuthGuard>
+      </Route>
+      <Route path="/workout-builder">
+        <AuthGuard>
+          <WorkoutBuilder />
+        </AuthGuard>
+      </Route>
+      <Route path="/workout-session/:id">
+        <AuthGuard>
+          <WorkoutSession />
+        </AuthGuard>
+      </Route>
+      <Route path="/battle">
+        <AuthGuard>
+          <Battle />
+        </AuthGuard>
+      </Route>
+      <Route path="/wardrobe">
+        <AuthGuard>
+          <Wardrobe />
+        </AuthGuard>
+      </Route>
+      <Route path="/shop">
+        <AuthGuard>
+          <Shop />
+        </AuthGuard>
+      </Route>
+      <Route path="/profile">
+        <AuthGuard>
+          <Profile />
+        </AuthGuard>
+      </Route>
+      <Route path="/leaderboard">
+        <AuthGuard>
+          <Leaderboard />
+        </AuthGuard>
+      </Route>
+      <Route path="/achievements">
+        <AuthGuard>
+          <Achievements />
+        </AuthGuard>
+      </Route>
+      <Route path="/analytics">
+        <AuthGuard>
+          <Analytics />
+        </AuthGuard>
+      </Route>
+      <Route path="/workout-programs">
+        <AuthGuard>
+          <WorkoutPrograms />
+        </AuthGuard>
+      </Route>
+      <Route path="/gem-shop">
+        <AuthGuard>
+          <GemShop />
+        </AuthGuard>
+      </Route>
+      <Route path="/admin">
+        <AuthGuard>
+          <AdminDashboard />
+        </AuthGuard>
+      </Route>
+      <Route path="/checkout">
+        <AuthGuard>
+          <Checkout />
+        </AuthGuard>
+      </Route>
+      <Route path="/subscribe">
+        <AuthGuard>
+          <Subscribe />
+        </AuthGuard>
+      </Route>
+      <Route path="/social">
+        <AuthGuard>
+          <Social />
+        </AuthGuard>
+      </Route>
+      <Route path="/mail">
+        <AuthGuard>
+          <MailPage />
+        </AuthGuard>
+      </Route>
+      <Route path="/payment-success">
+        <AuthGuard>
+          <PaymentSuccess />
+        </AuthGuard>
+      </Route>
+      
+      {/* 404 route */}
       <Route component={NotFound} />
     </Switch>
   );
@@ -96,17 +195,7 @@ function AppContent() {
     <TooltipProvider>
       <div className="min-h-screen bg-background text-foreground">
         <Toaster />
-        
-        {/* Fixed Currency Header */}
-        <CurrencyHeader />
-        
-        {/* Music Controls - Hidden per user request */}
-
-        {/* Main content with top padding to account for fixed header */}
-        <div className="pt-12">
-          <Router />
-        </div>
-        <BottomNav />
+        <Router />
       </div>
     </TooltipProvider>
   );
