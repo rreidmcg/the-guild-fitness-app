@@ -276,7 +276,7 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
 
         <div className="flex justify-between items-center pt-4 border-t border-border">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            Close
           </Button>
           <Button 
             onClick={handleApplyChanges}
