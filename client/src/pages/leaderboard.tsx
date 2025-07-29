@@ -48,7 +48,7 @@ export default function LeaderboardPage() {
       case 3:
         return "bg-gradient-to-r from-amber-600/20 to-amber-700/20 border-amber-600/30";
       default:
-        return "bg-card border-border";
+        return "bg-slate-800/90 border-slate-600";
     }
   };
 
@@ -58,12 +58,12 @@ export default function LeaderboardPage() {
       {/* Main Content with higher z-index */}
       <div className="relative" style={{ zIndex: 10 }}>
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4">
+      <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Leaderboard</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">Top adventurers ranked by experience</p>
+              <h1 className="text-2xl font-bold text-blue-100">Leaderboard</h1>
+              <p className="text-blue-200 mt-0.5 text-sm">Top adventurers ranked by experience</p>
             </div>
             <Trophy className="w-8 h-8 text-yellow-500" />
           </div>
@@ -74,7 +74,7 @@ export default function LeaderboardPage() {
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(10)].map((_, i) => (
-              <div key={i} className="bg-card border border-border rounded-lg p-4 animate-pulse">
+              <div key={i} className="bg-slate-800/90 border border-slate-600 rounded-lg p-4 animate-pulse">
                 <div className="flex items-center space-x-4">
                   <div className="w-8 h-8 bg-muted rounded-full"></div>
                   <div className="flex-1">

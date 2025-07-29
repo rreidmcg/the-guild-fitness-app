@@ -1072,12 +1072,12 @@ export default function Battle() {
         {/* Main Content with higher z-index */}
         <div className="relative" style={{ zIndex: 10 }}>
         {/* Header */}
-        <div className="bg-card border-b border-border px-4 py-6">
+        <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-6">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Battle Arena</h1>
-                <p className="text-muted-foreground mt-1">Choose your opponent and fight for gold coins</p>
+                <h1 className="text-3xl font-bold text-blue-100">Battle Arena</h1>
+                <p className="text-blue-200 mt-1">Choose your opponent and fight for gold coins</p>
               </div>
             </div>
           </div>

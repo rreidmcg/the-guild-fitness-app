@@ -177,12 +177,12 @@ export default function Stats() {
       {/* Main Content with higher z-index */}
       <div className="relative" style={{ zIndex: 10 }}>
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4">
+      <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Character Stats</h1>
-              <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
+              <h1 className="text-2xl font-bold text-blue-100">Character Stats</h1>
+              <p className="mt-0.5 text-sm text-blue-200">Your fitness progression journey</p>
             </div>
             <div className="flex items-center space-x-3">
               {/* Calculator button hidden per user request */}
@@ -195,7 +195,7 @@ export default function Stats() {
         {/* Atrophy Warning */}
         <AtrophyWarning />
         {/* Character Profile */}
-        <Card className="bg-card border-border relative">
+        <Card className="bg-slate-800/90 border-slate-600 relative">
           {/* Wardrobe Button in Corner */}
           <div className="absolute top-4 right-4 z-10">
             <Button

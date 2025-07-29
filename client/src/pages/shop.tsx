@@ -526,12 +526,12 @@ export default function Shop() {
       {/* Main Content with higher z-index */}
       <div className="relative" style={{ zIndex: 10 }}>
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4">
+      <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Shop</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
+              <h1 className="text-2xl font-bold text-blue-100">Shop</h1>
+              <p className="text-blue-200 mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
 
           </div>

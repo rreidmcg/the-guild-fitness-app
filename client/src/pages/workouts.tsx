@@ -163,12 +163,12 @@ export default function Workouts() {
       
       
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4">
+      <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="space-y-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Quests</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
+              <h1 className="text-2xl font-bold text-blue-100">Quests</h1>
+              <p className="text-blue-200 mt-0.5 text-sm">Complete your daily adventures</p>
             </div>
             <div className="flex items-center space-x-3">
               <Button 
@@ -232,7 +232,7 @@ export default function Workouts() {
         </Card>
 
         {/* Daily Quests */}
-        <Card className="bg-card border-border">
+        <Card className="bg-slate-800/90 border-slate-600">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
