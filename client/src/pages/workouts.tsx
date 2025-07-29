@@ -27,7 +27,8 @@ import {
   Sparkles,
   Snowflake,
   Brain,
-  Crown
+  Crown,
+  Lock
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -71,7 +72,7 @@ export default function Workouts() {
       
       if (variables.completed) {
         // Quest completed - always earn 5 XP per quest (with potential streak bonus)
-        const hasStreakBonus = userStats && userStats.currentStreak >= 3;
+        const hasStreakBonus = userStats && (userStats.currentStreak || 0) >= 3;
         const baseXp = hasStreakBonus ? Math.floor(5 * 1.5) : 5;
         
         let message = "Quest Completed!";
@@ -213,7 +214,7 @@ export default function Workouts() {
                     <span className="text-foreground">All 4: +5 Bonus XP</span>
                   </div>
                 </div>
-                {userStats && userStats.currentStreak >= 3 && (
+                {userStats && (userStats.currentStreak || 0) >= 3 && (
                   <div className="flex items-center space-x-1 px-2 py-1 bg-purple-900/30 rounded border border-purple-600">
                     <TrendingUp className="w-4 h-4 text-purple-400" />
                     <span className="text-purple-300 text-xs font-semibold">
@@ -410,24 +411,45 @@ export default function Workouts() {
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-foreground">{program.name}</h3>
-                          {program.name === "Novice Program" && (
+                          {program.name === "Free Novice Program" && (
                             <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-2 py-0.5 rounded text-xs font-medium">
                               Free
                             </span>
                           )}
+                          {(program.price || 0) > 0 && (
+                            <span className="bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1">
+                              <Lock className="w-3 h-3" />
+                              ${((program.price || 0) / 100).toFixed(2)}
+                            </span>
+                          )}
                         </div>
                         <div className="flex space-x-2">
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            className="text-game-primary hover:bg-game-primary/20"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStartProgram(program);
-                            }}
-                          >
-                            <Play className="w-3 h-3" />
-                          </Button>
+                          {(program.price || 0) === 0 ? (
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-game-primary hover:bg-game-primary/20"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStartProgram(program);
+                              }}
+                            >
+                              <Play className="w-3 h-3" />
+                            </Button>
+                          ) : (
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="text-yellow-600 border-yellow-500 hover:bg-yellow-50"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate('/workout-programs');
+                              }}
+                            >
+                              <Lock className="w-3 h-3 mr-1" />
+                              Buy
+                            </Button>
+                          )}
                         </div>
                       </div>
                       <p className="text-sm text-foreground/80 mb-3">{program.description}</p>
