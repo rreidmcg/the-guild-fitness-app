@@ -200,6 +200,35 @@
     opacity: 1 !important;
     backdrop-filter: none !important;
   }
+  
+  /* Fix toast and modal text visibility */
+  [data-sonner-toast],
+  .sonner-toast,
+  [role="dialog"],
+  [role="alertdialog"] {
+    background-color: hsl(45, 100%, 98%) !important;
+    color: hsl(240, 10%, 3.9%) !important;
+    border: 1px solid hsl(45, 30%, 85%) !important;
+  }
+  
+  [data-sonner-toast] [data-title],
+  [data-sonner-toast] [data-description],
+  .sonner-toast .toast-title,
+  .sonner-toast .toast-description,
+  [role="dialog"] [data-radix-dialog-title],
+  [role="dialog"] [data-radix-dialog-description],
+  [role="alertdialog"] [data-radix-alert-dialog-title],
+  [role="alertdialog"] [data-radix-alert-dialog-description] {
+    color: hsl(240, 10%, 3.9%) !important;
+  }
+  
+  /* Ensure all toast variants have dark text */
+  .toast-success,
+  .toast-error,
+  .toast-info,
+  .toast-warning {
+    color: hsl(240, 10%, 3.9%) !important;
+  }
 
   /* Light theme containers */
   .bg-card,
