@@ -973,6 +973,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/users/:targetUserId/ban", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const { targetUserId } = req.params;
+      const { reason, duration } = req.body;
+      
+      if (!targetUserId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      if (!reason || typeof reason !== 'string' || reason.trim() === '') {
+        return res.status(400).json({ error: "Ban reason is required" });
+      }
+
+      if (!duration || typeof duration !== 'string') {
+        return res.status(400).json({ error: "Ban duration is required" });
+      }
+
+      const bannedUser = await storage.banUser(parseInt(targetUserId), currentUser.username, reason.trim(), duration);
+      res.json({ success: true, user: bannedUser });
+    } catch (error) {
+      console.error("Failed to ban user:", error);
+      res.status(500).json({ error: "Failed to ban user" });
+    }
+  });
+
+  app.post("/api/admin/users/:targetUserId/unban", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const { targetUserId } = req.params;
+      
+      if (!targetUserId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      const unbannedUser = await storage.unbanUser(parseInt(targetUserId));
+      res.json({ success: true, user: unbannedUser });
+    } catch (error) {
+      console.error("Failed to unban user:", error);
+      res.status(500).json({ error: "Failed to unban user" });
+    }
+  });
+
+  app.delete("/api/admin/users/:targetUserId", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const { targetUserId } = req.params;
+      
+      if (!targetUserId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      // Prevent admins from deleting themselves
+      if (parseInt(targetUserId) === userId) {
+        return res.status(400).json({ error: "Cannot delete your own account" });
+      }
+
+      await storage.deleteUser(parseInt(targetUserId));
+      res.json({ success: true, message: "User permanently removed" });
+    } catch (error) {
+      console.error("Failed to remove user:", error);
+      res.status(500).json({ error: "Failed to remove user" });
+    }
+  });
+
   app.get("/api/admin/system-stats", async (req, res) => {
     try {
       const userId = getCurrentUserId(req);

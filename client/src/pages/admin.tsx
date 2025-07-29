@@ -16,11 +16,16 @@ import {
   Trash2,
   BarChart3,
   Settings,
-  Coins
+  Coins,
+  UserX,
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -424,6 +429,8 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
 function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const updateUserMutation = useMutation({
@@ -454,14 +461,110 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
     }
   });
 
+  const banUserMutation = useMutation({
+    mutationFn: async (data: { userId: string; banData: any }) => {
+      const response = await apiRequest(`/api/admin/users/${data.userId}/ban`, {
+        method: 'POST',
+        body: data.banData
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Banned",
+        description: "User has been successfully banned.",
+      });
+      setBanDialogOpen(false);
+      setSelectedUser(null);
+      refetchUsers();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Ban Failed",
+        description: error.message || "Failed to ban user",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const removeUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const response = await apiRequest(`/api/admin/users/${userId}`, {
+        method: 'DELETE'
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Removed",
+        description: "User has been permanently removed from the system.",
+      });
+      setRemoveDialogOpen(false);
+      setSelectedUser(null);
+      refetchUsers();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Remove Failed",
+        description: error.message || "Failed to remove user",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const unbanUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const response = await apiRequest(`/api/admin/users/${userId}/unban`, {
+        method: 'POST'
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Unbanned",
+        description: "User has been successfully unbanned.",
+      });
+      refetchUsers();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Unban Failed",
+        description: error.message || "Failed to unban user",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleEditUser = (user: any) => {
     setSelectedUser(user);
     setEditDialogOpen(true);
   };
 
+  const handleBanUser = (user: any) => {
+    setSelectedUser(user);
+    setBanDialogOpen(true);
+  };
+
+  const handleRemoveUser = (user: any) => {
+    setSelectedUser(user);
+    setRemoveDialogOpen(true);
+  };
+
   const handleUpdateUser = (updates: any) => {
     if (selectedUser) {
       updateUserMutation.mutate({ userId: selectedUser.id, updates });
+    }
+  };
+
+  const handleBanSubmit = (banData: any) => {
+    if (selectedUser) {
+      banUserMutation.mutate({ userId: selectedUser.id, banData });
+    }
+  };
+
+  const handleRemoveSubmit = () => {
+    if (selectedUser) {
+      removeUserMutation.mutate(selectedUser.id);
     }
   };
 
@@ -532,10 +635,12 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                 <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-3">
                   <div className="text-left md:text-right text-sm">
                     <div className="text-foreground">
-                      {user.emailVerified ? (
+                      {user.isBanned ? (
+                        <span className="text-red-400">🚫 BANNED</span>
+                      ) : user.emailVerified ? (
                         <span className="text-green-400">✓ Verified</span>
                       ) : (
-                        <span className="text-red-400">Not Verified</span>
+                        <span className="text-yellow-400">Not Verified</span>
                       )}
                     </div>
                     <div className="text-muted-foreground">
@@ -547,6 +652,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                       size="sm" 
                       variant="outline"
                       onClick={() => handleEditUser(user)}
+                      title="Edit User"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -565,6 +671,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                         });
                       }}
                       className="text-green-400 border-green-400 hover:bg-green-500/10"
+                      title="Level Up (+5 levels, +500 XP, +2 all stats)"
                     >
                       <TrendingUp className="w-4 h-4" />
                     </Button>
@@ -573,8 +680,40 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                       variant="outline"
                       onClick={() => handleUpdateUser({ gold: user.gold + 1000 })}
                       className="text-yellow-400 border-yellow-400 hover:bg-yellow-500/10"
+                      title="Add 1000 Gold"
                     >
                       <Coins className="w-4 h-4" />
+                    </Button>
+                    {user.isBanned ? (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => unbanUserMutation.mutate(user.id)}
+                        className="text-green-400 border-green-400 hover:bg-green-500/10"
+                        title="Unban User"
+                        disabled={unbanUserMutation.isPending}
+                      >
+                        <Shield className="w-4 h-4" />
+                      </Button>
+                    ) : (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleBanUser(user)}
+                        className="text-orange-400 border-orange-400 hover:bg-orange-500/10"
+                        title="Ban User"
+                      >
+                        <UserX className="w-4 h-4" />
+                      </Button>
+                    )}
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleRemoveUser(user)}
+                      className="text-red-400 border-red-400 hover:bg-red-500/10"
+                      title="Permanently Remove User"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -602,6 +741,44 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
               user={selectedUser} 
               onSubmit={handleUpdateUser}
               isLoading={updateUserMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Ban User Dialog */}
+      <Dialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-orange-400">
+              <UserX className="w-5 h-5" />
+              Ban User: {selectedUser?.username}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <BanUserForm 
+              user={selectedUser} 
+              onSubmit={handleBanSubmit}
+              isLoading={banUserMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove User Dialog */}
+      <Dialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-400">
+              <AlertTriangle className="w-5 h-5" />
+              Remove User: {selectedUser?.username}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <RemoveUserForm 
+              user={selectedUser} 
+              onSubmit={handleRemoveSubmit}
+              isLoading={removeUserMutation.isPending}
             />
           )}
         </DialogContent>
@@ -1123,5 +1300,159 @@ function MonsterListItem({ monster, onUpdate }: { monster: any; onUpdate: () => 
         )}
       </div>
     </div>
+  );
+}
+
+function BanUserForm({ user, onSubmit, isLoading }: { user: any; onSubmit: (data: any) => void; isLoading: boolean }) {
+  const [formData, setFormData] = useState({
+    reason: "",
+    duration: "permanent"
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.reason.trim()) {
+      return;
+    }
+    
+    const banData = {
+      reason: formData.reason.trim(),
+      duration: formData.duration === "permanent" ? "permanent" : formData.duration
+    };
+    
+    onSubmit(banData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+        <div className="flex items-start space-x-3">
+          <UserX className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-medium text-orange-800 dark:text-orange-200">Ban User Account</h4>
+            <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">
+              This will prevent <strong>{user.username}</strong> from logging in or accessing the application.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="banReason">Reason for Ban *</Label>
+        <Textarea
+          id="banReason"
+          value={formData.reason}
+          onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+          placeholder="Enter the reason for banning this user (e.g., violation of terms of service, inappropriate behavior, spam, etc.)"
+          rows={3}
+          required
+          className="mt-1"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="banDuration">Ban Duration</Label>
+        <Select value={formData.duration} onValueChange={(value) => setFormData({ ...formData, duration: value })}>
+          <SelectTrigger className="mt-1">
+            <SelectValue placeholder="Select ban duration" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="permanent">Permanent Ban</SelectItem>
+            <SelectItem value="2025-02-28">1 Month (until Feb 28, 2025)</SelectItem>
+            <SelectItem value="2025-03-31">2 Months (until Mar 31, 2025)</SelectItem>
+            <SelectItem value="2025-06-30">6 Months (until Jun 30, 2025)</SelectItem>
+            <SelectItem value="2025-12-31">1 Year (until Dec 31, 2025)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={() => {}}>
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isLoading || !formData.reason.trim()}
+          className="bg-orange-600 hover:bg-orange-700 text-white"
+        >
+          {isLoading ? "Banning..." : "Ban User"}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function RemoveUserForm({ user, onSubmit, isLoading }: { user: any; onSubmit: () => void; isLoading: boolean }) {
+  const [confirmText, setConfirmText] = useState("");
+  const confirmPhrase = `DELETE ${user.username}`;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (confirmText === confirmPhrase) {
+      onSubmit();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+        <div className="flex items-start space-x-3">
+          <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+          <div>
+            <h4 className="font-medium text-red-800 dark:text-red-200">Permanently Remove User</h4>
+            <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+              This action is <strong>irreversible</strong>. It will permanently delete:
+            </p>
+            <ul className="text-sm text-red-700 dark:text-red-300 mt-2 list-disc list-inside space-y-1">
+              <li>User account and profile data</li>
+              <li>All workout sessions and progress</li>
+              <li>Battle history and achievements</li>
+              <li>Character stats and progression</li>
+              <li>Purchase history and subscriptions</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-foreground">User Details:</p>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <div><strong>Username:</strong> {user.username}</div>
+            <div><strong>Email:</strong> {user.email}</div>
+            <div><strong>Level:</strong> {user.level}</div>
+            <div><strong>Total XP:</strong> {user.experience}</div>
+            <div><strong>Joined:</strong> {new Date(user.createdAt).toLocaleDateString()}</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="confirmText">
+          Type <code className="bg-muted px-2 py-1 rounded text-red-600">{confirmPhrase}</code> to confirm deletion
+        </Label>
+        <Input
+          id="confirmText"
+          value={confirmText}
+          onChange={(e) => setConfirmText(e.target.value)}
+          placeholder={confirmPhrase}
+          className="mt-1 font-mono"
+          autoComplete="off"
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={() => {}}>
+          Cancel
+        </Button>
+        <Button 
+          type="submit" 
+          disabled={isLoading || confirmText !== confirmPhrase}
+          className="bg-red-600 hover:bg-red-700 text-white"
+        >
+          {isLoading ? "Removing..." : "Permanently Delete User"}
+        </Button>
+      </div>
+    </form>
   );
 }

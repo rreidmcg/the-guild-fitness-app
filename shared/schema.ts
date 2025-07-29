@@ -73,6 +73,12 @@ export const users = pgTable("users", {
   // Wardrobe notification tracking
   hasUnseenWardrobeChanges: boolean("has_unseen_wardrobe_changes").default(false),
   lastWardrobeViewedAt: timestamp("last_wardrobe_viewed_at"),
+  // Ban system
+  isBanned: boolean("is_banned").default(false),
+  banReason: text("ban_reason"),
+  banDuration: text("ban_duration"), // "permanent" or date string (YYYY-MM-DD)
+  bannedAt: timestamp("banned_at"),
+  bannedBy: text("banned_by"), // Username of admin who banned
   createdAt: timestamp("created_at").defaultNow(),
 });
 

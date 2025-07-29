@@ -35,6 +35,9 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
   markWardrobeNotification(userId: number): Promise<void>;
+  banUser(userId: number, adminUsername: string, reason: string, duration: string): Promise<User>;
+  unbanUser(userId: number): Promise<User>;
+  deleteUser(userId: number): Promise<void>;
   updateStripeCustomerId(userId: number, customerId: string): Promise<User>;
   updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User>;
 
@@ -319,6 +322,50 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ hasUnseenWardrobeChanges: true })
       .where(eq(users.id, userId));
+  }
+
+  async banUser(userId: number, adminUsername: string, reason: string, duration: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        isBanned: true,
+        banReason: reason,
+        banDuration: duration,
+        bannedAt: new Date(),
+        bannedBy: adminUsername
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async unbanUser(userId: number): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        isBanned: false,
+        banReason: null,
+        banDuration: null,
+        bannedAt: null,
+        bannedBy: null
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) throw new Error("User not found");
+    return user;
+  }
+
+  async deleteUser(userId: number): Promise<void> {
+    // Delete related data first
+    await db.delete(workoutSessions).where(eq(workoutSessions.userId, userId));
+    await db.delete(exercisePerformances).where(eq(exercisePerformances.userId, userId));
+    await db.delete(personalRecords).where(eq(personalRecords.userId, userId));
+    await db.delete(workouts).where(eq(workouts.userId, userId));
+    await db.delete(dailyProgress).where(eq(dailyProgress.userId, userId));
+    
+    // Finally delete the user
+    await db.delete(users).where(eq(users.id, userId));
   }
 
   // Exercise operations
