@@ -116,7 +116,7 @@ export default function SignupPage() {
     setPendingSignupData(null);
     toast({
       title: "Account creation cancelled",
-      description: "You must accept the liability waiver to use Dumbbells & Dragons.",
+      description: "You must accept the liability waiver to use The Guild: Gamified Fitness.",
       variant: "destructive",
     });
   };
