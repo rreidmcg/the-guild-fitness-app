@@ -28,6 +28,7 @@ import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753825222475.png";
+import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753827749723.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 
 import { useBackgroundMusic } from "@/contexts/background-music-context";
@@ -127,7 +128,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 9, name: "Plague Rat", level: 2, maxHp: 16, currentHp: 16, attack: 4, goldReward: 3, description: "A sickly rat spreading corruption", image: caveRatImage },
       { id: 10, name: "Giant Rat", level: 3, maxHp: 18, currentHp: 18, attack: 4, goldReward: 3, description: "An oversized rodent with massive claws", image: caveRatImage },
       { id: 11, name: "War Rat", level: 3, maxHp: 20, currentHp: 20, attack: 5, goldReward: 4, description: "A battle-scarred rat veteran", image: caveRatImage },
-      { id: 12, name: "Rat Chieftain", level: 3, maxHp: 26, currentHp: 26, attack: 5, goldReward: 6, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack" }
+      { id: 12, name: "Rat Chieftain", level: 3, maxHp: 26, currentHp: 26, attack: 5, goldReward: 6, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack", image: ratChieftainImage }
     ]
   },
   {

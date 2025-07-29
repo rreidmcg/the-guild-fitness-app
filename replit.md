@@ -173,6 +173,20 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Rat Chieftain Mini-Boss Integration & Dark Theme Restoration:**
+- **Added Custom Rat Chieftain Mini-Boss Art**: Integrated detailed pixel art for the Rat Chieftain boss
+  - Features menacing rat warrior with red armor, feathered helmet, and spear weapon
+  - Custom artwork properly displays in "The Rat Tunnels" E-rank dungeon zone as the Level 3 mini-boss
+  - Enhanced battle system with proper image integration for all monster types
+  - Maintains consistent pixel art style with other custom monster artwork
+- **Complete Dark Gaming Theme Restoration**: Reverted entire application from light amber theme back to authentic dark gaming aesthetic
+  - All pages now use dark slate gradient backgrounds (from-slate-900 via-slate-800 to-slate-900)
+  - Bright white/blue text throughout for excellent readability and gamer feel
+  - Removed all light theme decorations (floating orbs, amber backgrounds, rustic patterns)
+  - Fixed dropdown menus and modal text colors for proper dark theme visibility
+  - Updated login, signup, stats, workouts, battle, shop, and leaderboard pages consistently
+  - Enhanced CSS with proper dark theme overrides for all UI components
+
 **July 29, 2025 - Slime King Mini-Boss Integration & Avatar Selection Enhancement:**
 - **Added Slime King Mini-Boss**: Integrated custom pixel art Slime King into battle system
   - Created "The Slime Kingdom" E-rank dungeon zone with toxic swamp theme and story narrative
