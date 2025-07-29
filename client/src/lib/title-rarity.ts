@@ -14,7 +14,7 @@ export const getTitleRarity = (title: string): TitleRarity => {
   // G.M. title is highest rarity (red/relic) - check for both formats
   if (title === "<G.M.>" || title === "G.M.") {
     return {
-      color: "text-red-300",
+      color: "text-red-500",
       bgColor: "bg-red-500/20",
       borderColor: "border-red-400/40",
       rarity: "relic"
