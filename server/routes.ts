@@ -2620,12 +2620,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/exercises", isAdmin, async (req, res) => {
+    try {
+      const exerciseData = req.body;
+      
+      // Validate required fields
+      if (!exerciseData.name || !exerciseData.category) {
+        return res.status(400).json({ error: "Name and category are required" });
+      }
+
+      const newExercise = await storage.createExercise(exerciseData);
+      res.json({ success: true, exercise: newExercise });
+    } catch (error) {
+      console.error("Failed to create exercise:", error);
+      res.status(500).json({ error: "Failed to create exercise" });
+    }
+  });
+
   app.get("/api/admin/monsters", isAdmin, async (req, res) => {
     try {
       const monsters = await storage.getAllMonsters();
       res.json(monsters);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch monsters" });
+    }
+  });
+
+  app.post("/api/admin/monsters", isAdmin, async (req, res) => {
+    try {
+      const monsterData = req.body;
+      
+      // Validate required fields  
+      if (!monsterData.name || !monsterData.level || !monsterData.tier) {
+        return res.status(400).json({ error: "Name, level, and tier are required" });
+      }
+
+      const newMonster = await storage.createMonster(monsterData);
+      res.json({ success: true, monster: newMonster });
+    } catch (error) {
+      console.error("Failed to create monster:", error);
+      res.status(500).json({ error: "Failed to create monster" });
     }
   });
 

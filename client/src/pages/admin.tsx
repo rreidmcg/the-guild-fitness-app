@@ -267,6 +267,52 @@ function AnalyticsOverview({ data }: { data: any }) {
 }
 
 function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoading, exercisesError, monstersError }: any) {
+  const [addExerciseOpen, setAddExerciseOpen] = useState(false);
+  const [addMonsterOpen, setAddMonsterOpen] = useState(false);
+  const { toast } = useToast();
+
+  const addExerciseMutation = useApiMutation({
+    endpoint: '/api/admin/exercises',
+    method: 'POST',
+    onSuccess: () => {
+      toast({
+        title: "Exercise Added",
+        description: "New exercise has been successfully created.",
+      });
+      setAddExerciseOpen(false);
+      // Refresh exercises list
+      window.location.reload();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Add Exercise",
+        description: error.message || "Failed to create exercise",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const addMonsterMutation = useApiMutation({
+    endpoint: '/api/admin/monsters',  
+    method: 'POST',
+    onSuccess: () => {
+      toast({
+        title: "Monster Added",
+        description: "New monster has been successfully created.",
+      });
+      setAddMonsterOpen(false);
+      // Refresh monsters list
+      window.location.reload();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Add Monster",
+        description: error.message || "Failed to create monster",
+        variant: "destructive",
+      });
+    }
+  });
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -274,7 +320,11 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-foreground">Exercise Management</CardTitle>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button 
+              size="sm" 
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => setAddExerciseOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Exercise
             </Button>
@@ -311,7 +361,11 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         <Card className="bg-card border-border">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-foreground">Monster Management</CardTitle>
-            <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">
+            <Button 
+              size="sm" 
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => setAddMonsterOpen(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Monster
             </Button>
@@ -344,6 +398,32 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Exercise Dialog */}
+      <Dialog open={addExerciseOpen} onOpenChange={setAddExerciseOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Exercise</DialogTitle>
+          </DialogHeader>
+          <AddExerciseForm 
+            onSubmit={(data) => addExerciseMutation.mutate(data)}
+            isLoading={addExerciseMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Monster Dialog */}
+      <Dialog open={addMonsterOpen} onOpenChange={setAddMonsterOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Monster</DialogTitle>
+          </DialogHeader>
+          <AddMonsterForm 
+            onSubmit={(data) => addMonsterMutation.mutate(data)}
+            isLoading={addMonsterMutation.isPending}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -355,10 +435,13 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: { userId: string; updates: any }) => {
-      return await useApiMutation({ 
-        endpoint: `/api/admin/users/${data.userId}`, 
-        method: 'PATCH' 
-      }).mutateAsync(data.updates);
+      const response = await fetch(`/api/admin/users/${data.userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data.updates)
+      });
+      if (!response.ok) throw new Error('Failed to update user');
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -661,6 +744,240 @@ function UserEditForm({ user, onSubmit, isLoading }: { user: any; onSubmit: (dat
         </Button>
         <Button type="submit" disabled={isLoading}>
           {isLoading ? "Updating..." : "Update User"}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function AddExerciseForm({ onSubmit, isLoading }: { onSubmit: (data: any) => void; isLoading: boolean }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    muscleGroups: "",
+    description: "",
+    statTypes: JSON.stringify({ strength: 70, stamina: 20, agility: 10 })
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Parse statTypes back to JSON
+    let statTypesObject;
+    try {
+      statTypesObject = JSON.parse(formData.statTypes);
+    } catch {
+      statTypesObject = { strength: 70, stamina: 20, agility: 10 };
+    }
+
+    onSubmit({
+      ...formData,
+      muscleGroups: formData.muscleGroups.split(',').map(mg => mg.trim()).filter(mg => mg),
+      statTypes: statTypesObject
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="exerciseName">Exercise Name</Label>
+        <Input
+          id="exerciseName"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="e.g., Push-up, Squat, Bench Press"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="category">Category</Label>
+        <Input
+          id="category"
+          value={formData.category}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          placeholder="e.g., Upper Body, Lower Body, Cardio"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="muscleGroups">Muscle Groups (comma-separated)</Label>
+        <Input
+          id="muscleGroups"
+          value={formData.muscleGroups}
+          onChange={(e) => setFormData({ ...formData, muscleGroups: e.target.value })}
+          placeholder="e.g., Chest, Shoulders, Triceps"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Input
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Brief description of the exercise"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="statTypes">Stat Distribution (JSON)</Label>
+        <Input
+          id="statTypes"
+          value={formData.statTypes}
+          onChange={(e) => setFormData({ ...formData, statTypes: e.target.value })}
+          placeholder='{"strength": 70, "stamina": 20, "agility": 10}'
+        />
+        <p className="text-xs text-muted-foreground mt-1">Total should equal 100</p>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={() => {}}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Adding..." : "Add Exercise"}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+function AddMonsterForm({ onSubmit, isLoading }: { onSubmit: (data: any) => void; isLoading: boolean }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    level: 1,
+    hp: 100,
+    damage: 10,
+    tier: "E",
+    zone: "",
+    goldReward: 50,
+    description: ""
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({
+      ...formData,
+      level: parseInt(formData.level.toString()),
+      hp: parseInt(formData.hp.toString()),
+      damage: parseInt(formData.damage.toString()),
+      goldReward: parseInt(formData.goldReward.toString())
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label htmlFor="monsterName">Monster Name</Label>
+        <Input
+          id="monsterName"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="e.g., Goblin Warrior, Ancient Dragon"
+          required
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="level">Level</Label>
+          <Input
+            id="level"
+            type="number"
+            min="1"
+            max="50"
+            value={formData.level}
+            onChange={(e) => setFormData({ ...formData, level: parseInt(e.target.value) })}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="tier">Tier</Label>
+          <select
+            id="tier"
+            value={formData.tier}
+            onChange={(e) => setFormData({ ...formData, tier: e.target.value })}
+            className="w-full px-3 py-2 border border-input bg-background rounded-md"
+            required
+          >
+            <option value="E">E-rank</option>
+            <option value="D">D-rank</option>
+            <option value="C">C-rank</option>
+            <option value="B">B-rank</option>
+            <option value="A">A-rank</option>
+            <option value="S">S-rank</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="hp">HP</Label>
+          <Input
+            id="hp"
+            type="number"
+            min="1"
+            value={formData.hp}
+            onChange={(e) => setFormData({ ...formData, hp: parseInt(e.target.value) })}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="damage">Damage</Label>
+          <Input
+            id="damage"
+            type="number"
+            min="1"
+            value={formData.damage}
+            onChange={(e) => setFormData({ ...formData, damage: parseInt(e.target.value) })}
+            required
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="zone">Zone</Label>
+          <Input
+            id="zone"
+            value={formData.zone}
+            onChange={(e) => setFormData({ ...formData, zone: e.target.value })}
+            placeholder="e.g., Goblin Caves, Dragon's Lair"
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="goldReward">Gold Reward</Label>
+          <Input
+            id="goldReward"
+            type="number"
+            min="1"
+            value={formData.goldReward}
+            onChange={(e) => setFormData({ ...formData, goldReward: parseInt(e.target.value) })}
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="monsterDescription">Description</Label>
+        <Input
+          id="monsterDescription"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Brief description of the monster"
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={() => {}}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Adding..." : "Add Monster"}
         </Button>
       </div>
     </form>

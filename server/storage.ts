@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -16,7 +16,8 @@ import {
   type SocialShareLike, type InsertSocialShareLike,
   type LiabilityWaiver, type InsertLiabilityWaiver,
   type WorkoutPreferences, type InsertWorkoutPreferences,
-  type WorkoutFeedback, type InsertWorkoutFeedback
+  type WorkoutFeedback, type InsertWorkoutFeedback,
+  type Monster, type InsertMonster
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -41,6 +42,8 @@ export interface IStorage {
   getAllExercises(): Promise<Exercise[]>;
   getExercise(id: number): Promise<Exercise | undefined>;
   createExercise(exercise: InsertExercise): Promise<Exercise>;
+  getAllMonsters(): Promise<Monster[]>;
+  createMonster(monster: any): Promise<Monster>;
 
   // Workout operations
   getUserWorkouts(userId: number): Promise<Workout[]>;
@@ -1288,9 +1291,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Analytics helper methods - removed duplicates and fixed table references
-  async getAllMonsters() {
-    // Note: monsters table not defined in current schema
-    return [];
+  async getAllMonsters(): Promise<Monster[]> {
+    await this.ensureInitialized();
+    return await db.select().from(monsters);
+  }
+
+  async createMonster(monsterData: any): Promise<Monster> {
+    const [monster] = await db
+      .insert(monsters)
+      .values(monsterData)
+      .returning();
+    return monster;
   }
 
   // Liability waiver operations
