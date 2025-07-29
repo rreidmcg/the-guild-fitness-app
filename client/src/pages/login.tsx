@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { Eye, EyeOff } from "lucide-react";
 import ForgotPasswordForm from "@/components/forgot-password-form";
-import logoImage from "@assets/The Guild Beta Logo_1753824042077.png";
+import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753824284012.png";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),

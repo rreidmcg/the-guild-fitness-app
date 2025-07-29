@@ -179,9 +179,10 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - Successfully removed Jenn's account so she can create her own fresh account
   - Admin can now properly manage users through the interface
 - **Complete Rustic Theme Implementation & Logo Update:**
-- **Updated Application Logo**: Replaced login page logo with new "The Guild Beta Logo" provided by user
-  - Updated import from old logo to new logo file "The Guild Beta Logo_1753824042077.png"
-  - Logo now displays consistently with proper sizing and drop shadow effects
+- **Updated Application Logo**: Updated login page logo with latest "The Guild Gamified Fitness" logo
+  - Updated import to use new logo file "24D3E703-7380-4E15-9893-55D6C971DD0C_1753824284012.png"
+  - Features rustic golden text styling with "BETA" tag matching the app's theme
+  - Logo displays consistently with proper sizing and drop shadow effects
 - **Unified Rustic Background Theme**: Applied consistent warm rustic styling across all pages
   - All pages now inherit the same gradient background (amber to orange to yellow)
   - Floating orbs with blur effects positioned throughout the app for atmospheric depth
