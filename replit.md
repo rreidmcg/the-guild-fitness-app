@@ -173,6 +173,14 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Female Legendary Hunter Skin Addition:**
+- **Added Female Variant of Legendary Hunter Skin**: Founders Pack users now have gender-specific legendary hunter skins
+  - Integrated female pixel art version of "The Legendary Hunter" skin for female characters
+  - Updated Avatar2D component to automatically select appropriate gender-specific legendary hunter skin
+  - Female users with "The First Flame" title now display custom female legendary hunter appearance
+  - Maintains visual consistency with Founders Pack exclusivity while providing proper gender representation
+  - Both male and female legendary hunter skins use same pixel art style and rarity treatment
+
 **July 29, 2025 - Quest Page Reorganization & Free Program Purchase Fix:**
 - **Fixed Free Program Purchase System**: Resolved issue with free novice program not adding to user's library
   - Added special handling for free programs (price = 0) to bypass Stripe payment system
