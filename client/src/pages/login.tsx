@@ -91,16 +91,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
-        <Card className="w-full max-w-md bg-gray-900/80 backdrop-blur-sm border-yellow-500/30">
+        <Card className="w-full max-w-md bg-card border-border">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-yellow-400">
+            <CardTitle className="text-2xl font-bold text-foreground">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-gray-100">
+            <CardDescription className="text-muted-foreground">
               Sign in to your The Guild: Gamified Fitness account
             </CardDescription>
           </CardHeader>
@@ -112,15 +112,14 @@ export default function LoginPage() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-200">Username</FormLabel>
+                      <FormLabel>Username</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter your username" 
                           {...field} 
-                          className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-500"
                         />
                       </FormControl>
-                      <FormMessage className="text-red-400" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -130,32 +129,32 @@ export default function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-200">Password</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input 
                             placeholder="Enter your password" 
                             type={showPassword ? "text" : "password"}
                             {...field} 
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-500 pr-10"
+                            className="pr-10"
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage className="text-red-400" />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold"
+                  className="w-full"
                   disabled={loginMutation.isPending}
                 >
                   {loginMutation.isPending ? "Signing in..." : "Sign In"}
@@ -166,18 +165,18 @@ export default function LoginPage() {
             <div className="mt-4 text-center">
               <button 
                 onClick={() => setShowForgotPassword(true)}
-                className="text-sm text-yellow-400 hover:text-yellow-300 hover:underline"
+                className="text-sm text-primary hover:text-primary/80 hover:underline"
               >
                 Forgot your password?
               </button>
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-200">
+              <p className="text-sm text-muted-foreground">
                 Don't have an account?{" "}
                 <button 
                   onClick={() => setLocation("/signup")}
-                  className="text-yellow-400 hover:text-yellow-300 hover:underline font-medium"
+                  className="text-primary hover:text-primary/80 hover:underline font-medium"
                 >
                   Sign up
                 </button>
