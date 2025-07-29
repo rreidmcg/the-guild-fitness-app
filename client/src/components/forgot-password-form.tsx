@@ -68,22 +68,22 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
 
   if (isEmailSent) {
     return (
-      <Card className="w-full max-w-md bg-gray-900/80 backdrop-blur-sm border-yellow-500/30">
+      <Card className="w-full max-w-md bg-card border-border">
         <CardHeader className="text-center">
-          <CardTitle className="text-yellow-400">Check Your Email</CardTitle>
-          <CardDescription className="text-gray-300">
+          <CardTitle className="text-foreground">Check Your Email</CardTitle>
+          <CardDescription className="text-muted-foreground">
             If an account with that email exists, we've sent a password reset link.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-gray-400 text-center">
+          <p className="text-sm text-muted-foreground text-center">
             Check your email inbox and click the link to reset your password. 
             The link will expire in 1 hour.
           </p>
           <Button
             onClick={onBack}
             variant="outline"
-            className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
+            className="w-full"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Login
@@ -94,17 +94,17 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
   }
 
   return (
-    <Card className="w-full max-w-md bg-gray-900/80 backdrop-blur-sm border-yellow-500/30">
+    <Card className="w-full max-w-md bg-card border-border">
       <CardHeader className="text-center">
-        <CardTitle className="text-yellow-400">Forgot Password</CardTitle>
-        <CardDescription className="text-gray-300">
+        <CardTitle className="text-foreground">Forgot Password</CardTitle>
+        <CardDescription className="text-muted-foreground">
           Enter your email address and we'll send you a link to reset your password.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-200">
+            <Label htmlFor="email">
               Email Address
             </Label>
             <Input
@@ -113,7 +113,7 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="bg-gray-800/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-yellow-500"
+              className="placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
               required
             />
           </div>
@@ -122,7 +122,7 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md transition-colors"
+              className="w-full"
             >
               {isLoading ? "Sending..." : "Send Reset Link"}
             </Button>
@@ -131,7 +131,7 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
               type="button"
               onClick={onBack}
               variant="outline"
-              className="w-full border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
+              className="w-full"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Login
