@@ -14,6 +14,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { validateUsername, formatUsernameInput } from "@/utils/username-validation";
 import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
+import { Avatar2D } from "@/components/ui/avatar-2d";
 import logoImage from "@assets/1208A981-BCE0-47F4-9A78-AD830AA0432A_1753818737424.png";
 
 const signupSchema = z.object({
@@ -30,7 +31,8 @@ const signupSchema = z.object({
   weight: z.number().min(1, "Weight is required"),
   fitnessGoal: z.enum(["lose_weight", "gain_muscle", "improve_endurance", "general_fitness"]),
   measurementUnit: z.enum(["imperial", "metric"]),
-  gender: z.enum(["male", "female", "other"])
+  gender: z.enum(["male", "female", "other", "prefer_not_to_say"]),
+  avatarStyle: z.enum(["male", "female"])
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -56,7 +58,8 @@ export default function SignupPage() {
       weight: 0,
       fitnessGoal: "general_fitness",
       measurementUnit: "imperial",
-      gender: "male"
+      gender: "male",
+      avatarStyle: "male"
     },
   });
 
@@ -75,7 +78,7 @@ export default function SignupPage() {
           weight: data.weight,
           fitnessGoal: data.fitnessGoal,
           measurementUnit: data.measurementUnit,
-          gender: data.gender
+          gender: data.avatarStyle // Use avatarStyle for the avatar appearance
         }),
       });
       
@@ -320,23 +323,67 @@ export default function SignupPage() {
 
                   <FormField
                     control={form.control}
+                    name="avatarStyle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Choose Your Avatar Style</FormLabel>
+                        <FormControl>
+                          <div className="grid grid-cols-2 gap-4">
+                            {[
+                              { value: "male", label: "Male Avatar" },
+                              { value: "female", label: "Female Avatar" }
+                            ].map((option) => (
+                              <div 
+                                key={option.value}
+                                className={`cursor-pointer border-2 rounded-lg p-4 text-center transition-all ${
+                                  field.value === option.value 
+                                    ? "border-primary bg-primary/10" 
+                                    : "border-muted hover:border-muted-foreground"
+                                }`}
+                                onClick={() => field.onChange(option.value)}
+                              >
+                                <div className="mb-2 flex justify-center">
+                                  <Avatar2D 
+                                    user={{ gender: option.value, level: 1, strength: 10, stamina: 10, agility: 10 } as any} 
+                                    size="sm" 
+                                  />
+                                </div>
+                                <p className="text-sm font-medium">{option.label}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Choose your preferred avatar appearance - you can change this later in settings
+                        </p>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="gender"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Gender</FormLabel>
+                        <FormLabel>Gender (Optional)</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select gender" />
+                              <SelectValue placeholder="Select gender (optional)" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="male">Male</SelectItem>
                             <SelectItem value="female">Female</SelectItem>
                             <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
+                        <p className="text-xs text-muted-foreground">
+                          This information is for personalization and analytics only
+                        </p>
                       </FormItem>
                     )}
                   />
