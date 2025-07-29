@@ -173,6 +173,20 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Change Password & Push Notification System Fix:**
+- **Fixed Change Password Functionality**: Implemented secure password change system with user-friendly interface
+  - Added `/api/user/password` PATCH endpoint with current password verification and secure hashing
+  - Created `ChangePasswordDialog` component with password visibility toggles and validation
+  - Added current/new/confirm password fields with 6+ character minimum requirement
+  - Removed duplicate non-functional Change Password button in settings page
+  - Password change now properly validates current password before updating
+- **Enhanced Push Notification System**: Improved notification settings with real-time status updates
+  - Added notification permission handling in settings page with clear status messages
+  - Daily workout reminders scheduled for 6 PM, atrophy warnings at 10 PM
+  - Achievement alerts and streak warnings properly integrated with permission system
+  - Service worker configured for push notifications with proper event handling
+  - Notification switches now show descriptive status based on permission state
+
 **July 29, 2025 - Comprehensive Streak Bonus System Implementation:**
 - **Completed Streak Bonus System**: Implemented 1.5x XP multiplier for users with 3+ day streaks
   - Applied streak bonus to all XP gains: daily quest XP, workout session XP, and stat XP

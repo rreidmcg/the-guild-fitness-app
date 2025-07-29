@@ -302,11 +302,6 @@ export default function Settings() {
               </div>
               <Switch id="workout-privacy" defaultChecked />
             </div>
-
-            <Button variant="outline" className="w-full">
-              <Shield className="w-4 h-4 mr-2" />
-              Change Password
-            </Button>
           </CardContent>
         </Card>
 
