@@ -1128,8 +1128,24 @@ export default function Battle() {
                 )}
               </CardTitle>
             </CardHeader>
-            {isMonsterListOpen && (
-              <CardContent>
+            <CardContent>
+              {!isMonsterListOpen && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {ERANK_DUNGEON_ZONES.map((zone) => (
+                    <Card key={zone.id} className="bg-card border-border hover:border-primary hover:shadow-lg cursor-pointer">
+                      <CardContent className="p-3 text-center">
+                        <div 
+                          className="w-6 h-6 rounded-full mx-auto mb-2"
+                          style={{ backgroundColor: zone.background }}
+                        />
+                        <h3 className="font-medium text-sm">{zone.name}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+              {isMonsterListOpen && (
                 <div className="space-y-6">
                   {ERANK_DUNGEON_ZONES.map((zone) => (
                     <Card key={zone.id} className="bg-card border-border">
@@ -1234,8 +1250,8 @@ export default function Battle() {
                     </Card>
                   ))}
                 </div>
-              </CardContent>
-            )}
+              )}
+            </CardContent>
           </Card>
 
           {/* D-rank Dungeon Zones */}
