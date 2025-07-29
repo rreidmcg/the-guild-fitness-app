@@ -1515,6 +1515,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Change password endpoint
+  app.patch("/api/user/password", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Current password and new password are required" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "New password must be at least 6 characters long" });
+      }
+
+      // Get current user to verify current password
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await authUtils.comparePassword(currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return res.status(401).json({ error: "Current password is incorrect" });
+      }
+
+      // Hash new password
+      const hashedNewPassword = await authUtils.hashPassword(newPassword);
+
+      // Update password
+      await storage.updateUser(userId, { password: hashedNewPassword });
+
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Error changing password:", error);
+      res.status(500).json({ error: "Failed to change password" });
+    }
+  });
+
   // Atrophy system routes
   app.get("/api/user/atrophy-status", async (req, res) => {
     try {
