@@ -1116,9 +1116,9 @@ export default function Battle() {
                 onClick={() => setIsMonsterListOpen(!isMonsterListOpen)}
               >
                 <div className="flex items-center space-x-2">
-                  <Skull className="w-6 h-6 text-white !text-white" />
+                  <Skull className="w-6 h-6 text-muted-foreground" />
                   <span>E-rank Dungeons</span>
-                  <span className="text-xs bg-white/20 text-white !text-white px-2 py-1 rounded">COMMON</span>
+                  <span className="text-xs bg-muted/20 text-muted-foreground px-2 py-1 rounded">COMMON</span>
                   <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 1-10</span>
                 </div>
                 {isMonsterListOpen ? (
