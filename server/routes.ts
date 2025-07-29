@@ -1522,8 +1522,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle "No Title" option (set to null)
       const titleToSet = title === "No Title" ? null : title;
       
-      // Special handling for exclusive titles
-      if (title === "The First Flame" && user.currentTitle !== "The First Flame") {
+      // Special handling for exclusive titles - Zero has access to ALL titles
+      if (title === "The First Flame" && user.currentTitle !== "The First Flame" && username !== "zero") {
         return res.status(403).json({ error: "This title is exclusive to Founders Pack members" });
       }
       
