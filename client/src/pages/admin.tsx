@@ -15,8 +15,15 @@ import {
   Edit,
   Trash2,
   BarChart3,
-  Settings
+  Settings,
+  Coins
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('analytics');
@@ -342,6 +349,46 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
 }
 
 function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) {
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const updateUserMutation = useMutation({
+    mutationFn: async (data: { userId: string; updates: any }) => {
+      return await useApiMutation({ 
+        endpoint: `/api/admin/users/${data.userId}`, 
+        method: 'PATCH' 
+      }).mutateAsync(data.updates);
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Updated",
+        description: "User has been successfully updated.",
+      });
+      setEditDialogOpen(false);
+      setSelectedUser(null);
+      refetchUsers();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update user",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleEditUser = (user: any) => {
+    setSelectedUser(user);
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateUser = (updates: any) => {
+    if (selectedUser) {
+      updateUserMutation.mutate({ userId: selectedUser.id, updates });
+    }
+  };
+
   if (usersLoading) {
     return <LoadingState>Loading users...</LoadingState>;
   }
@@ -420,8 +467,38 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleEditUser(user)}
+                    >
                       <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        const newLevel = Math.min(user.level + 5, 100);
+                        const newXP = user.experience + 500;
+                        handleUpdateUser({ 
+                          level: newLevel, 
+                          experience: newXP,
+                          strength: user.strength + 2,
+                          stamina: user.stamina + 2,
+                          agility: user.agility + 2
+                        });
+                      }}
+                      className="text-green-400 border-green-400 hover:bg-green-500/10"
+                    >
+                      <TrendingUp className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleUpdateUser({ gold: user.gold + 1000 })}
+                      className="text-yellow-400 border-yellow-400 hover:bg-yellow-500/10"
+                    >
+                      <Coins className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -437,6 +514,155 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
           )}
         </div>
       </CardContent>
+
+      {/* User Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit User: {selectedUser?.username}</DialogTitle>
+          </DialogHeader>
+          {selectedUser && (
+            <UserEditForm 
+              user={selectedUser} 
+              onSubmit={handleUpdateUser}
+              isLoading={updateUserMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
+  );
+}
+
+function UserEditForm({ user, onSubmit, isLoading }: { user: any; onSubmit: (data: any) => void; isLoading: boolean }) {
+  const [formData, setFormData] = useState({
+    level: user.level,
+    experience: user.experience,
+    strength: user.strength,
+    stamina: user.stamina,
+    agility: user.agility,
+    gold: user.gold,
+    gems: user.gems || 0,
+    currentTitle: user.currentTitle || "",
+    emailVerified: user.emailVerified
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="level">Level</Label>
+          <Input
+            id="level"
+            type="number"
+            min="1"
+            max="100"
+            value={formData.level}
+            onChange={(e) => setFormData({ ...formData, level: parseInt(e.target.value) })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="experience">Experience</Label>
+          <Input
+            id="experience"
+            type="number"
+            min="0"
+            value={formData.experience}
+            onChange={(e) => setFormData({ ...formData, experience: parseInt(e.target.value) })}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="strength">Strength</Label>
+          <Input
+            id="strength"
+            type="number"
+            min="1"
+            value={formData.strength}
+            onChange={(e) => setFormData({ ...formData, strength: parseInt(e.target.value) })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="stamina">Stamina</Label>
+          <Input
+            id="stamina"
+            type="number"
+            min="1"
+            value={formData.stamina}
+            onChange={(e) => setFormData({ ...formData, stamina: parseInt(e.target.value) })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="agility">Agility</Label>
+          <Input
+            id="agility"
+            type="number"
+            min="1"
+            value={formData.agility}
+            onChange={(e) => setFormData({ ...formData, agility: parseInt(e.target.value) })}
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="gold">Gold</Label>
+          <Input
+            id="gold"
+            type="number"
+            min="0"
+            value={formData.gold}
+            onChange={(e) => setFormData({ ...formData, gold: parseInt(e.target.value) })}
+          />
+        </div>
+        <div>
+          <Label htmlFor="gems">Gems</Label>
+          <Input
+            id="gems"
+            type="number"
+            min="0"
+            value={formData.gems}
+            onChange={(e) => setFormData({ ...formData, gems: parseInt(e.target.value) })}
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="currentTitle">Current Title</Label>
+        <Input
+          id="currentTitle"
+          value={formData.currentTitle}
+          onChange={(e) => setFormData({ ...formData, currentTitle: e.target.value })}
+          placeholder="Enter user title (e.g., <G.M.>, Dragon Vanquisher)"
+        />
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="emailVerified"
+          checked={formData.emailVerified}
+          onChange={(e) => setFormData({ ...formData, emailVerified: e.target.checked })}
+          className="w-4 h-4"
+        />
+        <Label htmlFor="emailVerified">Email Verified</Label>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={() => {}}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Updating..." : "Update User"}
+        </Button>
+      </div>
+    </form>
   );
 }

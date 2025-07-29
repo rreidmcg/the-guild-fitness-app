@@ -941,6 +941,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/admin/users/:targetUserId", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const { targetUserId } = req.params;
+      const updates = req.body;
+      
+      if (!targetUserId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      const updatedUser = await storage.updateUser(targetUserId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({ success: true, user: updatedUser });
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
   app.get("/api/admin/system-stats", async (req, res) => {
     try {
       const userId = getCurrentUserId(req);
