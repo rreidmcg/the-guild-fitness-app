@@ -49,19 +49,19 @@ export function CurrencyHeader() {
             )}
             <div className="flex items-center space-x-1.5">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span className="font-semibold text-white text-sm">{(userStats as any)?.currentStreak || 0}</span>
+              <span className="font-semibold text-blue-100 text-sm">{(userStats as any)?.currentStreak || 0}</span>
             </div>
             <div className="flex items-center space-x-1.5">
               <Snowflake className="w-3.5 h-3.5 text-blue-400" />
-              <span className="font-semibold text-white text-sm">{(userStats as any)?.streakFreezeCount || 0}</span>
+              <span className="font-semibold text-blue-100 text-sm">{(userStats as any)?.streakFreezeCount || 0}</span>
             </div>
             <div className="flex items-center space-x-1.5">
               <Coins className="w-3.5 h-3.5 text-yellow-500" />
-              <span className="font-semibold text-white text-sm">{(userStats as any)?.gold || 0}</span>
+              <span className="font-semibold text-blue-100 text-sm">{(userStats as any)?.gold || 0}</span>
             </div>
             <div className="flex items-center space-x-1.5">
               <span className="text-blue-400 text-sm">💎</span>
-              <span className="font-semibold text-white text-sm">{(userStats as any)?.gems || 0}</span>
+              <span className="font-semibold text-blue-100 text-sm">{(userStats as any)?.gems || 0}</span>
             </div>
             <div className="flex items-center space-x-1">
               <button
