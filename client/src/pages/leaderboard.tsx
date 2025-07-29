@@ -12,9 +12,12 @@ export default function LeaderboardPage() {
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
 
   const getAvatarRarityClass = (user: any) => {
-    if (user?.title?.includes('<G.M.>')) {
-      return 'border-2 border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]';
+    // Avatar borders are based on avatar rarity/skin selection, not user title
+    // Yellow border for legendary avatars (Founders Pack "The First Flame" or Legendary Hunter skin)
+    if (user?.title === "The First Flame" || user?.hasLegendaryHunterSkin) {
+      return 'border-2 border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]';
     }
+    // Gray border for common/default avatars
     return 'border-2 border-gray-500 shadow-[0_0_10px_rgba(107,114,128,0.5)]';
   };
 
