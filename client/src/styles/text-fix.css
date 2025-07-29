@@ -1,48 +1,58 @@
-/* Text readability fixes */
-.text-white {
+/* Text readability fixes - exclude admin dashboard */
+.text-white:not(.admin-dashboard *):not(.admin-dashboard) {
   color: rgb(20, 20, 20) !important;
   font-weight: 700 !important;
 }
 
-.text-gray-300, .text-gray-400 {
+.text-gray-300:not(.admin-dashboard *):not(.admin-dashboard), 
+.text-gray-400:not(.admin-dashboard *):not(.admin-dashboard) {
   color: rgb(40, 40, 40) !important;
   font-weight: 600 !important;
 }
 
-.text-muted-foreground {
+.text-muted-foreground:not(.admin-dashboard *):not(.admin-dashboard) {
   color: rgb(60, 60, 60) !important;
   font-weight: 600 !important;
 }
 
-.text-foreground {
+.text-foreground:not(.admin-dashboard *):not(.admin-dashboard) {
   color: rgb(30, 30, 30) !important;
   font-weight: 600 !important;
 }
 
-p, span, div, h1, h2, h3, h4, h5, h6 {
+*:not(.admin-dashboard *):not(.admin-dashboard) p, 
+*:not(.admin-dashboard *):not(.admin-dashboard) span, 
+*:not(.admin-dashboard *):not(.admin-dashboard) div, 
+*:not(.admin-dashboard *):not(.admin-dashboard) h1, 
+*:not(.admin-dashboard *):not(.admin-dashboard) h2, 
+*:not(.admin-dashboard *):not(.admin-dashboard) h3, 
+*:not(.admin-dashboard *):not(.admin-dashboard) h4, 
+*:not(.admin-dashboard *):not(.admin-dashboard) h5, 
+*:not(.admin-dashboard *):not(.admin-dashboard) h6 {
   font-weight: 600 !important;
 }
 
-.font-medium {
+.font-medium:not(.admin-dashboard *):not(.admin-dashboard) {
   font-weight: 600 !important;
 }
 
-.font-semibold {
+.font-semibold:not(.admin-dashboard *):not(.admin-dashboard) {
   font-weight: 700 !important;
 }
 
-.font-bold {
+.font-bold:not(.admin-dashboard *):not(.admin-dashboard) {
   font-weight: 800 !important;
 }
 
-/* Card text improvements */
-.bg-game-slate, .bg-card {
+/* Card text improvements - exclude admin dashboard */
+.bg-game-slate:not(.admin-dashboard *):not(.admin-dashboard), 
+.bg-card:not(.admin-dashboard *):not(.admin-dashboard) {
   background-color: rgb(255, 255, 255) !important;
   border: 1px solid rgb(229, 231, 235) !important;
 }
 
-/* Button text */
-button {
+/* Button text - exclude admin dashboard */
+button:not(.admin-dashboard *):not(.admin-dashboard) {
   font-weight: 600 !important;
 }
 
