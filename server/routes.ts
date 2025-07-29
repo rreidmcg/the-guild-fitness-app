@@ -676,7 +676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           username: users.username,
           level: users.level,
           experience: users.experience,
-          title: users.currentTitle,
+          currentTitle: users.currentTitle,
           strength: users.strength,
           stamina: users.stamina,
           agility: users.agility,
@@ -687,6 +687,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           weight: users.weight,
           fitnessGoal: users.fitnessGoal,
           customAvatarUrl: users.customAvatarUrl,
+          hasLegendaryHunterSkin: users.hasLegendaryHunterSkin,
         })
         .from(users)
         .orderBy(desc(users.experience))
