@@ -150,12 +150,21 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-primary/20 rounded-full blur-xl"></div>
-        <div className="absolute bottom-32 right-20 w-40 h-40 bg-secondary/20 rounded-full blur-xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-accent/20 rounded-full blur-lg"></div>
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-amber-500/30 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-32 right-20 w-40 h-40 bg-emerald-500/20 rounded-full blur-xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-blue-500/25 rounded-full blur-lg"></div>
+        <div className="absolute top-1/3 right-1/4 w-28 h-28 bg-purple-500/15 rounded-full blur-xl"></div>
+        {/* Subtle grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-5" 
+          style={{
+            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)',
+            backgroundSize: '50px 50px'
+          }}
+        ></div>
       </div>
       {/* Logo */}
       <div className="mb-8 relative z-10">
@@ -166,7 +175,7 @@ export default function SignupPage() {
         />
       </div>
       
-      <Card className="w-full max-w-md bg-card border-border relative z-10 shadow-xl backdrop-blur-sm">
+      <Card className="w-full max-w-md bg-slate-800/90 border-slate-600 relative z-10 shadow-2xl backdrop-blur-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-foreground">
             Join The Guild: Gamified Fitness
