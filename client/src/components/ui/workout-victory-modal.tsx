@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trophy, Star, Zap, TrendingUp, Coins } from "lucide-react";
+import { Trophy, Star, Zap, TrendingUp, Coins, Flame } from "lucide-react";
 
 interface WorkoutVictoryModalProps {
   isOpen: boolean;
@@ -20,6 +20,11 @@ interface WorkoutVictoryModalProps {
     confidence: "high" | "medium" | "low";
   };
   newAchievements?: any[];
+  streakBonus?: {
+    isActive: boolean;
+    streakDays: number;
+    multiplier: number;
+  };
 }
 
 export function WorkoutVictoryModal({
@@ -31,7 +36,8 @@ export function WorkoutVictoryModal({
   duration,
   totalVolume,
   validation,
-  newAchievements = []
+  newAchievements = [],
+  streakBonus
 }: WorkoutVictoryModalProps) {
   const formatDuration = (minutes: number) => {
     const hrs = Math.floor(minutes / 60);
@@ -57,6 +63,15 @@ export function WorkoutVictoryModal({
               <span className="text-xl font-bold text-green-100">Experience Gained</span>
             </div>
             <div className="text-4xl font-bold text-yellow-400">+{xpGained} XP</div>
+            {streakBonus?.isActive && (
+              <div className="flex items-center justify-center space-x-1 mt-2 px-2 py-1 bg-purple-900/30 rounded border border-purple-600">
+                <Flame className="w-4 h-4 text-orange-400" />
+                <TrendingUp className="w-4 h-4 text-purple-400" />
+                <span className="text-purple-300 text-sm font-semibold">
+                  {streakBonus.streakDays} day streak: {streakBonus.multiplier}x XP bonus!
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Stats Gained */}

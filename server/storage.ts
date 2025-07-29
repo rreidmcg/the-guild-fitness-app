@@ -21,6 +21,7 @@ import {
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
 import { dailyResetService } from "./daily-reset-system.js";
+import { applyStreakBonus } from "./streak-bonus.js";
 
 export interface IStorage {
   // User operations
@@ -673,11 +674,12 @@ export class DatabaseStorage implements IStorage {
     let streakFreezeRemoved = false;
     
     if (completed) {
-      // COMPLETING A QUEST - Award 5 XP for individual quest completion
+      // COMPLETING A QUEST - Award 5 XP for individual quest completion with streak bonus
       const user = await this.getUser(userId);
       if (user) {
+        const streakBonus = applyStreakBonus(5, user.currentStreak ?? 0);
         await this.updateUser(userId, {
-          experience: (user.experience ?? 0) + 5
+          experience: (user.experience ?? 0) + streakBonus.finalXp
         });
       }
       
@@ -685,8 +687,9 @@ export class DatabaseStorage implements IStorage {
       if (allCompleted && !updatedProgress.xpAwarded) {
         const updatedUser = await this.getUser(userId); // Get updated user data
         if (updatedUser) {
+          const bonusStreakBonus = applyStreakBonus(5, updatedUser.currentStreak ?? 0);
           await this.updateUser(userId, {
-            experience: (updatedUser.experience ?? 0) + 5 // Add bonus XP
+            experience: (updatedUser.experience ?? 0) + bonusStreakBonus.finalXp // Add bonus XP with streak multiplier
           });
           
           // Mark bonus XP as awarded
@@ -720,19 +723,21 @@ export class DatabaseStorage implements IStorage {
         });
       }
     } else {
-      // UNCHECKING A QUEST - Remove 5 XP for individual quest
+      // UNCHECKING A QUEST - Remove XP for individual quest (with original streak bonus that was applied)
       const user = await this.getUser(userId);
       if (user) {
+        const streakBonus = applyStreakBonus(5, user.currentStreak ?? 0);
         await this.updateUser(userId, {
-          experience: Math.max(0, (user.experience ?? 0) - 5)
+          experience: Math.max(0, (user.experience ?? 0) - streakBonus.finalXp)
         });
         
         // Remove bonus XP if it was awarded and we no longer have all 4 quests
         if (previousAllCompleted && !allCompleted && wasXpAwarded) {
           const updatedUser = await this.getUser(userId); // Get updated user data
           if (updatedUser) {
+            const bonusStreakBonus = applyStreakBonus(5, updatedUser.currentStreak ?? 0);
             await this.updateUser(userId, {
-              experience: Math.max(0, (updatedUser.experience ?? 0) - 5) // Remove bonus XP
+              experience: Math.max(0, (updatedUser.experience ?? 0) - bonusStreakBonus.finalXp) // Remove bonus XP with streak multiplier
             });
             
             // Mark bonus XP as not awarded

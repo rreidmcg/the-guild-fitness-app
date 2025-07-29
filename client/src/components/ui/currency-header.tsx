@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Coins, Backpack, Settings, Volume2, VolumeX, Flame, Snowflake, Mail } from "lucide-react";
+import { Coins, Backpack, Settings, Volume2, VolumeX, Flame, Snowflake, Mail, TrendingUp } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 
@@ -41,6 +41,12 @@ export function CurrencyHeader() {
             </button>
           </div>
           <div className="flex items-center space-x-3 sm:space-x-4">
+            {(userStats as any)?.currentStreak >= 3 && (
+              <div className="flex items-center space-x-1 px-1.5 py-0.5 bg-purple-900/30 rounded border border-purple-600">
+                <TrendingUp className="w-3 h-3 text-purple-400" />
+                <span className="text-purple-300 text-xs font-semibold">1.5x XP</span>
+              </div>
+            )}
             <div className="flex items-center space-x-1.5">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
               <span className="font-semibold text-foreground text-sm">{(userStats as any)?.currentStreak || 0}</span>

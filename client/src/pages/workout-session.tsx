@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Play, Pause, Square, Check, Target } from "lucide-react";
+import type { User } from "@shared/schema";
 
 export default function WorkoutSession() {
   const { id } = useParams();
@@ -27,6 +28,10 @@ export default function WorkoutSession() {
   const [completedSession, setCompletedSession] = useState<any>(null);
   const [perceivedEffort, setPerceivedEffort] = useState(7); // RPE scale 1-10
   const [showRPESelection, setShowRPESelection] = useState(false);
+
+  const { data: userStats } = useQuery<User>({
+    queryKey: ["/api/user/stats"],
+  });
 
   // Timer effect
   useEffect(() => {
@@ -231,6 +236,11 @@ export default function WorkoutSession() {
           totalVolume={completedSession.totalVolume}
           validation={completedSession.validation}
           newAchievements={completedSession.newAchievements || []}
+          streakBonus={userStats && (userStats.currentStreak ?? 0) >= 3 ? {
+            isActive: true,
+            streakDays: userStats.currentStreak ?? 0,
+            multiplier: 1.5
+          } : undefined}
         />
       )}
 

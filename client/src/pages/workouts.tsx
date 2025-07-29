@@ -70,19 +70,24 @@ export default function Workouts() {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       
       if (variables.completed) {
-        // Quest completed - always earn 5 XP per quest
+        // Quest completed - always earn 5 XP per quest (with potential streak bonus)
+        const hasStreakBonus = userStats && userStats.currentStreak >= 3;
+        const baseXp = hasStreakBonus ? Math.floor(5 * 1.5) : 5;
+        
         let message = "Quest Completed!";
-        let description = "You earned 5 XP!";
+        let description = `You earned ${baseXp} XP!${hasStreakBonus ? ` (1.5x streak bonus!)` : ''}`;
         
         if (data.xpAwarded && data.streakFreezeAwarded) {
+          const totalXp = hasStreakBonus ? Math.floor(25 * 1.5) : 25;
           message = "All Daily Quests Complete!";
-          description = "You earned a total of 25 XP and a Streak Freeze!";
+          description = `You earned a total of ${totalXp} XP and a Streak Freeze!${hasStreakBonus ? ` (1.5x streak bonus!)` : ''}`;
         } else if (data.xpAwarded) {
+          const totalXp = hasStreakBonus ? Math.floor(25 * 1.5) : 25;
           message = "All Daily Quests Complete!";
-          description = "You earned a total of 25 XP! (Already have max Streak Freezes)";
+          description = `You earned a total of ${totalXp} XP!${hasStreakBonus ? ` (1.5x streak bonus!)` : ''} (Already have max Streak Freezes)`;
         } else if (data.streakFreezeAwarded) {
           message = "2+ Quests Complete!";
-          description = "You earned 5 XP and a Streak Freeze!";
+          description = `You earned ${baseXp} XP and a Streak Freeze!${hasStreakBonus ? ` (1.5x streak bonus!)` : ''}`;
         }
         
         toast({
@@ -193,19 +198,29 @@ export default function Workouts() {
                 <Gift className="w-6 h-6 text-yellow-500" />
                 <h3 className="font-bold text-yellow-400">Daily Quest Rewards</h3>
               </div>
-              <div className="flex items-center justify-center space-x-4 text-sm">
-                <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-yellow-500" />
-                  <span className="text-foreground">Each Quest: +5 XP</span>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center justify-center space-x-4 text-sm">
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span className="text-foreground">Each Quest: +5 XP</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Snowflake className="w-4 h-4 text-blue-500" />
+                    <span className="text-foreground">2+ Quests: Streak Freeze</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-orange-500" />
+                    <span className="text-foreground">All 4: +5 Bonus XP</span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Snowflake className="w-4 h-4 text-blue-500" />
-                  <span className="text-foreground">2+ Quests: Streak Freeze</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-orange-500" />
-                  <span className="text-foreground">All 4: +5 Bonus XP</span>
-                </div>
+                {userStats && userStats.currentStreak >= 3 && (
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-purple-900/30 rounded border border-purple-600">
+                    <TrendingUp className="w-4 h-4 text-purple-400" />
+                    <span className="text-purple-300 text-xs font-semibold">
+                      {userStats.currentStreak} day streak: 1.5x XP bonus active!
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

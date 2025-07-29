@@ -8,6 +8,7 @@ import { authUtils } from "./auth";
 import { validateUsername, sanitizeUsername } from "./username-validation";
 import { AtrophySystem } from "./atrophy-system";
 import { calculateStatXpGains, calculateStatLevel } from "./stat-progression";
+import { applyStreakBonus } from "./streak-bonus";
 import { workoutValidator } from "./workout-validation";
 import { aiWorkoutEngine } from "./ai-workout-engine";
 import { sendEmail, generateLiabilityWaiverEmail, generateAdminWaiverNotification } from "./email-service";
@@ -998,11 +999,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await storage.createWorkoutSession(sessionData);
       
       // Update user stats with the XP and stat gains using proper progression system
-      const newExperience = (user.experience || 0) + sessionData.xpEarned;
+      // Apply streak bonus to main XP and stat XP
+      const mainXpBonus = applyStreakBonus(sessionData.xpEarned, user.currentStreak ?? 0);
+      const newExperience = (user.experience || 0) + mainXpBonus.finalXp;
       const newLevel = calculateLevel(newExperience);
       
       // Calculate XP gains for each stat based on workout
-      const statXpGains = calculateStatXpGains(sessionData);
+      const baseStatXpGains = calculateStatXpGains(sessionData);
+      
+      // Apply streak bonus to stat XP gains
+      const strengthXpBonus = applyStreakBonus(baseStatXpGains.strengthXp, user.currentStreak ?? 0);
+      const staminaXpBonus = applyStreakBonus(baseStatXpGains.staminaXp, user.currentStreak ?? 0);
+      const agilityXpBonus = applyStreakBonus(baseStatXpGains.agilityXp, user.currentStreak ?? 0);
+      
+      const statXpGains = {
+        strengthXp: strengthXpBonus.finalXp,
+        staminaXp: staminaXpBonus.finalXp,
+        agilityXp: agilityXpBonus.finalXp
+      };
       
       // Update stat XP and recalculate actual stat levels
       const newStrengthXp = (user.strengthXp || 0) + statXpGains.strengthXp;
@@ -1038,7 +1052,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Return session data with calculated rewards and validation info for the victory screen
       res.json({
         ...session,
-        xpEarned: sessionData.xpEarned,
+        xpEarned: mainXpBonus.finalXp,
         validation: {
           multiplier: 1,
           suspicious: [],
