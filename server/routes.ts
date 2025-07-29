@@ -279,7 +279,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Program not found" });
       }
       
-      // Create Stripe payment intent for one-time purchase
+      // Handle free programs differently
+      if (program.price === 0) {
+        // Directly add free program to user's purchased programs
+        await storage.purchaseWorkoutProgram(userId, programId);
+        
+        return res.json({ 
+          success: true,
+          isFree: true,
+          programId: programId,
+          programName: program.name,
+          message: "Free program added successfully!" 
+        });
+      }
+      
+      // Create Stripe payment intent for paid programs
       const paymentIntent = await stripe.paymentIntents.create({
         amount: program.price, // Already in cents
         currency: "usd",

@@ -173,6 +173,22 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Quest Page Reorganization & Free Program Purchase Fix:**
+- **Fixed Free Program Purchase System**: Resolved issue with free novice program not adding to user's library
+  - Added special handling for free programs (price = 0) to bypass Stripe payment system
+  - Free programs now automatically added to user's purchased programs without payment flow
+  - Updated API endpoint to return success response for free program acquisition
+- **Reorganized Quest Page Layout**: Enhanced user experience with better program management
+  - Replaced "Recent Sessions" with "My Programs" card in prime location
+  - "My Programs" shows owned/purchased programs with green styling and "Start" buttons
+  - Moved "Recent Sessions" to bottom of page for workout history viewing
+  - Added "Browse Programs" button to easily discover new workout programs
+  - Empty state includes helpful call-to-action buttons for getting started
+- **Enhanced Program Display**: Improved visual distinction between owned and available programs
+  - Owned programs show with green gradient backgrounds and "Owned" badges
+  - Clear separation between user's programs and browsable program catalog
+  - Streamlined navigation between program discovery and personal library
+
 **July 29, 2025 - User Management Fix & Rustic Theme Implementation:**
 - **Fixed Admin User Removal**: Resolved database deletion issues for removing users from admin panel
   - Updated deleteUser function with proper error handling and table relationships
