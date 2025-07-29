@@ -1139,7 +1139,6 @@ export default function Battle() {
                           style={{ backgroundColor: zone.background }}
                         />
                         <h3 className="font-medium text-sm">{zone.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
                       </CardContent>
                     </Card>
                   ))}
@@ -1277,7 +1276,6 @@ export default function Battle() {
                         style={{ backgroundColor: zone.background }}
                       />
                       <h3 className="font-medium text-sm">{zone.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -1308,7 +1306,6 @@ export default function Battle() {
                         style={{ backgroundColor: zone.background }}
                       />
                       <h3 className="font-medium text-sm">{zone.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
                     </CardContent>
                   </Card>
                 ))}
