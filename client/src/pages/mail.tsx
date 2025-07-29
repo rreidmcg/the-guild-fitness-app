@@ -12,13 +12,18 @@ import {
   Calendar,
   Coins,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  Plus,
+  Trash2
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
@@ -48,10 +53,15 @@ interface PlayerMail {
 
 export default function MailPage() {
   const [selectedMail, setSelectedMail] = useState<PlayerMail | null>(null);
+  const [showCompose, setShowCompose] = useState(false);
   const { toast } = useToast();
 
   const { data: mail = [], isLoading, refetch } = useQuery({
     queryKey: ["/api/mail"],
+  });
+
+  const { data: userStats } = useQuery({
+    queryKey: ["/api/user/stats"],
   });
 
   const markAsReadMutation = useMutation({
@@ -133,7 +143,8 @@ export default function MailPage() {
     claimRewardsMutation.mutate(mailId);
   };
 
-  const unreadCount = mail.filter((m: PlayerMail) => !m.isRead).length;
+  const unreadCount = (mail as PlayerMail[]).filter((m: PlayerMail) => !m.isRead).length;
+  const isAdmin = (userStats as any)?.currentTitle?.includes('G.M.');
 
   if (isLoading) {
     return (
@@ -172,15 +183,28 @@ export default function MailPage() {
                 News, rewards, and announcements from the developers
               </p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => refetch()}
-              disabled={isLoading}
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
+            <div className="flex items-center space-x-2">
+              {isAdmin && (
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  onClick={() => setShowCompose(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Compose
+                </Button>
+              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => refetch()}
+                disabled={isLoading}
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -282,10 +306,19 @@ export default function MailPage() {
               )}
             </CardContent>
           </Card>
+        ) : showCompose ? (
+          // Compose Mail View
+          <ComposeMailForm 
+            onClose={() => setShowCompose(false)}
+            onSent={() => {
+              setShowCompose(false);
+              refetch();
+            }}
+          />
         ) : (
           // Mail List View
           <div className="space-y-3">
-            {mail.length === 0 ? (
+            {(mail as PlayerMail[]).length === 0 ? (
               <Card className="text-center py-12">
                 <CardContent>
                   <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -296,7 +329,7 @@ export default function MailPage() {
                 </CardContent>
               </Card>
             ) : (
-              mail.map((mailItem: PlayerMail) => (
+              (mail as PlayerMail[]).map((mailItem: PlayerMail) => (
                 <Card 
                   key={mailItem.id}
                   className={`cursor-pointer hover:bg-accent/50 transition-colors ${
@@ -352,5 +385,277 @@ export default function MailPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function ComposeMailForm({ onClose, onSent }: { onClose: () => void; onSent: () => void }) {
+  const [formData, setFormData] = useState({
+    subject: "",
+    content: "",
+    mailType: "announcement",
+    goldReward: "",
+    xpReward: "",
+    itemRewards: [{ itemType: "potion", itemName: "", quantity: "" }]
+  });
+  const { toast } = useToast();
+
+  const sendMailMutation = useMutation({
+    mutationFn: async (mailData: any) => {
+      // Get all users first
+      const allUsersResponse = await apiRequest('/api/admin/users', {
+        method: 'GET'
+      });
+      const allUserIds = allUsersResponse.users.map((user: any) => user.id);
+      
+      const response = await apiRequest('/api/admin/send-mail', {
+        method: 'POST',
+        body: {
+          ...mailData,
+          targetUserIds: allUserIds // Send to all users
+        }
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Mail Sent Successfully",
+        description: "Your message has been sent to all users.",
+      });
+      onSent();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Send Mail",
+        description: error.message || "Failed to send mail to users",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const mailData: any = {
+      subject: formData.subject.trim(),
+      content: formData.content.trim(),
+      mailType: formData.mailType,
+      rewards: {}
+    };
+
+    // Add rewards if specified
+    if (formData.goldReward && parseInt(formData.goldReward) > 0) {
+      mailData.rewards.gold = parseInt(formData.goldReward);
+    }
+    if (formData.xpReward && parseInt(formData.xpReward) > 0) {
+      mailData.rewards.xp = parseInt(formData.xpReward);
+    }
+    
+    const validItems = formData.itemRewards.filter(item => 
+      item.itemName.trim() && item.quantity && parseInt(item.quantity) > 0
+    );
+    if (validItems.length > 0) {
+      mailData.rewards.items = validItems.map(item => ({
+        itemType: item.itemType,
+        itemName: item.itemName.trim(),
+        quantity: parseInt(item.quantity)
+      }));
+    }
+
+    sendMailMutation.mutate(mailData);
+  };
+
+  const addItemReward = () => {
+    setFormData({
+      ...formData,
+      itemRewards: [...formData.itemRewards, { itemType: "potion", itemName: "", quantity: "" }]
+    });
+  };
+
+  const removeItemReward = (index: number) => {
+    setFormData({
+      ...formData,
+      itemRewards: formData.itemRewards.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateItemReward = (index: number, field: string, value: string) => {
+    const newItems = [...formData.itemRewards];
+    newItems[index] = { ...newItems[index], [field]: value };
+    setFormData({ ...formData, itemRewards: newItems });
+  };
+
+  return (
+    <Card className="max-w-3xl mx-auto">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center space-x-2">
+              <Mail className="w-5 h-5 text-blue-500" />
+              <span>Compose Mail - Send to All Users</span>
+            </CardTitle>
+            <CardDescription>
+              Send announcements, rewards, or updates to all registered users
+            </CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={onClose}>
+            Cancel
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Mail Type */}
+          <div>
+            <Label htmlFor="mailType">Mail Type</Label>
+            <select
+              id="mailType"
+              value={formData.mailType}
+              onChange={(e) => setFormData({ ...formData, mailType: e.target.value })}
+              className="w-full mt-1 px-3 py-2 border border-input bg-background rounded-md"
+              required
+            >
+              <option value="announcement">📢 Announcement</option>
+              <option value="news">📰 News</option>
+              <option value="reward">🎁 Reward</option>
+              <option value="event">⭐ Event</option>
+            </select>
+          </div>
+
+          {/* Subject */}
+          <div>
+            <Label htmlFor="subject">Subject *</Label>
+            <Input
+              id="subject"
+              value={formData.subject}
+              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+              placeholder="Enter mail subject..."
+              required
+              className="mt-1"
+            />
+          </div>
+
+          {/* Content */}
+          <div>
+            <Label htmlFor="content">Message Content *</Label>
+            <Textarea
+              id="content"
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              placeholder="Write your message to all users..."
+              rows={4}
+              required
+              className="mt-1"
+            />
+          </div>
+
+          {/* Rewards Section */}
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+            <h3 className="font-semibold text-purple-800 dark:text-purple-200 flex items-center space-x-2 mb-4">
+              <Gift className="w-5 h-5" />
+              <span>Attach Rewards (Optional)</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {/* Gold Reward */}
+              <div>
+                <Label htmlFor="goldReward">Gold Coins</Label>
+                <Input
+                  id="goldReward"
+                  type="number"
+                  min="0"
+                  value={formData.goldReward}
+                  onChange={(e) => setFormData({ ...formData, goldReward: e.target.value })}
+                  placeholder="0"
+                  className="mt-1"
+                />
+              </div>
+
+              {/* XP Reward */}
+              <div>
+                <Label htmlFor="xpReward">Experience Points</Label>
+                <Input
+                  id="xpReward"
+                  type="number"
+                  min="0"
+                  value={formData.xpReward}
+                  onChange={(e) => setFormData({ ...formData, xpReward: e.target.value })}
+                  placeholder="0"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            {/* Item Rewards */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Items</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addItemReward}
+                  className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Item
+                </Button>
+              </div>
+              
+              {formData.itemRewards.map((item, index) => (
+                <div key={index} className="flex items-center space-x-2 mb-2">
+                  <select
+                    value={item.itemType}
+                    onChange={(e) => updateItemReward(index, 'itemType', e.target.value)}
+                    className="px-2 py-1 border border-input bg-background rounded text-sm"
+                  >
+                    <option value="potion">🧪 Potion</option>
+                    <option value="equipment">⚔️ Equipment</option>
+                    <option value="consumable">🍎 Consumable</option>
+                    <option value="material">🔧 Material</option>
+                  </select>
+                  <Input
+                    placeholder="Item name"
+                    value={item.itemName}
+                    onChange={(e) => updateItemReward(index, 'itemName', e.target.value)}
+                    className="flex-1 text-sm"
+                  />
+                  <Input
+                    type="number"
+                    min="1"
+                    placeholder="Qty"
+                    value={item.quantity}
+                    onChange={(e) => updateItemReward(index, 'quantity', e.target.value)}
+                    className="w-16 text-sm"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeItemReward(index)}
+                    className="text-red-600 border-red-300 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              type="submit"
+              disabled={sendMailMutation.isPending || !formData.subject.trim() || !formData.content.trim()}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {sendMailMutation.isPending ? "Sending..." : "Send to All Users"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

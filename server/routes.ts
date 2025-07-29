@@ -2603,7 +2603,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expiresAt: expiresAt ? new Date(expiresAt) : null
       };
 
-      const sentCount = await storage.sendBulkMail(mailData, targetUserIds);
+      let sentCount = 0;
+      
+      if (targetUserIds && Array.isArray(targetUserIds)) {
+        // Send to specific users
+        for (const targetUserId of targetUserIds) {
+          await storage.createPlayerMail({
+            ...mailData,
+            userId: targetUserId,
+            rewardsClaimed: false
+          });
+          sentCount++;
+        }
+      } else {
+        // Send to all users if no specific targets
+        const allUsers = await storage.getAllUsers();
+        for (const user of allUsers) {
+          await storage.createPlayerMail({
+            ...mailData,
+            userId: user.id,
+            rewardsClaimed: false
+          });
+          sentCount++;
+        }
+      }
       
       res.json({ 
         success: true, 
