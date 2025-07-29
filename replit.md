@@ -173,6 +173,20 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Complete Rustic Theme Implementation & Logo Update:**
+- **Updated Application Logo**: Replaced login page logo with new "The Guild Beta Logo" provided by user
+  - Updated import from old logo to new logo file "The Guild Beta Logo_1753824042077.png"
+  - Logo now displays consistently with proper sizing and drop shadow effects
+- **Unified Rustic Background Theme**: Applied consistent warm rustic styling across all pages
+  - All pages now inherit the same gradient background (amber to orange to yellow)
+  - Floating orbs with blur effects positioned throughout the app for atmospheric depth
+  - Paper-like texture pattern and rustic dotted elements applied globally
+  - Maintained fixed background attachment for consistent visual experience
+- **Enhanced Visual Consistency**: Ensured all interface elements match login page styling
+  - Warm amber color palette with professional blue accents maintained throughout
+  - Dark text on light backgrounds for optimal readability
+  - Glass-effect cards with backdrop blur and shadows for modern appearance
+
 **July 29, 2025 - Authentication UI Enhancement & Branding Fix:**
 - **Enhanced Authentication Page Backgrounds**: Added visual depth and character to login/signup pages
   - Implemented gradient background from background to muted/20 for subtle depth
