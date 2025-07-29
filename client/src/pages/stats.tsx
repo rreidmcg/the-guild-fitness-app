@@ -258,7 +258,7 @@ export default function Stats() {
                   <Heart className="w-5 h-5 text-red-400" />
                   <span className="font-semibold text-red-400">Health</span>
                 </div>
-                <span className="text-sm text-red-300">
+                <span className="text-sm text-red-600 font-semibold">
                   {safeUserStats.currentHp || 0} / {safeUserStats.maxHp || 40}
                 </span>
               </div>
@@ -270,7 +270,7 @@ export default function Stats() {
                   }}
                 />
               </div>
-              <div className="text-xs text-red-300 mt-2 opacity-80">
+              <div className="text-xs text-red-500 mt-2">
                 Regenerates 1% of max HP per minute when not in combat
               </div>
               
@@ -290,10 +290,12 @@ export default function Stats() {
                     <Button
                       key={potionType}
                       size="sm"
-                      variant="outline"
                       onClick={() => usePotionMutation.mutate(potionType)}
                       disabled={usePotionMutation.isPending}
-                      className="text-xs border-red-500 text-red-300 hover:bg-red-900/30"
+                      className={`text-xs ${potionType === 'minor_healing' 
+                        ? 'bg-red-600 text-white hover:bg-red-700 border-red-600' 
+                        : 'border-red-500 text-red-600 hover:bg-red-50'} transition-colors`}
+                      variant={potionType === 'minor_healing' ? 'default' : 'outline'}
                     >
                       <Heart className="w-3 h-3 mr-1" />
                       {potionNames[potionType as keyof typeof potionNames]} ({quantity})
@@ -313,7 +315,7 @@ export default function Stats() {
                   <Sparkle className="w-5 h-5 text-blue-400" />
                   <span className="font-semibold text-blue-400">Magic Points</span>
                 </div>
-                <span className="text-sm text-blue-300">
+                <span className="text-sm text-blue-600 font-semibold">
                   {safeUserStats.currentMp || 0} / {safeUserStats.maxMp || 20}
                 </span>
               </div>
@@ -325,7 +327,7 @@ export default function Stats() {
                   }}
                 />
               </div>
-              <div className="text-xs text-blue-300 mt-2 opacity-80">
+              <div className="text-xs text-blue-500 mt-2">
                 Regenerates 4% per minute when not in combat
               </div>
               
