@@ -92,20 +92,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-primary/20 rounded-full blur-xl"></div>
+        <div className="absolute bottom-32 right-20 w-40 h-40 bg-secondary/20 rounded-full blur-xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-accent/20 rounded-full blur-lg"></div>
+      </div>
       {/* Logo */}
-      <div className="mb-8">
+      <div className="mb-8 relative z-10">
         <img 
           src={logoImage} 
           alt="The Guild: Gamified Fitness"
-          className="w-80 h-auto max-w-full"
+          className="w-80 h-auto max-w-full drop-shadow-lg"
         />
       </div>
       
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
-        <Card className="w-full max-w-md bg-card border-border">
+        <Card className="w-full max-w-md bg-card border-border relative z-10 shadow-xl backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-foreground">
               Welcome Back

@@ -371,7 +371,7 @@ export default function Settings() {
             </div>
             
             <div className="text-center py-4 border-t border-border">
-              <p className="text-sm text-muted-foreground mb-2">Dumbbells & Dragons v1.0.0</p>
+              <p className="text-sm text-muted-foreground mb-2">The Guild: Gamified Fitness v1.0.0</p>
               <p className="text-xs text-muted-foreground">
                 Made with ❤️ for fitness enthusiasts
               </p>

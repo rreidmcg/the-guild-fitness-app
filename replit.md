@@ -173,6 +173,16 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Authentication UI Enhancement & Branding Fix:**
+- **Enhanced Authentication Page Backgrounds**: Added visual depth and character to login/signup pages
+  - Implemented gradient background from background to muted/20 for subtle depth
+  - Added decorative floating orbs with blur effects for atmospheric feel
+  - Logo and cards positioned with proper z-index layering and drop shadows
+  - Cards enhanced with shadow-xl and backdrop-blur-sm for modern glass effect
+- **Fixed Remaining Branding**: Updated settings page footer to show "The Guild: Gamified Fitness v1.0.0"
+  - Removed last instance of old "Dumbbells & Dragons" name from app
+  - All branding now consistently shows correct app name throughout interface
+
 **July 29, 2025 - Change Password & Push Notification System Fix:**
 - **Fixed Change Password Functionality**: Implemented secure password change system with user-friendly interface
   - Added `/api/user/password` PATCH endpoint with current password verification and secure hashing
