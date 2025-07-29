@@ -107,7 +107,7 @@ export default function LoginPage() {
       ) : (
         <Card className="w-full max-w-md bg-slate-800/90 border-slate-600 relative z-10 shadow-2xl backdrop-blur-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-foreground">
+            <CardTitle className="text-2xl font-bold text-blue-100">
               Welcome Back
             </CardTitle>
             <CardDescription className="text-muted-foreground">
@@ -122,7 +122,7 @@ export default function LoginPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="text-blue-100">Email Address</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter your email address" 
@@ -141,7 +141,7 @@ export default function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <FormLabel className="text-blue-100">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input 
