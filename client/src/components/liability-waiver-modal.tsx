@@ -141,24 +141,24 @@ export function LiabilityWaiverModal({
 
             {/* Main Liability Waiver */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg">ASSUMPTION OF RISK AND RELEASE OF LIABILITY</h3>
+              <h3 className="font-semibold text-lg text-foreground">ASSUMPTION OF RISK AND RELEASE OF LIABILITY</h3>
               
-              <p>
+              <p className="text-foreground">
                 By using The Guild: Gamified Fitness (the "App"), I acknowledge and agree to the following:
               </p>
 
               <div className="space-y-3">
                 <div>
-                  <h4 className="font-medium mb-1">1. Voluntary Participation</h4>
-                  <p>
+                  <h4 className="font-medium mb-1 text-foreground">1. Voluntary Participation</h4>
+                  <p className="text-foreground">
                     I am voluntarily participating in fitness activities through this App. I understand 
                     that physical exercise involves inherent risks of injury, and I am participating at my own risk.
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1">2. Assumption of Risk</h4>
-                  <p>
+                  <h4 className="font-medium mb-1 text-foreground">2. Assumption of Risk</h4>
+                  <p className="text-foreground">
                     I assume full responsibility for any risks, injuries, or damages, known or unknown, 
                     which I might incur as a result of participating in the fitness activities suggested 
                     by this App. This includes but is not limited to muscle strains, joint injuries, 
@@ -167,10 +167,10 @@ export function LiabilityWaiverModal({
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1">3. Release of Liability</h4>
-                  <p>
+                  <h4 className="font-medium mb-1 text-foreground">3. Release of Liability</h4>
+                  <p className="text-foreground">
                     I hereby release, waive, discharge, and covenant not to sue the developers, owners, 
-                    and operators of Dumbbells & Dragons, their agents, employees, or assigns from any 
+                    and operators of The Guild: Gamified Fitness, their agents, employees, or assigns from any 
                     and all liability, claims, demands, actions, or causes of action whatsoever arising 
                     out of or related to any loss, damage, or injury that may be sustained by me while 
                     participating in activities suggested by this App.
@@ -178,8 +178,8 @@ export function LiabilityWaiverModal({
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1">4. Fitness Level and Limitations</h4>
-                  <p>
+                  <h4 className="font-medium mb-1 text-foreground">4. Fitness Level and Limitations</h4>
+                  <p className="text-foreground">
                     I understand that it is my responsibility to know my physical limitations and to 
                     exercise within them. I will not attempt exercises or activities that are beyond 
                     my current fitness level or that cause pain or discomfort.
@@ -187,16 +187,16 @@ export function LiabilityWaiverModal({
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1">5. Equipment and Environment Safety</h4>
-                  <p>
+                  <h4 className="font-medium mb-1 text-foreground">5. Equipment and Environment Safety</h4>
+                  <p className="text-foreground">
                     I am responsible for ensuring that any equipment I use is safe, appropriate, and 
                     in good working condition. I will exercise in a safe environment free from hazards.
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1">6. No Professional Advice</h4>
-                  <p>
+                  <h4 className="font-medium mb-1 text-foreground">6. No Professional Advice</h4>
+                  <p className="text-foreground">
                     I understand that the App does not provide professional medical, fitness, or 
                     nutritional advice. Any information provided is for general educational and 
                     entertainment purposes only.
@@ -205,7 +205,7 @@ export function LiabilityWaiverModal({
               </div>
 
               <div className="bg-gray-50 dark:bg-gray-900 border rounded-lg p-4">
-                <p className="font-medium text-center">
+                <p className="font-medium text-center text-foreground">
                   I HAVE READ THIS WAIVER CAREFULLY AND UNDERSTAND ITS CONTENTS. 
                   I AM AWARE THAT BY USING THIS APP, I AM GIVING UP SUBSTANTIAL RIGHTS, 
                   INCLUDING MY RIGHT TO SUE FOR DAMAGES.
@@ -223,7 +223,7 @@ export function LiabilityWaiverModal({
                 checked={hasReadFully}
                 onCheckedChange={(checked) => setHasReadFully(checked as boolean)}
               />
-              <label htmlFor="read-fully" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label htmlFor="read-fully" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
                 I have read and understand the entire liability waiver above
               </label>
             </div>
@@ -234,7 +234,7 @@ export function LiabilityWaiverModal({
                 checked={agreedToTerms}
                 onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
               />
-              <label htmlFor="agree-terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label htmlFor="agree-terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
                 I agree to all terms and conditions in this liability waiver and release
               </label>
             </div>
@@ -244,7 +244,7 @@ export function LiabilityWaiverModal({
             <Button
               variant="outline"
               onClick={onDecline}
-              className="flex-1"
+              className="flex-1 border-2 border-red-500 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 font-semibold"
               disabled={isSubmitting}
             >
               Decline & Exit
@@ -253,7 +253,7 @@ export function LiabilityWaiverModal({
             <Button
               onClick={handleAccept}
               disabled={!hasReadFully || !agreedToTerms || isSubmitting}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold border-2 border-green-600 disabled:opacity-50"
             >
               {isSubmitting ? "Processing..." : "Accept & Continue"}
             </Button>
