@@ -173,6 +173,14 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Enhanced Daily Quest XP System:**
+- **Updated Daily Quest Rewards**: Changed XP system to reward 5 XP for each individual quest completion plus 5 XP bonus for completing all four
+  - Individual quest completion: 5 XP each (hydration, steps, protein, sleep)
+  - All four quests completed: Additional 5 XP bonus (total 25 XP for all quests)
+  - Updated UI to reflect new reward structure with clear messaging
+  - Fixed leaderboard avatar border system to properly separate titles from avatar rarity
+  - Avatar borders now based on skin selection only, not user status
+
 **July 29, 2025 - Deployment Ready & Email Authentication Migration:**
 - **Email-Based Authentication System**: Successfully migrated from username to email-based login
   - Updated Zero's test account to use guildmasterreid@gmail.com with properly hashed password

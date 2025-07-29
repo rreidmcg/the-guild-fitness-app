@@ -673,16 +673,23 @@ export class DatabaseStorage implements IStorage {
     let streakFreezeRemoved = false;
     
     if (completed) {
-      // COMPLETING A QUEST
+      // COMPLETING A QUEST - Award 5 XP for individual quest completion
+      const user = await this.getUser(userId);
+      if (user) {
+        await this.updateUser(userId, {
+          experience: (user.experience ?? 0) + 5
+        });
+      }
+      
+      // Award additional 5 XP bonus for completing all daily quests
       if (allCompleted && !updatedProgress.xpAwarded) {
-        // Award 5 XP for completing all daily quests
-        const user = await this.getUser(userId);
-        if (user) {
+        const updatedUser = await this.getUser(userId); // Get updated user data
+        if (updatedUser) {
           await this.updateUser(userId, {
-            experience: (user.experience ?? 0) + 5
+            experience: (updatedUser.experience ?? 0) + 5 // Add bonus XP
           });
           
-          // Mark XP as awarded
+          // Mark bonus XP as awarded
           await this.updateDailyProgress(userId, today, {
             xpAwarded: true
           });
@@ -713,20 +720,27 @@ export class DatabaseStorage implements IStorage {
         });
       }
     } else {
-      // UNCHECKING A QUEST
+      // UNCHECKING A QUEST - Remove 5 XP for individual quest
       const user = await this.getUser(userId);
       if (user) {
-        // Remove XP if it was awarded and we no longer have all 4 quests
+        await this.updateUser(userId, {
+          experience: Math.max(0, (user.experience ?? 0) - 5)
+        });
+        
+        // Remove bonus XP if it was awarded and we no longer have all 4 quests
         if (previousAllCompleted && !allCompleted && wasXpAwarded) {
-          await this.updateUser(userId, {
-            experience: Math.max(0, (user.experience ?? 0) - 5)
-          });
-          
-          // Mark XP as not awarded
-          await this.updateDailyProgress(userId, today, {
-            xpAwarded: false
-          });
-          xpRemoved = true;
+          const updatedUser = await this.getUser(userId); // Get updated user data
+          if (updatedUser) {
+            await this.updateUser(userId, {
+              experience: Math.max(0, (updatedUser.experience ?? 0) - 5) // Remove bonus XP
+            });
+            
+            // Mark bonus XP as not awarded
+            await this.updateDailyProgress(userId, today, {
+              xpAwarded: false
+            });
+            xpRemoved = true;
+          }
         }
         
         // Remove streak freeze if it was awarded and we now have less than 2 quests

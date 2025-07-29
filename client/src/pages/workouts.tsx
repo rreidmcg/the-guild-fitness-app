@@ -70,19 +70,19 @@ export default function Workouts() {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       
       if (variables.completed) {
-        // Quest completed
+        // Quest completed - always earn 5 XP per quest
         let message = "Quest Completed!";
-        let description = "Keep going to complete all daily quests for rewards!";
+        let description = "You earned 5 XP!";
         
         if (data.xpAwarded && data.streakFreezeAwarded) {
-          message = "Rewards Earned!";
-          description = "You earned 5 XP and a Streak Freeze!";
+          message = "All Daily Quests Complete!";
+          description = "You earned a total of 25 XP and a Streak Freeze!";
         } else if (data.xpAwarded) {
           message = "All Daily Quests Complete!";
-          description = "You earned 5 XP! (Already have max Streak Freezes)";
+          description = "You earned a total of 25 XP! (Already have max Streak Freezes)";
         } else if (data.streakFreezeAwarded) {
           message = "2+ Quests Complete!";
-          description = "You earned a Streak Freeze!";
+          description = "You earned 5 XP and a Streak Freeze!";
         }
         
         toast({
@@ -193,14 +193,18 @@ export default function Workouts() {
                 <Gift className="w-6 h-6 text-yellow-500" />
                 <h3 className="font-bold text-yellow-400">Daily Quest Rewards</h3>
               </div>
-              <div className="flex items-center justify-center space-x-6 text-sm">
+              <div className="flex items-center justify-center space-x-4 text-sm">
+                <div className="flex items-center space-x-1">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  <span className="text-foreground">Each Quest: +5 XP</span>
+                </div>
                 <div className="flex items-center space-x-1">
                   <Snowflake className="w-4 h-4 text-blue-500" />
                   <span className="text-foreground">2+ Quests: Streak Freeze</span>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-yellow-500" />
-                  <span className="text-foreground">All 4: +5 XP</span>
+                  <Star className="w-4 h-4 text-orange-500" />
+                  <span className="text-foreground">All 4: +5 Bonus XP</span>
                 </div>
               </div>
             </div>
