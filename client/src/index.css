@@ -73,6 +73,14 @@
 }
 
 @layer components {
+  .text-glow-blue {
+    color: hsl(205, 100%, 90%);
+    text-shadow: 0 0 10px rgba(173, 216, 255, 0.6), 0 0 20px rgba(173, 216, 255, 0.4), 0 0 30px rgba(173, 216, 255, 0.2);
+  }
+  
+  .text-bright-blue {
+    color: hsl(205, 100%, 85%);
+  }
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
   }

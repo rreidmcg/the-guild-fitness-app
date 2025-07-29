@@ -1076,8 +1076,8 @@ export default function Battle() {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-blue-100">Battle Arena</h1>
-                <p className="text-blue-200 mt-1">Choose your opponent and fight for gold coins</p>
+                <h1 className="text-3xl font-bold text-glow-blue">Battle Arena</h1>
+                <p className="text-bright-blue mt-1">Choose your opponent and fight for gold coins</p>
               </div>
             </div>
           </div>

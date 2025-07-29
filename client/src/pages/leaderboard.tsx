@@ -62,8 +62,8 @@ export default function LeaderboardPage() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-blue-100">Leaderboard</h1>
-              <p className="text-blue-200 mt-0.5 text-sm">Top adventurers ranked by experience</p>
+              <h1 className="text-2xl font-bold text-glow-blue">Leaderboard</h1>
+              <p className="text-bright-blue mt-0.5 text-sm">Top adventurers ranked by experience</p>
             </div>
             <Trophy className="w-8 h-8 text-yellow-500" />
           </div>

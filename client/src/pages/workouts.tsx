@@ -167,8 +167,8 @@ export default function Workouts() {
         <div className="max-w-4xl mx-auto">
           <div className="space-y-4">
             <div>
-              <h1 className="text-2xl font-bold text-blue-100">Quests</h1>
-              <p className="text-blue-200 mt-0.5 text-sm">Complete your daily adventures</p>
+              <h1 className="text-2xl font-bold text-glow-blue">Quests</h1>
+              <p className="text-bright-blue mt-0.5 text-sm">Complete your daily adventures</p>
             </div>
             <div className="flex items-center space-x-3">
               <Button 

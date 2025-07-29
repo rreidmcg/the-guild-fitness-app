@@ -181,8 +181,8 @@ export default function Stats() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-blue-100">Character Stats</h1>
-              <p className="mt-0.5 text-sm text-blue-200">Your fitness progression journey</p>
+              <h1 className="text-2xl font-bold text-glow-blue">Character Stats</h1>
+              <p className="mt-0.5 text-sm text-bright-blue">Your fitness progression journey</p>
             </div>
             <div className="flex items-center space-x-3">
               {/* Calculator button hidden per user request */}

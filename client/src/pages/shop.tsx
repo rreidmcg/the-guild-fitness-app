@@ -530,8 +530,8 @@ export default function Shop() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-blue-100">Shop</h1>
-              <p className="text-blue-200 mt-0.5 text-sm">Purchase gear and cosmetics</p>
+              <h1 className="text-2xl font-bold text-glow-blue">Shop</h1>
+              <p className="text-bright-blue mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
 
           </div>
