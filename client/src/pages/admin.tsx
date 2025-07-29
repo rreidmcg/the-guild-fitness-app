@@ -52,6 +52,17 @@ export default function AdminDashboard() {
     enabled: activeTab === 'content'
   });
 
+  const { 
+    data: users, 
+    isLoading: usersLoading, 
+    error: usersError,
+    refetch: refetchUsers
+  } = useApiQuery({
+    queryKey: ['/api/admin/users'],
+    endpoint: '/api/admin/users',
+    enabled: activeTab === 'users'
+  });
+
   if (analyticsLoading && activeTab === 'analytics') {
     return <LoadingState>Loading analytics dashboard...</LoadingState>;
   }
@@ -69,17 +80,17 @@ export default function AdminDashboard() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-muted">
-          <TabsTrigger value="analytics" className="flex items-center space-x-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
-            <BarChart3 className="w-4 h-4" />
-            <span>Analytics</span>
+          <TabsTrigger value="analytics" className="flex items-center space-x-1 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
+            <BarChart3 className="w-4 h-4 shrink-0" />
+            <span className="text-sm truncate">Analytics</span>
           </TabsTrigger>
-          <TabsTrigger value="content" className="flex items-center space-x-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
-            <Settings className="w-4 h-4" />
-            <span>Content Management</span>
+          <TabsTrigger value="content" className="flex items-center space-x-1 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
+            <Settings className="w-4 h-4 shrink-0" />
+            <span className="text-sm truncate">Content</span>
           </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center space-x-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
-            <Users className="w-4 h-4" />
-            <span>User Management</span>
+          <TabsTrigger value="users" className="flex items-center space-x-1 px-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
+            <Users className="w-4 h-4 shrink-0" />
+            <span className="text-sm truncate">Users</span>
           </TabsTrigger>
         </TabsList>
 
@@ -99,7 +110,12 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
-          <UserManagement />
+          <UserManagement 
+            users={users} 
+            usersLoading={usersLoading} 
+            usersError={usersError}
+            refetchUsers={refetchUsers}
+          />
         </TabsContent>
       </Tabs>
     </div>
@@ -325,17 +341,100 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
   );
 }
 
-function UserManagement() {
+function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) {
+  if (usersLoading) {
+    return <LoadingState>Loading users...</LoadingState>;
+  }
+
+  if (usersError) {
+    return <ApiError error={usersError} onRetry={refetchUsers} />;
+  }
+
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">User Management</CardTitle>
+        <CardTitle className="text-foreground flex items-center justify-between">
+          <span>User Management</span>
+          <span className="text-sm text-muted-foreground font-normal">
+            {users?.length || 0} users
+          </span>
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-center py-8 text-muted-foreground">
-          <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>User management features coming soon</p>
-          <p className="text-sm">Ability to view, edit, and moderate user accounts</p>
+        <div className="space-y-4">
+          {/* User Stats Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="text-center p-4 bg-muted rounded-lg">
+              <div className="text-2xl font-bold text-foreground">{users?.length || 0}</div>
+              <div className="text-sm text-muted-foreground">Total Users</div>
+            </div>
+            <div className="text-center p-4 bg-muted rounded-lg">
+              <div className="text-2xl font-bold text-green-400">
+                {users?.filter((u: any) => u.emailVerified).length || 0}
+              </div>
+              <div className="text-sm text-muted-foreground">Verified</div>
+            </div>
+            <div className="text-center p-4 bg-muted rounded-lg">
+              <div className="text-2xl font-bold text-blue-400">
+                {Math.round((users?.reduce((acc: number, u: any) => acc + u.level, 0) || 0) / (users?.length || 1))}
+              </div>
+              <div className="text-sm text-muted-foreground">Avg Level</div>
+            </div>
+            <div className="text-center p-4 bg-muted rounded-lg">
+              <div className="text-2xl font-bold text-purple-400">
+                {users?.filter((u: any) => u.currentTitle?.includes('G.M.')).length || 0}
+              </div>
+              <div className="text-sm text-muted-foreground">Admins</div>
+            </div>
+          </div>
+
+          {/* Users List */}
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {users?.map((user: any) => (
+              <div key={user.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-muted rounded-lg space-y-3 md:space-y-0">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-medium text-foreground">{user.username}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {user.email} • Level {user.level} • {user.experience} XP
+                    </div>
+                    {user.currentTitle && (
+                      <div className="text-xs text-purple-400">{user.currentTitle}</div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-3">
+                  <div className="text-left md:text-right text-sm">
+                    <div className="text-foreground">
+                      {user.emailVerified ? (
+                        <span className="text-green-400">✓ Verified</span>
+                      ) : (
+                        <span className="text-red-400">Not Verified</span>
+                      )}
+                    </div>
+                    <div className="text-muted-foreground">
+                      STR: {user.strength} STA: {user.stamina} AGI: {user.agility}
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button size="sm" variant="outline">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {(!users || users.length === 0) && (
+            <div className="text-center py-8 text-muted-foreground">
+              <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>No users found</p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

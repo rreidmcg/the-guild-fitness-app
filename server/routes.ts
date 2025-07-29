@@ -924,7 +924,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes - only accessible to users with <G.M.> title
   app.get("/api/admin/users", async (req, res) => {
     try {
-      const currentUser = await storage.getUser(currentUserId);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
       if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Access denied" });
       }
@@ -939,7 +944,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/system-stats", async (req, res) => {
     try {
-      const currentUser = await storage.getUser(currentUserId);
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
       if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Access denied" });
       }
