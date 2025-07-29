@@ -59,14 +59,15 @@
   }
 
   body {
-    @apply font-sans antialiased text-foreground;
+    @apply font-sans antialiased;
     background: linear-gradient(135deg, hsl(222.2, 84%, 4.9%) 0%, hsl(217.2, 32.6%, 17.5%) 50%, hsl(215, 20.2%, 25%) 100%) !important;
     background-attachment: fixed !important;
-    color: hsl(213, 31%, 91%) !important; /* Blue-ish white text */
+    color: hsl(205, 100%, 90%) !important; /* Bright blue-ish white text */
     font-weight: 400;
     line-height: 1.5;
     position: relative;
     min-height: 100vh;
+    text-shadow: 0 0 8px rgba(173, 216, 255, 0.4) !important;
   }
   
 
@@ -125,10 +126,12 @@
     background-color: hsl(220, 50%, 12%) !important;
   }
   
-  /* Apply glowing effect to all main text elements */
+  /* Apply glowing effect to all main text elements - more specific selectors */
   .text-foreground,
   [class*="text-foreground"],
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4, h5, h6,
+  div h1, div h2, div h3, div h4, div h5, div h6,
+  span, p, div {
     color: hsl(205, 100%, 90%) !important;
     text-shadow: 0 0 8px rgba(173, 216, 255, 0.4), 0 0 16px rgba(173, 216, 255, 0.2) !important;
   }
@@ -136,7 +139,11 @@
   /* Card titles and important text with stronger glow */
   [data-testid="card-title"],
   .card-title,
-  .font-bold {
+  .font-bold,
+  .text-2xl,
+  .text-3xl,
+  .text-xl {
+    color: hsl(205, 100%, 92%) !important;
     text-shadow: 0 0 10px rgba(173, 216, 255, 0.6), 0 0 20px rgba(173, 216, 255, 0.3) !important;
   }
   
@@ -162,6 +169,30 @@
   [data-testid="card-content"] {
     color: hsl(205, 100%, 88%) !important;
     text-shadow: 0 0 6px rgba(173, 216, 255, 0.3) !important;
+  }
+  
+  /* Universal text color override - highest priority */
+  * {
+    color: hsl(205, 100%, 90%) !important;
+  }
+  
+  /* Specific overrides for headings and titles */
+  h1, h2, h3, h4, h5, h6,
+  .text-2xl, .text-3xl, .text-xl, .text-lg,
+  [class*="font-bold"],
+  [class*="text-2xl"],
+  [class*="text-3xl"] {
+    color: hsl(205, 100%, 92%) !important;
+    text-shadow: 0 0 12px rgba(173, 216, 255, 0.7), 0 0 24px rgba(173, 216, 255, 0.4) !important;
+  }
+  
+  /* Override any Tailwind black text classes */
+  .text-black,
+  [class*="text-black"],
+  .text-gray-900,
+  [class*="text-gray-900"] {
+    color: hsl(205, 100%, 90%) !important;
+    text-shadow: 0 0 8px rgba(173, 216, 255, 0.4) !important;
   }
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
