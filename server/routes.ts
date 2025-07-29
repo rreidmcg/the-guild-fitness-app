@@ -1678,6 +1678,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedUser = await storage.updateUser(userId, { currentTitle: titleToSet });
+      
+      // Mark wardrobe notification if title actually changed
+      if (user.currentTitle !== titleToSet) {
+        await storage.markWardrobeNotification(userId);
+      }
+      
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user title" });
@@ -1699,9 +1705,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid gender value" });
       }
       
+      // Get user to check current gender and restrictions
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
       // Restrict gm_avatar to Zero and Rob only
       if (gender === 'gm_avatar') {
-        const user = await storage.getUser(userId);
         const username = user?.username?.toLowerCase();
         if (username !== "zero" && username !== "rob") {
           return res.status(403).json({ error: "G.M. avatar is restricted to admin users" });
@@ -1709,6 +1720,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedUser = await storage.updateUser(userId, { gender });
+      
+      // Mark wardrobe notification if avatar actually changed
+      if (user.gender !== gender) {
+        await storage.markWardrobeNotification(userId);
+      }
+      
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user avatar" });
@@ -2319,6 +2336,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error setting timezone:", error);
       res.status(500).json({ error: "Failed to set timezone" });
+    }
+  });
+
+  app.post("/api/user/clear-wardrobe-notification", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      
+      await storage.updateUser(userId, { 
+        hasUnseenWardrobeChanges: false,
+        lastWardrobeViewedAt: new Date()
+      });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error clearing wardrobe notification:", error);
+      res.status(500).json({ error: "Failed to clear wardrobe notification" });
     }
   });
 

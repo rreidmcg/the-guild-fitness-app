@@ -70,6 +70,9 @@ export const users = pgTable("users", {
   liabilityWaiverAccepted: boolean("liability_waiver_accepted").default(false),
   liabilityWaiverAcceptedAt: timestamp("liability_waiver_accepted_at"),
   liabilityWaiverIpAddress: text("liability_waiver_ip_address"),
+  // Wardrobe notification tracking
+  hasUnseenWardrobeChanges: boolean("has_unseen_wardrobe_changes").default(false),
+  lastWardrobeViewedAt: timestamp("last_wardrobe_viewed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -96,6 +96,20 @@ export default function Stats() {
     },
   });
 
+  const clearWardrobeNotificationMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("/api/user/clear-wardrobe-notification", {
+        method: "POST"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+    },
+    onError: (error: any) => {
+      console.error("Failed to clear wardrobe notification:", error);
+    }
+  });
+
   // Streak freeze mutation removed - now handled automatically at midnight
 
   const recentSessions = Array.isArray(workoutSessions) ? workoutSessions.slice(0, 3) : [];
@@ -180,14 +194,19 @@ export default function Stats() {
         {/* Character Profile */}
         <Card className="bg-card border-border relative">
           {/* Wardrobe Button in Corner */}
-          <Button
-            size="sm"
-            onClick={() => setShowWardrobe(true)}
-            className="absolute top-4 right-4 bg-purple-600 text-white hover:bg-purple-700 p-2 z-10"
-            title="Open Wardrobe"
-          >
-            <Shirt className="w-4 h-4" />
-          </Button>
+          <div className="absolute top-4 right-4 z-10">
+            <Button
+              size="sm"
+              onClick={() => setShowWardrobe(true)}
+              className="bg-purple-600 text-white hover:bg-purple-700 p-2 relative"
+              title="Open Wardrobe"
+            >
+              <Shirt className="w-4 h-4" />
+              {safeUserStats.hasUnseenWardrobeChanges && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-background animate-pulse"></div>
+              )}
+            </Button>
+          </div>
           
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
@@ -461,7 +480,13 @@ export default function Stats() {
       {/* Wardrobe Modal */}
       <WardrobeModal 
         isOpen={showWardrobe}
-        onClose={() => setShowWardrobe(false)}
+        onClose={() => {
+          setShowWardrobe(false);
+          // Clear the notification when wardrobe is viewed
+          if (safeUserStats.hasUnseenWardrobeChanges) {
+            clearWardrobeNotificationMutation.mutate();
+          }
+        }}
         user={safeUserStats}
       />
     </div>
