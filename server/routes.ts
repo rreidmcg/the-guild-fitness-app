@@ -2663,6 +2663,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/admin/monsters/:id", isAdmin, async (req, res) => {
+    try {
+      const monsterId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      if (isNaN(monsterId)) {
+        return res.status(400).json({ error: "Invalid monster ID" });
+      }
+
+      const updatedMonster = await storage.updateMonster(monsterId, updates);
+      res.json({ success: true, monster: updatedMonster });
+    } catch (error) {
+      console.error("Failed to update monster:", error);
+      res.status(500).json({ error: "Failed to update monster" });
+    }
+  });
+
   // Liability waiver acceptance route
   app.post("/api/accept-liability-waiver", async (req, res) => {
     try {

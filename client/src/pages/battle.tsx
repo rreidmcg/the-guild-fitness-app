@@ -1182,10 +1182,10 @@ export default function Battle() {
                                 <CardContent className={`p-3 ${onCooldown ? 'bg-gray-50 dark:bg-gray-800' : ''}`}>
                                   <div className="flex items-start space-x-4">
                                     {/* Monster Image */}
-                                    {monster.image && (
+                                    {monster.avatar && (
                                       <div className="flex-shrink-0 relative">
                                         <img 
-                                          src={monster.image} 
+                                          src={monster.avatar} 
                                           alt={monster.name}
                                           className={`w-16 h-16 object-contain rounded-lg border border-border bg-transparent ${
                                             onCooldown ? 'grayscale' : ''
@@ -1570,9 +1570,9 @@ export default function Battle() {
                          }}>
                     </div>
                   )}
-                  {battleState.currentMonsterIndex === 0 && battleState.monster.image ? (
+                  {battleState.currentMonsterIndex === 0 && battleState.monster.avatar ? (
                     <img 
-                      src={battleState.monster.image} 
+                      src={battleState.monster.avatar} 
                       alt="Green Slime #1"
                       className={`w-20 h-20 object-contain transition-all duration-300 ${
                         isMonsterAttacking ? '-translate-x-8 scale-110' : ''
@@ -1641,9 +1641,9 @@ export default function Battle() {
                          }}>
                     </div>
                   )}
-                  {battleState.monster.image ? (
+                  {battleState.monster.avatar ? (
                     <img 
-                      src={battleState.monster.image} 
+                      src={battleState.monster.avatar} 
                       alt="Green Slime #2"
                       className="w-20 h-20 object-contain"
                       style={{ 
@@ -1699,9 +1699,9 @@ export default function Battle() {
                        boxShadow: '0 0 25px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4), inset 0 0 15px rgba(255, 0, 0, 0.2)'
                      }}>
                 </div>
-                {battleState.monster.image ? (
+                {battleState.monster.avatar ? (
                   <img 
-                    src={battleState.monster.image} 
+                    src={battleState.monster.avatar} 
                     alt={battleState.monster.name}
                     className={`w-32 h-32 object-contain transition-all duration-300 ${
                       isMonsterAttacking ? '-translate-x-8 scale-110' : ''

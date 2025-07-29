@@ -44,6 +44,7 @@ export interface IStorage {
   createExercise(exercise: InsertExercise): Promise<Exercise>;
   getAllMonsters(): Promise<Monster[]>;
   createMonster(monster: any): Promise<Monster>;
+  updateMonster(id: number, updates: Partial<Monster>): Promise<Monster>;
 
   // Workout operations
   getUserWorkouts(userId: number): Promise<Workout[]>;
@@ -1301,6 +1302,16 @@ export class DatabaseStorage implements IStorage {
       .insert(monsters)
       .values(monsterData)
       .returning();
+    return monster;
+  }
+
+  async updateMonster(id: number, updates: Partial<Monster>): Promise<Monster> {
+    const [monster] = await db
+      .update(monsters)
+      .set(updates)
+      .where(eq(monsters.id, id))
+      .returning();
+    if (!monster) throw new Error("Monster not found");
     return monster;
   }
 

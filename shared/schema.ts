@@ -246,6 +246,7 @@ export const monsters = pgTable("monsters", {
   goldReward: integer("gold_reward").default(0),
   description: text("description"),
   isBoss: boolean("is_boss").default(false),
+  avatar: text("avatar"), // URL or path to monster avatar image
 });
 
 // User achievements

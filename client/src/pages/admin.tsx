@@ -376,22 +376,15 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
             ) : monstersError ? (
               <ApiError error={monstersError} />
             ) : (
-              <div className="space-y-3 max-h-64 overflow-y-auto">
+              <div className="space-y-3 max-h-96 overflow-y-auto">
                 {monsters?.map((monster: any) => (
-                  <div key={monster.id} className="flex items-center justify-between p-3 bg-muted rounded">
-                    <div>
-                      <div className="font-medium text-foreground">{monster.name}</div>
-                      <div className="text-sm text-muted-foreground">Level {monster.level} • {monster.tier}-rank</div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" className="text-red-400 border-red-400 hover:bg-red-500/10">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
+                  <MonsterListItem 
+                    key={monster.id} 
+                    monster={monster} 
+                    onUpdate={() => {
+                      queryClient.invalidateQueries({ queryKey: ['/api/admin/monsters'] });
+                    }} 
+                  />
                 ))}
               </div>
             )}
@@ -854,7 +847,8 @@ function AddMonsterForm({ onSubmit, isLoading }: { onSubmit: (data: any) => void
     tier: "E",
     zone: "",
     goldReward: 50,
-    description: ""
+    description: "",
+    avatar: ""
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -972,6 +966,30 @@ function AddMonsterForm({ onSubmit, isLoading }: { onSubmit: (data: any) => void
         />
       </div>
 
+      <div>
+        <Label htmlFor="avatar">Avatar URL</Label>
+        <Input
+          id="avatar"
+          value={formData.avatar}
+          onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+          placeholder="Enter image URL for monster avatar"
+        />
+        {formData.avatar && (
+          <div className="mt-2 flex items-center space-x-2">
+            <img 
+              src={formData.avatar} 
+              alt="Avatar preview"
+              className="w-12 h-12 object-contain border rounded"
+              style={{ imageRendering: 'pixelated' }}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <span className="text-xs text-muted-foreground">Preview</span>
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-end space-x-2 pt-4">
         <Button type="button" variant="outline" onClick={() => {}}>
           Cancel
@@ -981,5 +999,129 @@ function AddMonsterForm({ onSubmit, isLoading }: { onSubmit: (data: any) => void
         </Button>
       </div>
     </form>
+  );
+}
+
+function MonsterListItem({ monster, onUpdate }: { monster: any; onUpdate: () => void }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(monster.avatar || '');
+  const { toast } = useToast();
+
+  const updateMonsterMutation = useMutation({
+    mutationFn: async (data: { id: number; avatar: string }) => {
+      const response = await fetch(`/api/admin/monsters/${data.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: data.avatar })
+      });
+      if (!response.ok) throw new Error('Failed to update monster');
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Monster Updated",
+        description: "Monster avatar has been successfully updated.",
+      });
+      setIsEditing(false);
+      onUpdate();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Update Monster",
+        description: error.message || "Failed to update monster",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSave = () => {
+    updateMonsterMutation.mutate({ id: monster.id, avatar: avatarUrl });
+  };
+
+  const handleCancel = () => {
+    setAvatarUrl(monster.avatar || '');
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="flex items-center justify-between p-4 bg-muted rounded-lg border">
+      <div className="flex items-center space-x-4 flex-1">
+        {/* Monster Avatar */}
+        <div className="w-16 h-16 bg-gray-200 rounded border flex items-center justify-center flex-shrink-0">
+          {(isEditing ? avatarUrl : monster.avatar) ? (
+            <img 
+              src={isEditing ? avatarUrl : monster.avatar} 
+              alt={monster.name}
+              className="w-full h-full object-contain rounded"
+              style={{ imageRendering: 'pixelated' }}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div className="w-full h-full flex items-center justify-center text-gray-400" style={{ display: (isEditing ? avatarUrl : monster.avatar) ? 'none' : 'flex' }}>
+            <Sword className="w-8 h-8" />
+          </div>
+        </div>
+
+        {/* Monster Info */}
+        <div className="flex-1">
+          <div className="font-medium text-foreground">{monster.name}</div>
+          <div className="text-sm text-muted-foreground">
+            Level {monster.level} • {monster.tier}-rank • HP: {monster.maxHp} • ATK: {monster.attack}
+          </div>
+          <div className="text-xs text-yellow-400">
+            Gold Reward: {monster.goldReward}
+          </div>
+          
+          {isEditing && (
+            <div className="mt-2">
+              <Label htmlFor={`avatar-${monster.id}`} className="text-xs">Avatar URL</Label>
+              <Input
+                id={`avatar-${monster.id}`}
+                value={avatarUrl}
+                onChange={(e) => setAvatarUrl(e.target.value)}
+                placeholder="Enter image URL"
+                className="mt-1 text-sm"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex space-x-2 ml-4">
+        {isEditing ? (
+          <>
+            <Button 
+              size="sm" 
+              onClick={handleSave}
+              disabled={updateMonsterMutation.isPending}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              {updateMonsterMutation.isPending ? 'Saving...' : 'Save'}
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={handleCancel}
+              disabled={updateMonsterMutation.isPending}
+            >
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={() => setIsEditing(true)}
+          >
+            <Edit className="w-4 h-4 mr-1" />
+            Edit Avatar
+          </Button>
+        )}
+      </div>
+    </div>
   );
 }
