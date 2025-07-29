@@ -61,7 +61,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="admin-dashboard container mx-auto p-4 max-w-7xl">
+    <div className="container mx-auto p-4 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-foreground mb-2">Admin Dashboard</h1>
         <p className="text-muted-foreground">Manage your RPG fitness application</p>
