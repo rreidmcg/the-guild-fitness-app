@@ -20,35 +20,35 @@
 }
 
 :root {
-  /* Clean Light Theme for Better Readability */
-  --background: hsl(0, 0%, 100%); /* White background */
+  /* Warm Rustic Light Theme */
+  --background: hsl(45, 100%, 97%); /* Very light amber background */
   --foreground: hsl(240, 10%, 3.9%); /* Very dark text */
-  --muted: hsl(240, 4.8%, 95.9%); /* Light gray background */
+  --muted: hsl(45, 50%, 94%); /* Light amber-tinted background */
   --muted-foreground: hsl(240, 3.8%, 46.1%); /* Medium gray text */
-  --popover: hsl(0, 0%, 100%);
+  --popover: hsl(45, 100%, 98%);
   --popover-foreground: hsl(240, 10%, 3.9%);
-  --card: hsl(0, 0%, 100%); /* White cards */
+  --card: hsl(45, 100%, 98%); /* Very light amber cards */
   --card-foreground: hsl(240, 10%, 3.9%); /* Dark text on cards */
-  --border: hsl(240, 5.9%, 90%); /* Light gray borders */
-  --input: hsl(240, 5.9%, 90%); /* Light gray inputs */
+  --border: hsl(45, 30%, 85%); /* Light amber borders */
+  --input: hsl(45, 30%, 90%); /* Light amber inputs */
   --primary: hsl(197, 100%, 45%); /* Professional blue */
   --primary-foreground: hsl(0, 0%, 98%); /* White text on blue */
-  --secondary: hsl(240, 4.8%, 95.9%); /* Light gray secondary */
+  --secondary: hsl(45, 50%, 94%); /* Light amber secondary */
   --secondary-foreground: hsl(240, 5.9%, 10%); /* Dark secondary text */
-  --accent: hsl(240, 4.8%, 95.9%); /* Light accent */
+  --accent: hsl(45, 50%, 94%); /* Light amber accent */
   --accent-foreground: hsl(240, 5.9%, 10%); /* Dark accent text */
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(197, 100%, 45%); /* Blue focus rings */
   --radius: 0.5rem;
   
-  /* Gaming theme colors adapted for light theme */
+  /* Gaming theme colors adapted for rustic theme */
   --game-primary: hsl(197, 100%, 45%); /* Professional blue */
-  --game-secondary: hsl(240, 4.8%, 95.9%); /* Light gray */
+  --game-secondary: hsl(45, 50%, 94%); /* Light amber */
   --game-success: hsl(142, 71%, 45%); /* Darker green for contrast */
   --game-warning: hsl(38, 92%, 50%); /* Darker yellow for contrast */
   --game-dark: hsl(240, 10%, 3.9%); /* Dark text */
-  --game-slate: hsl(240, 4.8%, 95.9%); /* Light card background */
+  --game-slate: hsl(45, 50%, 96%); /* Light amber card background */
 }
 
 
@@ -59,11 +59,97 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-    background-color: hsl(0, 0%, 100%) !important; /* White background */
+    @apply font-sans antialiased text-foreground;
+    background: linear-gradient(135deg, hsl(45, 100%, 96%) 0%, hsl(39, 100%, 94%) 50%, hsl(43, 100%, 92%) 100%) !important;
+    background-attachment: fixed !important;
     color: hsl(240, 10%, 3.9%) !important; /* Dark text */
     font-weight: 400;
     line-height: 1.5;
+    position: relative;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle at 2px 2px, rgba(139, 69, 19, 0.08) 1px, transparent 0);
+    background-size: 30px 30px;
+    pointer-events: none;
+    z-index: -2;
+  }
+  
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d2691e' fill-opacity='0.02'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3Ccircle cx='53' cy='13' r='1'/%3E%3Ccircle cx='23' cy='31' r='1'/%3E%3Ccircle cx='41' cy='47' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  /* Floating orbs for rustic background effect */
+  .floating-orb-1 {
+    position: fixed;
+    top: 10vh;
+    left: 10vw;
+    width: 8rem;
+    height: 8rem;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: float1 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  .floating-orb-2 {
+    position: fixed;
+    bottom: 15vh;
+    right: 15vw;
+    width: 10rem;
+    height: 10rem;
+    background: rgba(249, 115, 22, 0.12);
+    border-radius: 50%;
+    filter: blur(50px);
+    animation: float2 10s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  .floating-orb-3 {
+    position: fixed;
+    top: 40vh;
+    left: 30vw;
+    width: 6rem;
+    height: 6rem;
+    background: rgba(251, 191, 36, 0.2);
+    border-radius: 50%;
+    filter: blur(30px);
+    animation: float3 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  @keyframes float1 {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(-20px) translateX(10px); }
+  }
+  
+  @keyframes float2 {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    33% { transform: translateY(-15px) translateX(-10px); }
+    66% { transform: translateY(10px) translateX(5px); }
+  }
+  
+  @keyframes float3 {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    50% { transform: translateY(15px) translateX(-8px); }
   }
 }
 
@@ -109,8 +195,8 @@
   }
   
   .bottom-nav-solid {
-    background-color: hsl(0, 0%, 100%) !important; /* Clean white nav */
-    border-top: 1px solid hsl(240, 5.9%, 90%) !important; /* Light border */
+    background-color: hsl(45, 100%, 98%) !important; /* Light amber nav */
+    border-top: 1px solid hsl(45, 30%, 85%) !important; /* Light amber border */
     opacity: 1 !important;
     backdrop-filter: none !important;
   }

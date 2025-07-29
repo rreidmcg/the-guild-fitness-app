@@ -193,7 +193,12 @@ function AppContent() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground relative">
+        {/* Floating orbs for background ambiance */}
+        <div className="floating-orb-1"></div>
+        <div className="floating-orb-2"></div>
+        <div className="floating-orb-3"></div>
+        
         <Toaster />
         <Router />
       </div>
