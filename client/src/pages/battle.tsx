@@ -27,6 +27,7 @@ import wildGoblinImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_175315
 import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753196270170.png";
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
+import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753825222475.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 
 import { useBackgroundMusic } from "@/contexts/background-music-context";
@@ -159,6 +160,22 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 22, name: "Shadow Spider", level: 4, maxHp: 24, currentHp: 24, attack: 7, goldReward: 5, description: "A spider that strikes from the darkness", image: forestSpiderImage },
       { id: 23, name: "Warrior Spider", level: 5, maxHp: 26, currentHp: 26, attack: 8, goldReward: 6, description: "A heavily armored spider guardian", image: forestSpiderImage },
       { id: 24, name: "Broodmother", level: 5, maxHp: 32, currentHp: 32, attack: 8, goldReward: 8, description: "🏆 MINI-BOSS: An enormous spider surrounded by her countless offspring" }
+    ]
+  },
+  {
+    id: "slime_kingdom",
+    name: "The Slime Kingdom",
+    description: "A toxic swampland ruled by the legendary Slime King and his gelatinous subjects",
+    background: "#2d5016",
+    storyIntro: "You wade through bubbling toxic pools where acidic slimes emerge from the murky depths. The air is thick with noxious fumes as you approach the throne of the notorious Slime King...",
+    completionStory: "The Slime King's crown tumbles into the swamp as his gelatinous form dissolves. The toxic kingdom begins to purify, revealing hidden passages deeper underground.",
+    monsters: [
+      { id: 160, name: "Acid Blob", level: 4, maxHp: 22, currentHp: 22, attack: 6, goldReward: 4, description: "A corrosive mass that burns everything it touches" },
+      { id: 161, name: "Poison Slime", level: 4, maxHp: 24, currentHp: 24, attack: 6, goldReward: 5, description: "A venomous creature leaving toxic trails" },
+      { id: 162, name: "Bubble Slime", level: 5, maxHp: 26, currentHp: 26, attack: 7, goldReward: 5, description: "A bouncy slime that inflates and deflates unpredictably" },
+      { id: 163, name: "Royal Slime", level: 5, maxHp: 28, currentHp: 28, attack: 7, goldReward: 6, description: "An elite slime wearing a tiny crown" },
+      { id: 164, name: "Slime Guardian", level: 6, maxHp: 30, currentHp: 30, attack: 8, goldReward: 6, description: "A massive slime protecting the royal throne" },
+      { id: 165, name: "Slime King", level: 6, maxHp: 40, currentHp: 40, attack: 9, goldReward: 15, description: "🏆 MINI-BOSS: The crowned ruler of all slimes, dripping with toxic majesty", image: slimeKingImage }
     ]
   }
 ];
@@ -1190,10 +1207,10 @@ export default function Battle() {
                                 <CardContent className={`p-3 ${onCooldown ? 'bg-gray-50 dark:bg-gray-800' : ''}`}>
                                   <div className="flex items-start space-x-4">
                                     {/* Monster Image */}
-                                    {monster.avatar && (
+                                    {monster.image && (
                                       <div className="flex-shrink-0 relative">
                                         <img 
-                                          src={monster.avatar} 
+                                          src={monster.image} 
                                           alt={monster.name}
                                           className={`w-16 h-16 object-contain rounded-lg border border-border bg-transparent ${
                                             onCooldown ? 'grayscale' : ''
@@ -1579,9 +1596,9 @@ export default function Battle() {
                          }}>
                     </div>
                   )}
-                  {battleState.currentMonsterIndex === 0 && battleState.monster.avatar ? (
+                  {battleState.currentMonsterIndex === 0 && battleState.monster.image ? (
                     <img 
-                      src={battleState.monster.avatar} 
+                      src={battleState.monster.image} 
                       alt="Green Slime #1"
                       className={`w-20 h-20 object-contain transition-all duration-300 ${
                         isMonsterAttacking ? '-translate-x-8 scale-110' : ''
@@ -1650,9 +1667,9 @@ export default function Battle() {
                          }}>
                     </div>
                   )}
-                  {battleState.monster.avatar ? (
+                  {battleState.monster.image ? (
                     <img 
-                      src={battleState.monster.avatar} 
+                      src={battleState.monster.image} 
                       alt="Green Slime #2"
                       className="w-20 h-20 object-contain"
                       style={{ 
@@ -1708,9 +1725,9 @@ export default function Battle() {
                        boxShadow: '0 0 25px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4), inset 0 0 15px rgba(255, 0, 0, 0.2)'
                      }}>
                 </div>
-                {battleState.monster.avatar ? (
+                {battleState.monster.image ? (
                   <img 
-                    src={battleState.monster.avatar} 
+                    src={battleState.monster.image} 
                     alt={battleState.monster.name}
                     className={`w-32 h-32 object-contain transition-all duration-300 ${
                       isMonsterAttacking ? '-translate-x-8 scale-110' : ''

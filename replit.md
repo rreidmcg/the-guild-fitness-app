@@ -173,6 +173,20 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Slime King Mini-Boss Integration & Avatar Selection Enhancement:**
+- **Added Slime King Mini-Boss**: Integrated custom pixel art Slime King into battle system
+  - Created "The Slime Kingdom" E-rank dungeon zone with toxic swamp theme and story narrative
+  - Added 6 new slime monsters leading up to the crowned Slime King boss (Level 6, 40 HP, 15 gold reward)
+  - Integrated custom pixel art featuring green slime with golden crown and menacing expression
+  - Enhanced battle system with proper image display for all monster types
+  - Fixed Monster interface to support both image and avatar properties consistently
+- **Enhanced Avatar Selection System**: Separated avatar appearance from gender identity for inclusivity
+  - Added visual avatar style selection during account creation with live character previews
+  - Users can choose between male and female avatar styles independent of personal gender identity
+  - Gender field made optional with "Prefer not to say" option for better inclusivity
+  - Avatar selection shows actual Avatar2D component previews for informed choice
+  - Founders Pack legendary hunter skins automatically display based on chosen avatar style
+
 **July 29, 2025 - Female Legendary Hunter Skin Addition:**
 - **Added Female Variant of Legendary Hunter Skin**: Founders Pack users now have gender-specific legendary hunter skins
   - Integrated female pixel art version of "The Legendary Hunter" skin for female characters
