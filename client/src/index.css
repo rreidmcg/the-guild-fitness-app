@@ -194,6 +194,25 @@
     color: hsl(205, 100%, 90%) !important;
     text-shadow: 0 0 8px rgba(173, 216, 255, 0.4) !important;
   }
+  
+  /* Fix white gap between currency header and page content */
+  body, html {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: linear-gradient(135deg, hsl(222.2, 84%, 4.9%) 0%, hsl(217.2, 32.6%, 17.5%) 50%, hsl(215, 20.2%, 25%) 100%) !important;
+  }
+  
+  /* Remove white gaps in page layout */
+  .min-h-screen {
+    margin: 0 !important;
+    padding-top: 64px !important; /* Space for currency header */
+  }
+  
+  /* Connect page headers seamlessly to currency header */
+  .bg-slate-800\/90 {
+    margin-top: -64px !important; /* Pull up to touch currency header */
+    padding-top: 64px !important; /* Account for pulled up margin */
+  }
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
   }

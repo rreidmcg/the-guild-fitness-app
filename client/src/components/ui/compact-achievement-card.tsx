@@ -132,7 +132,7 @@ export function CompactAchievementCard({ achievements, userAchievements, userSta
   };
 
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-slate-800/90 border-slate-600">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

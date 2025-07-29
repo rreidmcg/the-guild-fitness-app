@@ -193,7 +193,7 @@ export default function Stats() {
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Atrophy Warning */}
-        <AtrophyWarning />
+        {userStats && <AtrophyWarning />}
         {/* Character Profile */}
         <Card className="bg-slate-800/90 border-slate-600 relative">
           {/* Wardrobe Button in Corner */}
@@ -442,7 +442,7 @@ export default function Stats() {
         )}
 
         {/* Personal Records */}
-        <Card className="bg-card border-border">
+        <Card className="bg-slate-800/90 border-slate-600">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
@@ -458,7 +458,7 @@ export default function Stats() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {topRecords.map((record) => (
-                  <Card key={record.id} className="bg-secondary border-border">
+                  <Card key={record.id} className="bg-slate-700/50 border-slate-600">
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-3 mb-2">
                         <Trophy className="w-4 h-4 text-yellow-500" />
