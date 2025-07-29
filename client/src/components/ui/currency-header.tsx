@@ -24,19 +24,19 @@ export function CurrencyHeader() {
 
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-b border-border/50 px-2 sm:px-4 py-1.5 z-40">
+    <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-amber-900/95 via-orange-800/95 to-yellow-900/95 backdrop-blur-sm border-b border-amber-600/50 px-2 sm:px-4 py-1.5 z-40 shadow-lg">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <button
               onClick={handleMusicToggle}
-              className="flex items-center hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors"
+              className="flex items-center hover:bg-amber-700/50 px-1.5 py-0.5 rounded transition-colors"
               title="Toggle Music"
             >
               {isMuted || !isPlaying ? (
-                <VolumeX className="w-4 h-4 text-muted-foreground" />
+                <VolumeX className="w-4 h-4 text-amber-200" />
               ) : (
-                <Volume2 className="w-4 h-4 text-muted-foreground" />
+                <Volume2 className="w-4 h-4 text-amber-200" />
               )}
             </button>
           </div>
@@ -48,45 +48,45 @@ export function CurrencyHeader() {
               </div>
             )}
             <div className="flex items-center space-x-1.5">
-              <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.currentStreak || 0}</span>
+              <Flame className="w-3.5 h-3.5 text-orange-300" />
+              <span className="font-semibold text-amber-100 text-sm">{(userStats as any)?.currentStreak || 0}</span>
             </div>
             <div className="flex items-center space-x-1.5">
-              <Snowflake className="w-3.5 h-3.5 text-blue-500" />
-              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.streakFreezeCount || 0}</span>
+              <Snowflake className="w-3.5 h-3.5 text-blue-300" />
+              <span className="font-semibold text-amber-100 text-sm">{(userStats as any)?.streakFreezeCount || 0}</span>
             </div>
             <div className="flex items-center space-x-1.5">
-              <Coins className="w-3.5 h-3.5 text-yellow-500" />
-              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gold || 0}</span>
+              <Coins className="w-3.5 h-3.5 text-yellow-300" />
+              <span className="font-semibold text-amber-100 text-sm">{(userStats as any)?.gold || 0}</span>
             </div>
             <div className="flex items-center space-x-1.5">
-              <span className="text-blue-400 text-sm">💎</span>
-              <span className="font-semibold text-foreground text-sm">{(userStats as any)?.gems || 0}</span>
+              <span className="text-blue-300 text-sm">💎</span>
+              <span className="font-semibold text-amber-100 text-sm">{(userStats as any)?.gems || 0}</span>
             </div>
             <div className="flex items-center space-x-1">
               <button
                 onClick={() => navigate('/inventory')}
-                className="flex items-center hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors"
+                className="flex items-center hover:bg-amber-700/50 px-1.5 py-0.5 rounded transition-colors"
                 title="Inventory"
               >
-                <Backpack className="w-4 h-4 text-muted-foreground" />
+                <Backpack className="w-4 h-4 text-amber-200" />
               </button>
               <button
                 onClick={() => navigate('/mail')}
-                className="flex items-center hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors relative"
+                className="flex items-center hover:bg-amber-700/50 px-1.5 py-0.5 rounded transition-colors relative"
                 title="Mail"
               >
-                <Mail className="w-4 h-4 text-muted-foreground" />
+                <Mail className="w-4 h-4 text-amber-200" />
                 {Array.isArray(mail) && mail.filter((m: any) => !m.isRead).length > 0 && (
-                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full animate-pulse" />
                 )}
               </button>
               <button
                 onClick={() => navigate('/settings')}
-                className="flex items-center hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors"
+                className="flex items-center hover:bg-amber-700/50 px-1.5 py-0.5 rounded transition-colors"
                 title="Settings"
               >
-                <Settings className="w-4 h-4 text-muted-foreground" />
+                <Settings className="w-4 h-4 text-amber-200" />
               </button>
             </div>
           </div>
