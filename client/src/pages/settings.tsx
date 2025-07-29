@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
@@ -11,7 +11,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
-import { getTitleComponent } from "@/lib/title-rarity";
+
 import { 
   User, 
   Bell, 
@@ -26,7 +26,7 @@ import {
   Vibrate,
   Moon,
   Smartphone,
-  Crown,
+
   BarChart3
 } from "lucide-react";
 
@@ -61,7 +61,7 @@ export default function Settings() {
       // Show success message
       toast({
         title: "Signed out successfully",
-        description: "You have been logged out of Dumbbells & Dragons",
+        description: "You have been logged out of The Guild: Gamified Fitness",
       });
       
       // Redirect to login page
@@ -80,64 +80,7 @@ export default function Settings() {
     signOutMutation.mutate();
   };
 
-  // Available titles based on dungeon rank completion
-  const getAvailableTitles = (userProgress: any, currentTitle: string) => {
-    const titleRequirements = [
-      { title: "No Title", requirement: "default" }, // Always available option
-      { title: "Recruit", requirement: "default" },
-      { title: "E-Rank Survivor", requirement: "e_rank_complete" },
-      { title: "Novice Adventurer", requirement: "e_rank_complete" },
-      { title: "D-Rank Conqueror", requirement: "d_rank_complete" },
-      { title: "Dungeon Walker", requirement: "d_rank_complete" },
-      { title: "C-Rank Vanquisher", requirement: "c_rank_complete" },
-      { title: "Monster Hunter", requirement: "c_rank_complete" },
-      { title: "Fitness Warrior", requirement: "c_rank_complete" },
-      // B, A, S rank titles are locked for now
-    ];
 
-    const unlockedTitles = titleRequirements
-      .filter(req => {
-        if (req.requirement === "default") return true;
-        // For now, all dungeon ranks are in development, so only basic titles available
-        return false;
-      })
-      .map(req => req.title);
-
-    // Add special admin title for specific users or if user already has it
-    const username = userProgress?.username;
-    if (currentTitle === "<G.M.>" || username === "Player 1") {
-      unlockedTitles.push("<G.M.>");
-    }
-
-    return unlockedTitles;
-  };
-
-  const availableTitles = getAvailableTitles(userStats, (userStats as any)?.currentTitle || "");
-
-  // Title update mutation
-  const updateTitleMutation = useMutation({
-    mutationFn: async (newTitle: string) => {
-      return apiRequest("/api/user/update-title", {
-        method: "PATCH",
-        body: { title: newTitle }
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/leaderboard"] });
-      toast({
-        title: "Title Updated",
-        description: "Your title has been changed successfully!",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update title",
-        variant: "destructive",
-      });
-    },
-  });
 
 
 
@@ -149,7 +92,7 @@ export default function Settings() {
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">Customize your Dumbbells & Dragons experience</p>
+          <p className="text-muted-foreground mt-0.5 text-sm">Customize your The Guild: Gamified Fitness experience</p>
         </div>
       </div>
 
@@ -175,60 +118,18 @@ export default function Settings() {
               <div className="flex-1">
                 <div className="flex items-center space-x-2">
                   <h3 className="text-lg font-semibold text-foreground">{(userStats as any)?.username || 'Fitness Warrior'}</h3>
-                  {(() => {
-                    const titleComponent = getTitleComponent((userStats as any)?.currentTitle, "sm");
-                    return titleComponent.displayTitle ? (
-                      <span className={titleComponent.className}>
-                        {titleComponent.displayTitle}
-                      </span>
-                    ) : null;
-                  })()}
+                  {(userStats as any)?.currentTitle && (userStats as any)?.currentTitle !== "No Title" && (
+                    <span className="text-sm text-muted-foreground">
+                      {(userStats as any)?.currentTitle}
+                    </span>
+                  )}
                 </div>
                 <p className="text-muted-foreground">Level {(userStats as any)?.level || 1} • {(userStats as any)?.experience || 0} XP</p>
                 <p className="text-sm text-muted-foreground">Avatar: {(userStats as any)?.gender === 'female' ? 'Female' : 'Male'}</p>
               </div>
             </div>
 
-            {/* Title Selection */}
-            <div className="border-t border-border pt-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="text-base flex items-center space-x-2">
-                    <Crown className="w-4 h-4" />
-                    <span>Character Title</span>
-                  </Label>
-                  <div className="text-sm text-muted-foreground">
-                    Choose your display title
-                  </div>
-                </div>
-                <div className="w-48">
-                  <Select 
-                    value={(userStats as any)?.currentTitle || "No Title"} 
-                    onValueChange={(value) => updateTitleMutation.mutate(value)}
-                    disabled={updateTitleMutation.isPending}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select title" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableTitles.map((title) => {
-                        const titleComponent = getTitleComponent(title, "sm");
-                        return (
-                          <SelectItem key={title} value={title}>
-                            <span className={title === "No Title" ? "text-gray-500" : titleComponent.className}>
-                              {title === "No Title" ? "No Title" : titleComponent.displayTitle}
-                            </span>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              {updateTitleMutation.isPending && (
-                <p className="text-xs text-muted-foreground mt-2">Updating title...</p>
-              )}
-            </div>
+
           </CardContent>
         </Card>
 
