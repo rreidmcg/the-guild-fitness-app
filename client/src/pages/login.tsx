@@ -100,7 +100,7 @@ export default function LoginPage() {
             <CardTitle className="text-2xl font-bold text-yellow-400">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-gray-300">
+            <CardDescription className="text-gray-100">
               Sign in to your The Guild: Gamified Fitness account
             </CardDescription>
           </CardHeader>
@@ -173,7 +173,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-200">
                 Don't have an account?{" "}
                 <button 
                   onClick={() => setLocation("/signup")}
