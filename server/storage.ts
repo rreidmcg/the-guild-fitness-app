@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerInventory, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -357,15 +357,42 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteUser(userId: number): Promise<void> {
-    // Delete related data first
-    await db.delete(workoutSessions).where(eq(workoutSessions.userId, userId));
-    await db.delete(exercisePerformances).where(eq(exercisePerformances.userId, userId));
-    await db.delete(personalRecords).where(eq(personalRecords.userId, userId));
-    await db.delete(workouts).where(eq(workouts.userId, userId));
-    await db.delete(dailyProgress).where(eq(dailyProgress.userId, userId));
-    
-    // Finally delete the user
-    await db.delete(users).where(eq(users.id, userId));
+    try {
+      // Delete related data first (only tables that exist)
+      
+      // Delete exercise performances by finding sessions first, then deleting by sessionId
+      const userSessions = await db.select({ id: workoutSessions.id }).from(workoutSessions).where(eq(workoutSessions.userId, userId));
+      for (const session of userSessions) {
+        await db.delete(exercisePerformances).where(eq(exercisePerformances.sessionId, session.id));
+      }
+      
+      // Delete workout sessions
+      await db.delete(workoutSessions).where(eq(workoutSessions.userId, userId));
+      
+      // Delete personal records
+      await db.delete(personalRecords).where(eq(personalRecords.userId, userId));
+      
+      // Delete workouts
+      await db.delete(workouts).where(eq(workouts.userId, userId));
+      
+      // Delete daily progress
+      await db.delete(dailyProgress).where(eq(dailyProgress.userId, userId));
+      
+      // Delete inventory items
+      await db.delete(playerInventory).where(eq(playerInventory.userId, userId));
+      
+      // Delete user achievements
+      await db.delete(userAchievements).where(eq(userAchievements.userId, userId));
+      
+      // Delete user wardrobe
+      await db.delete(userWardrobe).where(eq(userWardrobe.userId, userId));
+      
+      // Finally delete the user
+      await db.delete(users).where(eq(users.id, userId));
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw new Error('Failed to delete user');
+    }
   }
 
   // Exercise operations

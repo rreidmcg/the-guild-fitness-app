@@ -173,7 +173,12 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
-**July 29, 2025 - Complete Rustic Theme Implementation & Logo Update:**
+**July 29, 2025 - User Management Fix & Rustic Theme Implementation:**
+- **Fixed Admin User Removal**: Resolved database deletion issues for removing users from admin panel
+  - Updated deleteUser function with proper error handling and table relationships
+  - Successfully removed Jenn's account so she can create her own fresh account
+  - Admin can now properly manage users through the interface
+- **Complete Rustic Theme Implementation & Logo Update:**
 - **Updated Application Logo**: Replaced login page logo with new "The Guild Beta Logo" provided by user
   - Updated import from old logo to new logo file "The Guild Beta Logo_1753824042077.png"
   - Logo now displays consistently with proper sizing and drop shadow effects
