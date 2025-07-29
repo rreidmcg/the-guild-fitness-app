@@ -175,6 +175,7 @@ export default function SignupPage() {
                             placeholder="Enter your email" 
                             type="email"
                             {...field} 
+                            className="placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
@@ -197,6 +198,7 @@ export default function SignupPage() {
                               const formatted = formatUsernameInput(e.target.value);
                               field.onChange(formatted);
                             }}
+                            className="placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
@@ -218,6 +220,7 @@ export default function SignupPage() {
                             placeholder="Create a password" 
                             type="password"
                             {...field} 
+                            className="placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
@@ -236,6 +239,7 @@ export default function SignupPage() {
                             placeholder="Confirm your password" 
                             type="password"
                             {...field} 
+                            className="placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
