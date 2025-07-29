@@ -20,35 +20,35 @@
 }
 
 :root {
-  /* Warm Rustic Light Theme */
-  --background: hsl(45, 100%, 97%); /* Very light amber background */
-  --foreground: hsl(240, 10%, 3.9%); /* Very dark text */
-  --muted: hsl(45, 50%, 94%); /* Light amber-tinted background */
-  --muted-foreground: hsl(240, 3.8%, 46.1%); /* Medium gray text */
-  --popover: hsl(45, 100%, 98%);
-  --popover-foreground: hsl(240, 10%, 3.9%);
-  --card: hsl(45, 100%, 98%); /* Very light amber cards */
-  --card-foreground: hsl(240, 10%, 3.9%); /* Dark text on cards */
-  --border: hsl(45, 30%, 85%); /* Light amber borders */
-  --input: hsl(45, 30%, 90%); /* Light amber inputs */
-  --primary: hsl(197, 100%, 45%); /* Professional blue */
-  --primary-foreground: hsl(0, 0%, 98%); /* White text on blue */
-  --secondary: hsl(45, 50%, 94%); /* Light amber secondary */
-  --secondary-foreground: hsl(240, 5.9%, 10%); /* Dark secondary text */
-  --accent: hsl(45, 50%, 94%); /* Light amber accent */
-  --accent-foreground: hsl(240, 5.9%, 10%); /* Dark accent text */
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(197, 100%, 45%); /* Blue focus rings */
+  /* Dark Gaming Theme */
+  --background: hsl(222.2, 84%, 4.9%); /* Deep slate background */
+  --foreground: hsl(210, 40%, 98%); /* Bright white text */
+  --muted: hsl(217.2, 32.6%, 17.5%); /* Dark slate muted background */
+  --muted-foreground: hsl(215, 20.2%, 65.1%); /* Light gray text */
+  --popover: hsl(222.2, 84%, 4.9%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(222.2, 84%, 4.9%); /* Dark slate cards */
+  --card-foreground: hsl(210, 40%, 98%); /* Bright white text on cards */
+  --border: hsl(217.2, 32.6%, 17.5%); /* Dark slate borders */
+  --input: hsl(217.2, 32.6%, 17.5%); /* Dark slate inputs */
+  --primary: hsl(210, 40%, 60%); /* Bright blue */
+  --primary-foreground: hsl(222.2, 84%, 4.9%); /* Dark text on blue */
+  --secondary: hsl(217.2, 32.6%, 17.5%); /* Dark slate secondary */
+  --secondary-foreground: hsl(210, 40%, 98%); /* White secondary text */
+  --accent: hsl(217.2, 32.6%, 17.5%); /* Dark slate accent */
+  --accent-foreground: hsl(210, 40%, 98%); /* White accent text */
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(210, 40%, 60%); /* Blue focus rings */
   --radius: 0.5rem;
   
-  /* Gaming theme colors adapted for rustic theme */
-  --game-primary: hsl(197, 100%, 45%); /* Professional blue */
-  --game-secondary: hsl(45, 50%, 94%); /* Light amber */
-  --game-success: hsl(142, 71%, 45%); /* Darker green for contrast */
-  --game-warning: hsl(38, 92%, 50%); /* Darker yellow for contrast */
-  --game-dark: hsl(240, 10%, 3.9%); /* Dark text */
-  --game-slate: hsl(45, 50%, 96%); /* Light amber card background */
+  /* Gaming theme colors for dark theme */
+  --game-primary: hsl(210, 40%, 60%); /* Bright blue */
+  --game-secondary: hsl(217.2, 32.6%, 17.5%); /* Dark slate */
+  --game-success: hsl(142, 71%, 45%); /* Green */
+  --game-warning: hsl(38, 92%, 50%); /* Yellow */
+  --game-dark: hsl(222.2, 84%, 4.9%); /* Deep slate */
+  --game-slate: hsl(217.2, 32.6%, 17.5%); /* Dark slate card background */
 }
 
 
@@ -60,98 +60,16 @@
 
   body {
     @apply font-sans antialiased text-foreground;
-    background: linear-gradient(135deg, hsl(45, 100%, 96%) 0%, hsl(39, 100%, 94%) 50%, hsl(43, 100%, 92%) 100%) !important;
+    background: linear-gradient(135deg, hsl(222.2, 84%, 4.9%) 0%, hsl(217.2, 32.6%, 17.5%) 50%, hsl(215, 20.2%, 25%) 100%) !important;
     background-attachment: fixed !important;
-    color: hsl(240, 10%, 3.9%) !important; /* Dark text */
+    color: hsl(210, 40%, 98%) !important; /* Bright white text */
     font-weight: 400;
     line-height: 1.5;
     position: relative;
     min-height: 100vh;
   }
   
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: radial-gradient(circle at 2px 2px, rgba(139, 69, 19, 0.08) 1px, transparent 0);
-    background-size: 30px 30px;
-    pointer-events: none;
-    z-index: -2;
-  }
-  
-  body::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d2691e' fill-opacity='0.02'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3Ccircle cx='53' cy='13' r='1'/%3E%3Ccircle cx='23' cy='31' r='1'/%3E%3Ccircle cx='41' cy='47' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  /* Floating orbs for rustic background effect */
-  .floating-orb-1 {
-    position: fixed;
-    top: 10vh;
-    left: 10vw;
-    width: 8rem;
-    height: 8rem;
-    background: rgba(245, 158, 11, 0.15);
-    border-radius: 50%;
-    filter: blur(40px);
-    animation: float1 8s ease-in-out infinite;
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  .floating-orb-2 {
-    position: fixed;
-    bottom: 15vh;
-    right: 15vw;
-    width: 10rem;
-    height: 10rem;
-    background: rgba(249, 115, 22, 0.12);
-    border-radius: 50%;
-    filter: blur(50px);
-    animation: float2 10s ease-in-out infinite;
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  .floating-orb-3 {
-    position: fixed;
-    top: 40vh;
-    left: 30vw;
-    width: 6rem;
-    height: 6rem;
-    background: rgba(251, 191, 36, 0.2);
-    border-radius: 50%;
-    filter: blur(30px);
-    animation: float3 6s ease-in-out infinite;
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  @keyframes float1 {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    50% { transform: translateY(-20px) translateX(10px); }
-  }
-  
-  @keyframes float2 {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    33% { transform: translateY(-15px) translateX(-10px); }
-    66% { transform: translateY(10px) translateX(5px); }
-  }
-  
-  @keyframes float3 {
-    0%, 100% { transform: translateY(0px) translateX(0px); }
-    50% { transform: translateY(15px) translateX(-8px); }
-  }
+
 }
 
 @layer components {
@@ -195,21 +113,14 @@
     background: transparent;
   }
   
-  .bottom-nav-solid {
-    background-color: hsl(45, 100%, 98%) !important; /* Light amber nav */
-    border-top: 1px solid hsl(45, 30%, 85%) !important; /* Light amber border */
-    opacity: 1 !important;
-    backdrop-filter: none !important;
-  }
-  
-  /* Fix toast and modal text visibility */
+  /* Fix toast and modal text visibility for dark theme */
   [data-sonner-toast],
   .sonner-toast,
   [role="dialog"],
   [role="alertdialog"] {
-    background-color: hsl(45, 100%, 98%) !important;
-    color: hsl(240, 10%, 3.9%) !important;
-    border: 1px solid hsl(45, 30%, 85%) !important;
+    background-color: hsl(222.2, 84%, 4.9%) !important;
+    color: hsl(210, 40%, 98%) !important;
+    border: 1px solid hsl(217.2, 32.6%, 17.5%) !important;
   }
   
   [data-sonner-toast] [data-title],
@@ -220,7 +131,27 @@
   [role="dialog"] [data-radix-dialog-description],
   [role="alertdialog"] [data-radix-alert-dialog-title],
   [role="alertdialog"] [data-radix-alert-dialog-description] {
-    color: hsl(240, 10%, 3.9%) !important;
+    color: hsl(210, 40%, 98%) !important;
+  }
+
+  /* Ensure dropdown menus have correct dark theme colors */
+  [data-radix-select-content],
+  [data-radix-dropdown-menu-content],
+  [data-radix-popover-content] {
+    background-color: hsl(222.2, 84%, 4.9%) !important;
+    color: hsl(210, 40%, 98%) !important;
+    border: 1px solid hsl(217.2, 32.6%, 17.5%) !important;
+  }
+
+  [data-radix-select-item],
+  [data-radix-dropdown-menu-item] {
+    color: hsl(210, 40%, 98%) !important;
+  }
+
+  [data-radix-select-item]:hover,
+  [data-radix-dropdown-menu-item]:hover {
+    background-color: hsl(217.2, 32.6%, 17.5%) !important;
+    color: hsl(210, 40%, 98%) !important;
   }
   
   /* Ensure all toast variants have dark text */
