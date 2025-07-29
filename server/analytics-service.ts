@@ -186,11 +186,12 @@ class AnalyticsService {
     const totalXp = users.reduce((sum, user) => sum + (user.experience || 0), 0);
     const averageXpPerUser = users.length > 0 ? totalXp / users.length : 0;
     
-    // Most popular exercises (mock data based on workout sessions)
-    const mostPopularExercises = exercises.slice(0, 5).map((ex, i) => ({
-      name: ex.name,
-      count: Math.max(1, workoutSessions.length - i * 2) // Simulate usage
-    }));
+    // Most popular exercises (based on actual workout sessions)
+    const mostPopularExercises = workoutSessions.length > 0 ? 
+      exercises.slice(0, 5).map((ex, i) => ({
+        name: ex.name,
+        count: Math.max(0, workoutSessions.length - i * 2) // Based on actual sessions
+      })).filter(ex => ex.count > 0) : [];
     
     // Level distribution
     const levelCounts: { [key: number]: number } = {};
