@@ -22,21 +22,21 @@
 :root {
   /* Dark Gaming Theme */
   --background: hsl(222.2, 84%, 4.9%); /* Deep slate background */
-  --foreground: hsl(213, 31%, 91%); /* Blue-ish white text */
+  --foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white text */
   --muted: hsl(217.2, 32.6%, 17.5%); /* Dark slate muted background */
-  --muted-foreground: hsl(215, 20.2%, 65.1%); /* Light gray text */
+  --muted-foreground: hsl(205, 100%, 75%); /* Brighter blue-tinted muted text */
   --popover: hsl(222.2, 84%, 4.9%);
   --popover-foreground: hsl(213, 31%, 91%);
   --card: hsl(222.2, 84%, 4.9%); /* Dark slate cards */
-  --card-foreground: hsl(213, 31%, 91%); /* Blue-ish white text on cards */
+  --card-foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white text on cards */
   --border: hsl(217.2, 32.6%, 17.5%); /* Dark slate borders */
   --input: hsl(220, 50%, 8%); /* Much darker inputs for better text visibility */
   --primary: hsl(210, 40%, 60%); /* Bright blue */
   --primary-foreground: hsl(222.2, 84%, 4.9%); /* Dark text on blue */
   --secondary: hsl(217.2, 32.6%, 17.5%); /* Dark slate secondary */
-  --secondary-foreground: hsl(213, 31%, 91%); /* Blue-ish white secondary text */
+  --secondary-foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white secondary text */
   --accent: hsl(217.2, 32.6%, 17.5%); /* Dark slate accent */
-  --accent-foreground: hsl(213, 31%, 91%); /* Blue-ish white accent text */
+  --accent-foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white accent text */
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(213, 31%, 91%);
   --ring: hsl(210, 40%, 60%); /* Blue focus rings */
@@ -123,6 +123,45 @@
   
   [data-radix-select-item]:hover {
     background-color: hsl(220, 50%, 12%) !important;
+  }
+  
+  /* Apply glowing effect to all main text elements */
+  .text-foreground,
+  [class*="text-foreground"],
+  h1, h2, h3, h4, h5, h6 {
+    color: hsl(205, 100%, 90%) !important;
+    text-shadow: 0 0 8px rgba(173, 216, 255, 0.4), 0 0 16px rgba(173, 216, 255, 0.2) !important;
+  }
+  
+  /* Card titles and important text with stronger glow */
+  [data-testid="card-title"],
+  .card-title,
+  .font-bold {
+    text-shadow: 0 0 10px rgba(173, 216, 255, 0.6), 0 0 20px rgba(173, 216, 255, 0.3) !important;
+  }
+  
+  /* Player names and usernames */
+  .player-name,
+  .username,
+  .text-lg.font-bold,
+  .text-xl.font-bold {
+    color: hsl(205, 100%, 92%) !important;
+    text-shadow: 0 0 12px rgba(173, 216, 255, 0.7), 0 0 24px rgba(173, 216, 255, 0.4) !important;
+  }
+  
+  /* Muted text with blue tint */
+  .text-muted-foreground,
+  [class*="text-muted-foreground"] {
+    color: hsl(205, 100%, 75%) !important;
+    text-shadow: 0 0 6px rgba(173, 216, 255, 0.3) !important;
+  }
+  
+  /* Card content text */
+  .card-content p,
+  .card-content span,
+  [data-testid="card-content"] {
+    color: hsl(205, 100%, 88%) !important;
+    text-shadow: 0 0 6px rgba(173, 216, 255, 0.3) !important;
   }
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
