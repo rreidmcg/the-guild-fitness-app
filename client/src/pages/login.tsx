@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { Eye, EyeOff } from "lucide-react";
 import ForgotPasswordForm from "@/components/forgot-password-form";
+import logoImage from "@assets/1208A981-BCE0-47F4-9A78-AD830AA0432A_1753818737424.png";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -91,7 +92,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      {/* Logo */}
+      <div className="mb-8">
+        <img 
+          src={logoImage} 
+          alt="The Guild: Gamified Fitness"
+          className="w-80 h-auto max-w-full"
+        />
+      </div>
+      
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
