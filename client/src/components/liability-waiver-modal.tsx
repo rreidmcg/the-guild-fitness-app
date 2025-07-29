@@ -46,16 +46,19 @@ export function LiabilityWaiverModal({
         .catch(() => 'unknown');
 
       // Submit liability waiver acceptance
-      await apiRequest("POST", "/api/accept-liability-waiver", {
-        fullName: userName,
-        email: userEmail,
-        ipAddress,
-        userAgent: navigator.userAgent,
+      await apiRequest("/api/accept-liability-waiver", {
+        method: "POST",
+        body: JSON.stringify({
+          fullName: userName,
+          email: userEmail,
+          ipAddress,
+          userAgent: navigator.userAgent,
+        }),
       });
 
       toast({
         title: "Waiver Accepted",
-        description: "Thank you for completing the liability waiver. Welcome to Dumbbells & Dragons!",
+        description: "Thank you for completing the liability waiver. Welcome to The Guild: Gamified Fitness!",
       });
 
       onAccept();
@@ -80,7 +83,7 @@ export function LiabilityWaiverModal({
             LIABILITY WAIVER AND RELEASE
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Please read this document carefully before using Dumbbells & Dragons
+            Please read this document carefully before using The Guild: Gamified Fitness
           </DialogDescription>
         </DialogHeader>
 
@@ -96,7 +99,7 @@ export function LiabilityWaiverModal({
                   </h3>
                   <p className="text-red-700 dark:text-red-300 mb-3">
                     <strong>CONSULT YOUR PHYSICIAN:</strong> Before beginning any exercise program, 
-                    including the use of Dumbbells & Dragons, you should consult with your physician 
+                    including the use of The Guild: Gamified Fitness, you should consult with your physician 
                     or healthcare provider. This is especially important if you:
                   </p>
                   <ul className="list-disc list-inside text-red-700 dark:text-red-300 space-y-1 ml-4">
@@ -126,7 +129,7 @@ export function LiabilityWaiverModal({
                     ENTERTAINMENT PURPOSES ONLY
                   </h3>
                   <p className="text-yellow-700 dark:text-yellow-300">
-                    Dumbbells & Dragons is designed for <strong>entertainment purposes only</strong>. 
+                    The Guild: Gamified Fitness is designed for <strong>entertainment purposes only</strong>. 
                     This application is not intended to diagnose, treat, cure, or prevent any medical 
                     condition or disease. The RPG elements, character progression, and gamification 
                     features are for motivational and entertainment value only and do not constitute 
@@ -141,7 +144,7 @@ export function LiabilityWaiverModal({
               <h3 className="font-semibold text-lg">ASSUMPTION OF RISK AND RELEASE OF LIABILITY</h3>
               
               <p>
-                By using Dumbbells & Dragons (the "App"), I acknowledge and agree to the following:
+                By using The Guild: Gamified Fitness (the "App"), I acknowledge and agree to the following:
               </p>
 
               <div className="space-y-3">

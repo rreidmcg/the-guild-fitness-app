@@ -63,7 +63,7 @@ export default function LoginPage() {
       
       toast({
         title: "Login successful!",
-        description: "Welcome back to Dumbbells & Dragons!",
+        description: "Welcome back to The Guild: Gamified Fitness!",
       });
       setLocation("/");
     },
@@ -101,7 +101,7 @@ export default function LoginPage() {
               Welcome Back
             </CardTitle>
             <CardDescription className="text-gray-300">
-              Sign in to your Dumbbells & Dragons account
+              Sign in to your The Guild: Gamified Fitness account
             </CardDescription>
           </CardHeader>
           <CardContent>

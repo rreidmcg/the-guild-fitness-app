@@ -106,7 +106,7 @@ export default function SignupPage() {
     
     toast({
       title: "Account created successfully!",
-      description: "Welcome to Dumbbells & Dragons! Your liability waiver has been accepted.",
+      description: "Welcome to The Guild: Gamified Fitness! Your liability waiver has been accepted.",
     });
     setLocation("/");
   };
@@ -153,7 +153,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-md bg-card border-border">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-foreground">
-            Join Dumbbells & Dragons
+            Join The Guild: Gamified Fitness
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             {step === 1 ? "Create your account" : "Complete your profile"}

@@ -173,6 +173,26 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 29, 2025 - Deployment Preparation & App Branding Fixes:**
+- **Complete App Branding Update**: Fixed all remaining references to old "Dumbbells & Dragons" name
+  - Updated signup page title and success messages to "The Guild: Gamified Fitness"
+  - Fixed all liability waiver modal references and legal documentation
+  - Updated login page branding and welcome messages
+  - Corrected medical disclaimer text to reference proper app name
+- **Liability Waiver Submission Fix**: Resolved waiver acceptance issues preventing account creation
+  - Fixed API request format to use proper JSON body structure
+  - Corrected apiRequest function call to match expected parameters
+  - Waiver submission now works correctly for new user registration
+- **Dropdown UI Improvements**: Enhanced select component styling for better visibility
+  - Added explicit text-foreground class to SelectItem components
+  - Improved hover states and contrast for dropdown menu items
+  - Fixed dark text visibility issues across all dropdown menus
+- **Analytics & User Data Reset**: Complete reset for deployment preparation
+  - Reset Zero's character stats to Level 1 with 0 XP and base stats
+  - Removed test user data, keeping only Rob (admin) and Zero (test user)
+  - Reset all analytics data to show 0 revenue, workouts, and engagement metrics
+  - Updated user creation timestamps for fresh analytics tracking from deployment
+
 **January 28, 2025 - Boss-Themed Title System & Avatar Border Separation:**
 - **Updated Title System with Boss Names**: Replaced generic "Conqueror" titles with boss-themed progression titles
   - E-rank: "Goblin Slayer" (defeat Goblin King, Lv 1-10)
