@@ -186,8 +186,9 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 - **Unified Rustic Background Theme**: Applied consistent warm rustic styling across all pages
   - All pages now inherit the same gradient background (amber to orange to yellow)
   - Floating orbs with blur effects positioned throughout the app for atmospheric depth
-  - Paper-like texture pattern and rustic dotted elements applied globally
-  - Maintained fixed background attachment for consistent visual experience
+  - Fixed background consistency issues where individual pages were showing white backgrounds
+  - Updated stats, workouts, battle, shop, and leaderboard pages to use proper rustic theme
+  - Maintained proper z-index layering for floating orbs and main content
 - **Enhanced Visual Consistency**: Ensured all interface elements match login page styling
   - Warm amber color palette with professional blue accents maintained throughout
   - Dark text on light backgrounds for optimal readability
