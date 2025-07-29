@@ -92,29 +92,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-amber-300/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute bottom-32 right-20 w-40 h-40 bg-orange-300/15 rounded-full blur-xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-yellow-300/20 rounded-full blur-lg"></div>
-        <div className="absolute top-1/3 right-1/4 w-28 h-28 bg-amber-400/10 rounded-full blur-xl"></div>
-        {/* Rustic texture pattern */}
-        <div 
-          className="absolute inset-0 opacity-20" 
-          style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(139, 69, 19, 0.1) 1px, transparent 0)',
-            backgroundSize: '30px 30px'
-          }}
-        ></div>
-        {/* Paper-like texture */}
-        <div 
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d2691e' fill-opacity='0.03'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3Ccircle cx='53' cy='13' r='1'/%3E%3Ccircle cx='23' cy='31' r='1'/%3E%3Ccircle cx='41' cy='47' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        ></div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Logo */}
       <div className="mb-8 relative z-10">
         <img 
@@ -127,7 +105,7 @@ export default function LoginPage() {
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
-        <Card className="w-full max-w-md bg-white/80 border-amber-200 relative z-10 shadow-2xl backdrop-blur-md">
+        <Card className="w-full max-w-md bg-slate-800/90 border-slate-600 relative z-10 shadow-2xl backdrop-blur-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-foreground">
               Welcome Back
