@@ -30,7 +30,7 @@
   --card: hsl(222.2, 84%, 4.9%); /* Dark slate cards */
   --card-foreground: hsl(213, 31%, 91%); /* Blue-ish white text on cards */
   --border: hsl(217.2, 32.6%, 17.5%); /* Dark slate borders */
-  --input: hsl(217.2, 32.6%, 17.5%); /* Dark slate inputs */
+  --input: hsl(220, 50%, 8%); /* Much darker inputs for better text visibility */
   --primary: hsl(210, 40%, 60%); /* Bright blue */
   --primary-foreground: hsl(222.2, 84%, 4.9%); /* Dark text on blue */
   --secondary: hsl(217.2, 32.6%, 17.5%); /* Dark slate secondary */
@@ -80,6 +80,49 @@
   
   .text-bright-blue {
     color: hsl(205, 100%, 85%);
+  }
+  
+  /* Dark input field styling for better text visibility */
+  input[type="text"], 
+  input[type="email"], 
+  input[type="password"], 
+  input[type="number"],
+  textarea,
+  select {
+    background-color: hsl(220, 50%, 8%) !important;
+    border: 1px solid hsl(217.2, 32.6%, 25%) !important;
+    color: hsl(205, 100%, 90%) !important;
+  }
+  
+  input[type="text"]:focus, 
+  input[type="email"]:focus, 
+  input[type="password"]:focus, 
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    background-color: hsl(220, 50%, 10%) !important;
+    border-color: hsl(210, 40%, 60%) !important;
+    box-shadow: 0 0 0 1px hsl(210, 40%, 60%) !important;
+  }
+  
+  /* Placeholder text styling */
+  input::placeholder,
+  textarea::placeholder {
+    color: hsl(217, 20%, 45%) !important;
+  }
+  
+  /* Select dropdown styling */
+  [data-radix-select-content] {
+    background-color: hsl(220, 50%, 8%) !important;
+    border: 1px solid hsl(217.2, 32.6%, 25%) !important;
+  }
+  
+  [data-radix-select-item] {
+    color: hsl(205, 100%, 90%) !important;
+  }
+  
+  [data-radix-select-item]:hover {
+    background-color: hsl(220, 50%, 12%) !important;
   }
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
