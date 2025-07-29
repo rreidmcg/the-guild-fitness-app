@@ -278,12 +278,12 @@ export default function Shop() {
         <CardHeader className="text-center">
           <div className="text-4xl mb-2">🔥</div>
           <CardTitle className="flex items-center justify-center space-x-2">
-            <span className="text-orange-400">Founders Pack</span>
-            <Crown className="w-5 h-5 text-yellow-500" />
+            <span className="text-orange-800">Founders Pack</span>
+            <Crown className="w-5 h-5 text-yellow-700" />
           </CardTitle>
           <div className="text-center">
-            <div className="text-2xl font-bold text-orange-400">$29.97</div>
-            <div className="text-sm text-orange-300">
+            <div className="text-2xl font-bold text-orange-800">$29.97</div>
+            <div className="text-sm text-orange-700">
               Limited: {foundersStatus?.claimsRemaining || 0} remaining
             </div>
           </div>
@@ -748,8 +748,8 @@ export default function Shop() {
                 <div>
                   <div className="text-center mb-6">
                     <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
-                      <Flame className="w-6 h-6 text-orange-500" />
-                      <span className="text-orange-400">Limited Time - Founders Pack</span>
+                      <Flame className="w-6 h-6 text-orange-700" />
+                      <span className="text-orange-800">Limited Time - Founders Pack</span>
                     </h2>
                     <p className="text-muted-foreground">Exclusive pack for the first 100 users!</p>
                   </div>
