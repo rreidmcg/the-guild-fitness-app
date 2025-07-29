@@ -22,23 +22,23 @@
 :root {
   /* Dark Gaming Theme */
   --background: hsl(222.2, 84%, 4.9%); /* Deep slate background */
-  --foreground: hsl(210, 40%, 98%); /* Bright white text */
+  --foreground: hsl(213, 31%, 91%); /* Blue-ish white text */
   --muted: hsl(217.2, 32.6%, 17.5%); /* Dark slate muted background */
   --muted-foreground: hsl(215, 20.2%, 65.1%); /* Light gray text */
   --popover: hsl(222.2, 84%, 4.9%);
-  --popover-foreground: hsl(210, 40%, 98%);
+  --popover-foreground: hsl(213, 31%, 91%);
   --card: hsl(222.2, 84%, 4.9%); /* Dark slate cards */
-  --card-foreground: hsl(210, 40%, 98%); /* Bright white text on cards */
+  --card-foreground: hsl(213, 31%, 91%); /* Blue-ish white text on cards */
   --border: hsl(217.2, 32.6%, 17.5%); /* Dark slate borders */
   --input: hsl(217.2, 32.6%, 17.5%); /* Dark slate inputs */
   --primary: hsl(210, 40%, 60%); /* Bright blue */
   --primary-foreground: hsl(222.2, 84%, 4.9%); /* Dark text on blue */
   --secondary: hsl(217.2, 32.6%, 17.5%); /* Dark slate secondary */
-  --secondary-foreground: hsl(210, 40%, 98%); /* White secondary text */
+  --secondary-foreground: hsl(213, 31%, 91%); /* Blue-ish white secondary text */
   --accent: hsl(217.2, 32.6%, 17.5%); /* Dark slate accent */
-  --accent-foreground: hsl(210, 40%, 98%); /* White accent text */
+  --accent-foreground: hsl(213, 31%, 91%); /* Blue-ish white accent text */
   --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(210, 40%, 98%);
+  --destructive-foreground: hsl(213, 31%, 91%);
   --ring: hsl(210, 40%, 60%); /* Blue focus rings */
   --radius: 0.5rem;
   
@@ -62,7 +62,7 @@
     @apply font-sans antialiased text-foreground;
     background: linear-gradient(135deg, hsl(222.2, 84%, 4.9%) 0%, hsl(217.2, 32.6%, 17.5%) 50%, hsl(215, 20.2%, 25%) 100%) !important;
     background-attachment: fixed !important;
-    color: hsl(210, 40%, 98%) !important; /* Bright white text */
+    color: hsl(213, 31%, 91%) !important; /* Blue-ish white text */
     font-weight: 400;
     line-height: 1.5;
     position: relative;
