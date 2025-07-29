@@ -96,20 +96,6 @@ export default function Stats() {
     },
   });
 
-  const clearWardrobeNotificationMutation = useMutation({
-    mutationFn: async () => {
-      return apiRequest("/api/user/clear-wardrobe-notification", {
-        method: "POST"
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-    },
-    onError: (error: any) => {
-      console.error("Failed to clear wardrobe notification:", error);
-    }
-  });
-
   // Streak freeze mutation removed - now handled automatically at midnight
 
   const recentSessions = Array.isArray(workoutSessions) ? workoutSessions.slice(0, 3) : [];
@@ -160,11 +146,11 @@ export default function Stats() {
 
   if (userStatsLoading || workoutSessionsLoading || personalRecordsLoading || inventoryLoading || achievementsLoading || userAchievementsLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pb-20">
+      <div className="min-h-screen bg-background text-foreground pb-20">
         <div className="max-w-4xl mx-auto p-6 flex items-center justify-center">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-300">Loading your stats...</p>
+            <p className="text-muted-foreground">Loading your stats...</p>
           </div>
         </div>
       </div>
@@ -172,17 +158,14 @@ export default function Stats() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative pb-20">
-      
-      {/* Main Content with higher z-index */}
-      <div className="relative" style={{ zIndex: 10 }}>
+    <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-4">
+      <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-glow-blue">Character Stats</h1>
-              <p className="mt-0.5 text-sm text-bright-blue">Your fitness progression journey</p>
+              <h1 className="text-2xl font-bold text-foreground">Character Stats</h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
             </div>
             <div className="flex items-center space-x-3">
               {/* Calculator button hidden per user request */}
@@ -193,23 +176,18 @@ export default function Stats() {
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Atrophy Warning */}
-        {userStats && <AtrophyWarning />}
+        <AtrophyWarning />
         {/* Character Profile */}
-        <Card className="bg-slate-800/90 border-slate-600 relative">
+        <Card className="bg-card border-border relative">
           {/* Wardrobe Button in Corner */}
-          <div className="absolute top-4 right-4 z-10">
-            <Button
-              size="sm"
-              onClick={() => setShowWardrobe(true)}
-              className="bg-purple-600 text-white hover:bg-purple-700 p-2 relative"
-              title="Open Wardrobe"
-            >
-              <Shirt className="w-4 h-4" />
-              {safeUserStats.hasUnseenWardrobeChanges && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-background animate-pulse"></div>
-              )}
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            onClick={() => setShowWardrobe(true)}
+            className="absolute top-4 right-4 bg-purple-600 text-white hover:bg-purple-700 p-2 z-10"
+            title="Open Wardrobe"
+          >
+            <Shirt className="w-4 h-4" />
+          </Button>
           
           <CardContent className="pt-6">
             {/* Character Info Above Avatar */}
@@ -280,7 +258,7 @@ export default function Stats() {
                   <Heart className="w-5 h-5 text-red-400" />
                   <span className="font-semibold text-red-400">Health</span>
                 </div>
-                <span className="text-sm text-red-600 font-semibold">
+                <span className="text-sm text-red-300">
                   {safeUserStats.currentHp || 0} / {safeUserStats.maxHp || 40}
                 </span>
               </div>
@@ -292,7 +270,7 @@ export default function Stats() {
                   }}
                 />
               </div>
-              <div className="text-xs text-red-500 mt-2">
+              <div className="text-xs text-red-300 mt-2 opacity-80">
                 Regenerates 1% of max HP per minute when not in combat
               </div>
               
@@ -312,12 +290,10 @@ export default function Stats() {
                     <Button
                       key={potionType}
                       size="sm"
+                      variant="outline"
                       onClick={() => usePotionMutation.mutate(potionType)}
                       disabled={usePotionMutation.isPending}
-                      className={`text-xs ${potionType === 'minor_healing' 
-                        ? 'bg-red-600 text-white hover:bg-red-700 border-red-600' 
-                        : 'border-red-500 text-red-600 hover:bg-red-50'} transition-colors`}
-                      variant={potionType === 'minor_healing' ? 'default' : 'outline'}
+                      className="text-xs border-red-500 text-red-300 hover:bg-red-900/30"
                     >
                       <Heart className="w-3 h-3 mr-1" />
                       {potionNames[potionType as keyof typeof potionNames]} ({quantity})
@@ -337,7 +313,7 @@ export default function Stats() {
                   <Sparkle className="w-5 h-5 text-blue-400" />
                   <span className="font-semibold text-blue-400">Magic Points</span>
                 </div>
-                <span className="text-sm text-blue-600 font-semibold">
+                <span className="text-sm text-blue-300">
                   {safeUserStats.currentMp || 0} / {safeUserStats.maxMp || 20}
                 </span>
               </div>
@@ -349,7 +325,7 @@ export default function Stats() {
                   }}
                 />
               </div>
-              <div className="text-xs text-blue-500 mt-2">
+              <div className="text-xs text-blue-300 mt-2 opacity-80">
                 Regenerates 4% per minute when not in combat
               </div>
               
@@ -442,7 +418,7 @@ export default function Stats() {
         )}
 
         {/* Personal Records */}
-        <Card className="bg-slate-800/90 border-slate-600">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
@@ -458,7 +434,7 @@ export default function Stats() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {topRecords.map((record) => (
-                  <Card key={record.id} className="bg-slate-700/50 border-slate-600">
+                  <Card key={record.id} className="bg-secondary border-border">
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-3 mb-2">
                         <Trophy className="w-4 h-4 text-yellow-500" />
@@ -483,16 +459,9 @@ export default function Stats() {
       {/* Wardrobe Modal */}
       <WardrobeModal 
         isOpen={showWardrobe}
-        onClose={() => {
-          setShowWardrobe(false);
-          // Clear the notification when wardrobe is viewed
-          if (safeUserStats.hasUnseenWardrobeChanges) {
-            clearWardrobeNotificationMutation.mutate();
-          }
-        }}
+        onClose={() => setShowWardrobe(false)}
         user={safeUserStats}
       />
-      </div>
     </div>
   );
 }

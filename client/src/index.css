@@ -20,35 +20,35 @@
 }
 
 :root {
-  /* Dark Gaming Theme */
-  --background: hsl(222.2, 84%, 4.9%); /* Deep slate background */
-  --foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white text */
-  --muted: hsl(217.2, 32.6%, 17.5%); /* Dark slate muted background */
-  --muted-foreground: hsl(205, 100%, 75%); /* Brighter blue-tinted muted text */
-  --popover: hsl(222.2, 84%, 4.9%);
-  --popover-foreground: hsl(213, 31%, 91%);
-  --card: hsl(222.2, 84%, 4.9%); /* Dark slate cards */
-  --card-foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white text on cards */
-  --border: hsl(217.2, 32.6%, 17.5%); /* Dark slate borders */
-  --input: hsl(220, 50%, 8%); /* Much darker inputs for better text visibility */
-  --primary: hsl(210, 40%, 60%); /* Bright blue */
-  --primary-foreground: hsl(222.2, 84%, 4.9%); /* Dark text on blue */
-  --secondary: hsl(217.2, 32.6%, 17.5%); /* Dark slate secondary */
-  --secondary-foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white secondary text */
-  --accent: hsl(217.2, 32.6%, 17.5%); /* Dark slate accent */
-  --accent-foreground: hsl(205, 100%, 90%); /* Brighter blue-ish white accent text */
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(213, 31%, 91%);
-  --ring: hsl(210, 40%, 60%); /* Blue focus rings */
+  /* Bright Gaming Theme with Glowing Text */
+  --background: hsl(215, 28%, 8%);  /* Dark slate background */
+  --foreground: hsl(197, 100%, 90%); /* Bright blue-white text */
+  --muted: hsl(215, 20%, 12%); /* Slightly lighter background */
+  --muted-foreground: hsl(197, 80%, 75%); /* Bright muted blue text */
+  --popover: hsl(215, 25%, 10%);
+  --popover-foreground: hsl(197, 100%, 90%);
+  --card: hsl(215, 25%, 12%); /* Dark slate for cards */
+  --card-foreground: hsl(197, 100%, 90%); /* Bright blue-white text */
+  --border: hsl(215, 20%, 20%); /* Subtle borders */
+  --input: hsl(215, 20%, 15%); /* Dark inputs */
+  --primary: hsl(197, 100%, 60%); /* Bright cyan for primary elements */
+  --primary-foreground: hsl(215, 28%, 8%); /* Dark text on bright blue */
+  --secondary: hsl(215, 20%, 16%); /* Dark secondary background */
+  --secondary-foreground: hsl(197, 100%, 85%); /* Bright blue text */
+  --accent: hsl(197, 100%, 60%); /* Bright cyan accent */
+  --accent-foreground: hsl(215, 28%, 8%); /* Dark text on accent */
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(197, 100%, 60%); /* Bright cyan focus rings */
   --radius: 0.5rem;
   
-  /* Gaming theme colors for dark theme */
-  --game-primary: hsl(210, 40%, 60%); /* Bright blue */
-  --game-secondary: hsl(217.2, 32.6%, 17.5%); /* Dark slate */
-  --game-success: hsl(142, 71%, 45%); /* Green */
-  --game-warning: hsl(38, 92%, 50%); /* Yellow */
-  --game-dark: hsl(222.2, 84%, 4.9%); /* Deep slate */
-  --game-slate: hsl(217.2, 32.6%, 17.5%); /* Dark slate card background */
+  /* Bright gaming theme colors */
+  --game-primary: hsl(197, 100%, 60%); /* Bright cyan */
+  --game-secondary: hsl(215, 20%, 16%); /* Dark secondary */
+  --game-success: hsl(142, 71%, 55%);
+  --game-warning: hsl(38, 92%, 60%);
+  --game-dark: hsl(215, 28%, 8%); /* Dark slate */
+  --game-slate: hsl(215, 25%, 12%); /* Card background */
 }
 
 
@@ -59,160 +59,16 @@
   }
 
   body {
-    @apply font-sans antialiased;
-    background: linear-gradient(135deg, hsl(222.2, 84%, 4.9%) 0%, hsl(217.2, 32.6%, 17.5%) 50%, hsl(215, 20.2%, 25%) 100%) !important;
-    background-attachment: fixed !important;
-    color: hsl(205, 100%, 90%) !important; /* Bright blue-ish white text */
+    @apply font-sans antialiased bg-background text-foreground;
+    background-color: hsl(215, 28%, 8%) !important; /* Dark slate background */
+    color: hsl(197, 100%, 90%); /* Bright blue-white text */
     font-weight: 400;
     line-height: 1.5;
-    position: relative;
-    min-height: 100vh;
-    text-shadow: 0 0 8px rgba(173, 216, 255, 0.4) !important;
+    text-shadow: 0 0 10px rgba(107, 185, 230, 0.3); /* Subtle glow effect */
   }
-  
-
 }
 
 @layer components {
-  .text-glow-blue {
-    color: hsl(205, 100%, 90%);
-    text-shadow: 0 0 10px rgba(173, 216, 255, 0.6), 0 0 20px rgba(173, 216, 255, 0.4), 0 0 30px rgba(173, 216, 255, 0.2);
-  }
-  
-  .text-bright-blue {
-    color: hsl(205, 100%, 85%);
-  }
-  
-  /* Dark input field styling for better text visibility */
-  input[type="text"], 
-  input[type="email"], 
-  input[type="password"], 
-  input[type="number"],
-  textarea,
-  select {
-    background-color: hsl(220, 50%, 8%) !important;
-    border: 1px solid hsl(217.2, 32.6%, 25%) !important;
-    color: hsl(205, 100%, 90%) !important;
-  }
-  
-  input[type="text"]:focus, 
-  input[type="email"]:focus, 
-  input[type="password"]:focus, 
-  input[type="number"]:focus,
-  textarea:focus,
-  select:focus {
-    background-color: hsl(220, 50%, 10%) !important;
-    border-color: hsl(210, 40%, 60%) !important;
-    box-shadow: 0 0 0 1px hsl(210, 40%, 60%) !important;
-  }
-  
-  /* Placeholder text styling */
-  input::placeholder,
-  textarea::placeholder {
-    color: hsl(217, 20%, 45%) !important;
-  }
-  
-  /* Select dropdown styling */
-  [data-radix-select-content] {
-    background-color: hsl(220, 50%, 8%) !important;
-    border: 1px solid hsl(217.2, 32.6%, 25%) !important;
-  }
-  
-  [data-radix-select-item] {
-    color: hsl(205, 100%, 90%) !important;
-  }
-  
-  [data-radix-select-item]:hover {
-    background-color: hsl(220, 50%, 12%) !important;
-  }
-  
-  /* Apply glowing effect to all main text elements - more specific selectors */
-  .text-foreground,
-  [class*="text-foreground"],
-  h1, h2, h3, h4, h5, h6,
-  div h1, div h2, div h3, div h4, div h5, div h6,
-  span, p, div {
-    color: hsl(205, 100%, 90%) !important;
-    text-shadow: 0 0 8px rgba(173, 216, 255, 0.4), 0 0 16px rgba(173, 216, 255, 0.2) !important;
-  }
-  
-  /* Card titles and important text with stronger glow */
-  [data-testid="card-title"],
-  .card-title,
-  .font-bold,
-  .text-2xl,
-  .text-3xl,
-  .text-xl {
-    color: hsl(205, 100%, 92%) !important;
-    text-shadow: 0 0 10px rgba(173, 216, 255, 0.6), 0 0 20px rgba(173, 216, 255, 0.3) !important;
-  }
-  
-  /* Player names and usernames */
-  .player-name,
-  .username,
-  .text-lg.font-bold,
-  .text-xl.font-bold {
-    color: hsl(205, 100%, 92%) !important;
-    text-shadow: 0 0 12px rgba(173, 216, 255, 0.7), 0 0 24px rgba(173, 216, 255, 0.4) !important;
-  }
-  
-  /* Muted text with blue tint */
-  .text-muted-foreground,
-  [class*="text-muted-foreground"] {
-    color: hsl(205, 100%, 75%) !important;
-    text-shadow: 0 0 6px rgba(173, 216, 255, 0.3) !important;
-  }
-  
-  /* Card content text */
-  .card-content p,
-  .card-content span,
-  [data-testid="card-content"] {
-    color: hsl(205, 100%, 88%) !important;
-    text-shadow: 0 0 6px rgba(173, 216, 255, 0.3) !important;
-  }
-  
-  /* Universal text color override - highest priority */
-  * {
-    color: hsl(205, 100%, 90%) !important;
-  }
-  
-  /* Specific overrides for headings and titles */
-  h1, h2, h3, h4, h5, h6,
-  .text-2xl, .text-3xl, .text-xl, .text-lg,
-  [class*="font-bold"],
-  [class*="text-2xl"],
-  [class*="text-3xl"] {
-    color: hsl(205, 100%, 92%) !important;
-    text-shadow: 0 0 12px rgba(173, 216, 255, 0.7), 0 0 24px rgba(173, 216, 255, 0.4) !important;
-  }
-  
-  /* Override any Tailwind black text classes */
-  .text-black,
-  [class*="text-black"],
-  .text-gray-900,
-  [class*="text-gray-900"] {
-    color: hsl(205, 100%, 90%) !important;
-    text-shadow: 0 0 8px rgba(173, 216, 255, 0.4) !important;
-  }
-  
-  /* Fix white gap between currency header and page content */
-  body, html {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: linear-gradient(135deg, hsl(222.2, 84%, 4.9%) 0%, hsl(217.2, 32.6%, 17.5%) 50%, hsl(215, 20.2%, 25%) 100%) !important;
-  }
-  
-  /* Remove white gaps in page layout */
-  .min-h-screen {
-    margin: 0 !important;
-    padding-top: 64px !important; /* Space for currency header */
-  }
-  
-  /* Connect page headers seamlessly to currency header */
-  .bg-slate-800\/90 {
-    margin-top: -64px !important; /* Pull up to touch currency header */
-    padding-top: 64px !important; /* Account for pulled up margin */
-  }
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
   }
@@ -222,7 +78,7 @@
   }
   
   .avatar-container {
-    background: radial-gradient(circle at center, var(--game-slate) 0%, var(--muted) 70%);
+    background: radial-gradient(circle at center, var(--game-slate) 0%, var(--game-dark) 70%);
   }
   
   .card-glow:hover {
@@ -253,115 +109,83 @@
     background: transparent;
   }
   
-  /* Fix toast and modal text visibility for dark theme */
-  [data-sonner-toast],
-  .sonner-toast,
-  [role="dialog"],
-  [role="alertdialog"] {
-    background-color: hsl(222.2, 84%, 4.9%) !important;
-    color: hsl(210, 40%, 98%) !important;
-    border: 1px solid hsl(217.2, 32.6%, 17.5%) !important;
-  }
-  
-  [data-sonner-toast] [data-title],
-  [data-sonner-toast] [data-description],
-  .sonner-toast .toast-title,
-  .sonner-toast .toast-description,
-  [role="dialog"] [data-radix-dialog-title],
-  [role="dialog"] [data-radix-dialog-description],
-  [role="alertdialog"] [data-radix-alert-dialog-title],
-  [role="alertdialog"] [data-radix-alert-dialog-description] {
-    color: hsl(210, 40%, 98%) !important;
+  .bottom-nav-solid {
+    background-color: hsl(215, 25%, 12%) !important; /* Professional dark nav */
+    border-top: 1px solid hsl(215, 20%, 20%) !important; /* Subtle border */
+    opacity: 1 !important;
+    backdrop-filter: none !important;
   }
 
-  /* Ensure dropdown menus have correct dark theme colors */
-  [data-radix-select-content],
-  [data-radix-dropdown-menu-content],
-  [data-radix-popover-content] {
-    background-color: hsl(222.2, 84%, 4.9%) !important;
-    color: hsl(210, 40%, 98%) !important;
-    border: 1px solid hsl(217.2, 32.6%, 17.5%) !important;
-  }
-
-  [data-radix-select-item],
-  [data-radix-dropdown-menu-item] {
-    color: hsl(210, 40%, 98%) !important;
-  }
-
-  [data-radix-select-item]:hover,
-  [data-radix-dropdown-menu-item]:hover {
-    background-color: hsl(217.2, 32.6%, 17.5%) !important;
-    color: hsl(210, 40%, 98%) !important;
-  }
-  
-  /* Ensure all toast variants have dark text */
-  .toast-success,
-  .toast-error,
-  .toast-info,
-  .toast-warning {
-    color: hsl(240, 10%, 3.9%) !important;
-  }
-
-  /* Light theme containers */
+  /* Professional dark theme containers */
   .bg-card,
   [class*="bg-card"] {
-    background-color: hsl(0, 0%, 100%) !important;
-    border-color: hsl(240, 5.9%, 90%) !important;
+    background-color: hsl(215, 25%, 12%) !important;
+    border-color: hsl(215, 20%, 20%) !important;
   }
   
   .bg-secondary,
   [class*="bg-secondary"] {
-    background-color: hsl(240, 4.8%, 95.9%) !important;
+    background-color: hsl(215, 20%, 16%) !important;
   }
   
   .bg-muted,
   [class*="bg-muted"] {
-    background-color: hsl(240, 4.8%, 95.9%) !important;
+    background-color: hsl(215, 20%, 12%) !important;
   }
   
   .bg-background,
   [class*="bg-background"] {
-    background-color: hsl(0, 0%, 100%) !important;
+    background-color: hsl(215, 28%, 8%) !important;
   }
 
-  /* Light theme card styling */
+  /* Professional card styling */
   .card,
   [data-radix-collection-item],
   [role="tabpanel"] {
-    background-color: hsl(0, 0%, 100%) !important;
-    border-color: hsl(240, 5.9%, 90%) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: hsl(215, 25%, 12%) !important;
+    border-color: hsl(215, 20%, 20%) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
-  /* Clean text styling */
+  /* Enhanced glowing text */
   h1, h2, h3, h4, h5, h6 {
-    color: hsl(240, 10%, 3.9%) !important;
+    color: hsl(197, 100%, 92%) !important;
     font-weight: 600;
+    text-shadow: 0 0 15px rgba(107, 185, 230, 0.4);
   }
 
-  /* Clear text for primary content */
+  /* Glowing text for primary content */
   .text-foreground {
-    color: hsl(240, 10%, 3.9%) !important;
+    color: hsl(197, 100%, 90%) !important;
+    text-shadow: 0 0 8px rgba(107, 185, 230, 0.25);
   }
 
   .text-muted-foreground {
-    color: hsl(240, 3.8%, 46.1%) !important;
+    color: hsl(197, 80%, 75%) !important;
+    text-shadow: 0 0 6px rgba(107, 185, 230, 0.2);
   }
 
-  /* Button improvements */
+  /* Button improvements with glow */
   .btn-primary {
-    background-color: hsl(197, 100%, 45%);
-    border-color: hsl(197, 100%, 45%);
-    color: hsl(0, 0%, 98%);
+    background-color: hsl(197, 100%, 60%);
+    border-color: hsl(197, 100%, 60%);
+    color: hsl(215, 28%, 8%);
+    box-shadow: 0 0 15px rgba(107, 185, 230, 0.3);
   }
 
   .btn-primary:hover {
-    background-color: hsl(197, 100%, 40%);
-    border-color: hsl(197, 100%, 40%);
+    background-color: hsl(197, 100%, 55%);
+    border-color: hsl(197, 100%, 55%);
+    box-shadow: 0 0 20px rgba(107, 185, 230, 0.4);
   }
 
-  /* Clean card hover effect */
+  /* Glowing effect for interactive elements */
+  a, button {
+    text-shadow: 0 0 5px rgba(107, 185, 230, 0.2);
+  }
+
+  /* Enhanced card glow */
   .card-glow:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 30px rgba(107, 185, 230, 0.4);
   }
 }

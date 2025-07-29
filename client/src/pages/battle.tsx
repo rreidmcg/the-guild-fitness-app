@@ -27,8 +27,6 @@ import wildGoblinImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_175315
 import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753196270170.png";
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
-import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753825222475.png";
-import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753827749723.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 
 import { useBackgroundMusic } from "@/contexts/background-music-context";
@@ -128,7 +126,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 9, name: "Plague Rat", level: 2, maxHp: 16, currentHp: 16, attack: 4, goldReward: 3, description: "A sickly rat spreading corruption", image: caveRatImage },
       { id: 10, name: "Giant Rat", level: 3, maxHp: 18, currentHp: 18, attack: 4, goldReward: 3, description: "An oversized rodent with massive claws", image: caveRatImage },
       { id: 11, name: "War Rat", level: 3, maxHp: 20, currentHp: 20, attack: 5, goldReward: 4, description: "A battle-scarred rat veteran", image: caveRatImage },
-      { id: 12, name: "Rat Chieftain", level: 3, maxHp: 26, currentHp: 26, attack: 5, goldReward: 6, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack", image: ratChieftainImage }
+      { id: 12, name: "Rat Chieftain", level: 3, maxHp: 26, currentHp: 26, attack: 5, goldReward: 6, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack" }
     ]
   },
   {
@@ -161,22 +159,6 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 22, name: "Shadow Spider", level: 4, maxHp: 24, currentHp: 24, attack: 7, goldReward: 5, description: "A spider that strikes from the darkness", image: forestSpiderImage },
       { id: 23, name: "Warrior Spider", level: 5, maxHp: 26, currentHp: 26, attack: 8, goldReward: 6, description: "A heavily armored spider guardian", image: forestSpiderImage },
       { id: 24, name: "Broodmother", level: 5, maxHp: 32, currentHp: 32, attack: 8, goldReward: 8, description: "🏆 MINI-BOSS: An enormous spider surrounded by her countless offspring" }
-    ]
-  },
-  {
-    id: "slime_kingdom",
-    name: "The Slime Kingdom",
-    description: "A toxic swampland ruled by the legendary Slime King and his gelatinous subjects",
-    background: "#2d5016",
-    storyIntro: "You wade through bubbling toxic pools where acidic slimes emerge from the murky depths. The air is thick with noxious fumes as you approach the throne of the notorious Slime King...",
-    completionStory: "The Slime King's crown tumbles into the swamp as his gelatinous form dissolves. The toxic kingdom begins to purify, revealing hidden passages deeper underground.",
-    monsters: [
-      { id: 160, name: "Acid Blob", level: 4, maxHp: 22, currentHp: 22, attack: 6, goldReward: 4, description: "A corrosive mass that burns everything it touches" },
-      { id: 161, name: "Poison Slime", level: 4, maxHp: 24, currentHp: 24, attack: 6, goldReward: 5, description: "A venomous creature leaving toxic trails" },
-      { id: 162, name: "Bubble Slime", level: 5, maxHp: 26, currentHp: 26, attack: 7, goldReward: 5, description: "A bouncy slime that inflates and deflates unpredictably" },
-      { id: 163, name: "Royal Slime", level: 5, maxHp: 28, currentHp: 28, attack: 7, goldReward: 6, description: "An elite slime wearing a tiny crown" },
-      { id: 164, name: "Slime Guardian", level: 6, maxHp: 30, currentHp: 30, attack: 8, goldReward: 6, description: "A massive slime protecting the royal throne" },
-      { id: 165, name: "Slime King", level: 6, maxHp: 40, currentHp: 40, attack: 9, goldReward: 15, description: "🏆 MINI-BOSS: The crowned ruler of all slimes, dripping with toxic majesty", image: slimeKingImage }
     ]
   }
 ];
@@ -1067,17 +1049,16 @@ export default function Battle() {
   // Monster Selection View
   if (!battleState) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative pb-20">
+      <div className="min-h-screen bg-background text-foreground pb-20">
         
-        {/* Main Content with higher z-index */}
-        <div className="relative" style={{ zIndex: 10 }}>
+        
         {/* Header */}
-        <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-6">
+        <div className="bg-card border-b border-border px-4 py-6">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-glow-blue">Battle Arena</h1>
-                <p className="text-bright-blue mt-1">Choose your opponent and fight for gold coins</p>
+                <h1 className="text-3xl font-bold text-foreground">Battle Arena</h1>
+                <p className="text-muted-foreground mt-1">Choose your opponent and fight for gold coins</p>
               </div>
             </div>
           </div>
@@ -1135,9 +1116,9 @@ export default function Battle() {
                 onClick={() => setIsMonsterListOpen(!isMonsterListOpen)}
               >
                 <div className="flex items-center space-x-2">
-                  <Skull className="w-6 h-6 text-muted-foreground" />
+                  <Skull className="w-6 h-6 text-white !text-white" />
                   <span>E-rank Dungeons</span>
-                  <span className="text-xs bg-muted/20 text-muted-foreground px-2 py-1 rounded">COMMON</span>
+                  <span className="text-xs bg-white/20 text-white !text-white px-2 py-1 rounded">COMMON</span>
                   <span className="text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded">Lv 1-10</span>
                 </div>
                 {isMonsterListOpen ? (
@@ -1147,23 +1128,8 @@ export default function Battle() {
                 )}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              {!isMonsterListOpen && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {ERANK_DUNGEON_ZONES.map((zone) => (
-                    <Card key={zone.id} className="bg-card border-border hover:border-primary hover:shadow-lg cursor-pointer">
-                      <CardContent className="p-3 text-center">
-                        <div 
-                          className="w-6 h-6 rounded-full mx-auto mb-2"
-                          style={{ backgroundColor: zone.background }}
-                        />
-                        <h3 className="font-medium text-sm">{zone.name}</h3>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-              {isMonsterListOpen && (
+            {isMonsterListOpen && (
+              <CardContent>
                 <div className="space-y-6">
                   {ERANK_DUNGEON_ZONES.map((zone) => (
                     <Card key={zone.id} className="bg-card border-border">
@@ -1268,8 +1234,8 @@ export default function Battle() {
                     </Card>
                   ))}
                 </div>
-              )}
-            </CardContent>
+              </CardContent>
+            )}
           </Card>
 
           {/* D-rank Dungeon Zones */}
@@ -1295,6 +1261,7 @@ export default function Battle() {
                         style={{ backgroundColor: zone.background }}
                       />
                       <h3 className="font-medium text-sm">{zone.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -1325,6 +1292,7 @@ export default function Battle() {
                         style={{ backgroundColor: zone.background }}
                       />
                       <h3 className="font-medium text-sm">{zone.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{zone.monsters.length} monsters</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -1422,7 +1390,6 @@ export default function Battle() {
             </CardContent>
           </Card>
 
-        </div>
         </div>
       </div>
     );

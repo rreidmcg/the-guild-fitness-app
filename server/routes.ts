@@ -1,7 +1,5 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import session from "express-session";
-import MemoryStore from "memorystore";
 import { storage } from "./storage";
 import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, users, playerInventory } from "@shared/schema";
 import { db } from "./db";
@@ -16,11 +14,8 @@ import { aiWorkoutEngine } from "./ai-workout-engine";
 import { sendEmail, generateLiabilityWaiverEmail, generateAdminWaiverNotification } from "./email-service";
 import Stripe from "stripe";
 
-// Create memory store for sessions (automatically cleans up expired sessions)
-const MemoryStoreConstructor = MemoryStore(session);
-
-// Simple fallback for when session is not available
-let fallbackUserId: number | null = null;
+// Simple in-memory session storage (in production, use proper session management)
+let currentUserId: number | null = null;
 
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -31,39 +26,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Configure session middleware with longer session duration
-  app.use(session({
-    secret: process.env.SESSION_SECRET || 'guild-gamified-fitness-secret-key-change-in-production',
-    store: new MemoryStoreConstructor({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    }),
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // Set to true in production with HTTPS
-      httpOnly: true,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
-    },
-  }));
-
-  // Helper function to get current user ID from session
-  function getCurrentUserId(req: any): number | null {
-    return req.session?.userId || fallbackUserId;
-  }
-
-  // Helper function to set current user ID in session
-  function setCurrentUserId(req: any, userId: number | null): void {
-    if (req.session) {
-      req.session.userId = userId;
-    } else {
-      fallbackUserId = userId;
-    }
-  }
   // Workout recommendations route (premium feature) - DISABLED to save API costs
   /*
   app.get("/api/workout-recommendations", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       // Check if user has active subscription
       const user = await storage.getUser(userId);
@@ -87,7 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   /*
   app.post("/api/workout-recommendations/:id/create", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const recommendationId = req.params.id;
       
       // Get the recommendation
@@ -124,7 +91,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Analytics routes - Admin only
   app.get("/api/analytics/users", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       // Check if user has G.M. title (admin access)
@@ -143,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/analytics/retention", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       if (!user || user.currentTitle !== "<G.M.>") {
@@ -161,7 +128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/analytics/engagement", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       if (!user || user.currentTitle !== "<G.M.>") {
@@ -179,7 +146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/analytics/revenue", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       if (!user || user.currentTitle !== "<G.M.>") {
@@ -198,7 +165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout Program routes
   app.get("/api/workout-programs", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const programs = await storage.getAllWorkoutPrograms();
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
       
@@ -225,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Workout program not found" });
       }
       
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
       const isPurchased = purchasedPrograms.includes(programId.toString());
       
@@ -243,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/workout-programs/:id/workouts", async (req, res) => {
     try {
       const programId = parseInt(req.params.id);
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       // Check if user has purchased this program
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
@@ -265,7 +232,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/purchase-program/:id", async (req, res) => {
     try {
       const programId = req.params.id;
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       // Check if already purchased
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
@@ -279,21 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Program not found" });
       }
       
-      // Handle free programs differently
-      if (program.price === 0) {
-        // Directly add free program to user's purchased programs
-        await storage.purchaseWorkoutProgram(userId, programId);
-        
-        return res.json({ 
-          success: true,
-          isFree: true,
-          programId: programId,
-          programName: program.name,
-          message: "Free program added successfully!" 
-        });
-      }
-      
-      // Create Stripe payment intent for paid programs
+      // Create Stripe payment intent for one-time purchase
       const paymentIntent = await stripe.paymentIntents.create({
         amount: program.price, // Already in cents
         currency: "usd",
@@ -320,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/confirm-program-purchase", async (req, res) => {
     try {
       const { paymentIntentId } = req.body;
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       // Retrieve the payment intent from Stripe to verify it was successful
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -369,7 +322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/purchase-gems/:id", async (req, res) => {
     try {
       const itemId = parseInt(req.params.id);
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       const items = await storage.getAllShopItems();
       const item = items.find(i => i.id === itemId);
@@ -406,7 +359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/confirm-gem-purchase", async (req, res) => {
     try {
       const { paymentIntentId } = req.body;
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       // Retrieve the payment intent from Stripe to verify it was successful
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -435,7 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/purchase-with-gems/:id", async (req, res) => {
     try {
       const itemId = parseInt(req.params.id);
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       const result = await storage.purchaseShopItem(userId, itemId);
       
@@ -453,7 +406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Founders pack routes
   app.get("/api/founders-pack/status", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const claimCount = await storage.getFoundersPackClaimCount();
       const canClaim = await storage.canUserClaimFoundersPack(userId);
       
@@ -472,7 +425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Purchase founders pack
   app.post("/api/purchase-founders-pack", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       // Check if user can claim
       const canClaim = await storage.canUserClaimFoundersPack(userId);
@@ -505,7 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/confirm-founders-pack", async (req, res) => {
     try {
       const { paymentIntentId } = req.body;
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       
       // Retrieve the payment intent from Stripe to verify it was successful
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -534,7 +487,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/create-subscription", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -626,7 +579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cancel subscription with money-back guarantee
   app.post("/api/cancel-subscription", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const { reason } = req.body;
       const user = await storage.getUser(userId);
       
@@ -671,7 +624,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout preferences management
   app.get("/api/workout-preferences", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const preferences = await storage.getUserWorkoutPreferences(userId);
       res.json(preferences || {
         equipmentAccess: 'home_gym',
@@ -691,7 +644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workout-preferences", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const preferences = await storage.updateUserWorkoutPreferences(userId, req.body);
       res.json(preferences);
     } catch (error) {
@@ -703,7 +656,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout feedback for AI learning
   app.post("/api/workout-feedback", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const feedback = await storage.createWorkoutFeedback({
         userId,
         ...req.body
@@ -735,6 +688,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           weight: users.weight,
           fitnessGoal: users.fitnessGoal,
           customAvatarUrl: users.customAvatarUrl,
+          hasLegendaryHunterSkin: users.hasLegendaryHunterSkin,
         })
         .from(users)
         .orderBy(desc(users.experience))
@@ -854,7 +808,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Set the current user ID for session tracking
-      setCurrentUserId(req, user.id);
+      currentUserId = user.id;
 
       res.json({ 
         user: { ...user, password: undefined }, // Don't send password back
@@ -869,14 +823,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/logout", async (req, res) => {
     try {
       // Clear current user session
-      setCurrentUserId(req, null);
-      if (req.session) {
-        req.session.destroy((err: any) => {
-          if (err) {
-            console.error("Error destroying session:", err);
-          }
-        });
-      }
+      currentUserId = null; // Clear session
       res.json({ message: "Logout successful" });
     } catch (error) {
       console.error("Error during logout:", error);
@@ -937,12 +884,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes - only accessible to users with <G.M.> title
   app.get("/api/admin/users", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const currentUser = await storage.getUser(userId);
+      const currentUser = await storage.getUser(currentUserId);
       if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Access denied" });
       }
@@ -955,138 +897,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/admin/users/:targetUserId", async (req, res) => {
-    try {
-      const userId = getCurrentUserId(req);
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const currentUser = await storage.getUser(userId);
-      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
-        return res.status(403).json({ error: "Access denied" });
-      }
-
-      const { targetUserId } = req.params;
-      const updates = req.body;
-      
-      if (!targetUserId) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-
-      const updatedUser = await storage.updateUser(targetUserId, updates);
-      
-      if (!updatedUser) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      res.json({ success: true, user: updatedUser });
-    } catch (error) {
-      console.error("Failed to update user:", error);
-      res.status(500).json({ error: "Failed to update user" });
-    }
-  });
-
-  app.post("/api/admin/users/:targetUserId/ban", async (req, res) => {
-    try {
-      const userId = getCurrentUserId(req);
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const currentUser = await storage.getUser(userId);
-      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
-        return res.status(403).json({ error: "Access denied" });
-      }
-
-      const { targetUserId } = req.params;
-      const { reason, duration } = req.body;
-      
-      if (!targetUserId) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-
-      if (!reason || typeof reason !== 'string' || reason.trim() === '') {
-        return res.status(400).json({ error: "Ban reason is required" });
-      }
-
-      if (!duration || typeof duration !== 'string') {
-        return res.status(400).json({ error: "Ban duration is required" });
-      }
-
-      const bannedUser = await storage.banUser(parseInt(targetUserId), currentUser.username, reason.trim(), duration);
-      res.json({ success: true, user: bannedUser });
-    } catch (error) {
-      console.error("Failed to ban user:", error);
-      res.status(500).json({ error: "Failed to ban user" });
-    }
-  });
-
-  app.post("/api/admin/users/:targetUserId/unban", async (req, res) => {
-    try {
-      const userId = getCurrentUserId(req);
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const currentUser = await storage.getUser(userId);
-      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
-        return res.status(403).json({ error: "Access denied" });
-      }
-
-      const { targetUserId } = req.params;
-      
-      if (!targetUserId) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-
-      const unbannedUser = await storage.unbanUser(parseInt(targetUserId));
-      res.json({ success: true, user: unbannedUser });
-    } catch (error) {
-      console.error("Failed to unban user:", error);
-      res.status(500).json({ error: "Failed to unban user" });
-    }
-  });
-
-  app.delete("/api/admin/users/:targetUserId", async (req, res) => {
-    try {
-      const userId = getCurrentUserId(req);
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const currentUser = await storage.getUser(userId);
-      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
-        return res.status(403).json({ error: "Access denied" });
-      }
-
-      const { targetUserId } = req.params;
-      
-      if (!targetUserId) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-
-      // Prevent admins from deleting themselves
-      if (parseInt(targetUserId) === userId) {
-        return res.status(400).json({ error: "Cannot delete your own account" });
-      }
-
-      await storage.deleteUser(parseInt(targetUserId));
-      res.json({ success: true, message: "User permanently removed" });
-    } catch (error) {
-      console.error("Failed to remove user:", error);
-      res.status(500).json({ error: "Failed to remove user" });
-    }
-  });
-
   app.get("/api/admin/system-stats", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const currentUser = await storage.getUser(userId);
+      const currentUser = await storage.getUser(currentUserId);
       if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Access denied" });
       }
@@ -1112,7 +925,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout routes
   app.get("/api/workouts", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const workouts = await storage.getUserWorkouts(userId);
       res.json(workouts);
     } catch (error) {
@@ -1122,7 +935,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workouts", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const workoutData = insertWorkoutSchema.parse({ ...req.body, userId });
       const workout = await storage.createWorkout(workoutData);
       res.json(workout);
@@ -1154,7 +967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Workout session routes
   app.get("/api/workout-sessions", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const sessions = await storage.getUserWorkoutSessions(userId);
       res.json(sessions);
     } catch (error) {
@@ -1164,7 +977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workout-sessions", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       // Create a simplified session data object that matches the schema
       const sessionData = {
@@ -1277,7 +1090,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Personal records routes
   app.get("/api/personal-records", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const records = await storage.getUserPersonalRecords(userId);
       res.json(records);
     } catch (error) {
@@ -1288,7 +1101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Wardrobe routes
   app.get("/api/wardrobe/items", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const items = await storage.getWardrobeItemsWithOwnership(userId);
       res.json(items);
     } catch (error) {
@@ -1298,7 +1111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/wardrobe/purchase", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const { itemId } = req.body;
       const result = await storage.purchaseWardrobeItem(userId, itemId);
       res.json(result);
@@ -1309,7 +1122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/wardrobe/equip", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const { itemId, category } = req.body;
       await storage.equipWardrobeItem(userId, itemId, category);
       res.json({ success: true });
@@ -1320,7 +1133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/wardrobe/unequip", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const { category } = req.body;
       await storage.unequipWardrobeItem(userId, category);
       res.json({ success: true });
@@ -1352,7 +1165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user stats with HP and MP regeneration
   app.get("/api/user/stats", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       // Check if user is authenticated
       if (!userId) {
@@ -1483,7 +1296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile (email, personal info)
   app.patch("/api/user/profile", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const { username, email, height, weight, fitnessGoal, measurementUnit, skinColor, hairColor, gender } = req.body;
       
       const user = await storage.getUser(userId);
@@ -1563,7 +1376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/stats", async (req, res) => {
     try {
       const { experienceGain, strengthGain, staminaGain, agilityGain, goldGain, battleWon } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       const user = await storage.getUser(userId);
       if (!user) {
@@ -1601,7 +1414,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/gender", async (req, res) => {
     try {
       const { gender } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       if (!gender || !["male", "female"].includes(gender)) {
         return res.status(400).json({ error: "Invalid gender value" });
@@ -1618,7 +1431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/profile", async (req, res) => {
     try {
       const { username, skinColor, hairColor, height, weight, fitnessGoal, measurementUnit } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       const updates: any = {};
       if (username) {
@@ -1652,53 +1465,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Change password endpoint
-  app.patch("/api/user/password", async (req, res) => {
-    try {
-      const userId = getCurrentUserId(req);
-      if (!userId) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const { currentPassword, newPassword } = req.body;
-      
-      if (!currentPassword || !newPassword) {
-        return res.status(400).json({ error: "Current password and new password are required" });
-      }
-
-      if (newPassword.length < 6) {
-        return res.status(400).json({ error: "New password must be at least 6 characters long" });
-      }
-
-      // Get current user to verify current password
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      // Verify current password
-      const isCurrentPasswordValid = await authUtils.comparePassword(currentPassword, user.password);
-      if (!isCurrentPasswordValid) {
-        return res.status(401).json({ error: "Current password is incorrect" });
-      }
-
-      // Hash new password
-      const hashedNewPassword = await authUtils.hashPassword(newPassword);
-
-      // Update password
-      await storage.updateUser(userId, { password: hashedNewPassword });
-
-      res.json({ message: "Password updated successfully" });
-    } catch (error) {
-      console.error("Error changing password:", error);
-      res.status(500).json({ error: "Failed to change password" });
-    }
-  });
-
   // Atrophy system routes
   app.get("/api/user/atrophy-status", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const status = await AtrophySystem.getUserAtrophyStatus(userId);
       res.json(status);
     } catch (error) {
@@ -1728,7 +1498,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/update-title", async (req, res) => {
     try {
       const { title } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       if (!title || typeof title !== 'string') {
         return res.status(400).json({ error: "Valid title is required" });
@@ -1784,12 +1554,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedUser = await storage.updateUser(userId, { currentTitle: titleToSet });
-      
-      // Mark wardrobe notification if title actually changed
-      if (user.currentTitle !== titleToSet) {
-        await storage.markWardrobeNotification(userId);
-      }
-      
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user title" });
@@ -1799,7 +1563,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/update-avatar", async (req, res) => {
     try {
       const { gender } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       if (!gender || typeof gender !== 'string') {
         return res.status(400).json({ error: "Valid gender is required" });
@@ -1811,14 +1575,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid gender value" });
       }
       
-      // Get user to check current gender and restrictions
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      
       // Restrict gm_avatar to Zero and Rob only
       if (gender === 'gm_avatar') {
+        const user = await storage.getUser(userId);
         const username = user?.username?.toLowerCase();
         if (username !== "zero" && username !== "rob") {
           return res.status(403).json({ error: "G.M. avatar is restricted to admin users" });
@@ -1826,12 +1585,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updatedUser = await storage.updateUser(userId, { gender });
-      
-      // Mark wardrobe notification if avatar actually changed
-      if (user.gender !== gender) {
-        await storage.markWardrobeNotification(userId);
-      }
-      
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ error: "Failed to update user avatar" });
@@ -1841,7 +1594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Shop routes
   app.get("/api/shop/items", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       console.log("Fetching shop items for user", userId);
       const shopItems = await storage.getShopItems(userId);
       console.log("Shop items fetched:", shopItems?.length, "items");
@@ -1855,7 +1608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/shop/purchase", async (req, res) => {
     try {
       const { itemId } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       const result = await storage.purchaseShopItem(userId, itemId);
       res.json(result);
@@ -1867,7 +1620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Wardrobe routes
   app.get("/api/wardrobe/items", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const items = await storage.getWardrobeItemsWithOwnership(userId);
       res.json(items);
     } catch (error) {
@@ -1878,7 +1631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/wardrobe/purchase", async (req, res) => {
     try {
       const { itemId } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       const result = await storage.purchaseWardrobeItem(userId, itemId);
       res.json(result);
@@ -1890,7 +1643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/wardrobe/equip", async (req, res) => {
     try {
       const { itemId, category } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       await storage.equipWardrobeItem(userId, itemId, category);
       res.json({ success: true });
@@ -1902,7 +1655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/wardrobe/unequip", async (req, res) => {
     try {
       const { category } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       await storage.unequipWardrobeItem(userId, category);
       res.json({ success: true });
@@ -1923,7 +1676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/user-achievements", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const achievements = await storage.getUserAchievements(userId);
       res.json(achievements);
     } catch (error) {
@@ -1933,7 +1686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/check-achievements", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const newAchievements = await storage.checkAndUnlockAchievements(userId);
       res.json({ newAchievements });
     } catch (error) {
@@ -1943,7 +1696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/user-achievements/:achievementId/mark-viewed", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const achievementId = parseInt(req.params.achievementId);
       
       if (isNaN(achievementId)) {
@@ -1960,7 +1713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Daily quest routes
   app.get("/api/daily-progress", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       // Get user's timezone
       const user = await storage.getUser(userId);
@@ -1998,7 +1751,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/toggle-daily-quest", async (req, res) => {
     try {
       const { questType, completed } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       if (!questType || !['hydration', 'steps', 'protein', 'sleep'].includes(questType)) {
         return res.status(400).json({ error: "Invalid quest type" });
@@ -2018,7 +1771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/complete-daily-quest", async (req, res) => {
     try {
       const { questType } = req.body;
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       
       if (!questType || !['hydration', 'steps', 'protein', 'sleep'].includes(questType)) {
         return res.status(400).json({ error: "Invalid quest type" });
@@ -2033,7 +1786,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/use-streak-freeze", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); // Use the current logged-in user
+      const userId = currentUserId; // Use the current logged-in user
       const result = await storage.useStreakFreeze(userId);
       res.json(result);
     } catch (error) {
@@ -2043,7 +1796,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Inventory endpoints
   app.get("/api/inventory", async (req, res) => {
-    const userId = getCurrentUserId(req); // Use the current logged-in user
+    const userId = currentUserId; // Use the current logged-in user
     
     try {
       const inventory = await db
@@ -2060,7 +1813,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Delete item endpoint
   app.delete("/api/delete-item/:id", async (req, res) => {
-    const userId = getCurrentUserId(req); // Use the current logged-in user
+    const userId = currentUserId; // Use the current logged-in user
     const itemId = parseInt(req.params.id);
     
     if (!itemId || isNaN(itemId)) {
@@ -2102,7 +1855,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Use potion endpoint
   app.post("/api/use-potion", async (req, res) => {
-    const userId = getCurrentUserId(req); // Use the current logged-in user
+    const userId = currentUserId; // Use the current logged-in user
     const { potionType } = req.body;
     
     if (!potionType || !["minor_healing", "major_healing", "full_healing", "minor_mana", "major_mana", "full_mana"].includes(potionType)) {
@@ -2238,7 +1991,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Purchase potion endpoint
   app.post("/api/shop/buy-potion", async (req, res) => {
-    const userId = getCurrentUserId(req); // Use the current logged-in user
+    const userId = currentUserId; // Use the current logged-in user
     const { potionType, quantity = 1 } = req.body;
     
     const potionPrices = {
@@ -2423,7 +2176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User timezone setting
   app.post("/api/user/timezone", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const { timezone } = req.body;
       
       if (!timezone || typeof timezone !== 'string') {
@@ -2445,25 +2198,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/user/clear-wardrobe-notification", async (req, res) => {
-    try {
-      const userId = getCurrentUserId(req);
-      
-      await storage.updateUser(userId, { 
-        hasUnseenWardrobeChanges: false,
-        lastWardrobeViewedAt: new Date()
-      });
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error clearing wardrobe notification:", error);
-      res.status(500).json({ error: "Failed to clear wardrobe notification" });
-    }
-  });
-
   // Subscription routes
   app.post('/api/get-or-create-subscription', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       let user = await storage.getUser(userId);
       
       if (!user) {
@@ -2519,7 +2257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Check subscription status
   app.get('/api/subscription-status', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       if (!user) {
@@ -2542,7 +2280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mail system routes
   app.get('/api/mail', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const mail = await storage.getPlayerMail(userId);
       res.json(mail);
     } catch (error: any) {
@@ -2553,7 +2291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/mail/:id/read', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const mailId = parseInt(req.params.id);
       
       if (!mailId || isNaN(mailId)) {
@@ -2570,7 +2308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/mail/:id/claim', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const mailId = parseInt(req.params.id);
       
       if (!mailId || isNaN(mailId)) {
@@ -2593,7 +2331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin mail routes (only for G.M. users)
   app.post('/api/admin/send-mail', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       // Check if user is admin (has G.M. title)
@@ -2617,30 +2355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expiresAt: expiresAt ? new Date(expiresAt) : null
       };
 
-      let sentCount = 0;
-      
-      if (targetUserIds && Array.isArray(targetUserIds)) {
-        // Send to specific users
-        for (const targetUserId of targetUserIds) {
-          await storage.createPlayerMail({
-            ...mailData,
-            userId: targetUserId,
-            rewardsClaimed: false
-          });
-          sentCount++;
-        }
-      } else {
-        // Send to all users if no specific targets
-        const allUsers = await storage.getAllUsers();
-        for (const user of allUsers) {
-          await storage.createPlayerMail({
-            ...mailData,
-            userId: user.id,
-            rewardsClaimed: false
-          });
-          sentCount++;
-        }
-      }
+      const sentCount = await storage.sendBulkMail(mailData, targetUserIds);
       
       res.json({ 
         success: true, 
@@ -2666,7 +2381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/user-achievements', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const userAchievements = await storage.getUserAchievements(userId);
       res.json(userAchievements);
     } catch (error: any) {
@@ -2678,7 +2393,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Social sharing routes
   app.post('/api/social-shares', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const { shareType, title, description, shareData } = req.body;
 
       if (!shareType || !title || !description) {
@@ -2713,7 +2428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/social-shares/:id/like', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const shareId = parseInt(req.params.id);
 
       if (!shareId || isNaN(shareId)) {
@@ -2730,7 +2445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/social-shares/:id/like', async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const shareId = parseInt(req.params.id);
 
       if (!shareId || isNaN(shareId)) {
@@ -2748,7 +2463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin routes (restricted to G.M. users)
   const isAdmin = async (req: any, res: any, next: any) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       
       if (!user || user.currentTitle !== '<G.M.>') {
@@ -2781,23 +2496,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/exercises", isAdmin, async (req, res) => {
-    try {
-      const exerciseData = req.body;
-      
-      // Validate required fields
-      if (!exerciseData.name || !exerciseData.category) {
-        return res.status(400).json({ error: "Name and category are required" });
-      }
-
-      const newExercise = await storage.createExercise(exerciseData);
-      res.json({ success: true, exercise: newExercise });
-    } catch (error) {
-      console.error("Failed to create exercise:", error);
-      res.status(500).json({ error: "Failed to create exercise" });
-    }
-  });
-
   app.get("/api/admin/monsters", isAdmin, async (req, res) => {
     try {
       const monsters = await storage.getAllMonsters();
@@ -2807,44 +2505,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/monsters", isAdmin, async (req, res) => {
-    try {
-      const monsterData = req.body;
-      
-      // Validate required fields  
-      if (!monsterData.name || !monsterData.level || !monsterData.tier) {
-        return res.status(400).json({ error: "Name, level, and tier are required" });
-      }
-
-      const newMonster = await storage.createMonster(monsterData);
-      res.json({ success: true, monster: newMonster });
-    } catch (error) {
-      console.error("Failed to create monster:", error);
-      res.status(500).json({ error: "Failed to create monster" });
-    }
-  });
-
-  app.patch("/api/admin/monsters/:id", isAdmin, async (req, res) => {
-    try {
-      const monsterId = parseInt(req.params.id);
-      const updates = req.body;
-      
-      if (isNaN(monsterId)) {
-        return res.status(400).json({ error: "Invalid monster ID" });
-      }
-
-      const updatedMonster = await storage.updateMonster(monsterId, updates);
-      res.json({ success: true, monster: updatedMonster });
-    } catch (error) {
-      console.error("Failed to update monster:", error);
-      res.status(500).json({ error: "Failed to update monster" });
-    }
-  });
-
   // Liability waiver acceptance route
   app.post("/api/accept-liability-waiver", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const { fullName, email, ipAddress, userAgent } = req.body;
 
       if (!fullName || !email) {
@@ -2895,7 +2559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Push notification routes
   app.post("/api/push/subscribe", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const subscription = req.body;
       
       // Store push subscription in database (would need to add table)
@@ -2909,7 +2573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/push/unsubscribe", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       console.log(`User ${userId} unsubscribed from push notifications`);
       res.json({ success: true });
     } catch (error) {
@@ -2920,7 +2584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add endpoint to recalculate user level with new XP formula
   app.post("/api/recalculate-level", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req);
+      const userId = currentUserId;
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });

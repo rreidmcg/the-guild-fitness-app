@@ -355,12 +355,12 @@ function FoundersPackCard() {
       <CardHeader className="text-center">
         <div className="text-4xl mb-2">🔥</div>
         <CardTitle className="flex items-center justify-center space-x-2">
-          <span className="text-orange-800">Founders Pack</span>
-          <Crown className="w-5 h-5 text-yellow-700" />
+          <span className="text-orange-400">Founders Pack</span>
+          <Crown className="w-5 h-5 text-yellow-500" />
         </CardTitle>
         <div className="text-center">
-          <div className="text-2xl font-bold text-orange-800">$29.97</div>
-          <div className="text-sm text-orange-700">
+          <div className="text-2xl font-bold text-orange-400">$29.97</div>
+          <div className="text-sm text-orange-300">
             Limited: {foundersStatus?.claimsRemaining || 0} remaining
           </div>
         </div>
@@ -376,7 +376,7 @@ function FoundersPackCard() {
             <span>12-Week At-Home Workout Plan</span>
           </div>
           <div className="flex items-center space-x-3 text-sm">
-            <Coins className="w-4 h-4 text-yellow-700" />
+            <Coins className="w-4 h-4 text-yellow-400" />
             <span>1,000 Gold Coins</span>
           </div>
           <div className="flex items-center space-x-3 text-sm">

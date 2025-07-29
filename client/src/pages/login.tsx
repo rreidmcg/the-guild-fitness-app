@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { Eye, EyeOff } from "lucide-react";
 import ForgotPasswordForm from "@/components/forgot-password-form";
-import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753824284012.png";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -92,25 +91,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Logo */}
-      <div className="mb-8 relative z-10">
-        <img 
-          src={logoImage} 
-          alt="The Guild: Gamified Fitness"
-          className="w-80 h-auto max-w-full drop-shadow-lg"
-        />
-      </div>
-      
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
-        <Card className="w-full max-w-md bg-slate-800/90 border-slate-600 relative z-10 shadow-2xl backdrop-blur-md">
+        <Card className="w-full max-w-md bg-card border-border">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-blue-100">
+            <CardTitle className="text-2xl font-bold text-foreground">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-blue-200">
+            <CardDescription className="text-muted-foreground">
               Sign in to your The Guild: Gamified Fitness account
             </CardDescription>
           </CardHeader>
@@ -122,7 +112,7 @@ export default function LoginPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-blue-100">Email Address</FormLabel>
+                      <FormLabel>Email Address</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter your email address" 
@@ -141,7 +131,7 @@ export default function LoginPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-blue-100">Password</FormLabel>
+                      <FormLabel>Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input 
@@ -166,7 +156,7 @@ export default function LoginPage() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold transition-colors"
+                  className="w-full"
                   disabled={loginMutation.isPending}
                 >
                   {loginMutation.isPending ? "Signing in..." : "Sign In"}
@@ -184,7 +174,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-blue-200">
+              <p className="text-sm text-muted-foreground">
                 Don't have an account?{" "}
                 <button 
                   onClick={() => setLocation("/signup")}

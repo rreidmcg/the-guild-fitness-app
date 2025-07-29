@@ -278,12 +278,12 @@ export default function Shop() {
         <CardHeader className="text-center">
           <div className="text-4xl mb-2">🔥</div>
           <CardTitle className="flex items-center justify-center space-x-2">
-            <span className="text-orange-800">Founders Pack</span>
-            <Crown className="w-5 h-5 text-yellow-700" />
+            <span className="text-orange-400">Founders Pack</span>
+            <Crown className="w-5 h-5 text-yellow-500" />
           </CardTitle>
           <div className="text-center">
-            <div className="text-2xl font-bold text-orange-800">$29.97</div>
-            <div className="text-sm text-orange-700">
+            <div className="text-2xl font-bold text-orange-400">$29.97</div>
+            <div className="text-sm text-orange-300">
               Limited: {foundersStatus?.claimsRemaining || 0} remaining
             </div>
           </div>
@@ -521,17 +521,14 @@ export default function Shop() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative pb-20">
-      
-      {/* Main Content with higher z-index */}
-      <div className="relative" style={{ zIndex: 10 }}>
+    <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-4">
+      <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-glow-blue">Shop</h1>
-              <p className="text-bright-blue mt-0.5 text-sm">Purchase gear and cosmetics</p>
+              <h1 className="text-2xl font-bold text-foreground">Shop</h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">Purchase gear and cosmetics</p>
             </div>
 
           </div>
@@ -751,8 +748,8 @@ export default function Shop() {
                 <div>
                   <div className="text-center mb-6">
                     <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
-                      <Flame className="w-6 h-6 text-orange-700" />
-                      <span className="text-orange-800">Limited Time - Founders Pack</span>
+                      <Flame className="w-6 h-6 text-orange-500" />
+                      <span className="text-orange-400">Limited Time - Founders Pack</span>
                     </h2>
                     <p className="text-muted-foreground">Exclusive pack for the first 100 users!</p>
                   </div>
@@ -939,7 +936,6 @@ export default function Shop() {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
       </div>
     </div>
   );

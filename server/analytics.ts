@@ -175,13 +175,13 @@ export class AnalyticsService {
     const userCount = totalUsersResult.userCount;
     const averageBattlesPerUser = userCount > 0 ? totalBattles / userCount : 0;
 
-    // Get monster defeat statistics (reset to 0 for fresh deployment)
+    // Get monster defeat statistics (placeholder data)
     const topMonsters = [
-      { name: "Goblin Scout", defeatedCount: 0 },
-      { name: "Wild Boar", defeatedCount: 0 },
-      { name: "Forest Spider", defeatedCount: 0 },
-      { name: "Skeleton Warrior", defeatedCount: 0 },
-      { name: "Orc Raider", defeatedCount: 0 }
+      { name: "Goblin Scout", defeatedCount: 245 },
+      { name: "Wild Boar", defeatedCount: 198 },
+      { name: "Forest Spider", defeatedCount: 167 },
+      { name: "Skeleton Warrior", defeatedCount: 134 },
+      { name: "Orc Raider", defeatedCount: 89 }
     ];
 
     return {

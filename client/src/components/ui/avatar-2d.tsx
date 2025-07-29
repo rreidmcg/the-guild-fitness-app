@@ -7,7 +7,6 @@ import robCustomAvatar2 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_17535
 import robCustomAvatar3 from "@assets/E6AE8982-C943-4154-A8B5-82F592441E5D_1753560953692.jpeg";
 import robGMAvatar from "@assets/IMG_3731_1753561497035.png";
 import legendaryHunterSkin from "@assets/IMG_3775_1753737253422.png";
-import femaleLegendaryHunterSkin from "@assets/female_legendary_hunter.png";
 
 interface Avatar2DProps {
   user?: User;
@@ -70,9 +69,9 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
       return robGMAvatar; // Use Rob's G.M. avatar image directly
     }
     
-    // Check for Legendary Hunter skin (Founders Pack exclusive) - gender-specific
+    // Check for Legendary Hunter skin (Founders Pack exclusive)
     if (playerData?.title === "The First Flame" || playerData?.hasLegendaryHunterSkin) {
-      return playerData?.gender === "female" ? femaleLegendaryHunterSkin : legendaryHunterSkin;
+      return legendaryHunterSkin;
     }
     
     // G.M. users with customAvatarUrl pointing to G.M. avatar

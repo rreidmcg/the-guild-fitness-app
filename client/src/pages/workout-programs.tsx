@@ -69,9 +69,8 @@ function PurchaseForm({ program, onSuccess }: { program: WorkoutProgram; onSucce
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
       // Confirm the purchase on our backend
       try {
-        await apiRequest("/api/confirm-program-purchase", {
-          method: "POST",
-          body: { paymentIntentId: paymentIntent.id }
+        await apiRequest("POST", "/api/confirm-program-purchase", {
+          paymentIntentId: paymentIntent.id
         });
         
         toast({
@@ -120,9 +119,8 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
 
   const purchaseMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/purchase-program/${program.id}`, {
-        method: "POST"
-      });
+      const response = await apiRequest("POST", `/api/purchase-program/${program.id}`);
+      return response.json();
     },
     onSuccess: (data) => {
       setClientSecret(data.clientSecret);
@@ -292,7 +290,7 @@ export default function WorkoutPrograms() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.isArray(programs) && programs.map((program: WorkoutProgram) => (
+          {programs?.map((program: WorkoutProgram) => (
             <ProgramCard key={program.id} program={program} />
           ))}
         </div>

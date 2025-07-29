@@ -27,9 +27,7 @@ import {
   Sparkles,
   Snowflake,
   Brain,
-  Crown,
-  Lock,
-  Check
+  Crown
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -73,7 +71,7 @@ export default function Workouts() {
       
       if (variables.completed) {
         // Quest completed - always earn 5 XP per quest (with potential streak bonus)
-        const hasStreakBonus = userStats && (userStats.currentStreak || 0) >= 3;
+        const hasStreakBonus = userStats && userStats.currentStreak >= 3;
         const baseXp = hasStreakBonus ? Math.floor(5 * 1.5) : 5;
         
         let message = "Quest Completed!";
@@ -156,19 +154,16 @@ export default function Workouts() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative pb-20">
-      
-      {/* Main Content with higher z-index */}
-      <div className="relative" style={{ zIndex: 10 }}>
+    <div className="min-h-screen bg-background text-foreground pb-20">
       
       
       {/* Header */}
-      <div className="bg-slate-800/90 border-b border-slate-600 px-4 py-4">
+      <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="space-y-4">
             <div>
-              <h1 className="text-2xl font-bold text-glow-blue">Quests</h1>
-              <p className="text-bright-blue mt-0.5 text-sm">Complete your daily adventures</p>
+              <h1 className="text-2xl font-bold text-foreground">Quests</h1>
+              <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
             </div>
             <div className="flex items-center space-x-3">
               <Button 
@@ -218,7 +213,7 @@ export default function Workouts() {
                     <span className="text-foreground">All 4: +5 Bonus XP</span>
                   </div>
                 </div>
-                {userStats && (userStats.currentStreak || 0) >= 3 && (
+                {userStats && userStats.currentStreak >= 3 && (
                   <div className="flex items-center space-x-1 px-2 py-1 bg-purple-900/30 rounded border border-purple-600">
                     <TrendingUp className="w-4 h-4 text-purple-400" />
                     <span className="text-purple-300 text-xs font-semibold">
@@ -232,7 +227,7 @@ export default function Workouts() {
         </Card>
 
         {/* Daily Quests */}
-        <Card className="bg-slate-800/90 border-slate-600">
+        <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
@@ -358,10 +353,10 @@ export default function Workouts() {
           </CardContent>
         </Card>
 
-        {/* My Programs */}
+        {/* Recent Workouts */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground mb-3">My Programs</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground mb-3">Recent Sessions</CardTitle>
             <div className="flex items-center space-x-2">
               <Button 
                 onClick={() => navigate('/workout-builder')}
@@ -371,88 +366,6 @@ export default function Workouts() {
                 <Plus className="w-4 h-4 mr-2" />
                 New Workout
               </Button>
-              <Button 
-                onClick={() => navigate("/workout-programs")}
-                size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white"
-              >
-                <Star className="w-4 h-4 mr-1" />
-                Browse Programs
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {programs.filter((program: WorkoutProgram) => program.isPurchased || (program.price || 0) === 0).length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold mb-2 text-foreground">No programs yet</h3>
-                <p className="mb-4">Get started with a free program or purchase a premium one!</p>
-                <div className="flex justify-center space-x-3">
-                  <Button 
-                    onClick={() => navigate("/workout-programs")}
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    <Gift className="w-4 h-4 mr-1" />
-                    Get Free Program
-                  </Button>
-                  <Button 
-                    onClick={() => navigate("/workout-programs")}
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Star className="w-4 h-4 mr-1" />
-                    Browse All Programs
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {programs.filter((program: WorkoutProgram) => program.isPurchased || (program.price || 0) === 0).map((program: WorkoutProgram) => (
-                  <Card 
-                    key={program.id} 
-                    className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20 hover:border-green-500/40 transition-colors cursor-pointer"
-                    onClick={() => handleProgramClick(program)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{program.name}</h3>
-                          <span className="bg-green-500/20 text-green-600 border border-green-500/30 px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1">
-                            <Check className="w-3 h-3" />
-                            Owned
-                          </span>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleStartProgram(program);
-                          }}
-                        >
-                          <Play className="w-3 h-3 mr-1" />
-                          Start
-                        </Button>
-                      </div>
-                      <p className="text-sm text-foreground/80 mb-3">{program.description}</p>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="bg-green-600/20 text-green-700 px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
-                        <span className="text-foreground/70 font-medium">{program.durationWeeks} weeks</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Workout Sessions */}
-        <Card className="bg-card border-border">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-xl font-bold text-foreground">Recent Sessions</CardTitle>
-            <div className="flex space-x-2">
               <Button variant="ghost" className="text-game-primary hover:text-blue-400">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View All
@@ -461,15 +374,71 @@ export default function Workouts() {
           </CardHeader>
           <CardContent className="space-y-4">
             {recentSessions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-12 text-muted-foreground">
                 <Dumbbell className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-semibold mb-2 text-foreground">No workouts yet</h3>
-                <p className="mb-6">Start your fitness journey today! Create a workout above or browse programs.</p>
+                <p className="mb-6">Start your fitness journey today! Use the "New Workout" button above.</p>
               </div>
             ) : (
               recentSessions.map((session: WorkoutSession) => (
                 <WorkoutCard key={session.id} session={session} />
               ))
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Workout Programs */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-foreground">Workout Programs</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {programs.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p className="mb-4">No workout programs available yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {programs.map((program: WorkoutProgram) => (
+                  <Card 
+                    key={program.id} 
+                    className="bg-card border-border hover:border-game-primary transition-colors cursor-pointer"
+                    onClick={() => handleProgramClick(program)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-foreground">{program.name}</h3>
+                          {program.name === "Novice Program" && (
+                            <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-2 py-0.5 rounded text-xs font-medium">
+                              Free
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            className="text-game-primary hover:bg-game-primary/20"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartProgram(program);
+                            }}
+                          >
+                            <Play className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-sm text-foreground/80 mb-3">{program.description}</p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="bg-game-primary/20 text-game-primary px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
+                        <span className="text-foreground/70 font-medium">{program.durationWeeks} weeks</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -506,7 +475,6 @@ export default function Workouts() {
             </CardContent>
           </Card>
         </div>
-      </div>
       </div>
     </div>
   );

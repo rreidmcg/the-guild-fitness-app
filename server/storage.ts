@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerInventory, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -16,8 +16,7 @@ import {
   type SocialShareLike, type InsertSocialShareLike,
   type LiabilityWaiver, type InsertLiabilityWaiver,
   type WorkoutPreferences, type InsertWorkoutPreferences,
-  type WorkoutFeedback, type InsertWorkoutFeedback,
-  type Monster, type InsertMonster
+  type WorkoutFeedback, type InsertWorkoutFeedback
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -34,10 +33,6 @@ export interface IStorage {
   getUserByResetToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
-  markWardrobeNotification(userId: number): Promise<void>;
-  banUser(userId: number, adminUsername: string, reason: string, duration: string): Promise<User>;
-  unbanUser(userId: number): Promise<User>;
-  deleteUser(userId: number): Promise<void>;
   updateStripeCustomerId(userId: number, customerId: string): Promise<User>;
   updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User>;
 
@@ -46,9 +41,6 @@ export interface IStorage {
   getAllExercises(): Promise<Exercise[]>;
   getExercise(id: number): Promise<Exercise | undefined>;
   createExercise(exercise: InsertExercise): Promise<Exercise>;
-  getAllMonsters(): Promise<Monster[]>;
-  createMonster(monster: any): Promise<Monster>;
-  updateMonster(id: number, updates: Partial<Monster>): Promise<Monster>;
 
   // Workout operations
   getUserWorkouts(userId: number): Promise<Workout[]>;
@@ -315,84 +307,6 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!user) throw new Error("User not found");
     return user;
-  }
-
-  async markWardrobeNotification(userId: number): Promise<void> {
-    await db
-      .update(users)
-      .set({ hasUnseenWardrobeChanges: true })
-      .where(eq(users.id, userId));
-  }
-
-  async banUser(userId: number, adminUsername: string, reason: string, duration: string): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({ 
-        isBanned: true,
-        banReason: reason,
-        banDuration: duration,
-        bannedAt: new Date(),
-        bannedBy: adminUsername
-      })
-      .where(eq(users.id, userId))
-      .returning();
-    if (!user) throw new Error("User not found");
-    return user;
-  }
-
-  async unbanUser(userId: number): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({ 
-        isBanned: false,
-        banReason: null,
-        banDuration: null,
-        bannedAt: null,
-        bannedBy: null
-      })
-      .where(eq(users.id, userId))
-      .returning();
-    if (!user) throw new Error("User not found");
-    return user;
-  }
-
-  async deleteUser(userId: number): Promise<void> {
-    try {
-      // Delete related data first (only tables that exist)
-      
-      // Delete exercise performances by finding sessions first, then deleting by sessionId
-      const userSessions = await db.select({ id: workoutSessions.id }).from(workoutSessions).where(eq(workoutSessions.userId, userId));
-      for (const session of userSessions) {
-        await db.delete(exercisePerformances).where(eq(exercisePerformances.sessionId, session.id));
-      }
-      
-      // Delete workout sessions
-      await db.delete(workoutSessions).where(eq(workoutSessions.userId, userId));
-      
-      // Delete personal records
-      await db.delete(personalRecords).where(eq(personalRecords.userId, userId));
-      
-      // Delete workouts
-      await db.delete(workouts).where(eq(workouts.userId, userId));
-      
-      // Delete daily progress
-      await db.delete(dailyProgress).where(eq(dailyProgress.userId, userId));
-      
-      // Delete inventory items
-      await db.delete(playerInventory).where(eq(playerInventory.userId, userId));
-      
-      // Delete user achievements
-      await db.delete(userAchievements).where(eq(userAchievements.userId, userId));
-      
-      // Delete user wardrobe
-      await db.delete(userWardrobe).where(eq(userWardrobe.userId, userId));
-      
-      // Finally delete the user
-      await db.delete(users).where(eq(users.id, userId));
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      throw new Error('Failed to delete user');
-    }
   }
 
   // Exercise operations
@@ -1374,27 +1288,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Analytics helper methods - removed duplicates and fixed table references
-  async getAllMonsters(): Promise<Monster[]> {
-    await this.ensureInitialized();
-    return await db.select().from(monsters);
-  }
-
-  async createMonster(monsterData: any): Promise<Monster> {
-    const [monster] = await db
-      .insert(monsters)
-      .values(monsterData)
-      .returning();
-    return monster;
-  }
-
-  async updateMonster(id: number, updates: Partial<Monster>): Promise<Monster> {
-    const [monster] = await db
-      .update(monsters)
-      .set(updates)
-      .where(eq(monsters.id, id))
-      .returning();
-    if (!monster) throw new Error("Monster not found");
-    return monster;
+  async getAllMonsters() {
+    // Note: monsters table not defined in current schema
+    return [];
   }
 
   // Liability waiver operations

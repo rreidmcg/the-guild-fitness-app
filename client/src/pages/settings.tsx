@@ -5,9 +5,7 @@ import { Label } from "@/components/ui/label";
 
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
-import { ChangePasswordDialog } from "@/components/ui/change-password-dialog";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
-import { useNotifications } from "@/lib/notifications";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -37,7 +35,6 @@ export default function Settings() {
   const { toast } = useToast();
   const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
   const [, setLocation] = useLocation();
-  const { requestPermission, subscribeToPush, hasPermission, isSupported, scheduleDailyReminders } = useNotifications();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -180,66 +177,25 @@ export default function Settings() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="workout-reminders" className="text-base">Workout Reminders</Label>
-                <p className="text-sm text-muted-foreground">
-                  {!isSupported ? "Notifications not supported on this device" :
-                   !hasPermission ? "Click to enable notifications" :
-                   "Daily reminders at 6 PM"}
-                </p>
+                <p className="text-sm text-muted-foreground">Get notified about scheduled workouts</p>
               </div>
-              <Switch 
-                id="workout-reminders" 
-                checked={hasPermission}
-                onCheckedChange={async (enabled) => {
-                  if (enabled) {
-                    const granted = await requestPermission();
-                    if (granted) {
-                      await subscribeToPush();
-                      scheduleDailyReminders();
-                      toast({
-                        title: "Notifications Enabled",
-                        description: "You'll receive daily workout reminders at 6 PM",
-                      });
-                    } else {
-                      toast({
-                        title: "Permission Denied",
-                        description: "Please enable notifications in your browser settings",
-                        variant: "destructive",
-                      });
-                    }
-                  }
-                }}
-                disabled={!isSupported}
-              />
+              <Switch id="workout-reminders" defaultChecked />
             </div>
             
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="achievement-alerts" className="text-base">Achievement Alerts</Label>
-                <p className="text-sm text-muted-foreground">
-                  {hasPermission ? "Notifications when you level up or unlock achievements" :
-                   "Enable workout reminders first to receive achievement alerts"}
-                </p>
+                <p className="text-sm text-muted-foreground">Celebrate when you level up or set PRs</p>
               </div>
-              <Switch 
-                id="achievement-alerts" 
-                checked={hasPermission}
-                disabled={!hasPermission}
-              />
+              <Switch id="achievement-alerts" defaultChecked />
             </div>
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="streak-warnings" className="text-base">Streak Warnings</Label>
-                <p className="text-sm text-muted-foreground">
-                  {hasPermission ? "Atrophy warnings at 10 PM when stats are at risk" :
-                   "Enable workout reminders first to receive streak warnings"}
-                </p>
+                <p className="text-sm text-muted-foreground">Get reminded when your streak is at risk</p>
               </div>
-              <Switch 
-                id="streak-warnings" 
-                checked={hasPermission}
-                disabled={!hasPermission}
-              />
+              <Switch id="streak-warnings" defaultChecked />
             </div>
           </CardContent>
         </Card>
@@ -280,13 +236,6 @@ export default function Settings() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <ChangePasswordDialog>
-              <Button variant="outline" className="w-full flex items-center justify-center">
-                <Shield className="w-4 h-4 mr-2" />
-                Change Password
-              </Button>
-            </ChangePasswordDialog>
-            
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="data-sharing" className="text-base">Anonymous Analytics</Label>
@@ -302,6 +251,11 @@ export default function Settings() {
               </div>
               <Switch id="workout-privacy" defaultChecked />
             </div>
+
+            <Button variant="outline" className="w-full">
+              <Shield className="w-4 h-4 mr-2" />
+              Change Password
+            </Button>
           </CardContent>
         </Card>
 
@@ -371,7 +325,7 @@ export default function Settings() {
             </div>
             
             <div className="text-center py-4 border-t border-border">
-              <p className="text-sm text-muted-foreground mb-2">The Guild: Gamified Fitness v1.0.0</p>
+              <p className="text-sm text-muted-foreground mb-2">Dumbbells & Dragons v1.0.0</p>
               <p className="text-xs text-muted-foreground">
                 Made with ❤️ for fitness enthusiasts
               </p>

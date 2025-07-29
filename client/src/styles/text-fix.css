@@ -1,61 +1,60 @@
-/* Light theme text improvements - now compatible with light background */
+/* Text readability fixes */
 .text-white {
-  color: hsl(240, 10%, 3.9%) !important; /* Dark text for light backgrounds */
-  font-weight: 600 !important;
-}
-
-.text-gray-300, .text-gray-400 {
-  color: hsl(240, 3.8%, 46.1%) !important; /* Medium gray for light backgrounds */
-  font-weight: 500 !important;
-}
-
-.text-muted-foreground {
-  color: hsl(240, 3.8%, 46.1%) !important;
-  font-weight: 500 !important;
-}
-
-.text-foreground {
-  color: hsl(240, 10%, 3.9%) !important;
-  font-weight: 500 !important;
-}
-
-/* Improved font weights for readability */
-p, span, div, h1, h2, h3, h4, h5, h6 {
-  font-weight: 500 !important;
-}
-
-.font-medium {
-  font-weight: 500 !important;
-}
-
-.font-semibold {
-  font-weight: 600 !important;
-}
-
-.font-bold {
+  color: rgb(20, 20, 20) !important;
   font-weight: 700 !important;
 }
 
-/* Light theme card improvements */
+.text-gray-300, .text-gray-400 {
+  color: rgb(40, 40, 40) !important;
+  font-weight: 600 !important;
+}
+
+.text-muted-foreground {
+  color: rgb(60, 60, 60) !important;
+  font-weight: 600 !important;
+}
+
+.text-foreground {
+  color: rgb(30, 30, 30) !important;
+  font-weight: 600 !important;
+}
+
+p, span, div, h1, h2, h3, h4, h5, h6 {
+  font-weight: 600 !important;
+}
+
+.font-medium {
+  font-weight: 600 !important;
+}
+
+.font-semibold {
+  font-weight: 700 !important;
+}
+
+.font-bold {
+  font-weight: 800 !important;
+}
+
+/* Card text improvements */
 .bg-game-slate, .bg-card {
-  background-color: hsl(0, 0%, 100%) !important;
-  border: 1px solid hsl(240, 5.9%, 90%) !important;
+  background-color: rgb(255, 255, 255) !important;
+  border: 1px solid rgb(229, 231, 235) !important;
 }
 
 /* Button text */
 button {
-  font-weight: 500 !important;
+  font-weight: 600 !important;
 }
 
-/* Navigation menu colors for light theme */
+/* Navigation menu colors override */
 nav h1 {
-  color: hsl(240, 10%, 3.9%) !important; /* Dark text for light nav */
+  color: rgb(209, 213, 219) !important; /* text-gray-300 */
 }
 
 nav .text-gray-300 {
-  color: hsl(240, 3.8%, 46.1%) !important; /* Medium gray for light nav */
+  color: rgb(209, 213, 219) !important;
 }
 
 .bottom-nav-solid .text-gray-300 {
-  color: hsl(240, 3.8%, 46.1%) !important;
+  color: rgb(209, 213, 219) !important;
 }

@@ -155,8 +155,8 @@ export function AchievementCard({ achievement, userAchievement, userStats }: Ach
         onClick={handleCardClick}
         className={`transition-all duration-300 cursor-pointer hover:shadow-md ${
           isUnlocked 
-            ? 'bg-gradient-to-br from-yellow-900/20 to-orange-900/20 border-yellow-800' 
-            : 'bg-slate-800/90 border-slate-600'
+            ? 'bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-800' 
+            : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
         }`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">

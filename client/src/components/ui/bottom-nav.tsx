@@ -16,7 +16,7 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-slate-700/50 px-4 py-2 z-50 bg-slate-900/95 backdrop-blur-sm shadow-lg" style={{ opacity: '1 !important' }}>
+    <div className="fixed bottom-0 left-0 right-0 border-t border-border px-4 py-2 z-50 bg-card" style={{ opacity: '1 !important' }}>
       <div className="max-w-md mx-auto">
         <div className="flex items-center justify-around">
           {navItems.map((item) => {
@@ -28,10 +28,10 @@ export function BottomNav() {
                 key={item.path}
                 variant="ghost"
                 onClick={() => navigate(item.path)}
-                className={`justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-slate-700/40 hover:text-white h-14 flex flex-col items-center justify-center space-y-1 px-2 py-2 flex-1 max-w-[80px] ${
+                className={`justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-14 flex flex-col items-center justify-center space-y-1 px-2 py-2 flex-1 max-w-[80px] ${
                   isActive 
-                    ? 'text-blue-400 bg-slate-700/60 border border-blue-500/50 shadow-lg' 
-                    : 'text-slate-300 hover:text-white'
+                    ? 'text-blue-400 bg-blue-900/20 border border-blue-700' 
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'text-blue-400' : ''}`} />

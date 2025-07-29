@@ -70,15 +70,6 @@ export const users = pgTable("users", {
   liabilityWaiverAccepted: boolean("liability_waiver_accepted").default(false),
   liabilityWaiverAcceptedAt: timestamp("liability_waiver_accepted_at"),
   liabilityWaiverIpAddress: text("liability_waiver_ip_address"),
-  // Wardrobe notification tracking
-  hasUnseenWardrobeChanges: boolean("has_unseen_wardrobe_changes").default(false),
-  lastWardrobeViewedAt: timestamp("last_wardrobe_viewed_at"),
-  // Ban system
-  isBanned: boolean("is_banned").default(false),
-  banReason: text("ban_reason"),
-  banDuration: text("ban_duration"), // "permanent" or date string (YYYY-MM-DD)
-  bannedAt: timestamp("banned_at"),
-  bannedBy: text("banned_by"), // Username of admin who banned
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -255,7 +246,6 @@ export const monsters = pgTable("monsters", {
   goldReward: integer("gold_reward").default(0),
   description: text("description"),
   isBoss: boolean("is_boss").default(false),
-  avatar: text("avatar"), // URL or path to monster avatar image
 });
 
 // User achievements
