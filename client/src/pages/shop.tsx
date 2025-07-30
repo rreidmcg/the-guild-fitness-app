@@ -29,6 +29,7 @@ import { useLocation } from "wouter";
 import { useNavigate } from "@/hooks/use-navigate";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ParallaxBackground } from "@/components/ui/parallax-background";
 
 import minorHealingPotionImage from "@assets/CA06160D-7763-41DC-A734-6F29760C0BD8_1753214477623.png";
 import majorHealingPotionImage from "@assets/1860C3F1-AEFB-419D-BAB2-306C00CA6321_1753215117108.png";
@@ -541,7 +542,8 @@ export default function Shop() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <ParallaxBackground>
+      <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
@@ -957,6 +959,7 @@ export default function Shop() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+      </div>
+    </ParallaxBackground>
   );
 }

@@ -13,6 +13,7 @@ import { ApiError } from '@/components/ui/api-error';
 import { useApiQuery, useApiMutation } from '@/hooks/use-api';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
+import { ParallaxBackground } from '@/components/ui/parallax-background';
 import { 
   Users, 
   Activity, 
@@ -95,7 +96,8 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-7xl">
+    <ParallaxBackground>
+      <div className="container mx-auto p-4 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-white mb-2">Administrative Control Panel</h1>
         <p className="text-gray-400">Comprehensive management suite for The Guild: Gamified Fitness platform</p>
@@ -149,7 +151,8 @@ export default function AdminDashboard() {
           <AdminMailbox />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </ParallaxBackground>
   );
 }
 

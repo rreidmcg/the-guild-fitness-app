@@ -29,7 +29,7 @@ import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_
 import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753841529625.png";
 import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753839669430.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
-
+import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { queryClient } from "@/lib/queryClient";
 
@@ -184,7 +184,8 @@ export default function PvEDungeonsPage() {
   const userLevel = userStats.level || 1;
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
+    <ParallaxBackground>
+      <div className="container mx-auto p-4 max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
@@ -360,6 +361,7 @@ export default function PvEDungeonsPage() {
           </Card>
         </div>
       )}
-    </div>
+      </div>
+    </ParallaxBackground>
   );
 }

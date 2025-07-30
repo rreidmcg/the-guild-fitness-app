@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { WorkoutCard } from "@/components/ui/workout-card";
+import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { useToast } from "@/hooks/use-toast";
 
 import { apiRequest } from "@/lib/queryClient";
@@ -160,7 +161,8 @@ export default function Workouts() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <ParallaxBackground>
+      <div className="min-h-screen bg-background text-foreground pb-20">
       
       
       {/* Header */}
@@ -638,6 +640,7 @@ export default function Workouts() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </ParallaxBackground>
   );
 }

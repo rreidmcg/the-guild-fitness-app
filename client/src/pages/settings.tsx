@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
+import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -85,7 +86,8 @@ export default function Settings() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <ParallaxBackground>
+      <div className="min-h-screen bg-background text-foreground pb-20">
       
       
       {/* Header */}
@@ -347,6 +349,7 @@ export default function Settings() {
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </ParallaxBackground>
   );
 }

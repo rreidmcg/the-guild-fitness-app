@@ -6,6 +6,7 @@ import { getTitleComponent } from "@/lib/title-rarity";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { Badge } from "@/components/ui/badge";
+import { ParallaxBackground } from "@/components/ui/parallax-background";
 
 export default function LeaderboardPage() {
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
@@ -53,7 +54,8 @@ export default function LeaderboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <ParallaxBackground>
+      <div className="min-h-screen bg-background text-foreground pb-20">
       
       
       {/* Header */}
@@ -271,6 +273,7 @@ export default function LeaderboardPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </ParallaxBackground>
   );
 }
