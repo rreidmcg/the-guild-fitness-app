@@ -85,11 +85,10 @@ export default function WorkoutBuilder() {
 
   const createWorkoutMutation = useMutation({
     mutationFn: async (workoutData: any) => {
-      const response = await apiRequest("/api/workouts", {
+      return await apiRequest("/api/workouts", {
         method: "POST",
-        body: JSON.stringify(workoutData)
+        body: workoutData
       });
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
@@ -243,9 +242,50 @@ export default function WorkoutBuilder() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-semibold text-foreground">{section.name}</h3>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem 
+                          onClick={() => {
+                            // Save section (edit mode)
+                            setCurrentSection(section);
+                            setIsEditingSection(true);
+                            setStep('section-form');
+                          }}
+                        >
+                          <Edit3 className="w-4 h-4 mr-2" />
+                          Edit Section
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => {
+                            // Duplicate section
+                            const duplicatedSection = {
+                              ...section,
+                              id: Date.now().toString(),
+                              name: `${section.name} (Copy)`
+                            };
+                            setSections([...sections, duplicatedSection]);
+                          }}
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Duplicate Section
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => {
+                            // Delete section
+                            setSections(sections.filter(s => s.id !== section.id));
+                          }}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete Section
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   
                   <div className="flex items-center space-x-2 mb-3">
