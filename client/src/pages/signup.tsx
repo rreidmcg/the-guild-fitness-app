@@ -409,6 +409,7 @@ export default function SignupPage() {
                             type="number"
                             {...field}
                             onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
@@ -430,6 +431,7 @@ export default function SignupPage() {
                             type="number"
                             {...field}
                             onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />

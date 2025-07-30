@@ -508,7 +508,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                 value={exerciseForm.name}
                 onChange={(e) => setExerciseForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Push-ups"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
             <div>
@@ -533,7 +533,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                 value={exerciseForm.muscleGroups}
                 onChange={(e) => setExerciseForm(prev => ({ ...prev, muscleGroups: e.target.value }))}
                 placeholder="e.g., chest, triceps, shoulders"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
             <div>
@@ -543,7 +543,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                 value={exerciseForm.description}
                 onChange={(e) => setExerciseForm(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Exercise instructions and form cues..."
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                 rows={3}
               />
             </div>
@@ -556,7 +556,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                   min="0"
                   value={exerciseForm.strengthPoints}
                   onChange={(e) => setExerciseForm(prev => ({ ...prev, strengthPoints: parseInt(e.target.value) || 0 }))}
-                  className="bg-gray-800 border-gray-600 text-white"
+                  className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                 />
               </div>
               <div>
@@ -567,7 +567,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                   min="0"
                   value={exerciseForm.staminaPoints}
                   onChange={(e) => setExerciseForm(prev => ({ ...prev, staminaPoints: parseInt(e.target.value) || 0 }))}
-                  className="bg-gray-800 border-gray-600 text-white"
+                  className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                 />
               </div>
               <div>
@@ -578,7 +578,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                   min="0"
                   value={exerciseForm.agilityPoints}
                   onChange={(e) => setExerciseForm(prev => ({ ...prev, agilityPoints: parseInt(e.target.value) || 0 }))}
-                  className="bg-gray-800 border-gray-600 text-white"
+                  className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                 />
               </div>
             </div>
@@ -1063,7 +1063,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                     value={banReason}
                     onChange={(e) => setBanReason(e.target.value)}
                     placeholder="Provide a detailed reason for banning this user..."
-                    className="min-h-20"
+                    className="min-h-20 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                   />
                 </div>
               </>
@@ -1077,7 +1077,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   value={removeReason}
                   onChange={(e) => setRemoveReason(e.target.value)}
                   placeholder="Provide a detailed reason for permanently removing this user account..."
-                  className="min-h-20"
+                  className="min-h-20 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                 />
                 <div className="p-3 bg-red-900/20 border border-red-500 rounded-lg">
                   <div className="flex items-center space-x-2 text-red-400">
@@ -1391,7 +1391,7 @@ function AdminMailbox() {
                 value={mailSubject}
                 onChange={(e) => setMailSubject(e.target.value)}
                 placeholder="Enter notification subject..."
-                className="w-full"
+                className="w-full placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
 
@@ -1403,7 +1403,7 @@ function AdminMailbox() {
                 value={mailContent}
                 onChange={(e) => setMailContent(e.target.value)}
                 placeholder="Enter your message content here..."
-                className="min-h-24 resize-none"
+                className="min-h-24 resize-none placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
 
@@ -1440,6 +1440,7 @@ function AdminMailbox() {
                       onChange={(e) => setGoldReward(e.target.value)}
                       placeholder="0"
                       min="0"
+                      className="placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                     />
                   </div>
                   
@@ -1452,6 +1453,7 @@ function AdminMailbox() {
                       onChange={(e) => setXpReward(e.target.value)}
                       placeholder="0"
                       min="0"
+                      className="placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                     />
                   </div>
                   
@@ -1465,6 +1467,7 @@ function AdminMailbox() {
                       placeholder="0"
                       min="0"
                       max="5"
+                      className="placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                     />
                   </div>
                   
@@ -1478,6 +1481,7 @@ function AdminMailbox() {
                       placeholder="0"
                       min="0"
                       max="10"
+                      className="placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                     />
                   </div>
                 </div>

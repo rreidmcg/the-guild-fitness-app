@@ -193,7 +193,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
               onChange={(e) => handleUsernameChange(e.target.value)}
               placeholder="Enter username (letters and spaces only)"
               maxLength={20}
-              className={usernameError ? "border-red-500" : ""}
+              className={`placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0 ${usernameError ? "border-red-500" : ""}`}
             />
             {usernameError && (
               <p className="text-sm text-red-500">{usernameError}</p>
@@ -218,7 +218,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
                 value={formData.skinColor}
                 onChange={(e) => setFormData({ ...formData, skinColor: e.target.value })}
                 placeholder="#F5C6A0"
-                className="flex-1 h-8"
+                className="flex-1 h-8 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
           </div>
@@ -238,7 +238,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
                 value={formData.hairColor}
                 onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
                 placeholder="#8B4513"
-                className="flex-1 h-8"
+                className="flex-1 h-8 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
           </div>

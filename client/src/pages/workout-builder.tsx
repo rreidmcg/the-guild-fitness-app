@@ -765,7 +765,7 @@ export default function WorkoutBuilder() {
               placeholder="Search exercise.."
               value={exerciseSearch}
               onChange={(e) => setExerciseSearch(e.target.value)}
-              className="pl-10 bg-muted border-border"
+              className="pl-10 bg-muted border-border placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
             />
           </div>
 
@@ -1364,7 +1364,7 @@ export default function WorkoutBuilder() {
                   <Input
                     value={editedExercise?.name || ''}
                     onChange={(e) => setEditedExercise((prev: any) => ({ ...prev, name: e.target.value }))}
-                    className="mt-1"
+                    className="mt-1 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                     placeholder="Enter exercise name"
                   />
                 </div>
