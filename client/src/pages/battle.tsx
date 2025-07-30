@@ -79,7 +79,7 @@ export default function BattlePage() {
               <img 
                 src={dungeonsTitle} 
                 alt="PvE Dungeons" 
-                className="h-12 object-contain"
+                className="h-20 object-contain"
                 style={{ 
                   imageRendering: 'pixelated',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
@@ -135,7 +135,7 @@ export default function BattlePage() {
               <img 
                 src={arenaTitle} 
                 alt="PvP Arena" 
-                className="h-12 object-contain"
+                className="h-20 object-contain"
                 style={{ 
                   imageRendering: 'pixelated',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
