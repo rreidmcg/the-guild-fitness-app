@@ -39,6 +39,7 @@ import characterMaleImage from "@assets/IMG_3682_1753213695174.png";
 import minorManaPotionImage from "@assets/A78C5316-EC32-40FF-8919-E20BF97740B3_1753733597516.png";
 import majorManaPotionImage from "@assets/B3B92435-50B3-4B4F-BF95-30E009AA81EB_1753733641186.png";
 import legendaryHunterSkin from "@assets/IMG_3775_1753737253422.png";
+import legendaryHunterFemaleSkin from "@assets/D230131C-14F5-4DAA-97FC-D1B46D95ED7F_1753833880560.png";
 import megaHealPotionImage from "@assets/08789489-C26E-40BE-BA19-1471C66163E2_1753500783697.png";
 import megaManaPotionImage from "@assets/E87E3B27-6376-4A57-93C6-2CE3FE0EF645_1753733707898.png";
 
@@ -293,13 +294,13 @@ export default function Shop() {
             Exclusive pack for the first 100 users! Get premium rewards and legendary status.
           </p>
 
-          {/* Legendary Hunter Skin Preview */}
-          <div className="flex justify-center mb-4">
+          {/* Legendary Hunter Skin Preview - Both Variants */}
+          <div className="flex justify-center gap-3 mb-4">
             <div className="relative">
-              <div className="w-24 h-36 rounded-lg overflow-hidden border-4 border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 shadow-lg shadow-yellow-500/25">
+              <div className="w-20 h-32 rounded-lg overflow-hidden border-4 border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 shadow-lg shadow-yellow-500/25">
                 <img 
                   src={legendaryHunterSkin}
-                  alt="The Legendary Hunter Skin"
+                  alt="The Legendary Hunter (Male)"
                   className="w-full h-full object-contain"
                   style={{
                     imageRendering: 'pixelated',
@@ -307,10 +308,29 @@ export default function Shop() {
                   }}
                 />
               </div>
-              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black text-xs px-2 py-1 rounded-full font-bold">
-                Legendary
+              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black text-xs px-1 py-0.5 rounded font-bold">
+                Male
               </div>
             </div>
+            <div className="relative">
+              <div className="w-20 h-32 rounded-lg overflow-hidden border-4 border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 shadow-lg shadow-yellow-500/25">
+                <img 
+                  src={legendaryHunterFemaleSkin}
+                  alt="The Legendary Hunter (Female)"
+                  className="w-full h-full object-contain"
+                  style={{
+                    imageRendering: 'pixelated',
+                    filter: 'drop-shadow(0 0 8px rgba(234, 179, 8, 0.5))'
+                  }}
+                />
+              </div>
+              <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black text-xs px-1 py-0.5 rounded font-bold">
+                Female
+              </div>
+            </div>
+          </div>
+          <div className="text-center text-yellow-400 text-sm font-semibold mb-3">
+            "The Legendary Hunter" - Both Variants
           </div>
           
           <div className="space-y-3">

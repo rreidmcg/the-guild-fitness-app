@@ -34,14 +34,24 @@ const AVAILABLE_TITLES = [
 const AVAILABLE_SKINS = [
   { name: "Default Male", id: "male", requirement: "Default", preview: "male" },
   { name: "Default Female", id: "female", requirement: "Default", preview: "female" },
-  { name: "The Legendary Hunter", id: "legendary_hunter", requirement: "Founders Pack Exclusive", preview: "legendary_hunter" },
+  { name: "The Legendary Hunter (Male)", id: "legendary_hunter_male", requirement: "Founders Pack Exclusive", preview: "legendary_hunter", gender: "male" },
+  { name: "The Legendary Hunter (Female)", id: "legendary_hunter_female", requirement: "Founders Pack Exclusive", preview: "legendary_hunter", gender: "female" },
   { name: "G.M. Avatar", id: "gm_avatar", requirement: "Admin Only", preview: "gm_avatar" },
 ];
 
 export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
   const { toast } = useToast();
   const [selectedTitle, setSelectedTitle] = useState(user?.currentTitle || "Recruit");
-  const [selectedSkin, setSelectedSkin] = useState(user?.gender || "male");
+  
+  // Set default selected skin based on user's current status
+  const getDefaultSkin = () => {
+    if (user?.title === "The First Flame" || user?.hasLegendaryHunterSkin) {
+      return user?.gender === "female" ? "legendary_hunter_female" : "legendary_hunter_male";
+    }
+    return user?.gender || "male";
+  };
+  
+  const [selectedSkin, setSelectedSkin] = useState(getDefaultSkin());
 
   // Update title mutation
   const updateTitleMutation = useMutation({
@@ -129,7 +139,7 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
     if (username === "zero") return true;
     
     if (skinId === "male" || skinId === "female") return true;
-    if (skinId === "legendary_hunter" && (user?.currentTitle === "The First Flame" || user?.hasLegendaryHunterSkin)) return true;
+    if ((skinId === "legendary_hunter_male" || skinId === "legendary_hunter_female") && (user?.currentTitle === "The First Flame" || user?.hasLegendaryHunterSkin)) return true;
     if (skinId === "gm_avatar") {
       return username === "rob";
     }
@@ -140,10 +150,20 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
     if (selectedTitle !== user?.currentTitle) {
       updateTitleMutation.mutate(selectedTitle);
     }
-    if (selectedSkin !== user?.gender) {
-      updateSkinMutation.mutate(selectedSkin);
+    
+    // Convert legendary hunter skin IDs back to gender-based system for backend compatibility
+    let genderToSend = selectedSkin;
+    if (selectedSkin === "legendary_hunter_male") {
+      genderToSend = "male";
+    } else if (selectedSkin === "legendary_hunter_female") {
+      genderToSend = "female";
     }
-    if (selectedTitle === user?.currentTitle && selectedSkin === user?.gender) {
+    
+    if (genderToSend !== user?.gender) {
+      updateSkinMutation.mutate(genderToSend);
+    }
+    
+    if (selectedTitle === user?.currentTitle && genderToSend === user?.gender) {
       toast({
         title: "No Changes",
         description: "Your current title and avatar are already selected.",
@@ -242,13 +262,17 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
                   >
                     <CardContent className="p-4">
                       <div className="flex flex-col items-center">
-                        <div className="mb-3 border-2 border-gray-600 rounded-lg p-2">
+                        <div className={`mb-3 border-2 rounded-lg p-2 ${
+                          (skin.id === "legendary_hunter_male" || skin.id === "legendary_hunter_female") 
+                            ? "border-yellow-500 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 shadow-lg shadow-yellow-500/25" 
+                            : "border-gray-600"
+                        }`}>
                           <Avatar2D 
                             user={{ 
                               ...user, 
-                              gender: skin.id === "gm_avatar" ? "gm_avatar" : (skin.preview === "legendary_hunter" ? user?.gender : skin.preview),
-                              title: skin.id === "legendary_hunter" ? "The First Flame" : skin.id === "gm_avatar" ? "<G.M.>" : user?.title,
-                              hasLegendaryHunterSkin: skin.id === "legendary_hunter",
+                              gender: skin.id === "gm_avatar" ? "gm_avatar" : (skin.preview === "legendary_hunter" ? skin.gender : skin.preview),
+                              title: (skin.id === "legendary_hunter_male" || skin.id === "legendary_hunter_female") ? "The First Flame" : skin.id === "gm_avatar" ? "<G.M.>" : user?.title,
+                              hasLegendaryHunterSkin: (skin.id === "legendary_hunter_male" || skin.id === "legendary_hunter_female"),
                               customAvatarUrl: skin.id === "gm_avatar" ? "/src/assets/IMG_3731_1753561497035.png" : undefined
                             }} 
                             size="md" 
