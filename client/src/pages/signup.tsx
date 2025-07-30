@@ -158,17 +158,18 @@ export default function SignupPage() {
   return (
     <>
       <AuthMusicBanner />
-      <div 
-        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden pt-16"
-        style={{
-          backgroundImage: `url(${forestBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
-          imageRendering: 'pixelated'
-        }}
-      >
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden pt-16">
+        {/* Fixed parallax background */}
+        <div 
+          className="fixed inset-0 w-full h-full z-0"
+          style={{
+            backgroundImage: `url(${forestBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            imageRendering: 'pixelated'
+          }}
+        ></div>
         {/* Dark overlay for better text readability */}
         <div className="absolute inset-0 bg-black/40 z-0"></div>
         <FloatingParticles count={20} />
