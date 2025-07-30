@@ -21,19 +21,19 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
 
   useEffect(() => {
     const colors = [
-      'rgba(255, 215, 0, 0.8)', // Gold
-      'rgba(255, 165, 0, 0.7)', // Orange
-      'rgba(255, 255, 0, 0.6)', // Yellow
-      'rgba(255, 140, 0, 0.8)', // Dark orange
-      'rgba(255, 193, 7, 0.7)', // Amber
+      'rgba(255, 215, 0, 0.9)', // Gold
+      'rgba(255, 165, 0, 0.85)', // Orange
+      'rgba(255, 255, 0, 0.8)', // Yellow
+      'rgba(255, 140, 0, 0.9)', // Dark orange
+      'rgba(255, 193, 7, 0.85)', // Amber
     ];
     
     const newParticles: Particle[] = Array.from({ length: count }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 3 + 1, // 1-4px
-      opacity: Math.random() * 0.4 + 0.3, // 0.3-0.7
+      size: Math.random() * 4 + 2, // 2-6px (increased from 1-4px)
+      opacity: Math.random() * 0.5 + 0.5, // 0.5-1.0 (increased from 0.3-0.7)
       duration: Math.random() * 25 + 20, // 20-45 seconds
       delay: Math.random() * 8, // 0-8 second delay
       color: colors[Math.floor(Math.random() * colors.length)],
@@ -56,7 +56,7 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
             opacity: particle.opacity,
             animationDuration: `${particle.duration}s`,
             animationDelay: `${particle.delay}s`,
-            boxShadow: `0 0 12px ${particle.color}, 0 0 6px ${particle.color}`,
+            boxShadow: `0 0 20px ${particle.color}, 0 0 10px ${particle.color}, 0 0 5px ${particle.color}`,
           }}
         />
       ))}
