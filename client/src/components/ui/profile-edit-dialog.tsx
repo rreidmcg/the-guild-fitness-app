@@ -30,8 +30,6 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
 
   const [formData, setFormData] = useState({
     username: "",
-    skinColor: "#F5C6A0",
-    hairColor: "#8B4513",
     gender: "male",
   });
 
@@ -42,8 +40,6 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
     if (userStats) {
       setFormData({
         username: (userStats as any).username || "",
-        skinColor: (userStats as any).skinColor || "#F5C6A0",
-        hairColor: (userStats as any).hairColor || "#8B4513",
         gender: (userStats as any).gender || "male",
       });
       setUsernameError(null);
@@ -64,7 +60,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
   };
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (updates: any) => {
+    mutationFn: async (updates: { username?: string; gender?: string }) => {
       // Validate username before submission
       if (updates.username) {
         const validation = validateUsername(updates.username);
@@ -80,7 +76,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
       const { gender, ...profileUpdates } = updates;
       
       console.log("Profile updates:", profileUpdates);
-      console.log("Gender update:", gender, "vs current:", userStats?.gender);
+      console.log("Gender update:", gender, "vs current:", (userStats as any)?.gender);
       
       // Update profile first
       if (Object.keys(profileUpdates).length > 0) {
@@ -97,7 +93,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
       }
       
       // Update gender if changed
-      if (gender !== (userStats as any)?.gender) {
+      if (gender && gender !== (userStats as any)?.gender) {
         const genderResult = await apiRequest("/api/user/gender", {
           method: "PATCH",
           body: { gender },
@@ -203,45 +199,7 @@ export function ProfileEditDialog({ children }: ProfileEditDialogProps) {
             </p>
           </div>
 
-          {/* Skin Color */}
-          <div className="space-y-2">
-            <Label htmlFor="skinColor">Skin Color</Label>
-            <div className="flex space-x-2 items-center">
-              <Input
-                id="skinColor"
-                type="color"
-                value={formData.skinColor}
-                onChange={(e) => setFormData({ ...formData, skinColor: e.target.value })}
-                className="w-12 h-8 p-1 border rounded"
-              />
-              <Input
-                value={formData.skinColor}
-                onChange={(e) => setFormData({ ...formData, skinColor: e.target.value })}
-                placeholder="#F5C6A0"
-                className="flex-1 h-8 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
-              />
-            </div>
-          </div>
 
-          {/* Hair Color */}
-          <div className="space-y-2">
-            <Label htmlFor="hairColor">Hair Color</Label>
-            <div className="flex space-x-2 items-center">
-              <Input
-                id="hairColor"
-                type="color"
-                value={formData.hairColor}
-                onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
-                className="w-12 h-8 p-1 border rounded"
-              />
-              <Input
-                value={formData.hairColor}
-                onChange={(e) => setFormData({ ...formData, hairColor: e.target.value })}
-                placeholder="#8B4513"
-                className="flex-1 h-8 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
-              />
-            </div>
-          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-2 pt-2 border-t">
