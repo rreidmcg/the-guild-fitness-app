@@ -36,6 +36,19 @@ export default function WorkoutSession() {
     queryKey: ["/api/user/stats"],
   });
 
+  // Fetch workout data
+  const { data: workout, isLoading: workoutLoading } = useQuery({
+    queryKey: ["/api/workouts", id],
+    enabled: !!id,
+  });
+
+  // Load workout data into exercise state
+  useEffect(() => {
+    if (workout && (workout as any).exercises) {
+      setExerciseData((workout as any).exercises);
+    }
+  }, [workout]);
+
   // Page loading effect with gentle fade-in
   useEffect(() => {
     const loadTimer = setTimeout(() => {
@@ -141,41 +154,29 @@ export default function WorkoutSession() {
   };
 
   const handleCompleteWithRPE = () => {
-    // Generate sample exercise data for validation
-    const sampleExercises = [
-      {
-        exerciseId: 1,
-        name: "Push-ups",
-        category: "strength",
-        statTypes: { strength: 1 },
-        sets: [
-          { reps: 15, weight: 0, completed: true },
-          { reps: 12, weight: 0, completed: true },
-          { reps: 10, weight: 0, completed: true }
-        ]
-      },
-      {
-        exerciseId: 2,
-        name: "Squats",
-        category: "strength", 
-        statTypes: { strength: 1, stamina: 0.5 },
-        sets: [
-          { reps: 20, weight: 0, completed: true },
-          { reps: 18, weight: 0, completed: true },
-          { reps: 15, weight: 0, completed: true }
-        ]
-      }
-    ];
+    // Use the actual exercise data from the workout
+    const completedExercises = exerciseData.map((exercise) => ({
+      exerciseId: exercise.id || 0,
+      name: exercise.name,
+      category: exercise.category || "strength",
+      statTypes: exercise.statTypes || { strength: 1 },
+      sets: exercise.sets?.map((set: any) => ({
+        reps: set.reps || 0,
+        weight: set.weight || 0,
+        duration: set.duration || 0,
+        completed: true
+      })) || []
+    }));
 
     const sessionData = {
       workoutId: parseInt(id || "0"),
-      name: "Workout Session",
+      name: (workout as any)?.name || "Workout Session",
       duration: Math.floor(time / 60), // Convert to minutes
       totalVolume: 0, // Will be calculated from exercises
       xpEarned: 0, // Will be calculated server-side
       statsEarned: {},
       perceivedEffort,
-      exercises: sampleExercises, // Include exercise data for validation
+      exercises: completedExercises,
     };
     
     setShowRPESelection(false);
@@ -190,8 +191,25 @@ export default function WorkoutSession() {
   const progress = exerciseData.length > 0 ? (currentExerciseIndex / exerciseData.length) * 100 : 0;
 
   // Show loading skeleton during initial load
-  if (isLoading || statsLoading) {
+  if (isLoading || statsLoading || workoutLoading) {
     return <LoadingSkeleton />;
+  }
+
+  // Handle case where workout is not found
+  if (!workout) {
+    return (
+      <div className="min-h-screen bg-game-dark text-foreground pb-20 flex items-center justify-center">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="p-6 text-center">
+            <h2 className="text-xl font-semibold mb-2">Workout Not Found</h2>
+            <p className="text-muted-foreground mb-4">The workout you're looking for doesn't exist.</p>
+            <Button onClick={() => navigate('/workouts')}>
+              Back to Workouts
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -209,7 +227,7 @@ export default function WorkoutSession() {
               >
                 <ArrowLeft className="w-4 h-4 transition-transform duration-200 hover:-translate-x-1" />
               </Button>
-              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-foreground animate-in fade-in slide-in-from-left-4 delay-200">Workout Session</h1>
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-foreground animate-in fade-in slide-in-from-left-4 delay-200">{(workout as any)?.name || "Workout Session"}</h1>
             </div>
             
             <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
