@@ -33,10 +33,12 @@ interface WorkoutExercise {
 
 interface ExerciseSet {
   id: string;
+  type: 'W' | '2' | 'D' | 'F'; // W=warmup, 2=regular, D=drop, F=failure
   reps?: number;
   weight?: number;
   duration?: string;
   rest?: string;
+  rir?: number; // Reps in reserve
   completed?: boolean;
 }
 
@@ -65,6 +67,8 @@ export default function WorkoutBuilder() {
   // Modal states
   const [showFormatSelector, setShowFormatSelector] = useState(false);
   const [showTypeSelector, setShowTypeSelector] = useState(false);
+  const [showSetTypeSelector, setShowSetTypeSelector] = useState(false);
+  const [editingSet, setEditingSet] = useState<{exerciseId: string, setId: string} | null>(null);
 
   const { data: exercises = [] } = useQuery({
     queryKey: ["/api/exercises"],
@@ -375,19 +379,59 @@ export default function WorkoutBuilder() {
 
                   {/* Sets Table */}
                   <div className="space-y-2">
-                    <div className="grid grid-cols-4 gap-4 text-xs font-medium text-muted-foreground uppercase">
+                    <div className="grid grid-cols-5 gap-2 text-xs font-medium text-muted-foreground uppercase">
                       <div>SET</div>
-                      <div>REPS</div>
                       <div>LB</div>
+                      <div>REPS</div>
+                      <div>RIR</div>
                       <div>REST</div>
                     </div>
                     
                     {exercise.sets.map((set, index) => (
-                      <div key={set.id} className="grid grid-cols-4 gap-4 items-center py-2">
-                        <div className="text-sm font-medium">{index + 1}</div>
-                        <div className="text-sm">-</div>
-                        <div className="text-sm">-</div>
-                        <div className="text-sm">00:00</div>
+                      <div key={set.id} className="grid grid-cols-5 gap-2 items-center py-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`h-8 w-8 p-0 text-sm font-bold ${
+                            set.type === 'W' ? 'text-orange-500' :
+                            set.type === '2' ? 'text-blue-500' :
+                            set.type === 'D' ? 'text-blue-400' :
+                            'text-red-500'
+                          }`}
+                          onClick={() => {
+                            setEditingSet({exerciseId: exercise.id, setId: set.id});
+                            setShowSetTypeSelector(true);
+                          }}
+                        >
+                          {set.type}
+                        </Button>
+                        <Input
+                          type="number"
+                          value={set.weight || ''}
+                          onChange={(e) => updateSet(exercise.id, set.id, 'weight', parseInt(e.target.value) || 0)}
+                          className="h-8 text-sm"
+                          placeholder="-"
+                        />
+                        <Input
+                          type="number"
+                          value={set.reps || ''}
+                          onChange={(e) => updateSet(exercise.id, set.id, 'reps', parseInt(e.target.value) || 0)}
+                          className="h-8 text-sm"
+                          placeholder="10"
+                        />
+                        <Input
+                          type="number"
+                          value={set.rir || ''}
+                          onChange={(e) => updateSet(exercise.id, set.id, 'rir', parseInt(e.target.value) || 0)}
+                          className="h-8 text-sm"
+                          placeholder="-"
+                        />
+                        <Input
+                          value={set.rest || ''}
+                          onChange={(e) => updateSet(exercise.id, set.id, 'rest', e.target.value)}
+                          className="h-8 text-sm"
+                          placeholder="01:00"
+                        />
                       </div>
                     ))}
 
@@ -395,11 +439,17 @@ export default function WorkoutBuilder() {
                       variant="ghost" 
                       className="text-primary text-sm"
                       onClick={() => {
-                        // Add new set
+                        // Add new set with default regular type
                         if (currentSection && currentSection.exercises) {
                           const updatedExercises = currentSection.exercises.map(ex => 
                             ex.id === exercise.id 
-                              ? {...ex, sets: [...ex.sets, {id: Date.now().toString()}]}
+                              ? {...ex, sets: [...ex.sets, {
+                                  id: Date.now().toString(),
+                                  type: '2' as const,
+                                  reps: 10,
+                                  weight: 0,
+                                  rest: '01:00'
+                                }]}
                               : ex
                           );
                           setCurrentSection({...currentSection, exercises: updatedExercises});
@@ -551,6 +601,26 @@ export default function WorkoutBuilder() {
     setStep('section-form');
   };
 
+  // Function to update individual set properties
+  const updateSet = (exerciseId: string, setId: string, property: keyof ExerciseSet, value: any) => {
+    if (!currentSection) return;
+    
+    const updatedExercises = currentSection.exercises?.map(exercise => {
+      if (exercise.id === exerciseId) {
+        const updatedSets = exercise.sets.map(set => {
+          if (set.id === setId) {
+            return { ...set, [property]: value };
+          }
+          return set;
+        });
+        return { ...exercise, sets: updatedSets };
+      }
+      return exercise;
+    }) || [];
+
+    setCurrentSection({ ...currentSection, exercises: updatedExercises });
+  };
+
   const handleSaveSection = () => {
     if (!currentSection?.name?.trim()) return;
 
@@ -561,7 +631,13 @@ export default function WorkoutBuilder() {
         id: Date.now().toString() + Math.random(),
         exerciseId,
         exercise,
-        sets: [{id: Date.now().toString()}] // Start with one set
+        sets: [{
+          id: Date.now().toString(),
+          type: '2' as const,
+          reps: 10,
+          weight: 0,
+          rest: '01:00'
+        }] // Start with one regular set
       };
     });
 
@@ -804,6 +880,50 @@ export default function WorkoutBuilder() {
     </Dialog>
   );
 
+  // Set type selector modal
+  const renderSetTypeSelector = () => (
+    <Dialog open={showSetTypeSelector} onOpenChange={setShowSetTypeSelector}>
+      <DialogContent className="max-w-md mx-auto bg-card border-border text-foreground">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-center text-lg font-semibold text-foreground">
+            Select Set Type
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4 pb-4">
+          {[
+            { type: 'W', name: 'Warmup', description: 'Light weight warmup set', color: 'text-orange-500' },
+            { type: '2', name: 'Regular', description: 'Standard working set', color: 'text-blue-500' },
+            { type: 'D', name: 'Drop Set', description: 'Reduce weight and continue', color: 'text-blue-400' },
+            { type: 'F', name: 'Failure', description: 'Go to complete failure', color: 'text-red-500' }
+          ].map((setType) => (
+            <div 
+              key={setType.type}
+              className="flex items-center justify-between cursor-pointer py-3"
+              onClick={() => {
+                if (editingSet) {
+                  updateSet(editingSet.exerciseId, editingSet.setId, 'type', setType.type as 'W' | '2' | 'D' | 'F');
+                }
+                setShowSetTypeSelector(false);
+                setEditingSet(null);
+              }}
+            >
+              <div className="flex items-center space-x-3">
+                <div className={`w-8 h-8 rounded-full border-2 border-current flex items-center justify-center font-bold ${setType.color}`}>
+                  {setType.type}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">{setType.name}</h3>
+                  <p className="text-sm text-muted-foreground">{setType.description}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   // Main render based on step
   return (
     <>
@@ -815,6 +935,7 @@ export default function WorkoutBuilder() {
       {/* Modals */}
       {renderFormatSelector()}
       {renderTypeSelector()}
+      {renderSetTypeSelector()}
     </>
   );
 }
