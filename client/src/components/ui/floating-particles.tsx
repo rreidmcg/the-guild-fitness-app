@@ -34,11 +34,11 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
     const newParticles: Particle[] = Array.from({ length: count }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
-      y: Math.random() * 100,
+      y: -10, // Start below screen
       size: Math.random() * 4 + 2, // 2-6px
       opacity: Math.random() * 0.5 + 0.5, // Max opacity when fully lit
-      duration: Math.random() * 25 + 20, // 20-45 seconds
-      delay: Math.random() * 8, // 0-8 second delay
+      duration: Math.random() * 15 + 10, // 10-25 seconds (faster for debugging)
+      delay: Math.random() * 5, // 0-5 second delay
       color: colors[Math.floor(Math.random() * colors.length)],
       animationType: animationTypes[Math.floor(Math.random() * animationTypes.length)],
     }));
