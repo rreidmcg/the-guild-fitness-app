@@ -205,7 +205,7 @@ export default function SignupPage() {
                             placeholder="Enter your email" 
                             type="email"
                             {...field} 
-                            className="bg-white/10 border-white/20 placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
@@ -228,7 +228,7 @@ export default function SignupPage() {
                               const formatted = formatUsernameInput(e.target.value);
                               field.onChange(formatted);
                             }}
-                            className="bg-white/10 border-white/20 placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
@@ -250,7 +250,7 @@ export default function SignupPage() {
                             placeholder="Create a password" 
                             type="password"
                             {...field} 
-                            className="bg-white/10 border-white/20 placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
@@ -269,7 +269,7 @@ export default function SignupPage() {
                             placeholder="Confirm your password" 
                             type="password"
                             {...field} 
-                            className="bg-white/10 border-white/20 placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
                         <FormMessage />
