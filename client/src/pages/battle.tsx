@@ -74,7 +74,7 @@ export default function BattlePage() {
           className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
           onClick={() => navigate("/pve-dungeons")}
         >
-          <CardHeader className="text-center py-1">
+          <CardHeader className="text-center pt-0 pb-1">
             <CardTitle className="text-2xl text-green-400 flex items-center justify-center">
               <img 
                 src={dungeonsTitle} 
@@ -130,7 +130,7 @@ export default function BattlePage() {
 
         {/* PvP Card */}
         <Card className="border-2 border-purple-500/50 bg-gradient-to-br from-purple-900/20 to-pink-900/20 opacity-60">
-          <CardHeader className="text-center py-1">
+          <CardHeader className="text-center pt-0 pb-1">
             <CardTitle className="text-2xl text-purple-400 flex items-center justify-center">
               <img 
                 src={arenaTitle} 
