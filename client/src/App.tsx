@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX } from "lucide-react";
 import { useEffect } from "react";
 import { AuthGuard, PublicRoute } from "@/components/auth-guard";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import Stats from "@/pages/stats";
 import Workouts from "@/pages/workouts";
 import Settings from "@/pages/settings";
@@ -200,6 +201,7 @@ function AppContent() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-background text-foreground">
+        <ScrollToTop />
         <Toaster />
         <Router />
       </div>

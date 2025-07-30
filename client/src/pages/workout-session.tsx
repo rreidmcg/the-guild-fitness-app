@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useParams, useLocation } from "wouter";
+import { useParams } from "wouter";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,7 @@ import type { User } from "@shared/schema";
 
 export default function WorkoutSession() {
   const { id } = useParams();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -183,7 +184,7 @@ export default function WorkoutSession() {
 
   const handleVictoryClose = () => {
     setShowVictoryModal(false);
-    setLocation("/workouts");
+    navigate("/workouts");
   };
 
   const progress = exerciseData.length > 0 ? (currentExerciseIndex / exerciseData.length) * 100 : 0;
@@ -203,7 +204,7 @@ export default function WorkoutSession() {
             <div className="flex flex-col space-y-2">
               <Button 
                 variant="ghost" 
-                onClick={() => setLocation("/workouts")}
+                onClick={() => navigate("/workouts")}
                 className="text-muted-foreground hover:text-foreground p-2 sm:p-3 self-start transition-all duration-200 hover:scale-110 animate-in fade-in slide-in-from-left-2 delay-100"
               >
                 <ArrowLeft className="w-4 h-4 transition-transform duration-200 hover:-translate-x-1" />

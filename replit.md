@@ -173,6 +173,20 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 30, 2025 - Universal Scroll-to-Top Navigation Enhancement:**
+- **ScrollToTop Component**: Created global scroll-to-top functionality for all page transitions
+  - Automatically scrolls to top when navigating between pages
+  - Uses instant scrolling for immediate page positioning without animation delays
+  - Integrated with existing wouter routing system
+- **Enhanced useNavigate Hook**: Leverages existing navigation hook with smooth scroll functionality
+  - All page navigation now includes automatic scroll-to-top behavior
+  - Updated key pages (workout-session, settings, stats) to use consistent navigation
+  - Smooth scroll behavior for user-initiated navigation actions
+- **Improved User Experience**: Ensures users always start at the top of newly opened pages
+  - Eliminates confusion from landing mid-page on new routes
+  - Consistent behavior across all application pages and navigation methods
+  - Professional navigation experience matching modern web standards
+
 **January 30, 2025 - Complete Admin User Management & Global Notification System:**
 - **Comprehensive User Management System**: Implemented full user moderation capabilities for admin users
   - User banning functionality with duration options (1 day to permanent ban)

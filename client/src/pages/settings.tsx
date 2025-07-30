@@ -11,7 +11,7 @@ import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useNavigate } from "@/hooks/use-navigate";
 
 
 import { 
@@ -36,7 +36,7 @@ import {
 export default function Settings() {
   const { toast } = useToast();
   const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -67,14 +67,14 @@ export default function Settings() {
       });
       
       // Redirect to login page
-      setLocation('/login');
+      navigate('/login');
     },
     onError: () => {
       // Even if logout fails on server, clear local data
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_data');
       queryClient.clear();
-      setLocation('/login');
+      navigate('/login');
     },
   });
 
@@ -312,7 +312,7 @@ export default function Settings() {
                   <Button 
                     variant="outline" 
                     className="flex items-center justify-center"
-                    onClick={() => setLocation('/admin')}
+                    onClick={() => navigate('/admin')}
                   >
                     <Shield className="w-4 h-4 mr-2" />
                     Admin Panel
@@ -320,7 +320,7 @@ export default function Settings() {
                   <Button 
                     variant="outline" 
                     className="flex items-center justify-center"
-                    onClick={() => setLocation('/analytics')}
+                    onClick={() => navigate('/analytics')}
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     Analytics Dashboard
