@@ -24,7 +24,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
       
       // If there's an error (likely 401/403) or no user data, redirect to login
       if (error || !userStats) {
-        console.log('AuthGuard: Redirecting to login due to:', error || 'no user data');
         setLocation('/login');
       }
     }
@@ -73,7 +72,6 @@ export function PublicRoute({ children }: PublicRouteProps) {
   useEffect(() => {
     // If user is authenticated, redirect to stats page
     if (!isLoading && userStats) {
-      console.log('PublicRoute: User authenticated, redirecting to stats');
       setLocation('/stats');
     }
   }, [isLoading, userStats, setLocation]);

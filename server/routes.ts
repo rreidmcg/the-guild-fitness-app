@@ -25,30 +25,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-06-30.basil",
 });
 
-// Authentication middleware for persistent sessions
-const authenticateToken = (req: any, res: any, next: any) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-  if (!token) {
-    // Fall back to current session if no token
-    if (!currentUserId) {
-      return res.status(401).json({ error: "Authentication required" });
-    }
-    req.userId = currentUserId;
-    return next();
-  }
-
-  const payload = authUtils.verifyJWT(token);
-  if (!payload) {
-    return res.status(401).json({ error: "Invalid or expired token" });
-  }
-
-  req.userId = payload.userId;
-  currentUserId = payload.userId; // Sync with current session
-  next();
-};
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Workout recommendations route (premium feature) - DISABLED to save API costs
   /*
@@ -831,15 +807,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Generate JWT token for persistent session
-      const token = authUtils.generateJWT(user.id);
-      
       // Set the current user ID for session tracking
       currentUserId = user.id;
 
       res.json({ 
         user: { ...user, password: undefined }, // Don't send password back
-        token,
         message: "Login successful" 
       });
     } catch (error) {
@@ -1191,9 +1163,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user stats with HP and MP regeneration
-  app.get("/api/user/stats", authenticateToken, async (req: any, res) => {
+  app.get("/api/user/stats", async (req, res) => {
     try {
-      const userId = req.userId;
+      const userId = currentUserId; // Use the current logged-in user
+      
+      // Check if user is authenticated
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
       
       // Check for daily reset and auto streak freeze before getting stats
       const user = await storage.getUser(userId);

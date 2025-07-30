@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { BackgroundMusicProvider } from "@/contexts/background-music-context";
-import { AuthProvider } from "@/contexts/auth-context";
 import { useTimezone } from "@/hooks/use-timezone";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { Button } from "@/components/ui/button";
@@ -44,13 +43,6 @@ import AIWorkouts from "@/pages/ai-workouts";
 function Router() {
   return (
     <Switch>
-      {/* Root path - show login for unauthenticated users */}
-      <Route path="/">
-        <PublicRoute>
-          <LoginPage />
-        </PublicRoute>
-      </Route>
-      
       {/* Public routes - redirect to /stats if already authenticated */}
       <Route path="/signup">
         <PublicRoute>
@@ -64,6 +56,11 @@ function Router() {
       </Route>
       
       {/* Protected routes - require authentication */}
+      <Route path="/">
+        <AuthGuard>
+          <Stats />
+        </AuthGuard>
+      </Route>
       <Route path="/stats">
         <AuthGuard>
           <Stats />
@@ -182,8 +179,8 @@ function Router() {
 }
 
 function AppContent() {
-  // Timezone detection disabled to prevent 401 errors for unauthenticated users
-  // useTimezone();
+  // Initialize timezone detection for daily quest resets
+  useTimezone();
 
   // Register service worker for PWA functionality
   useEffect(() => {
@@ -213,11 +210,9 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BackgroundMusicProvider>
-          <AppContent />
-        </BackgroundMusicProvider>
-      </AuthProvider>
+      <BackgroundMusicProvider>
+        <AppContent />
+      </BackgroundMusicProvider>
     </QueryClientProvider>
   );
 }

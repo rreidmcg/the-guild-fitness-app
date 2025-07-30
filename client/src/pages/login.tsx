@@ -54,11 +54,6 @@ export default function LoginPage() {
       return result;
     },
     onSuccess: (data) => {
-      // Store JWT token for persistent sessions
-      if (data.token) {
-        localStorage.setItem('auth_token', data.token);
-      }
-      
       // Clear any cached data to ensure fresh data for the new user
       queryClient.clear();
       
