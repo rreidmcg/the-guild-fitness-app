@@ -14,6 +14,7 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { validateUsername, formatUsernameInput } from "@/utils/username-validation";
 import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
+import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -152,6 +153,13 @@ export default function SignupPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-card border-border">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-6">
+            <img 
+              src={logoImage} 
+              alt="The Guild: Gamified Fitness" 
+              className="w-48 h-auto"
+            />
+          </div>
           <CardTitle className="text-2xl font-bold text-foreground">
             Join The Guild: Gamified Fitness
           </CardTitle>
