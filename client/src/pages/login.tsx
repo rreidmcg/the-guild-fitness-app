@@ -145,7 +145,7 @@ export default function LoginPage() {
                           placeholder="Enter your email address" 
                           type="email"
                           {...field} 
-                          className="placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
+                          className="bg-white/10 border-white/20 placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
                         />
                       </FormControl>
                       <FormMessage />
@@ -165,7 +165,7 @@ export default function LoginPage() {
                             placeholder="Enter your password" 
                             type={showPassword ? "text" : "password"}
                             {...field} 
-                            className="pr-10 placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            className="pr-10 bg-white/10 border-white/20 placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                           <button
                             type="button"
