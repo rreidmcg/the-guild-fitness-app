@@ -403,10 +403,10 @@ export default function WorkoutBuilder() {
                           setIsEditingExercise(true);
                           setEditedExercise({
                             name: exercise.exercise?.name || '',
-                            modality: exercise.exercise?.modality || 'strength',
+                            modality: 'strength',
                             muscleGroups: exercise.exercise?.muscleGroups || [],
                             category: exercise.exercise?.category || 'strength',
-                            fields: ['reps', 'weight', 'RPE'],
+                            fields: (exercise.exercise as any)?.trackingFields || ['reps', 'weight', 'RPE'],
                             instructions: exercise.exercise?.description || '',
                             videoUrl: '',
                             photos: []
@@ -421,61 +421,76 @@ export default function WorkoutBuilder() {
 
                   {/* Sets Table */}
                   <div className="space-y-2">
-                    <div className="grid grid-cols-5 gap-2 text-xs font-medium text-muted-foreground uppercase">
-                      <div>SET</div>
-                      <div>LB</div>
-                      <div>REPS</div>
-                      <div>RIR</div>
-                      <div>REST</div>
-                    </div>
-                    
-                    {exercise.sets.map((set, index) => (
-                      <div key={set.id} className="grid grid-cols-5 gap-2 items-center py-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`h-8 w-8 p-0 text-sm font-bold ${
-                            set.type === 'W' ? 'text-orange-500' :
-                            set.type === 'R' ? 'text-blue-500' :
-                            set.type === 'D' ? 'text-blue-400' :
-                            'text-red-500'
-                          }`}
-                          onClick={() => {
-                            setEditingSet({exerciseId: exercise.id, setId: set.id});
-                            setShowSetTypeSelector(true);
-                          }}
-                        >
-                          {set.type === 'R' ? index + 1 : set.type}
-                        </Button>
-                        <Input
-                          type="number"
-                          value={set.weight || ''}
-                          onChange={(e) => updateSet(exercise.id, set.id, 'weight', parseInt(e.target.value) || 0)}
-                          className="h-8 text-sm"
-                          placeholder="-"
-                        />
-                        <Input
-                          type="number"
-                          value={set.reps || ''}
-                          onChange={(e) => updateSet(exercise.id, set.id, 'reps', parseInt(e.target.value) || 0)}
-                          className="h-8 text-sm"
-                          placeholder="10"
-                        />
-                        <Input
-                          type="number"
-                          value={set.rir || ''}
-                          onChange={(e) => updateSet(exercise.id, set.id, 'rir', parseInt(e.target.value) || 0)}
-                          className="h-8 text-sm"
-                          placeholder="-"
-                        />
-                        <Input
-                          value={set.rest || ''}
-                          onChange={(e) => updateSet(exercise.id, set.id, 'rest', e.target.value)}
-                          className="h-8 text-sm"
-                          placeholder="01:00"
-                        />
-                      </div>
-                    ))}
+                    {(() => {
+                      // Get tracking fields for this exercise
+                      const trackingFields = (exercise.exercise as any)?.trackingFields || ['reps', 'weight', 'RPE'];
+                      
+                      // Define field mapping
+                      const fieldMap = {
+                        'reps': { label: 'REPS', key: 'reps', type: 'number', placeholder: '10' },
+                        'weight': { label: 'LB', key: 'weight', type: 'number', placeholder: '-' },
+                        'RPE': { label: 'RIR', key: 'rir', type: 'number', placeholder: '-' },
+                        'duration': { label: 'TIME', key: 'duration', type: 'text', placeholder: '0:30' },
+                        'distance': { label: 'DIST', key: 'distance', type: 'number', placeholder: '0' },
+                        'rest': { label: 'REST', key: 'rest', type: 'text', placeholder: '01:00' }
+                      };
+                      
+                      // Always show rest as the last column
+                      const visibleFields = [...trackingFields.filter(f => f !== 'rest'), 'rest'];
+                      const gridCols = visibleFields.length + 1; // +1 for SET column
+                      
+                      return (
+                        <>
+                          <div className={`grid grid-cols-${gridCols} gap-2 text-xs font-medium text-muted-foreground uppercase`} style={{gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`}}>
+                            <div>SET</div>
+                            {visibleFields.map(field => (
+                              <div key={field}>{fieldMap[field as keyof typeof fieldMap]?.label || field.toUpperCase()}</div>
+                            ))}
+                          </div>
+                          
+                          {exercise.sets.map((set, index) => (
+                            <div key={set.id} className={`grid grid-cols-${gridCols} gap-2 items-center py-2`} style={{gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`}}>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className={`h-8 w-8 p-0 text-sm font-bold ${
+                                  set.type === 'W' ? 'text-orange-500' :
+                                  set.type === 'R' ? 'text-blue-500' :
+                                  set.type === 'D' ? 'text-blue-400' :
+                                  'text-red-500'
+                                }`}
+                                onClick={() => {
+                                  setEditingSet({exerciseId: exercise.id, setId: set.id});
+                                  setShowSetTypeSelector(true);
+                                }}
+                              >
+                                {set.type === 'R' ? index + 1 : set.type}
+                              </Button>
+                              {visibleFields.map(field => {
+                                const fieldConfig = fieldMap[field as keyof typeof fieldMap];
+                                if (!fieldConfig) return null;
+                                
+                                return (
+                                  <Input
+                                    key={field}
+                                    type={fieldConfig.type}
+                                    value={(set as any)[fieldConfig.key] || ''}
+                                    onChange={(e) => {
+                                      const value = fieldConfig.type === 'number' 
+                                        ? parseInt(e.target.value) || 0
+                                        : e.target.value;
+                                      updateSet(exercise.id, set.id, fieldConfig.key as keyof ExerciseSet, value);
+                                    }}
+                                    className="h-8 text-sm"
+                                    placeholder={fieldConfig.placeholder}
+                                  />
+                                );
+                              })}
+                            </div>
+                          ))}
+                        </>
+                      );
+                    })()}
 
                     <Button 
                       variant="ghost" 
@@ -1063,7 +1078,8 @@ export default function WorkoutBuilder() {
                 modality: editedExercise.modality,
                 category: editedExercise.category,
                 muscleGroups: editedExercise.muscleGroups,
-                description: editedExercise.instructions
+                description: editedExercise.instructions,
+                trackingFields: editedExercise.fields
               }
             };
           }
@@ -1139,7 +1155,7 @@ export default function WorkoutBuilder() {
                   <div className="bg-muted/50 p-3 rounded-lg">
                     <h4 className="font-medium text-foreground mb-1">Modality</h4>
                     <p className="text-sm text-muted-foreground capitalize">
-                      {showExerciseDetails.exercise?.modality || 'strength'}
+                      {(showExerciseDetails.exercise as any)?.modality || 'strength'}
                     </p>
                   </div>
                   <div className="bg-muted/50 p-3 rounded-lg">
