@@ -75,23 +75,17 @@ export default function BattlePage() {
           onClick={() => navigate("/pve-dungeons")}
         >
           <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 p-4 bg-green-500/20 rounded-full w-20 h-20 flex items-center justify-center">
-              <Sword className="h-10 w-10 text-green-400" />
-            </div>
-            <CardTitle className="text-2xl text-green-400 flex items-center justify-center">
+            <CardTitle className="text-2xl text-green-400 flex items-center justify-center mb-4">
               <img 
                 src={dungeonsTitle} 
                 alt="PvE Dungeons" 
-                className="h-8 object-contain"
+                className="h-12 object-contain"
                 style={{ 
                   imageRendering: 'pixelated',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
                 }}
               />
             </CardTitle>
-            <p className="text-muted-foreground">
-              Player vs Environment
-            </p>
           </CardHeader>
           <CardContent className="text-center">
             <div className="space-y-4">
