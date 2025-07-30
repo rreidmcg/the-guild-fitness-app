@@ -31,7 +31,14 @@ import {
   Calendar,
   Clock,
   UserX,
-  Eye
+  Eye,
+  Mail,
+  Send,
+  Gift,
+  Coins,
+  Star,
+  Crown,
+  Newspaper
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -95,7 +102,7 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 bg-game-slate">
+        <TabsList className="grid w-full grid-cols-4 bg-game-slate">
           <TabsTrigger value="analytics" className="flex items-center space-x-2">
             <BarChart3 className="w-4 h-4" />
             <span>Analytics Dashboard</span>
@@ -107,6 +114,10 @@ export default function AdminDashboard() {
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="w-4 h-4" />
             <span>User Administration</span>
+          </TabsTrigger>
+          <TabsTrigger value="mailbox" className="flex items-center space-x-2">
+            <Mail className="w-4 h-4" />
+            <span>Admin Mailbox</span>
           </TabsTrigger>
         </TabsList>
 
@@ -132,6 +143,10 @@ export default function AdminDashboard() {
             usersError={usersError}
             refetchUsers={refetchUsers}
           />
+        </TabsContent>
+
+        <TabsContent value="mailbox" className="space-y-6">
+          <AdminMailbox />
         </TabsContent>
       </Tabs>
     </div>
@@ -373,14 +388,8 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
   // Ban user mutation
   const banUserMutation = useApiMutation({
-    mutationFn: async (data: any) => {
-      return await fetch('/api/admin/ban-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        credentials: 'include'
-      });
-    },
+    endpoint: '/api/admin/ban-user',
+    method: 'POST',
     onSuccess: () => {
       toast({
         title: "User Banned Successfully",
@@ -400,14 +409,8 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
   // Remove user mutation
   const removeUserMutation = useApiMutation({
-    mutationFn: async (data: any) => {
-      return await fetch('/api/admin/remove-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        credentials: 'include'
-      });
-    },
+    endpoint: '/api/admin/remove-user',
+    method: 'POST',
     onSuccess: () => {
       toast({
         title: "User Removed Successfully",
@@ -427,14 +430,8 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
   // Unban user mutation
   const unbanUserMutation = useApiMutation({
-    mutationFn: async (userId: number) => {
-      return await fetch('/api/admin/unban-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-        credentials: 'include'
-      });
-    },
+    endpoint: '/api/admin/unban-user',
+    method: 'POST',
     onSuccess: () => {
       toast({
         title: "User Unbanned Successfully",
@@ -631,7 +628,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                         size="sm" 
                         variant="outline" 
                         className="text-green-400 border-green-400"
-                        onClick={() => unbanUserMutation.mutate(user.id)}
+                        onClick={() => unbanUserMutation.mutate({ userId: user.id })}
                         disabled={unbanUserMutation.isPending}
                         title="Unban User"
                       >
@@ -784,6 +781,400 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                       Confirm Removal
                     </>
                   )}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function AdminMailbox() {
+  const { toast } = useToast();
+  const [showComposeDialog, setShowComposeDialog] = useState(false);
+  const [mailSubject, setMailSubject] = useState('');
+  const [mailContent, setMailContent] = useState('');
+  const [mailType, setMailType] = useState('announcement');
+  const [includeRewards, setIncludeRewards] = useState(false);
+  const [goldReward, setGoldReward] = useState('');
+  const [xpReward, setXpReward] = useState('');
+  const [streakFreezeReward, setStreakFreezeReward] = useState('');
+  const [potionReward, setPotionReward] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
+
+  // Send mail mutation
+  const sendMailMutation = useApiMutation({
+    endpoint: '/api/admin/send-mail',
+    method: 'POST',
+    onSuccess: (response: any) => {
+      toast({
+        title: "Mail Sent Successfully",
+        description: `Notification sent to ${response.sentCount} users.`,
+      });
+      closeComposeDialog();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Send Mail",
+        description: error.message || "Unable to send notification",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const closeComposeDialog = () => {
+    setShowComposeDialog(false);
+    setMailSubject('');
+    setMailContent('');
+    setMailType('announcement');
+    setIncludeRewards(false);
+    setGoldReward('');
+    setXpReward('');
+    setStreakFreezeReward('');
+    setPotionReward('');
+    setExpiryDate('');
+  };
+
+  const handleSendMail = () => {
+    if (!mailSubject.trim() || !mailContent.trim()) {
+      toast({
+        title: "Required Fields Missing",
+        description: "Subject and content are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const rewards = includeRewards ? {
+      gold: goldReward ? parseInt(goldReward) : undefined,
+      xp: xpReward ? parseInt(xpReward) : undefined,
+      items: [
+        ...(streakFreezeReward && parseInt(streakFreezeReward) > 0 ? [{
+          itemType: 'consumable',
+          itemName: 'Streak Freeze',
+          quantity: parseInt(streakFreezeReward)
+        }] : []),
+        ...(potionReward && parseInt(potionReward) > 0 ? [{
+          itemType: 'consumable',
+          itemName: 'Health Potion',
+          quantity: parseInt(potionReward)
+        }] : [])
+      ].filter(item => item.quantity > 0)
+    } : undefined;
+
+    const mailData = {
+      subject: mailSubject,
+      content: mailContent,
+      mailType,
+      rewards: Object.keys(rewards || {}).length > 0 ? rewards : undefined,
+      expiresAt: expiryDate ? new Date(expiryDate).toISOString() : undefined
+    };
+
+    sendMailMutation.mutate(mailData);
+  };
+
+  const getMailTypeIcon = (type: string) => {
+    switch (type) {
+      case 'news': return <Newspaper className="w-4 h-4 text-blue-400" />;
+      case 'reward': return <Gift className="w-4 h-4 text-purple-400" />;
+      case 'announcement': return <Crown className="w-4 h-4 text-yellow-400" />;
+      case 'event': return <Star className="w-4 h-4 text-green-400" />;
+      default: return <Mail className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  return (
+    <>
+      <Card className="bg-game-slate border-gray-700">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center space-x-2">
+            <Mail className="w-5 h-5 text-blue-400" />
+            <span>Admin Notification Center</span>
+          </CardTitle>
+          <Button 
+            onClick={() => setShowComposeDialog(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Send className="w-4 h-4 mr-2" />
+            Compose Global Notification
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <Newspaper className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">News Update</div>
+                      <div className="text-sm text-gray-400">Platform announcements</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-purple-500/10 rounded-lg">
+                      <Gift className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Reward Mail</div>
+                      <div className="text-sm text-gray-400">Send gifts to users</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-yellow-500/10 rounded-lg">
+                      <Crown className="w-5 h-5 text-yellow-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Announcement</div>
+                      <div className="text-sm text-gray-400">Important notices</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-green-500/10 rounded-lg">
+                      <Star className="w-5 h-5 text-green-400" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-white">Event Notice</div>
+                      <div className="text-sm text-gray-400">Special events</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            
+            {/* Information Panel */}
+            <div className="p-6 bg-gray-800/50 border border-gray-700 rounded-lg">
+              <h3 className="font-semibold text-white mb-3 flex items-center space-x-2">
+                <Send className="w-5 h-5 text-blue-400" />
+                <span>Global Notification System</span>
+              </h3>
+              <div className="text-gray-300 space-y-2">
+                <p>Send notifications to all active users in the platform. You can include various types of rewards and set expiry dates for time-sensitive content.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-sm">
+                  <div>
+                    <h4 className="font-medium text-white mb-2">Notification Types:</h4>
+                    <ul className="space-y-1 text-gray-400">
+                      <li>• <span className="text-blue-400">News:</span> Platform updates and announcements</li>
+                      <li>• <span className="text-purple-400">Rewards:</span> Send gold, XP, or items to users</li>
+                      <li>• <span className="text-yellow-400">Announcements:</span> Important system notices</li>
+                      <li>• <span className="text-green-400">Events:</span> Special events and competitions</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-white mb-2">Available Rewards:</h4>
+                    <ul className="space-y-1 text-gray-400">
+                      <li>• <span className="text-yellow-400">Gold Coins:</span> In-game currency</li>
+                      <li>• <span className="text-blue-400">Experience Points:</span> Character progression</li>
+                      <li>• <span className="text-purple-400">Streak Freezes:</span> Protect daily streaks</li>
+                      <li>• <span className="text-green-400">Health Potions:</span> Restore HP instantly</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Compose Mail Dialog */}
+      <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
+        <DialogContent className="bg-card border-border max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Send className="w-5 h-5 text-blue-400" />
+              <span>Compose Global Notification</span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {/* Mail Type */}
+            <div className="space-y-2">
+              <Label htmlFor="mailType">Notification Type</Label>
+              <Select value={mailType} onValueChange={setMailType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="news">
+                    <div className="flex items-center space-x-2">
+                      <Newspaper className="w-4 h-4 text-blue-400" />
+                      <span>News Update</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="reward">
+                    <div className="flex items-center space-x-2">
+                      <Gift className="w-4 h-4 text-purple-400" />
+                      <span>Reward Mail</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="announcement">
+                    <div className="flex items-center space-x-2">
+                      <Crown className="w-4 h-4 text-yellow-400" />
+                      <span>Announcement</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="event">
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-green-400" />
+                      <span>Event Notice</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Subject */}
+            <div className="space-y-2">
+              <Label htmlFor="subject">Subject *</Label>
+              <Input
+                id="subject"
+                value={mailSubject}
+                onChange={(e) => setMailSubject(e.target.value)}
+                placeholder="Enter notification subject..."
+                className="w-full"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="space-y-2">
+              <Label htmlFor="content">Message Content *</Label>
+              <Textarea
+                id="content"
+                value={mailContent}
+                onChange={(e) => setMailContent(e.target.value)}
+                placeholder="Enter your message content here..."
+                className="min-h-24 resize-none"
+              />
+            </div>
+
+            {/* Include Rewards Toggle */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="includeRewards"
+                checked={includeRewards}
+                onChange={(e) => setIncludeRewards(e.target.checked)}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+              />
+              <Label htmlFor="includeRewards" className="flex items-center space-x-2">
+                <Gift className="w-4 h-4 text-purple-400" />
+                <span>Include Rewards & Attachments</span>
+              </Label>
+            </div>
+
+            {/* Rewards Section */}
+            {includeRewards && (
+              <div className="space-y-4 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+                <h4 className="font-medium text-white flex items-center space-x-2">
+                  <Coins className="w-4 h-4 text-yellow-400" />
+                  <span>Reward Attachments</span>
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="goldReward">Gold Coins</Label>
+                    <Input
+                      id="goldReward"
+                      type="number"
+                      value={goldReward}
+                      onChange={(e) => setGoldReward(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="xpReward">Experience Points</Label>
+                    <Input
+                      id="xpReward"
+                      type="number"
+                      value={xpReward}
+                      onChange={(e) => setXpReward(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="streakFreezeReward">Streak Freezes</Label>
+                    <Input
+                      id="streakFreezeReward"
+                      type="number"
+                      value={streakFreezeReward}
+                      onChange={(e) => setStreakFreezeReward(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      max="5"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="potionReward">Health Potions</Label>
+                    <Input
+                      id="potionReward"
+                      type="number"
+                      value={potionReward}
+                      onChange={(e) => setPotionReward(e.target.value)}
+                      placeholder="0"
+                      min="0"
+                      max="10"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Expiry Date */}
+            <div className="space-y-2">
+              <Label htmlFor="expiryDate">Expiry Date (Optional)</Label>
+              <Input
+                id="expiryDate"
+                type="datetime-local"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+                className="w-full"
+              />
+              <p className="text-xs text-gray-400">
+                Leave empty for permanent notifications
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeComposeDialog}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendMail}
+              disabled={!mailSubject.trim() || !mailContent.trim() || sendMailMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {sendMailMutation.isPending ? (
+                <>Sending...</>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  Send to All Users
                 </>
               )}
             </Button>
