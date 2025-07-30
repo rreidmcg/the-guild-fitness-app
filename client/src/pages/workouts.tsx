@@ -134,6 +134,8 @@ export default function Workouts() {
   const programs = workoutPrograms || [];
   const myCustomWorkouts = customWorkouts || [];
   const myPurchasedPrograms = programs.filter((program: any) => program.isPurchased);
+  // Filter out owned programs from the main programs list
+  const availablePrograms = programs.filter((program: any) => !program.isPurchased);
 
   const handleProgramClick = (program: WorkoutProgram) => {
     toast({
@@ -523,14 +525,14 @@ export default function Workouts() {
             <CardTitle className="text-xl font-bold text-foreground">Workout Programs</CardTitle>
           </CardHeader>
           <CardContent>
-            {programs.length === 0 ? (
+            {availablePrograms.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="mb-4">No workout programs available yet.</p>
+                <p className="mb-4">{programs.length === 0 ? "No workout programs available yet." : "All available programs are already owned!"}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {programs.map((program: WorkoutProgram) => (
+                {availablePrograms.map((program: WorkoutProgram) => (
                   <Card 
                     key={program.id} 
                     className="bg-card border-border hover:border-game-primary transition-colors cursor-pointer"
