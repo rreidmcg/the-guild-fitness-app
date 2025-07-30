@@ -187,7 +187,7 @@ export default function Workouts() {
               <Button 
                 onClick={() => navigate("/workout-builder")}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-blue-100"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 New Workout
@@ -452,10 +452,10 @@ export default function Workouts() {
                                 Start
                               </Button>
                             </div>
-                            <p className="text-sm text-foreground/80 mb-3">{program.description}</p>
+                            <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
                             <div className="flex items-center justify-between text-xs">
                               <span className="bg-amber-500/20 text-amber-600 px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
-                              <span className="text-foreground/70 font-medium">{program.durationWeeks} weeks</span>
+                              <span className="text-muted-foreground font-medium">{program.durationWeeks} weeks</span>
                             </div>
                           </CardContent>
                         </Card>
@@ -499,12 +499,12 @@ export default function Workouts() {
                                 Start
                               </Button>
                             </div>
-                            <p className="text-sm text-foreground/80 mb-3">{workout.description || "Custom workout routine"}</p>
+                            <p className="text-sm text-muted-foreground mb-3">{workout.description || "Custom workout routine"}</p>
                             <div className="flex items-center justify-between text-xs">
-                              <span className="text-foreground/70 font-medium">
+                              <span className="text-muted-foreground font-medium">
                                 {workout.exercises?.length || 0} exercises
                               </span>
-                              <span className="text-foreground/70 font-medium">
+                              <span className="text-muted-foreground font-medium">
                                 ~{workout.estimatedDuration || 30} min
                               </span>
                             </div>
@@ -562,10 +562,10 @@ export default function Workouts() {
                           </Button>
                         </div>
                       </div>
-                      <p className="text-sm text-foreground/80 mb-3">{program.description}</p>
+                      <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
                       <div className="flex items-center justify-between text-xs">
                         <span className="bg-game-primary/20 text-game-primary px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
-                        <span className="text-foreground/70 font-medium">{program.durationWeeks} weeks</span>
+                        <span className="text-muted-foreground font-medium">{program.durationWeeks} weeks</span>
                       </div>
                     </CardContent>
                   </Card>
