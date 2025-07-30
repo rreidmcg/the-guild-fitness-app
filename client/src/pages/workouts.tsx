@@ -366,22 +366,22 @@ export default function Workouts() {
               <Crown className="w-5 h-5 text-amber-500" />
               My Programs
             </CardTitle>
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <Button 
                 onClick={() => navigate("/workout-programs")}
                 size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white"
+                className="bg-amber-600 hover:bg-amber-700 text-white flex-1 sm:flex-none"
               >
                 <Star className="w-4 h-4 mr-1" />
-                Browse Programs
+                Browse
               </Button>
               <Button 
                 onClick={() => navigate('/workout-builder')}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Create Custom
+                <Plus className="w-4 h-4 mr-1" />
+                Create
               </Button>
             </div>
           </CardHeader>
@@ -391,22 +391,23 @@ export default function Workouts() {
                 <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-semibold mb-2 text-foreground">No programs yet</h3>
                 <p className="mb-6">Purchase professional programs or create your own custom workouts to get started.</p>
-                <div className="flex items-center justify-center space-x-3">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Button 
                     onClick={() => navigate("/workout-programs")}
                     size="sm"
-                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                    className="bg-amber-600 hover:bg-amber-700 text-white w-full sm:w-auto"
                   >
                     <Star className="w-4 h-4 mr-1" />
-                    Browse Programs
+                    Browse
                   </Button>
                   <Button 
                     onClick={() => navigate('/workout-builder')}
                     size="sm"
                     variant="outline"
+                    className="w-full sm:w-auto"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create Custom
+                    <Plus className="w-4 h-4 mr-1" />
+                    Create
                   </Button>
                 </div>
               </div>
