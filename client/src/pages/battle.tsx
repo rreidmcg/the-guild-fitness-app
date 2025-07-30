@@ -87,7 +87,7 @@ export default function BattlePage() {
               />
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="text-center -mt-24">
             <div className="space-y-4">
               <div className="bg-green-500/10 p-4 rounded-lg">
                 <h4 className="font-semibold text-green-400 mb-2">E-Rank Available</h4>
