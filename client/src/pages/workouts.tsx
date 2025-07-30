@@ -175,30 +175,9 @@ export default function Workouts() {
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
-          <div className="space-y-4">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Quests</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button 
-                onClick={() => navigate("/workout-programs")}
-                size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white"
-              >
-                <Star className="w-4 h-4 mr-1" />
-                Programs
-              </Button>
-              <Button 
-                onClick={() => navigate("/workout-builder")}
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                New Workout
-              </Button>
-
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Quests</h1>
+            <p className="text-muted-foreground mt-0.5 text-sm">Complete your daily adventures</p>
           </div>
         </div>
       </div>
@@ -368,198 +347,175 @@ export default function Workouts() {
           </CardContent>
         </Card>
 
-        {/* My Programs */}
+        {/* Workouts */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
-              <Crown className="w-5 h-5 text-amber-500" />
-              My Programs
+              <Dumbbell className="w-5 h-5 text-blue-500" />
+              Workouts
             </CardTitle>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <Button 
-                onClick={() => navigate("/workout-programs")}
-                size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white flex-1 sm:flex-none"
-              >
-                <Star className="w-4 h-4 mr-1" />
-                Browse
-              </Button>
+            <div className="flex justify-end">
               <Button 
                 onClick={() => navigate('/workout-builder')}
                 size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-1" />
-                Create
+                New Workout
               </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {myPurchasedPrograms.length === 0 && myCustomWorkouts.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold mb-2 text-foreground">No programs yet</h3>
-                <p className="mb-6">Purchase professional programs or create your own custom workouts to get started.</p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Button 
-                    onClick={() => navigate("/workout-programs")}
-                    size="sm"
-                    className="bg-amber-600 hover:bg-amber-700 text-white w-full sm:w-auto"
-                  >
-                    <Star className="w-4 h-4 mr-1" />
-                    Browse
-                  </Button>
-                  <Button 
-                    onClick={() => navigate('/workout-builder')}
-                    size="sm"
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Create
-                  </Button>
-                </div>
+            {myCustomWorkouts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Dumbbell className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold mb-2 text-foreground">No workouts yet</h3>
+                <p className="mb-4">Create your first custom workout to get started.</p>
+                <Button 
+                  onClick={() => navigate('/workout-builder')}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Create Workout
+                </Button>
               </div>
             ) : (
-              <div className="space-y-6">
-                {/* Purchased Programs */}
-                {myPurchasedPrograms.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <Coins className="w-4 h-4 text-amber-500" />
-                      Purchased Programs ({myPurchasedPrograms.length})
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {myPurchasedPrograms.map((program: any) => (
-                        <Card 
-                          key={program.id} 
-                          className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 hover:border-amber-400/40 transition-colors cursor-pointer"
-                          onClick={() => handleProgramClick(program)}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <Crown className="w-4 h-4 text-amber-500" />
-                                <h3 className="font-semibold text-foreground">{program.name}</h3>
-                                <span className="bg-amber-500/10 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded text-xs font-medium">
-                                  Owned
-                                </span>
-                              </div>
-                              <Button 
-                                size="sm" 
-                                className="bg-amber-600 hover:bg-amber-700 text-white"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleStartProgram(program);
-                                }}
-                              >
-                                <Play className="w-3 h-3 mr-1" />
-                                Start
-                              </Button>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="bg-amber-500/20 text-amber-600 px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
-                              <span className="text-muted-foreground font-medium">{program.durationWeeks} weeks</span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {myCustomWorkouts.map((workout: any) => (
+                  <Card 
+                    key={workout.id} 
+                    className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/workout-builder?edit=${workout.id}`)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Dumbbell className="w-4 h-4 text-blue-500" />
+                          <h3 className="font-semibold text-foreground">{workout.name}</h3>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/workout-builder?edit=${workout.id}`);
+                              }}
+                            >
+                              <Edit3 className="w-4 h-4 mr-2" />
+                              Edit Workout
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Create a copy of the workout
+                                const duplicateWorkout = async () => {
+                                  try {
+                                    await apiRequest("/api/workouts", {
+                                      method: "POST",
+                                      body: {
+                                        name: `${workout.name} (Copy)`,
+                                        description: workout.description,
+                                        exercises: workout.exercises || []
+                                      }
+                                    });
+                                    queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
+                                    toast({
+                                      title: "Success!",
+                                      description: "Workout duplicated successfully",
+                                    });
+                                  } catch (error) {
+                                    toast({
+                                      title: "Error",
+                                      description: "Failed to duplicate workout",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                };
+                                duplicateWorkout();
+                              }}
+                            >
+                              <Copy className="w-4 h-4 mr-2" />
+                              Duplicate Workout
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">{workout.description || "Custom workout routine"}</p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground font-medium">
+                          {workout.exercises?.length || 0} exercises
+                        </span>
+                        <span className="text-muted-foreground font-medium">
+                          ~{workout.estimatedDuration || 30} min
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-                {/* Custom Workouts */}
-                {myCustomWorkouts.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <Settings className="w-4 h-4 text-blue-500" />
-                      Custom Workouts ({myCustomWorkouts.length})
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {myCustomWorkouts.map((workout: any) => (
-                        <Card 
-                          key={workout.id} 
-                          className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
-                          onClick={() => navigate(`/workout-builder?edit=${workout.id}`)}
+        {/* Programs */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
+              <Crown className="w-5 h-5 text-amber-500" />
+              Programs
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {myPurchasedPrograms.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Crown className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-semibold mb-2 text-foreground">No programs yet</h3>
+                <p className="mb-4">Purchase professional workout programs from the shop.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {myPurchasedPrograms.map((program: any) => (
+                  <Card 
+                    key={program.id} 
+                    className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 hover:border-amber-400/40 transition-colors cursor-pointer"
+                    onClick={() => handleProgramClick(program)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <Unlock className="w-4 h-4 text-amber-500" />
+                          <h3 className="font-semibold text-foreground">{program.name}</h3>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          className="bg-amber-600 hover:bg-amber-700 text-white"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleStartProgram(program);
+                          }}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                <Unlock className="w-4 h-4 text-blue-500" />
-                                <h3 className="font-semibold text-foreground">{workout.name}</h3>
-                              </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <MoreHorizontal className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48">
-                                  <DropdownMenuItem 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      navigate(`/workout-builder?edit=${workout.id}`);
-                                    }}
-                                  >
-                                    <Edit3 className="w-4 h-4 mr-2" />
-                                    Edit Workout
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      // Create a copy of the workout
-                                      const duplicateWorkout = async () => {
-                                        try {
-                                          await apiRequest("/api/workouts", {
-                                            method: "POST",
-                                            body: {
-                                              name: `${workout.name} (Copy)`,
-                                              description: workout.description,
-                                              exercises: workout.exercises || []
-                                            }
-                                          });
-                                          queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
-                                          toast({
-                                            title: "Success!",
-                                            description: "Workout duplicated successfully",
-                                          });
-                                        } catch (error) {
-                                          toast({
-                                            title: "Error",
-                                            description: "Failed to duplicate workout",
-                                            variant: "destructive",
-                                          });
-                                        }
-                                      };
-                                      duplicateWorkout();
-                                    }}
-                                  >
-                                    <Copy className="w-4 h-4 mr-2" />
-                                    Duplicate Workout
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-3">{workout.description || "Custom workout routine"}</p>
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground font-medium">
-                                {workout.exercises?.length || 0} exercises
-                              </span>
-                              <span className="text-muted-foreground font-medium">
-                                ~{workout.estimatedDuration || 30} min
-                              </span>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                          <Play className="w-3 h-3 mr-1" />
+                          Start
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="bg-amber-500/20 text-amber-600 px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
+                        <span className="text-muted-foreground font-medium">{program.durationWeeks} weeks</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </CardContent>

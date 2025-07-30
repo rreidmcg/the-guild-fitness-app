@@ -23,7 +23,8 @@ import {
   Shield,
   Gift,
   Crown,
-  Flame
+  Flame,
+  Lock
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useNavigate } from "@/hooks/use-navigate";
@@ -124,6 +125,10 @@ export default function Shop() {
 
   const { data: foundersStatus } = useQuery<FoundersStatus>({
     queryKey: ["/api/founders-pack/status"],
+  });
+
+  const { data: workoutPrograms } = useQuery({
+    queryKey: ["/api/workout-programs"],
   });
 
   const purchaseItemMutation = useMutation({
@@ -562,9 +567,13 @@ export default function Shop() {
           setActiveTab(value);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="consumables">Consumables</TabsTrigger>
             <TabsTrigger value="equipment">Equipment</TabsTrigger>
+            <TabsTrigger value="programs" className="text-amber-600 font-semibold data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800 dark:text-amber-400 dark:data-[state=active]:bg-amber-900/30 dark:data-[state=active]:text-amber-200">
+              <Crown className="w-4 h-4 mr-1" />
+              Programs
+            </TabsTrigger>
             <TabsTrigger value="bundles" className="text-orange-600 font-semibold data-[state=active]:bg-orange-100 data-[state=active]:text-orange-800 dark:text-orange-400 dark:data-[state=active]:bg-orange-900/30 dark:data-[state=active]:text-orange-200">
               <Gift className="w-4 h-4 mr-1" />
               Bundles
@@ -759,6 +768,79 @@ export default function Shop() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </TabsContent>
+
+          {/* Programs Tab */}
+          <TabsContent value="programs">
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center justify-center space-x-2">
+                  <Crown className="w-6 h-6 text-amber-500" />
+                  <span>Workout Programs</span>
+                </h2>
+                <p className="text-muted-foreground">Professional multi-week training programs</p>
+              </div>
+
+              {workoutPrograms && workoutPrograms.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {workoutPrograms
+                    .filter((program: any) => !program.isPurchased && program.price > 0)
+                    .map((program: any) => (
+                    <Card key={program.id} className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 hover:border-amber-400/40 transition-colors">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Lock className="w-4 h-4 text-amber-500" />
+                            <CardTitle className="text-lg font-bold text-foreground">{program.name}</CardTitle>
+                          </div>
+                          <div className="bg-amber-500/20 text-amber-600 px-2 py-1 rounded text-xs font-medium">
+                            ${program.price}
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{program.description}</p>
+                      </CardHeader>
+                      
+                      <CardContent>
+                        <div className="space-y-3 mb-4">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Duration:</span>
+                            <span className="font-medium">{program.durationWeeks} weeks</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Difficulty:</span>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              program.difficultyLevel === 'Beginner' ? 'bg-green-500/20 text-green-600' :
+                              program.difficultyLevel === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-600' :
+                              'bg-red-500/20 text-red-600'
+                            }`}>
+                              {program.difficultyLevel}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Sessions:</span>
+                            <span className="font-medium">{program.workoutCount || 12} workouts</span>
+                          </div>
+                        </div>
+
+                        <Button 
+                          onClick={() => navigate(`/program-checkout/${program.id}`)}
+                          className="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium"
+                        >
+                          <Lock className="w-4 h-4 mr-2" />
+                          Purchase Program
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Crown className="w-16 h-16 mx-auto mb-4 opacity-50 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Programs Available</h3>
+                  <p className="text-muted-foreground">All workout programs are currently purchased or free to access.</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
