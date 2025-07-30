@@ -114,7 +114,7 @@ export default function BattlePage() {
           className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
           onClick={() => navigate("/pve-dungeons")}
         >
-          <CardHeader className="text-center -mt-20 pb-1">
+          <CardHeader className="text-center -mt-20 pb-6">
             <CardTitle className="text-2xl text-green-400 flex items-center justify-center">
               <img 
                 src={dungeonsTitle} 
