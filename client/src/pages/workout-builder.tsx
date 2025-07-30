@@ -1018,48 +1018,112 @@ export default function WorkoutBuilder() {
   // Exercise details modal
   const renderExerciseDetailsModal = () => (
     <Dialog open={!!showExerciseDetails} onOpenChange={() => setShowExerciseDetails(null)}>
-      <DialogContent className="max-w-md mx-auto bg-card border-border text-foreground">
-        <DialogHeader className="pb-4">
-          <DialogTitle className="text-center text-lg font-semibold text-foreground">
-            Exercise Details
+      <DialogContent className="max-w-lg mx-auto bg-card border-border text-foreground max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="pb-6">
+          <DialogTitle className="text-center text-xl font-bold text-foreground">
+            {showExerciseDetails?.exercise?.name}
           </DialogTitle>
         </DialogHeader>
         
         {showExerciseDetails && (
-          <div className="space-y-4 pb-4">
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">{showExerciseDetails.exercise?.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                Category: {showExerciseDetails.exercise?.category}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Muscle Groups: {showExerciseDetails.exercise?.muscleGroups?.join(', ')}
-              </p>
+          <div className="space-y-6 pb-4">
+            {/* Exercise Image Placeholder */}
+            <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                  <span className="text-2xl font-bold text-primary">Ex</span>
+                </div>
+                <p className="text-sm text-muted-foreground">Exercise Image</p>
+              </div>
             </div>
-            
-            <div>
-              <h4 className="font-medium text-foreground mb-1">Sets Configuration</h4>
-              <p className="text-sm text-muted-foreground">
-                {showExerciseDetails.sets.length} set{showExerciseDetails.sets.length !== 1 ? 's' : ''} configured
-              </p>
-              <div className="mt-2 space-y-1">
-                {showExerciseDetails.sets.map((set, index) => (
-                  <div key={set.id} className="text-xs text-muted-foreground">
-                    Set {index + 1}: {set.type === 'W' ? 'Warmup' : set.type === 'R' ? 'Regular' : set.type === 'D' ? 'Drop Set' : 'Failure'} 
-                    {set.reps && ` - ${set.reps} reps`}
-                    {set.weight && ` - ${set.weight} lbs`}
-                    {set.rest && ` - ${set.rest} rest`}
+
+            {/* Exercise Information */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-1">Category</h4>
+                  <p className="text-sm text-muted-foreground capitalize">
+                    {showExerciseDetails.exercise?.category || 'Not specified'}
+                  </p>
+                </div>
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-1">Equipment</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {showExerciseDetails.exercise?.equipment || 'Body weight'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Muscle Groups */}
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <h4 className="font-medium text-foreground mb-2">Target Muscles</h4>
+                <div className="flex flex-wrap gap-2">
+                  {showExerciseDetails.exercise?.muscleGroups?.map((muscle, index) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {muscle}
+                    </Badge>
+                  )) || <span className="text-sm text-muted-foreground">Not specified</span>}
+                </div>
+              </div>
+
+              {/* Instructions */}
+              <div className="bg-muted/50 p-3 rounded-lg">
+                <h4 className="font-medium text-foreground mb-2">Instructions</h4>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>1. Set up in proper starting position</p>
+                  <p>2. Perform the movement with controlled form</p>
+                  <p>3. Focus on full range of motion</p>
+                  <p>4. Maintain proper breathing throughout</p>
+                </div>
+              </div>
+
+              {/* Current Workout Configuration */}
+              <div className="border-t pt-4">
+                <h4 className="font-medium text-foreground mb-3">Current Workout Configuration</h4>
+                <div className="space-y-2">
+                  <div className="text-sm text-muted-foreground mb-1">
+                    {showExerciseDetails.sets.length} set{showExerciseDetails.sets.length !== 1 ? 's' : ''} configured
                   </div>
-                ))}
+                  
+                  {/* Sets Table */}
+                  <div className="bg-muted/30 rounded-lg p-3">
+                    <div className="grid grid-cols-5 gap-2 text-xs font-medium text-muted-foreground uppercase mb-2">
+                      <div>SET</div>
+                      <div>TYPE</div>
+                      <div>REPS</div>
+                      <div>WEIGHT</div>
+                      <div>REST</div>
+                    </div>
+                    {showExerciseDetails.sets.map((set, index) => (
+                      <div key={set.id} className="grid grid-cols-5 gap-2 text-sm py-1">
+                        <div className="font-medium">{index + 1}</div>
+                        <div className={`font-medium ${
+                          set.type === 'W' ? 'text-orange-500' :
+                          set.type === 'R' ? 'text-blue-500' :
+                          set.type === 'D' ? 'text-blue-400' :
+                          'text-red-500'
+                        }`}>
+                          {set.type === 'W' ? 'Warmup' : 
+                           set.type === 'R' ? 'Regular' : 
+                           set.type === 'D' ? 'Drop' : 'Failure'}
+                        </div>
+                        <div>{set.reps || '-'}</div>
+                        <div>{set.weight ? `${set.weight}lbs` : '-'}</div>
+                        <div>{set.rest || '-'}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
+
+              {/* Notes Section */}
+              {showExerciseDetails.notes && (
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-2">Notes</h4>
+                  <p className="text-sm text-muted-foreground">{showExerciseDetails.notes}</p>
+                </div>
+              )}
             </div>
-            
-            {showExerciseDetails.notes && (
-              <div>
-                <h4 className="font-medium text-foreground mb-1">Notes</h4>
-                <p className="text-sm text-muted-foreground">{showExerciseDetails.notes}</p>
-              </div>
-            )}
           </div>
         )}
       </DialogContent>
