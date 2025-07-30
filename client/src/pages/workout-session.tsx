@@ -139,11 +139,11 @@ export default function WorkoutSession() {
       <div className="bg-card border-b border-border px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="flex flex-col space-y-2">
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation("/workouts")}
-                className="text-muted-foreground hover:text-foreground p-2 sm:p-3"
+                className="text-muted-foreground hover:text-foreground p-2 sm:p-3 self-start"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
