@@ -72,7 +72,7 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {isLoading ? (
+        {isLoading || !leaderboard ? (
           <div className="space-y-4">
             {[...Array(10)].map((_, i) => (
               <div key={i} className="bg-card border border-border rounded-lg p-4 animate-pulse">
@@ -115,7 +115,7 @@ export default function LeaderboardPage() {
                         <div className="flex items-center space-x-2">
                           <h3 className="font-semibold text-foreground">{player.username}</h3>
                           {(() => {
-                            const titleComponent = getTitleComponent(player.title, "sm");
+                            const titleComponent = getTitleComponent(player.currentTitle, "sm");
                             return (
                               <span className={titleComponent.className}>
                                 {titleComponent.displayTitle}
@@ -203,9 +203,9 @@ export default function LeaderboardPage() {
                     })()}
                     <span>#{leaderboard?.findIndex((p: any) => p.id === selectedPlayer.id) + 1 || 0}</span>
                     <span>{selectedPlayer.username}</span>
-                    {selectedPlayer.title && (
-                      <span className={getTitleComponent(selectedPlayer.title, "sm").className}>
-                        {selectedPlayer.title}
+                    {selectedPlayer.currentTitle && (
+                      <span className={getTitleComponent(selectedPlayer.currentTitle, "sm").className}>
+                        {selectedPlayer.currentTitle}
                       </span>
                     )}
                   </>

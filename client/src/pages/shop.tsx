@@ -635,13 +635,13 @@ export default function Shop() {
               {filterPotionsByCategory(selectedConsumableCategory).map((potion) => (
                 <Card key={potion.id} className="bg-card border-border relative overflow-hidden">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-bold text-foreground flex items-center truncate">
+                    <CardTitle className="text-xs font-bold text-foreground flex items-center">
                       {potion.type === 'healing' ? (
-                        <Heart className="w-4 h-4 text-red-500 mr-1" />
+                        <Heart className="w-3 h-3 text-red-500 mr-1 flex-shrink-0" />
                       ) : (
-                        <Zap className="w-4 h-4 text-blue-500 mr-1" />
+                        <Zap className="w-3 h-3 text-blue-500 mr-1 flex-shrink-0" />
                       )}
-                      {potion.name.replace(' Potion', '')}
+                      <span className="truncate">{potion.name.replace(' Potion', '')}</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3">

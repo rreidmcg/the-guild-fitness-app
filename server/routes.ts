@@ -671,31 +671,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Leaderboard route
   app.get("/api/leaderboard", async (req, res) => {
     try {
-      const leaderboard = await db
-        .select({
-          id: users.id,
-          username: users.username,
-          level: users.level,
-          experience: users.experience,
-          currentTitle: users.currentTitle,
-          strength: users.strength,
-          stamina: users.stamina,
-          agility: users.agility,
-          skinColor: users.skinColor,
-          hairColor: users.hairColor,
-          gender: users.gender,
-          height: users.height,
-          weight: users.weight,
-          fitnessGoal: users.fitnessGoal,
-          customAvatarUrl: users.customAvatarUrl,
-          hasLegendaryHunterSkin: users.hasLegendaryHunterSkin,
-        })
-        .from(users)
-        .orderBy(desc(users.experience))
-        .limit(100);
-      
-
-      
+      const leaderboard = await storage.getLeaderboard();
       res.json(leaderboard);
     } catch (error) {
       console.error("Error fetching leaderboard:", error);

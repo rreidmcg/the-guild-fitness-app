@@ -28,6 +28,7 @@ export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getAllUsers(): Promise<User[]>;
+  getLeaderboard(): Promise<User[]>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByVerificationToken(token: string): Promise<User | undefined>;
@@ -394,6 +395,13 @@ export class DatabaseStorage implements IStorage {
   async getAllUsers(): Promise<User[]> {
     await this.ensureInitialized();
     return await db.select().from(users);
+  }
+
+  async getLeaderboard(): Promise<User[]> {
+    await this.ensureInitialized();
+    return await db.select().from(users)
+      .orderBy(desc(users.experience))
+      .limit(100);
   }
 
   async getExercises(): Promise<Exercise[]> {
