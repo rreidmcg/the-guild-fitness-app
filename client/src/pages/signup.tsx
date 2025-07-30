@@ -15,7 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { validateUsername, formatUsernameInput } from "@/utils/username-validation";
 import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 import { FloatingParticles } from "@/components/ui/floating-particles";
-import { AuthMusic } from "@/components/ui/auth-music";
+import { AuthMusicBanner } from "@/components/ui/auth-music-banner";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 
 const signupSchema = z.object({
@@ -155,9 +155,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
-      <AuthMusic />
-      <FloatingParticles count={20} />
+    <>
+      <AuthMusicBanner />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden pt-16">
+        <FloatingParticles count={20} />
       <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10 overflow-hidden">
         <FloatingParticles count={8} className="absolute inset-0 z-0" />
         <CardHeader className="text-center relative z-10">
@@ -471,6 +472,7 @@ export default function SignupPage() {
           userEmail={pendingSignupData.email}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }
