@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
+import { ChangePasswordDialog } from "@/components/ui/change-password-dialog";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -254,10 +255,12 @@ export default function Settings() {
               <Switch id="workout-privacy" defaultChecked />
             </div>
 
-            <Button variant="outline" className="w-full">
-              <Shield className="w-4 h-4 mr-2" />
-              Change Password
-            </Button>
+            <ChangePasswordDialog>
+              <Button variant="outline" className="w-full">
+                <Shield className="w-4 h-4 mr-2" />
+                Change Password
+              </Button>
+            </ChangePasswordDialog>
           </CardContent>
         </Card>
 

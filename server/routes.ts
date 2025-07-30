@@ -820,6 +820,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Change password endpoint
+  app.post("/api/auth/change-password", async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      
+      // Check if user is authenticated
+      if (!currentUserId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Current password and new password are required" });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "New password must be at least 6 characters long" });
+      }
+      
+      // Get current user from database
+      const user = await storage.getUser(currentUserId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Verify current password
+      const passwordValid = await authUtils.comparePassword(currentPassword, user.password);
+      if (!passwordValid) {
+        return res.status(401).json({ error: "Current password is incorrect" });
+      }
+      
+      // Check that new password is different
+      const samePassword = await authUtils.comparePassword(newPassword, user.password);
+      if (samePassword) {
+        return res.status(400).json({ error: "New password must be different from current password" });
+      }
+      
+      // Hash new password
+      const hashedNewPassword = await authUtils.hashPassword(newPassword);
+      
+      // Update password in database
+      await storage.updateUser(currentUserId, { password: hashedNewPassword });
+      
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ error: "Failed to change password" });
+    }
+  });
+
   app.post("/api/auth/logout", async (req, res) => {
     try {
       // Clear current user session
