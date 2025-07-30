@@ -11,7 +11,8 @@ import {
   Trophy,
   Calendar,
   Coins,
-  Sparkles
+  Sparkles,
+  RotateCcw
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -177,7 +178,7 @@ export default function MailPage() {
               onClick={() => refetch()}
               disabled={isLoading}
             >
-              <Mail className="w-4 h-4 mr-2" />
+              <RotateCcw className="w-4 h-4 mr-2" />
               Refresh
             </Button>
           </div>
