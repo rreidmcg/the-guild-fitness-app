@@ -566,11 +566,11 @@ export default function Workouts() {
           </Card>
         </div>
 
-        {/* Recent Sessions - Moved to bottom */}
+        {/* Session History - Moved to bottom */}
         <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center justify-between mb-3">
-              <CardTitle className="text-xl font-bold text-foreground">Recent Sessions</CardTitle>
+              <CardTitle className="text-xl font-bold text-foreground">Session History</CardTitle>
               <Button variant="ghost" className="text-game-primary hover:text-blue-400">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View All
