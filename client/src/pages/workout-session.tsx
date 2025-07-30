@@ -178,7 +178,12 @@ export default function WorkoutSession() {
                 {currentExerciseIndex} of {exerciseData.length} exercises
               </span>
             </div>
-            <Progress value={progress} className="h-3 bg-muted" />
+            <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-300 dark:bg-gray-600">
+              <div 
+                className="h-full bg-game-primary transition-all duration-300 ease-in-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
           </CardContent>
         </Card>
 
