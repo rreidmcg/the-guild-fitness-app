@@ -577,16 +577,45 @@ export default function Workouts() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
             {recentSessions.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Dumbbell className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-semibold mb-2 text-foreground">No workouts yet</h3>
-                <p className="mb-6">Start your fitness journey today! Use the "New Workout" button above.</p>
+                <p className="mb-6">Start your fitness journey by creating a workout!</p>
               </div>
             ) : (
               recentSessions.map((session: WorkoutSession) => (
-                <WorkoutCard key={session.id} session={session} />
+                <Card 
+                  key={session.id} 
+                  className="bg-gradient-to-r from-blue-500/5 to-purple-500/5 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
+                  onClick={() => navigate(`/workout-results/${session.id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold text-foreground mb-1">
+                          {session.workoutName || "Custom Workout"}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(session.completedAt).toLocaleDateString('en-US', {
+                            weekday: 'short',
+                            month: 'short', 
+                            day: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-foreground">
+                          {session.duration ? `${session.duration} min` : ''}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {session.totalVolume ? `${session.totalVolume.toLocaleString()} lbs` : ''}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))
             )}
           </CardContent>
