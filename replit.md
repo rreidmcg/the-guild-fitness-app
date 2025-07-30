@@ -180,11 +180,12 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - Smooth upward floating animation with varying speeds, sizes, and durations
   - Magical firefly atmosphere for login and signup pages with warm ambient lighting
   - Proper z-index layering ensures particles don't interfere with form interactions
-- **Background Music Integration**: Added "Time of the Hero" theme music to authentication pages
-  - Custom useBackgroundMusic hook for audio management with auto-play and loop functionality
+- **Global Background Music System**: Added "Time of the Hero" theme music with seamless page transitions
+  - MusicProvider context ensures uninterrupted music across login/signup navigation
   - FloatingSpeaker component with floating speaker control in top-right corner
   - Toggle mute/unmute functionality with Volume2/VolumeX icons
-  - Music automatically starts on page load with graceful fallback for auto-play restrictions
+  - Music automatically starts on app load with graceful fallback for auto-play restrictions
+  - Single audio instance prevents music restarts when switching between authentication pages
   - Professional backdrop blur and translucent styling for speaker control button
 - **ScrollToTop Component**: Created global scroll-to-top functionality for all page transitions
   - Automatically scrolls to top when navigating between pages

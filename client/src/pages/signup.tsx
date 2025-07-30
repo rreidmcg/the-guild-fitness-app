@@ -16,9 +16,8 @@ import { validateUsername, formatUsernameInput } from "@/utils/username-validati
 import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 import { FloatingParticles } from "@/components/ui/floating-particles";
 import { FloatingSpeaker } from "@/components/ui/floating-speaker";
-import { useBackgroundMusic } from "@/hooks/use-background-music";
+import { useMusic } from "@/contexts/music-context";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
-import heroMusicSrc from "@assets/time-of-the-hero_1753848447367.mp3";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -49,7 +48,7 @@ export default function SignupPage() {
   const [step, setStep] = useState(1);
   const [showLiabilityWaiver, setShowLiabilityWaiver] = useState(false);
   const [pendingSignupData, setPendingSignupData] = useState<SignupForm | null>(null);
-  const { isPlaying, isMuted, toggleMute } = useBackgroundMusic(heroMusicSrc);
+  const { isPlaying, isMuted, toggleMute } = useMusic();
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
