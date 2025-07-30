@@ -65,10 +65,6 @@ export default function LoginPage() {
         localStorage.setItem('user_data', JSON.stringify(data.user));
       }
       
-      toast({
-        title: "Login successful!",
-        description: "Welcome back to The Guild: Gamified Fitness!",
-      });
       setLocation("/");
     },
     onError: (error: any) => {
