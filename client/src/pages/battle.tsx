@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@/hooks/use-navigate";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -40,6 +41,13 @@ interface UserStats {
 
 export default function BattlePage() {
   const navigate = useNavigate();
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -53,10 +61,42 @@ export default function BattlePage() {
     );
   }
 
-  const userLevel = userStats.level || 1;
+  const userLevel = (userStats as UserStats)?.level || 1;
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Parallax Background Layers */}
+      <div className="fixed inset-0 z-0">
+        {/* Far Background Layer - Slowest */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            transform: `translateY(${scrollY * 0.1}px)`,
+            background: 'radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.3) 0%, transparent 50%)'
+          }}
+        />
+        
+        {/* Mid Background Layer - Medium Speed */}
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            transform: `translateY(${scrollY * 0.2}px)`,
+            background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, transparent 40%, rgba(239, 68, 68, 0.1) 100%)'
+          }}
+        />
+        
+        {/* Near Background Layer - Faster */}
+        <div 
+          className="absolute inset-0 opacity-40"
+          style={{
+            transform: `translateY(${scrollY * 0.3}px)`,
+            background: 'conic-gradient(from 45deg at 50% 50%, rgba(168, 85, 247, 0.05) 0deg, rgba(59, 130, 246, 0.05) 120deg, rgba(34, 197, 94, 0.05) 240deg, rgba(168, 85, 247, 0.05) 360deg)'
+          }}
+        />
+      </div>
+
+      {/* Main Content with Backdrop */}
+      <div className="relative z-10 container mx-auto p-4 max-w-4xl backdrop-blur-sm">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
@@ -74,7 +114,7 @@ export default function BattlePage() {
           className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
           onClick={() => navigate("/pve-dungeons")}
         >
-          <CardHeader className="text-center -mt-4 pb-1">
+          <CardHeader className="text-center -mt-16 pb-1">
             <CardTitle className="text-2xl text-green-400 flex items-center justify-center">
               <img 
                 src={dungeonsTitle} 
@@ -172,6 +212,7 @@ export default function BattlePage() {
             </div>
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );
