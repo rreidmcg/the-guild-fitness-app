@@ -17,6 +17,7 @@ import Settings from "@/pages/settings";
 import WorkoutBuilder from "@/pages/workout-builder";
 import WorkoutSession from "@/pages/workout-session";
 import Battle from "@/pages/battle";
+import PvEDungeons from "@/pages/pve-dungeons";
 import Wardrobe from "@/pages/wardrobe";
 import Shop from "@/pages/shop";
 import Profile from "@/pages/profile";
@@ -93,6 +94,11 @@ function Router() {
       <Route path="/battle">
         <AuthGuard>
           <Battle />
+        </AuthGuard>
+      </Route>
+      <Route path="/pve-dungeons">
+        <AuthGuard>
+          <PvEDungeons />
         </AuthGuard>
       </Route>
       <Route path="/wardrobe">
