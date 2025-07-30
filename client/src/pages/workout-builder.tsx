@@ -496,33 +496,10 @@ export default function WorkoutBuilder() {
                       );
                     })()}
 
-                    <Button 
-                      variant="ghost" 
-                      className="text-primary text-sm"
-                      onClick={() => {
-                        // Add new set with default regular type
-                        if (currentSection && currentSection.exercises) {
-                          const updatedExercises = currentSection.exercises.map(ex => 
-                            ex.id === exercise.id 
-                              ? {...ex, sets: [...ex.sets, {
-                                  id: Date.now().toString(),
-                                  type: 'R' as const,
-                                  reps: 10,
-                                  weight: 0,
-                                  rest: '01:00'
-                                }]}
-                              : ex
-                          );
-                          setCurrentSection({...currentSection, exercises: updatedExercises});
-                        }
-                      }}
-                    >
-                      + Add Set
-                    </Button>
                   </div>
 
                   <div className="mt-4 space-y-3">
-                    {/* Each Side Checkbox and Tempo Input */}
+                    {/* Each Side Checkbox, Tempo Input, and Add Set Button */}
                     <div className="flex items-center justify-between">
                       <label className="flex items-center space-x-2 text-sm text-muted-foreground cursor-pointer">
                         <input
@@ -582,6 +559,30 @@ export default function WorkoutBuilder() {
                           className="w-20 text-center text-sm bg-muted border-border"
                         />
                       </div>
+
+                      <Button 
+                        variant="ghost" 
+                        className="text-primary text-sm"
+                        onClick={() => {
+                          // Add new set with default regular type
+                          if (currentSection && currentSection.exercises) {
+                            const updatedExercises = currentSection.exercises.map(ex => 
+                              ex.id === exercise.id 
+                                ? {...ex, sets: [...ex.sets, {
+                                    id: Date.now().toString(),
+                                    type: 'R' as const,
+                                    reps: 10,
+                                    weight: 0,
+                                    rest: '01:00'
+                                  }]}
+                                : ex
+                            );
+                            setCurrentSection({...currentSection, exercises: updatedExercises});
+                          }
+                        }}
+                      >
+                        + Add Set
+                      </Button>
                     </div>
                     
                     <Textarea 
