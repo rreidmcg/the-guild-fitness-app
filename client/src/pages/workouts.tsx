@@ -498,25 +498,12 @@ export default function Workouts() {
                   <Card 
                     key={program.id} 
                     className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 hover:border-amber-400/40 transition-colors cursor-pointer"
-                    onClick={() => handleProgramClick(program)}
+                    onClick={() => handleStartProgram(program)}
                   >
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <Unlock className="w-4 h-4 text-amber-500" />
-                          <h3 className="font-semibold text-foreground">{program.name}</h3>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          className="bg-amber-600 hover:bg-amber-700 text-white"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleStartProgram(program);
-                          }}
-                        >
-                          <Play className="w-3 h-3 mr-1" />
-                          Start
-                        </Button>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Unlock className="w-4 h-4 text-amber-500" />
+                        <h3 className="font-semibold text-foreground">{program.name}</h3>
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
                       <div className="flex items-center justify-between text-xs">
