@@ -812,7 +812,7 @@ export default function WorkoutBuilder() {
         <div className="space-y-4 pb-4">
           {/* Regular */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, format: 'regular'} : null);
               setShowFormatSelector(false);
@@ -830,7 +830,7 @@ export default function WorkoutBuilder() {
           
           {/* AMRAP */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, format: 'amrap'} : null);
               setShowFormatSelector(false);
@@ -851,7 +851,7 @@ export default function WorkoutBuilder() {
           
           {/* Timed */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, format: 'timed'} : null);
               setShowFormatSelector(false);
@@ -872,7 +872,7 @@ export default function WorkoutBuilder() {
           
           {/* Interval */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, format: 'interval'} : null);
               setShowFormatSelector(false);
@@ -911,7 +911,7 @@ export default function WorkoutBuilder() {
         <div className="space-y-4 pb-4">
           {/* Workout (Regular) */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, type: 'workout'} : null);
               setShowTypeSelector(false);
@@ -929,7 +929,7 @@ export default function WorkoutBuilder() {
           
           {/* Warm-up */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, type: 'warmup'} : null);
               setShowTypeSelector(false);
@@ -948,7 +948,7 @@ export default function WorkoutBuilder() {
           
           {/* Cool down */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, type: 'cooldown'} : null);
               setShowTypeSelector(false);
@@ -967,7 +967,7 @@ export default function WorkoutBuilder() {
           
           {/* Recovery */}
           <div 
-            className="flex items-center justify-between cursor-pointer py-3"
+            className="flex items-center justify-between cursor-pointer py-3 hover:bg-accent rounded-lg px-2"
             onClick={() => {
               setCurrentSection(prev => prev ? {...prev, type: 'recovery'} : null);
               setShowTypeSelector(false);
