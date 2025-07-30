@@ -143,7 +143,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 15, name: "Goblin Raider", level: 6, maxHp: 27, currentHp: 27, attack: 6, goldReward: 4, description: "A goblin armed with stolen gear", image: wildGoblinImage },
       { id: 16, name: "Goblin Shaman", level: 7, maxHp: 30, currentHp: 30, attack: 6, goldReward: 4, description: "A goblin mystic wielding dark magic", image: wildGoblinImage },
       { id: 17, name: "Goblin Captain", level: 8, maxHp: 33, currentHp: 33, attack: 9, goldReward: 5, description: "A goblin officer commanding the troops", image: wildGoblinImage },
-      { id: 18, name: "Goblin Warlord", level: 8, maxHp: 42, currentHp: 42, attack: 9, goldReward: 7, description: "🏆 MINI-BOSS: A battle-scarred goblin chief with stolen armor and weapons", image: goblinWarlordImage }
+      { id: 18, name: "Goblin Warlord", level: 10, maxHp: 48, currentHp: 48, attack: 10, goldReward: 8, description: "🏆 BOSS: A battle-scarred goblin chief with stolen armor and weapons", image: goblinWarlordImage }
     ]
   },
   {
@@ -179,7 +179,7 @@ const DRANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 27, name: "Orc Berserker", level: 13, maxHp: 51, currentHp: 51, attack: 13, goldReward: 8, description: "A rage-filled orc that knows no fear", image: wildGoblinImage },
       { id: 28, name: "Orc Captain", level: 14, maxHp: 54, currentHp: 54, attack: 14, goldReward: 9, description: "An orc commander leading the troops", image: wildGoblinImage },
       { id: 29, name: "Orc Champion", level: 15, maxHp: 57, currentHp: 57, attack: 15, goldReward: 10, description: "An elite orc warrior of legendary strength", image: wildGoblinImage },
-      { id: 30, name: "Orc Warlord", level: 16, maxHp: 72, currentHp: 72, attack: 16, goldReward: 15, description: "🏆 BOSS: The supreme commander of the orc armies", image: goblinWarlordImage }
+      { id: 30, name: "Orc Warlord", level: 16, maxHp: 72, currentHp: 72, attack: 16, goldReward: 15, description: "🏆 BOSS: The supreme commander of the orc armies", image: wildGoblinImage }
     ]
   },
   {
