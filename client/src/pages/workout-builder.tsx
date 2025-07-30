@@ -522,7 +522,7 @@ export default function WorkoutBuilder() {
 
                   <div className="mt-4 space-y-3">
                     {/* Each Side Checkbox */}
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-start">
                       <label className="flex items-center space-x-2 text-sm text-muted-foreground cursor-pointer">
                         <input
                           type="checkbox"
