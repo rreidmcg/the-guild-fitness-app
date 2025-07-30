@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dd-fitness-v1';
+const CACHE_NAME = 'guild-fitness-v1';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache for offline use

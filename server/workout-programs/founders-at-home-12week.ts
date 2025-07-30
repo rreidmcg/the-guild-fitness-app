@@ -4,7 +4,7 @@
 export const foundersAtHome12Week = {
   id: "founders-at-home-12week",
   name: "Founders At-Home 12-Week Program",
-  description: "Exclusive 12-week at-home workout program designed for the first 100 Dumbbells & Dragons users. Scalable for all fitness levels with bodyweight and minimal equipment variations.",
+  description: "Exclusive 12-week at-home workout program designed for the first 100 The Guild: Gamified Fitness users. Scalable for all fitness levels with bodyweight and minimal equipment variations.",
   category: "founders",
   difficultyLevel: "Scalable",
   durationWeeks: 12,
