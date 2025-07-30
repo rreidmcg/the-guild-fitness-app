@@ -28,10 +28,21 @@ export default function WorkoutSession() {
   const [completedSession, setCompletedSession] = useState<any>(null);
   const [perceivedEffort, setPerceivedEffort] = useState(7); // RPE scale 1-10
   const [showRPESelection, setShowRPESelection] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [pageLoaded, setPageLoaded] = useState(false);
 
-  const { data: userStats } = useQuery<User>({
+  const { data: userStats, isLoading: statsLoading } = useQuery<User>({
     queryKey: ["/api/user/stats"],
   });
+
+  // Page loading effect with gentle fade-in
+  useEffect(() => {
+    const loadTimer = setTimeout(() => {
+      setIsLoading(false);
+      setTimeout(() => setPageLoaded(true), 100);
+    }, 800);
+    return () => clearTimeout(loadTimer);
+  }, []);
 
   // Timer effect
   useEffect(() => {
@@ -77,6 +88,51 @@ export default function WorkoutSession() {
   const handleStartPause = () => {
     setIsActive(!isActive);
   };
+
+  // Loading skeleton component
+  const LoadingSkeleton = () => (
+    <div className="animate-pulse">
+      <div className="bg-card border-border px-4 py-6 mb-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col space-y-2">
+              <div className="w-8 h-8 bg-muted rounded"></div>
+              <div className="w-48 h-8 bg-muted rounded"></div>
+            </div>
+            <div className="flex flex-col items-end space-y-2">
+              <div className="w-20 h-6 bg-muted rounded"></div>
+              <div className="w-16 h-8 bg-muted rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto p-6 space-y-8">
+        <Card className="bg-card border-border">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-20 h-6 bg-muted rounded"></div>
+              <div className="w-24 h-4 bg-muted rounded"></div>
+            </div>
+            <div className="w-full h-3 bg-muted rounded-full"></div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <div className="w-32 h-6 bg-muted rounded"></div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-12">
+              <div className="w-24 h-24 bg-muted rounded-full mx-auto mb-4"></div>
+              <div className="w-48 h-8 bg-muted rounded mx-auto mb-2"></div>
+              <div className="w-64 h-4 bg-muted rounded mx-auto"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
 
   const handleCompleteWorkout = () => {
     setIsActive(false); // Stop the timer
@@ -132,36 +188,43 @@ export default function WorkoutSession() {
 
   const progress = exerciseData.length > 0 ? (currentExerciseIndex / exerciseData.length) * 100 : 0;
 
+  // Show loading skeleton during initial load
+  if (isLoading || statsLoading) {
+    return <LoadingSkeleton />;
+  }
+
   return (
-    <div className="min-h-screen bg-game-dark text-foreground pb-20">
+    <div className={`min-h-screen bg-game-dark text-foreground pb-20 transition-opacity duration-500 ${pageLoaded ? 'opacity-100' : 'opacity-0'}`}>
       
       
-      <div className="bg-card border-b border-border px-4 py-6">
+      <div className="bg-card border-b border-border px-4 py-6 animate-in fade-in slide-in-from-top-2 duration-400">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex flex-col space-y-2">
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation("/workouts")}
-                className="text-muted-foreground hover:text-foreground p-2 sm:p-3 self-start"
+                className="text-muted-foreground hover:text-foreground p-2 sm:p-3 self-start transition-all duration-200 hover:scale-110 animate-in fade-in slide-in-from-left-2 delay-100"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 transition-transform duration-200 hover:-translate-x-1" />
               </Button>
-              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-foreground">Workout Session</h1>
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-foreground animate-in fade-in slide-in-from-left-4 delay-200">Workout Session</h1>
             </div>
             
             <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <div className="text-right">
-                <div className="text-xl sm:text-2xl font-bold text-foreground">{formatTime(time)}</div>
+              <div className="text-right animate-in fade-in slide-in-from-right-2 delay-300">
+                <div className={`text-xl sm:text-2xl font-bold text-foreground transition-colors duration-300 ${isActive ? 'text-game-primary' : 'text-foreground'}`}>{formatTime(time)}</div>
                 <div className="text-xs sm:text-sm text-muted-foreground">Duration</div>
               </div>
               <Button 
                 onClick={handleStartPause}
-                className={isActive ? "bg-orange-600 hover:bg-orange-700 !text-white" : "bg-game-primary hover:bg-blue-600 !text-white"}
+                className={`transform transition-all duration-300 hover:scale-110 animate-in fade-in slide-in-from-right-4 delay-400 ${isActive ? "bg-orange-600 hover:bg-orange-700 !text-white" : "bg-game-primary hover:bg-blue-600 !text-white"}`}
                 size="sm"
               >
-                {isActive ? <Pause className="w-4 h-4 mr-2 !text-white" /> : <Play className="w-4 h-4 mr-2 !text-white" />}
-                <span className="!text-white">{isActive ? "Pause" : "Start"}</span>
+                <div className="flex items-center transition-all duration-200">
+                  {isActive ? <Pause className="w-4 h-4 mr-2 !text-white transition-transform duration-200 hover:rotate-12" /> : <Play className="w-4 h-4 mr-2 !text-white transition-transform duration-200 hover:scale-125" />}
+                  <span className="!text-white">{isActive ? "Pause" : "Start"}</span>
+                </div>
               </Button>
             </div>
           </div>
@@ -170,17 +233,17 @@ export default function WorkoutSession() {
 
       <div className="max-w-4xl mx-auto p-6">
         {/* Progress Bar */}
-        <Card className="bg-card border-border mb-8">
+        <Card className="bg-card border-border mb-8 transform transition-all duration-300 hover:scale-105 animate-in fade-in slide-in-from-top-4">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-foreground">Progress</h2>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground animate-in fade-in duration-500 delay-200">
                 {currentExerciseIndex} of {exerciseData.length} exercises
               </span>
             </div>
             <div className="relative h-3 w-full overflow-hidden rounded-full bg-gray-300 dark:bg-gray-600">
               <div 
-                className="h-full bg-game-primary transition-all duration-300 ease-in-out"
+                className="h-full bg-game-primary transition-all duration-700 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -188,43 +251,45 @@ export default function WorkoutSession() {
         </Card>
 
         {/* Current Exercise */}
-        <Card className="bg-card border-border mb-8">
+        <Card className="bg-card border-border mb-8 transform transition-all duration-300 hover:scale-105 animate-in fade-in slide-in-from-bottom-4 delay-150">
           <CardHeader>
-            <CardTitle className="text-foreground">Current Exercise</CardTitle>
+            <CardTitle className="text-foreground animate-in fade-in duration-500 delay-300">Current Exercise</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center py-12">
-              <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Play className="w-12 h-12 !text-white" />
+              <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-500 hover:scale-110 animate-in zoom-in delay-400">
+                <Play className="w-12 h-12 !text-white transition-transform duration-300 hover:scale-125" />
               </div>
-              <h3 className="text-2xl font-bold mb-2 text-foreground">Start Your Workout</h3>
-              <p className="text-muted-foreground">Press start to begin tracking your session</p>
+              <h3 className="text-2xl font-bold mb-2 text-foreground animate-in fade-in slide-in-from-bottom-2 delay-500">Start Your Workout</h3>
+              <p className="text-muted-foreground animate-in fade-in slide-in-from-bottom-2 delay-600">Press start to begin tracking your session</p>
             </div>
           </CardContent>
         </Card>
 
         {/* Exercise List */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border transform transition-all duration-300 hover:scale-105 animate-in fade-in slide-in-from-bottom-4 delay-300">
           <CardHeader>
-            <CardTitle className="text-foreground">Exercise List</CardTitle>
+            <CardTitle className="text-foreground animate-in fade-in duration-500 delay-700">Exercise List</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-8 text-muted-foreground animate-in fade-in delay-800">
               <p>Exercise list will be populated when workout is loaded</p>
             </div>
           </CardContent>
         </Card>
 
         {/* Complete Workout Button */}
-        <div className="fixed bottom-6 right-6">
+        <div className="fixed bottom-6 right-6 animate-in fade-in slide-in-from-bottom-6 delay-1000">
           <Button 
             size="lg"
             onClick={handleCompleteWorkout}
             disabled={completeWorkoutMutation.isPending}
-            className="bg-game-success hover:bg-green-600 text-white"
+            className="bg-game-success hover:bg-green-600 text-white transform transition-all duration-300 hover:scale-110 hover:shadow-lg"
           >
-            <Check className="w-6 h-6 mr-2 text-white" />
-            Complete Workout
+            <Check className={`w-6 h-6 mr-2 text-white transition-all duration-300 ${completeWorkoutMutation.isPending ? 'animate-spin' : 'hover:scale-125'}`} />
+            <span className="transition-all duration-200">
+              {completeWorkoutMutation.isPending ? 'Completing...' : 'Complete Workout'}
+            </span>
           </Button>
         </div>
       </div>
