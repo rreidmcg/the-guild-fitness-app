@@ -406,7 +406,7 @@ export default function WorkoutBuilder() {
                             modality: 'strength',
                             muscleGroups: exercise.exercise?.muscleGroups || [],
                             category: exercise.exercise?.category || 'strength',
-                            fields: (exercise.exercise as any)?.trackingFields || ['reps', 'weight', 'RPE'],
+                            fields: (exercise as any)?.trackingFields || ['reps', 'weight', 'RIR'],
                             instructions: exercise.exercise?.description || '',
                             videoUrl: '',
                             photos: []
@@ -423,20 +423,20 @@ export default function WorkoutBuilder() {
                   <div className="space-y-2">
                     {(() => {
                       // Get tracking fields for this exercise
-                      const trackingFields = (exercise.exercise as any)?.trackingFields || ['reps', 'weight', 'RPE'];
+                      const trackingFields = (exercise as any)?.trackingFields || ['reps', 'weight', 'RIR'];
                       
                       // Define field mapping
                       const fieldMap = {
                         'reps': { label: 'REPS', key: 'reps', type: 'number', placeholder: '10' },
                         'weight': { label: 'LB', key: 'weight', type: 'number', placeholder: '-' },
-                        'RPE': { label: 'RIR', key: 'rir', type: 'number', placeholder: '-' },
+                        'RIR': { label: 'RIR', key: 'rir', type: 'number', placeholder: '-' },
                         'duration': { label: 'TIME', key: 'duration', type: 'text', placeholder: '0:30' },
                         'distance': { label: 'DIST', key: 'distance', type: 'number', placeholder: '0' },
                         'rest': { label: 'REST', key: 'rest', type: 'text', placeholder: '01:00' }
                       };
                       
                       // Always show rest as the last column
-                      const visibleFields = [...trackingFields.filter(f => f !== 'rest'), 'rest'];
+                      const visibleFields = [...trackingFields.filter((f: string) => f !== 'rest'), 'rest'];
                       const gridCols = visibleFields.length + 1; // +1 for SET column
                       
                       return (
@@ -1056,7 +1056,7 @@ export default function WorkoutBuilder() {
           modality: 'strength',
           muscleGroups: showExerciseDetails.exercise?.muscleGroups || [],
           category: showExerciseDetails.exercise?.category || 'strength',
-          fields: ['reps', 'weight', 'RPE'],
+          fields: (showExerciseDetails as any)?.trackingFields || ['reps', 'weight', 'RIR'],
           instructions: showExerciseDetails.exercise?.description || '',
           videoUrl: '',
           photos: []
@@ -1075,13 +1075,12 @@ export default function WorkoutBuilder() {
               exercise: {
                 ...ex.exercise,
                 name: editedExercise.name,
-                modality: editedExercise.modality,
                 category: editedExercise.category,
                 muscleGroups: editedExercise.muscleGroups,
-                description: editedExercise.instructions,
-                trackingFields: editedExercise.fields
-              }
-            };
+                description: editedExercise.instructions
+              },
+              trackingFields: editedExercise.fields
+            } as any;
           }
           return ex;
         }) || [];
@@ -1284,7 +1283,7 @@ export default function WorkoutBuilder() {
                   <div className="mt-1 grid grid-cols-3 gap-2">
                     {[
                       'time', 'speed', 'cadence', 'distance-long', 'reps', '%1RM',
-                      'weight', 'RPE', 'RIR', 'heart-rate', '%HR', 'calories',
+                      'weight', 'RIR', 'heart-rate', '%HR', 'calories',
                       'watts', 'RPM', 'rounds'
                     ].map((field) => (
                       <label key={field} className="flex items-center space-x-2 text-sm">
