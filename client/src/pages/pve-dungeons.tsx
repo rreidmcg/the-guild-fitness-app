@@ -29,6 +29,7 @@ import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_
 import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753841529625.png";
 import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753839669430.png";
 import goblinWarlordImage from "@assets/36CF820D-0CC0-4C99-A780-79B6D125B307_1753844608679.png";
+import broodmotherImage from "@assets/CE5B8D2E-90AF-4DC0-A904-EDB98089C00A_1753845237897.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
@@ -159,7 +160,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 21, name: "Poison Spider", level: 8, maxHp: 33, currentHp: 33, attack: 9, goldReward: 5, description: "A deadly arachnid dripping with venom", image: forestSpiderImage },
       { id: 22, name: "Shadow Spider", level: 9, maxHp: 36, currentHp: 36, attack: 9, goldReward: 5, description: "A spider that strikes from the darkness", image: forestSpiderImage },
       { id: 23, name: "Warrior Spider", level: 9, maxHp: 39, currentHp: 39, attack: 10, goldReward: 6, description: "A heavily armored spider guardian", image: forestSpiderImage },
-      { id: 24, name: "Broodmother", level: 10, maxHp: 48, currentHp: 48, attack: 10, goldReward: 8, description: "🏆 MINI-BOSS: An enormous spider surrounded by her countless offspring" }
+      { id: 24, name: "Broodmother", level: 10, maxHp: 48, currentHp: 48, attack: 10, goldReward: 8, description: "🏆 BOSS: An enormous spider surrounded by her countless offspring", image: broodmotherImage }
     ]
   }
 ];
