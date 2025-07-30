@@ -569,16 +569,8 @@ export default function Workouts() {
         {/* Recent Sessions - Moved to bottom */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground mb-3">Recent Sessions</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Button 
-                onClick={() => navigate('/workout-builder')}
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Workout
-              </Button>
+            <div className="flex items-center justify-between mb-3">
+              <CardTitle className="text-xl font-bold text-foreground">Recent Sessions</CardTitle>
               <Button variant="ghost" className="text-game-primary hover:text-blue-400">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 View All
