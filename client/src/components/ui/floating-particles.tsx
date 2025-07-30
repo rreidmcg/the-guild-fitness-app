@@ -46,14 +46,14 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
   }, [count]);
 
   return (
-    <div className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}>
+    <div className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}>
       {particles.map((particle) => (
         <div
           key={particle.id}
           className={`absolute rounded-full animate-firefly-${particle.animationType}`}
           style={{
             left: `${particle.x}%`,
-            top: `${particle.y}%`,
+            bottom: `${particle.y}%`,
             width: `${particle.size}px`,
             height: `${particle.size}px`,
             backgroundColor: particle.color,
