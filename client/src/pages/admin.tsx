@@ -291,6 +291,124 @@ function AnalyticsOverview({ data }: { data: any }) {
 }
 
 function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoading, exercisesError, monstersError }: any) {
+  const { toast } = useToast();
+  const [showAddExercise, setShowAddExercise] = useState(false);
+  const [showAddMonster, setShowAddMonster] = useState(false);
+  
+  // Exercise form state
+  const [exerciseForm, setExerciseForm] = useState({
+    name: '',
+    category: '',
+    muscleGroups: '',
+    description: '',
+    strengthPoints: 0,
+    staminaPoints: 0,
+    agilityPoints: 0
+  });
+
+  // Monster form state
+  const [monsterForm, setMonsterForm] = useState({
+    name: '',
+    level: 1,
+    tier: 'E',
+    health: 100,
+    attack: 10,
+    defense: 5,
+    goldReward: 10,
+    imageUrl: ''
+  });
+
+  // Add exercise mutation
+  const addExerciseMutation = useApiMutation({
+    endpoint: '/api/admin/exercises',
+    method: 'POST',
+    onSuccess: () => {
+      toast({
+        title: "Exercise Created",
+        description: "New exercise has been added to the library.",
+      });
+      setShowAddExercise(false);
+      setExerciseForm({
+        name: '',
+        category: '',
+        muscleGroups: '',
+        description: '',
+        strengthPoints: 0,
+        staminaPoints: 0,
+        agilityPoints: 0
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/exercises'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Create Exercise",
+        description: error.message || "Unable to create exercise",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add monster mutation
+  const addMonsterMutation = useApiMutation({
+    endpoint: '/api/admin/monsters',
+    method: 'POST',
+    onSuccess: () => {
+      toast({
+        title: "Monster Created",
+        description: "New monster has been added to the battle system.",
+      });
+      setShowAddMonster(false);
+      setMonsterForm({
+        name: '',
+        level: 1,
+        tier: 'E',
+        health: 100,
+        attack: 10,
+        defense: 5,
+        goldReward: 10,
+        imageUrl: ''
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/monsters'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Create Monster",
+        description: error.message || "Unable to create monster",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAddExercise = () => {
+    const muscleGroups = exerciseForm.muscleGroups.split(',').map(mg => mg.trim()).filter(mg => mg);
+    const statTypes = {
+      ...(exerciseForm.strengthPoints > 0 && { strength: exerciseForm.strengthPoints }),
+      ...(exerciseForm.staminaPoints > 0 && { stamina: exerciseForm.staminaPoints }),
+      ...(exerciseForm.agilityPoints > 0 && { agility: exerciseForm.agilityPoints })
+    };
+
+    addExerciseMutation.mutate({
+      name: exerciseForm.name,
+      category: exerciseForm.category,
+      muscleGroups,
+      description: exerciseForm.description,
+      statTypes
+    });
+  };
+
+  const handleAddMonster = () => {
+    addMonsterMutation.mutate({
+      name: monsterForm.name,
+      level: monsterForm.level,
+      tier: monsterForm.tier,
+      health: monsterForm.health,
+      attack: monsterForm.attack,
+      defense: monsterForm.defense,
+      goldReward: monsterForm.goldReward,
+      imageUrl: monsterForm.imageUrl
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -298,7 +416,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Exercise Library Management</CardTitle>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => setShowAddExercise(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Create New Exercise
             </Button>
@@ -337,7 +455,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Battle Monster Management</CardTitle>
-            <Button size="sm" className="bg-red-600 hover:bg-red-700">
+            <Button size="sm" className="bg-red-600 hover:bg-red-700" onClick={() => setShowAddMonster(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Create New Monster
             </Button>
@@ -372,6 +490,225 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Exercise Dialog */}
+      <Dialog open={showAddExercise} onOpenChange={setShowAddExercise}>
+        <DialogContent className="bg-game-slate border-gray-700 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Create New Exercise</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="exercise-name" className="text-white">Exercise Name</Label>
+              <Input
+                id="exercise-name"
+                value={exerciseForm.name}
+                onChange={(e) => setExerciseForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Push-ups"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="exercise-category" className="text-white">Category</Label>
+              <Select value={exerciseForm.category} onValueChange={(value) => setExerciseForm(prev => ({ ...prev, category: value }))}>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="strength">Strength</SelectItem>
+                  <SelectItem value="cardio">Cardio</SelectItem>
+                  <SelectItem value="flexibility">Flexibility</SelectItem>
+                  <SelectItem value="core">Core</SelectItem>
+                  <SelectItem value="plyometric">Plyometric</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="muscle-groups" className="text-white">Muscle Groups (comma-separated)</Label>
+              <Input
+                id="muscle-groups"
+                value={exerciseForm.muscleGroups}
+                onChange={(e) => setExerciseForm(prev => ({ ...prev, muscleGroups: e.target.value }))}
+                placeholder="e.g., chest, triceps, shoulders"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="exercise-description" className="text-white">Description</Label>
+              <Textarea
+                id="exercise-description"
+                value={exerciseForm.description}
+                onChange={(e) => setExerciseForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Exercise instructions and form cues..."
+                className="bg-gray-800 border-gray-600 text-white"
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="strength-points" className="text-white">Strength Points</Label>
+                <Input
+                  id="strength-points"
+                  type="number"
+                  min="0"
+                  value={exerciseForm.strengthPoints}
+                  onChange={(e) => setExerciseForm(prev => ({ ...prev, strengthPoints: parseInt(e.target.value) || 0 }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="stamina-points" className="text-white">Stamina Points</Label>
+                <Input
+                  id="stamina-points"
+                  type="number"
+                  min="0"
+                  value={exerciseForm.staminaPoints}
+                  onChange={(e) => setExerciseForm(prev => ({ ...prev, staminaPoints: parseInt(e.target.value) || 0 }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="agility-points" className="text-white">Agility Points</Label>
+                <Input
+                  id="agility-points"
+                  type="number"
+                  min="0"
+                  value={exerciseForm.agilityPoints}
+                  onChange={(e) => setExerciseForm(prev => ({ ...prev, agilityPoints: parseInt(e.target.value) || 0 }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddExercise(false)}>Cancel</Button>
+            <Button 
+              onClick={handleAddExercise} 
+              disabled={addExerciseMutation.isPending || !exerciseForm.name || !exerciseForm.category}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {addExerciseMutation.isPending ? "Creating..." : "Create Exercise"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Monster Dialog */}
+      <Dialog open={showAddMonster} onOpenChange={setShowAddMonster}>
+        <DialogContent className="bg-game-slate border-gray-700 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Create New Monster</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="monster-name" className="text-white">Monster Name</Label>
+              <Input
+                id="monster-name"
+                value={monsterForm.name}
+                onChange={(e) => setMonsterForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Shadow Wolf"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="monster-level" className="text-white">Level</Label>
+                <Input
+                  id="monster-level"
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={monsterForm.level}
+                  onChange={(e) => setMonsterForm(prev => ({ ...prev, level: parseInt(e.target.value) || 1 }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="monster-tier" className="text-white">Tier</Label>
+                <Select value={monsterForm.tier} onValueChange={(value) => setMonsterForm(prev => ({ ...prev, tier: value }))}>
+                  <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="E">E-rank</SelectItem>
+                    <SelectItem value="D">D-rank</SelectItem>
+                    <SelectItem value="C">C-rank</SelectItem>
+                    <SelectItem value="B">B-rank</SelectItem>
+                    <SelectItem value="A">A-rank</SelectItem>
+                    <SelectItem value="S">S-rank</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="monster-health" className="text-white">Health</Label>
+                <Input
+                  id="monster-health"
+                  type="number"
+                  min="1"
+                  value={monsterForm.health}
+                  onChange={(e) => setMonsterForm(prev => ({ ...prev, health: parseInt(e.target.value) || 100 }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="monster-attack" className="text-white">Attack</Label>
+                <Input
+                  id="monster-attack"
+                  type="number"
+                  min="1"
+                  value={monsterForm.attack}
+                  onChange={(e) => setMonsterForm(prev => ({ ...prev, attack: parseInt(e.target.value) || 10 }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <Label htmlFor="monster-defense" className="text-white">Defense</Label>
+                <Input
+                  id="monster-defense"
+                  type="number"
+                  min="0"
+                  value={monsterForm.defense}
+                  onChange={(e) => setMonsterForm(prev => ({ ...prev, defense: parseInt(e.target.value) || 5 }))}
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="gold-reward" className="text-white">Gold Reward</Label>
+              <Input
+                id="gold-reward"
+                type="number"
+                min="1"
+                value={monsterForm.goldReward}
+                onChange={(e) => setMonsterForm(prev => ({ ...prev, goldReward: parseInt(e.target.value) || 10 }))}
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="image-url" className="text-white">Image URL (optional)</Label>
+              <Input
+                id="image-url"
+                value={monsterForm.imageUrl}
+                onChange={(e) => setMonsterForm(prev => ({ ...prev, imageUrl: e.target.value }))}
+                placeholder="https://..."
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddMonster(false)}>Cancel</Button>
+            <Button 
+              onClick={handleAddMonster} 
+              disabled={addMonsterMutation.isPending || !monsterForm.name}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {addMonsterMutation.isPending ? "Creating..." : "Create Monster"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

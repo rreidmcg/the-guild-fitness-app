@@ -2505,6 +2505,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new exercise
+  app.post("/api/admin/exercises", isAdmin, async (req, res) => {
+    try {
+      const { name, category, muscleGroups, description, statTypes } = req.body;
+      
+      if (!name || !category || !muscleGroups || !statTypes) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const exercise = await storage.createExercise({
+        name,
+        category,
+        muscleGroups,
+        description,
+        statTypes
+      });
+
+      res.json(exercise);
+    } catch (error) {
+      console.error("Error creating exercise:", error);
+      res.status(500).json({ error: "Failed to create exercise" });
+    }
+  });
+
+  // Create new monster
+  app.post("/api/admin/monsters", isAdmin, async (req, res) => {
+    try {
+      const { name, level, tier, health, attack, defense, goldReward, imageUrl } = req.body;
+      
+      if (!name || !level || !tier || !health || !attack || typeof defense === 'undefined' || !goldReward) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const monster = await storage.createMonster({
+        name,
+        level,
+        tier,
+        health,
+        attack,
+        defense,
+        goldReward,
+        imageUrl: imageUrl || null
+      });
+
+      res.json(monster);
+    } catch (error) {
+      console.error("Error creating monster:", error);
+      res.status(500).json({ error: "Failed to create monster" });
+    }
+  });
+
   // User management routes
   app.post("/api/admin/ban-user", isAdmin, async (req, res) => {
     try {
