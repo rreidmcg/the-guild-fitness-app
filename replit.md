@@ -193,6 +193,14 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - Enhanced content management buttons with descriptive action text and professional tooltips
   - Analytics section improvements with better titles and comprehensive data presentation
   - Professional disabled state styling and feature roadmap for upcoming capabilities
+- **My Programs Section**: Added comprehensive "My Programs" card to quest page for better workout organization
+  - Displays purchased workout programs with "Owned" status and crown icons
+  - Shows custom user-created workouts with "Custom" status and wrench icons
+  - Separates purchased programs from custom workouts with distinct styling
+  - Moved recent workouts section to bottom of page for better content hierarchy
+  - Added quick action buttons to browse programs or create custom workouts
+  - Enhanced UI with gradient backgrounds and professional status badges
+- **UI Enhancement**: Updated mail refresh button to use circular arrow icon (RotateCcw) for better user recognition
 
 **July 29, 2025 - Comprehensive Streak Bonus System Implementation:**
 - **Completed Streak Bonus System**: Implemented 1.5x XP multiplier for users with 3+ day streaks
