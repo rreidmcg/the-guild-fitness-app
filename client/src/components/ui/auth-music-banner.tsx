@@ -65,29 +65,19 @@ export function AuthMusicBanner() {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-sm border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center space-x-2 text-white/80 text-sm">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span>Epic music playing</span>
-        </div>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleMusic}
-          className="text-white/80 hover:text-white hover:bg-white/10 transition-colors"
-        >
-          {isPlaying && !isMuted ? (
-            <Volume2 className="w-4 h-4" />
-          ) : (
-            <VolumeX className="w-4 h-4" />
-          )}
-          <span className="ml-2 text-xs">
-            {isPlaying && !isMuted ? 'Mute' : 'Play'}
-          </span>
-        </Button>
-      </div>
+    <div className="fixed top-4 left-4 z-50">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={toggleMusic}
+        className="text-white/80 hover:text-white hover:bg-white/10 transition-colors p-2"
+      >
+        {isPlaying && !isMuted ? (
+          <Volume2 className="w-5 h-5" />
+        ) : (
+          <VolumeX className="w-5 h-5" />
+        )}
+      </Button>
     </div>
   );
 }
