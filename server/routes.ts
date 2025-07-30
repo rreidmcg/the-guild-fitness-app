@@ -706,7 +706,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post("/api/auth/signup", async (req, res) => {
     try {
-      const { email, username, password, height, weight, fitnessGoal, measurementUnit, gender } = req.body;
+      const { email, username, password, height, weight, fitnessGoal, measurementUnit, gender, avatarGender } = req.body;
       
       // Validate and sanitize username
       const validation = validateUsername(username);
@@ -747,7 +747,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         weight,
         fitnessGoal,
         measurementUnit,
-        gender,
+        gender: avatarGender || gender,
         experience: 0,
         level: 1,
         strength: 0,

@@ -30,7 +30,8 @@ const signupSchema = z.object({
   weight: z.number().min(1, "Weight is required"),
   fitnessGoal: z.enum(["lose_weight", "gain_muscle", "improve_endurance", "general_fitness"]),
   measurementUnit: z.enum(["imperial", "metric"]),
-  gender: z.enum(["male", "female", "other"])
+  gender: z.enum(["male", "female", "other"]),
+  avatarGender: z.enum(["male", "female"])
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -56,7 +57,8 @@ export default function SignupPage() {
       weight: 0,
       fitnessGoal: "general_fitness",
       measurementUnit: "imperial",
-      gender: "male"
+      gender: "male",
+      avatarGender: "male"
     },
   });
 
@@ -75,7 +77,8 @@ export default function SignupPage() {
           weight: data.weight,
           fitnessGoal: data.fitnessGoal,
           measurementUnit: data.measurementUnit,
-          gender: data.gender
+          gender: data.gender,
+          avatarGender: data.avatarGender
         }),
       });
       
@@ -312,6 +315,40 @@ export default function SignupPage() {
                             <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="avatarGender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Avatar Appearance</FormLabel>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          Choose your character's visual appearance
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            type="button"
+                            variant={field.value === "male" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => field.onChange("male")}
+                            className="flex-1"
+                          >
+                            Male Avatar
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={field.value === "female" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => field.onChange("female")}
+                            className="flex-1"
+                          >
+                            Female Avatar
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
