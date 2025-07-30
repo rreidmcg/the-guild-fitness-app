@@ -10,8 +10,9 @@ import { Badge } from "@/components/ui/badge";
 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown } from "lucide-react";
+import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown, Copy, Trash2, RefreshCw, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { Exercise } from "@shared/schema";
 
 interface WorkoutSection {
@@ -69,6 +70,8 @@ export default function WorkoutBuilder() {
   const [showTypeSelector, setShowTypeSelector] = useState(false);
   const [showSetTypeSelector, setShowSetTypeSelector] = useState(false);
   const [editingSet, setEditingSet] = useState<{exerciseId: string, setId: string} | null>(null);
+  const [showExerciseMenu, setShowExerciseMenu] = useState<string | null>(null);
+  const [showExerciseDetails, setShowExerciseDetails] = useState<WorkoutExercise | null>(null);
 
   const { data: exercises = [] } = useQuery({
     queryKey: ["/api/exercises"],
@@ -372,9 +375,31 @@ export default function WorkoutBuilder() {
                       </div>
                       <h3 className="font-semibold text-foreground">{exercise.exercise?.name}</h3>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => handleDuplicateExercise(exercise.id)}>
+                          <Copy className="w-4 h-4 mr-2" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDeleteExercise(exercise.id)}>
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleChangeExercise(exercise.id)}>
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Change exercise
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShowExerciseDetails(exercise)}>
+                          <Info className="w-4 h-4 mr-2" />
+                          Details
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
 
                   {/* Sets Table */}
@@ -646,6 +671,65 @@ export default function WorkoutBuilder() {
     }) || [];
 
     setCurrentSection({ ...currentSection, exercises: updatedExercises });
+  };
+
+  // Exercise menu handlers
+  const handleDuplicateExercise = (exerciseId: string) => {
+    if (!currentSection) return;
+    
+    const exerciseToDuplicate = currentSection.exercises?.find(ex => ex.id === exerciseId);
+    if (!exerciseToDuplicate) return;
+
+    const duplicatedExercise = {
+      ...exerciseToDuplicate,
+      id: Date.now().toString() + Math.random(),
+      sets: exerciseToDuplicate.sets.map(set => ({
+        ...set,
+        id: Date.now().toString() + Math.random()
+      }))
+    };
+
+    setCurrentSection(prev => ({
+      ...prev!,
+      exercises: [...(prev?.exercises || []), duplicatedExercise]
+    }));
+
+    toast({
+      title: "Exercise duplicated",
+      description: `${exerciseToDuplicate.exercise?.name} has been duplicated`,
+    });
+  };
+
+  const handleDeleteExercise = (exerciseId: string) => {
+    if (!currentSection) return;
+    
+    const exerciseToDelete = currentSection.exercises?.find(ex => ex.id === exerciseId);
+    
+    setCurrentSection(prev => ({
+      ...prev!,
+      exercises: prev?.exercises?.filter(ex => ex.id !== exerciseId) || []
+    }));
+
+    toast({
+      title: "Exercise deleted",
+      description: `${exerciseToDelete?.exercise?.name} has been removed`,
+    });
+  };
+
+  const handleChangeExercise = (exerciseId: string) => {
+    setSelectedSectionId(currentSection?.id || null);
+    setSelectedExercises([]);
+    setStep('exercise-selection');
+    
+    // Store the exercise being replaced for later
+    const exerciseToReplace = currentSection?.exercises?.find(ex => ex.id === exerciseId);
+    if (exerciseToReplace) {
+      // Remove the exercise being replaced temporarily
+      setCurrentSection(prev => ({
+        ...prev!,
+        exercises: prev?.exercises?.filter(ex => ex.id !== exerciseId) || []
+      }));
+    }
   };
 
   const handleSaveSection = () => {
@@ -931,11 +1015,62 @@ export default function WorkoutBuilder() {
     </Dialog>
   );
 
+  // Exercise details modal
+  const renderExerciseDetailsModal = () => (
+    <Dialog open={!!showExerciseDetails} onOpenChange={() => setShowExerciseDetails(null)}>
+      <DialogContent className="max-w-md mx-auto bg-card border-border text-foreground">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-center text-lg font-semibold text-foreground">
+            Exercise Details
+          </DialogTitle>
+        </DialogHeader>
+        
+        {showExerciseDetails && (
+          <div className="space-y-4 pb-4">
+            <div>
+              <h3 className="font-semibold text-foreground mb-2">{showExerciseDetails.exercise?.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                Category: {showExerciseDetails.exercise?.category}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Muscle Groups: {showExerciseDetails.exercise?.muscleGroups?.join(', ')}
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-foreground mb-1">Sets Configuration</h4>
+              <p className="text-sm text-muted-foreground">
+                {showExerciseDetails.sets.length} set{showExerciseDetails.sets.length !== 1 ? 's' : ''} configured
+              </p>
+              <div className="mt-2 space-y-1">
+                {showExerciseDetails.sets.map((set, index) => (
+                  <div key={set.id} className="text-xs text-muted-foreground">
+                    Set {index + 1}: {set.type === 'W' ? 'Warmup' : set.type === 'R' ? 'Regular' : set.type === 'D' ? 'Drop Set' : 'Failure'} 
+                    {set.reps && ` - ${set.reps} reps`}
+                    {set.weight && ` - ${set.weight} lbs`}
+                    {set.rest && ` - ${set.rest} rest`}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {showExerciseDetails.notes && (
+              <div>
+                <h4 className="font-medium text-foreground mb-1">Notes</h4>
+                <p className="text-sm text-muted-foreground">{showExerciseDetails.notes}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+
   // Main render based on step
   return (
     <>
-      {step === 'details' && renderDetailsStep()}
-      {step === 'sections' && renderSectionsStep()}
+      {step === 'details' && renderDetails()}
+      {step === 'sections' && renderSections()}
       {step === 'section-form' && renderSectionForm()}
       {step === 'exercise-selection' && renderExerciseSelection()}
       
@@ -943,6 +1078,7 @@ export default function WorkoutBuilder() {
       {renderFormatSelector()}
       {renderTypeSelector()}
       {renderSetTypeSelector()}
+      {renderExerciseDetailsModal()}
     </>
   );
 }
