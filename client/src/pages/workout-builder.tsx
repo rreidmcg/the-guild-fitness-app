@@ -41,6 +41,7 @@ interface ExerciseSet {
   duration?: string;
   rest?: string;
   rir?: number; // Reps in reserve
+  rpe?: number; // Rate of perceived exertion
   completed?: boolean;
 }
 
@@ -430,6 +431,7 @@ export default function WorkoutBuilder() {
                         'reps': { label: 'REPS', key: 'reps', type: 'number', placeholder: '10' },
                         'weight': { label: 'LB', key: 'weight', type: 'number', placeholder: '-' },
                         'RIR': { label: 'RIR', key: 'rir', type: 'number', placeholder: '-' },
+                        'RPE': { label: 'RPE', key: 'rpe', type: 'number', placeholder: '-' },
                         'duration': { label: 'TIME', key: 'duration', type: 'text', placeholder: '0:30' },
                         'distance': { label: 'DIST', key: 'distance', type: 'number', placeholder: '0' },
                         'rest': { label: 'REST', key: 'rest', type: 'text', placeholder: '01:00' }
@@ -1283,7 +1285,7 @@ export default function WorkoutBuilder() {
                   <div className="mt-1 grid grid-cols-3 gap-2">
                     {[
                       'time', 'speed', 'cadence', 'distance-long', 'reps', '%1RM',
-                      'weight', 'RIR', 'heart-rate', '%HR', 'calories',
+                      'weight', 'RIR', 'RPE', 'heart-rate', '%HR', 'calories',
                       'watts', 'RPM', 'rounds'
                     ].map((field) => (
                       <label key={field} className="flex items-center space-x-2 text-sm">
