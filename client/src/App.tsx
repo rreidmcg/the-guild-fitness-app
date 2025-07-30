@@ -70,6 +70,11 @@ function Router() {
           <Stats />
         </AuthGuard>
       </Route>
+      <Route path="/quests">
+        <AuthGuard>
+          <Workouts />
+        </AuthGuard>
+      </Route>
       <Route path="/workouts">
         <AuthGuard>
           <Workouts />
