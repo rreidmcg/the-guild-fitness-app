@@ -2,9 +2,17 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { LoadingState } from '@/components/ui/loading-spinner';
 import { ApiError } from '@/components/ui/api-error';
 import { useApiQuery, useApiMutation } from '@/hooks/use-api';
+import { useToast } from '@/hooks/use-toast';
+import { queryClient } from '@/lib/queryClient';
 import { 
   Users, 
   Activity, 
@@ -15,7 +23,15 @@ import {
   Edit,
   Trash2,
   BarChart3,
-  Settings
+  Settings,
+  Ban,
+  Shield,
+  AlertTriangle,
+  Search,
+  Calendar,
+  Clock,
+  UserX,
+  Eye
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -50,6 +66,17 @@ export default function AdminDashboard() {
     queryKey: ['/api/admin/monsters'],
     endpoint: '/api/admin/monsters',
     enabled: activeTab === 'content'
+  });
+
+  const { 
+    data: users, 
+    isLoading: usersLoading, 
+    error: usersError,
+    refetch: refetchUsers 
+  } = useApiQuery({
+    queryKey: ['/api/admin/users'],
+    endpoint: '/api/admin/users',
+    enabled: activeTab === 'users'
   });
 
   if (analyticsLoading && activeTab === 'analytics') {
@@ -99,7 +126,12 @@ export default function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
-          <UserManagement />
+          <UserManagement 
+            users={users}
+            usersLoading={usersLoading}
+            usersError={usersError}
+            refetchUsers={refetchUsers}
+          />
         </TabsContent>
       </Tabs>
     </div>
@@ -329,51 +361,435 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
   );
 }
 
-function UserManagement() {
+function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) {
+  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [actionType, setActionType] = useState<'ban' | 'remove' | null>(null);
+  const [banDuration, setBanDuration] = useState('');
+  const [banReason, setBanReason] = useState('');
+  const [removeReason, setRemoveReason] = useState('');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+  // Ban user mutation
+  const banUserMutation = useApiMutation({
+    mutationFn: async (data: any) => {
+      return await fetch('/api/admin/ban-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include'
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Banned Successfully",
+        description: `${selectedUser?.username} has been banned.`,
+      });
+      refetchUsers();
+      closeDialog();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Ban User",
+        description: error.message || "Unable to ban user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove user mutation
+  const removeUserMutation = useApiMutation({
+    mutationFn: async (data: any) => {
+      return await fetch('/api/admin/remove-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include'
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Removed Successfully",
+        description: `${selectedUser?.username} has been permanently removed.`,
+      });
+      refetchUsers();
+      closeDialog();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Remove User",
+        description: error.message || "Unable to remove user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Unban user mutation
+  const unbanUserMutation = useApiMutation({
+    mutationFn: async (userId: number) => {
+      return await fetch('/api/admin/unban-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+        credentials: 'include'
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "User Unbanned Successfully",
+        description: "User has been restored and can access the platform again.",
+      });
+      refetchUsers();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Unban User",
+        description: error.message || "Unable to unban user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const closeDialog = () => {
+    setShowConfirmDialog(false);
+    setSelectedUser(null);
+    setActionType(null);
+    setBanDuration('');
+    setBanReason('');
+    setRemoveReason('');
+  };
+
+  const handleBanUser = (user: any) => {
+    setSelectedUser(user);
+    setActionType('ban');
+    setShowConfirmDialog(true);
+  };
+
+  const handleRemoveUser = (user: any) => {
+    setSelectedUser(user);
+    setActionType('remove');
+    setShowConfirmDialog(true);
+  };
+
+  const confirmAction = () => {
+    if (actionType === 'ban') {
+      const banData = {
+        userId: selectedUser.id,
+        reason: banReason,
+        duration: banDuration || null, // null = permanent
+      };
+      banUserMutation.mutate(banData);
+    } else if (actionType === 'remove') {
+      const removeData = {
+        userId: selectedUser.id,
+        reason: removeReason,
+      };
+      removeUserMutation.mutate(removeData);
+    }
+  };
+
+  const getUserStatusBadge = (user: any) => {
+    if (user.isDeleted) {
+      return <Badge variant="destructive" className="text-xs">Deleted</Badge>;
+    }
+    if (user.isBanned) {
+      const isTemporary = user.bannedUntil && new Date(user.bannedUntil) > new Date();
+      return (
+        <Badge variant="destructive" className="text-xs">
+          {isTemporary ? 'Temp Banned' : 'Banned'}
+        </Badge>
+      );
+    }
+    return <Badge variant="secondary" className="text-xs bg-green-600">Active</Badge>;
+  };
+
+  const filteredUsers = users?.filter((user: any) =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  if (usersLoading) {
+    return <LoadingState>Loading user accounts...</LoadingState>;
+  }
+
+  if (usersError) {
+    return <ApiError error={usersError} onRetry={refetchUsers} />;
+  }
+
   return (
-    <Card className="bg-game-slate border-gray-700">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>User Management Dashboard</CardTitle>
-        <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Administrator
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="outline" className="p-4 h-auto flex-col space-y-2" disabled>
-              <Users className="w-6 h-6 text-blue-400" />
-              <span>View All Users</span>
-              <span className="text-xs text-muted-foreground">Browse & Search Users</span>
-            </Button>
-            <Button variant="outline" className="p-4 h-auto flex-col space-y-2" disabled>
-              <Settings className="w-6 h-6 text-green-400" />
-              <span>User Permissions</span>
-              <span className="text-xs text-muted-foreground">Manage Access Levels</span>
-            </Button>
-            <Button variant="outline" className="p-4 h-auto flex-col space-y-2" disabled>
-              <Activity className="w-6 h-6 text-orange-400" />
-              <span>Account Moderation</span>
-              <span className="text-xs text-muted-foreground">Suspend/Restore Users</span>
+    <>
+      <Card className="bg-game-slate border-gray-700">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>User Account Management</CardTitle>
+          <div className="flex items-center space-x-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search users..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-64"
+              />
+            </div>
+            <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Administrator
             </Button>
           </div>
-          
-          {/* Coming Soon Notice */}
-          <div className="text-center py-6 border border-gray-700 rounded-lg bg-gray-800/50">
-            <Users className="w-10 h-10 mx-auto mb-3 text-blue-400 opacity-70" />
-            <h3 className="font-semibold text-white mb-2">Advanced User Management</h3>
-            <p className="text-gray-400 mb-3">Comprehensive user administration tools are being developed</p>
-            <div className="text-sm text-gray-500 space-y-1">
-              <p>• Real-time user monitoring and activity tracking</p>
-              <p>• Automated moderation and content filtering</p>
-              <p>• Detailed user analytics and engagement metrics</p>
-              <p>• Bulk user operations and data export capabilities</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* User Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-5 h-5 text-blue-400" />
+                    <div>
+                      <div className="text-xl font-bold text-white">{users?.length || 0}</div>
+                      <div className="text-sm text-gray-400">Total Users</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Shield className="w-5 h-5 text-green-400" />
+                    <div>
+                      <div className="text-xl font-bold text-white">
+                        {users?.filter((u: any) => !u.isBanned && !u.isDeleted).length || 0}
+                      </div>
+                      <div className="text-sm text-gray-400">Active Users</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <Ban className="w-5 h-5 text-red-400" />
+                    <div>
+                      <div className="text-xl font-bold text-white">
+                        {users?.filter((u: any) => u.isBanned).length || 0}
+                      </div>
+                      <div className="text-sm text-gray-400">Banned Users</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-gray-800 border-gray-600">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-2">
+                    <UserX className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <div className="text-xl font-bold text-white">
+                        {users?.filter((u: any) => u.isDeleted).length || 0}
+                      </div>
+                      <div className="text-sm text-gray-400">Deleted Users</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* User List */}
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {filteredUsers.map((user: any) => (
+                <div key={user.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium text-white">{user.username}</span>
+                        {getUserStatusBadge(user)}
+                        {user.currentTitle && (
+                          <Badge variant="outline" className="text-xs">
+                            {user.currentTitle}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        {user.email} • Level {user.level} • Joined {new Date(user.createdAt).toLocaleDateString()}
+                      </div>
+                      {user.isBanned && (
+                        <div className="text-xs text-red-400 mt-1">
+                          Banned: {user.banReason} 
+                          {user.bannedUntil && (
+                            <span> (until {new Date(user.bannedUntil).toLocaleDateString()})</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <Button size="sm" variant="outline" title="View User Details">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    {user.isBanned ? (
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-green-400 border-green-400"
+                        onClick={() => unbanUserMutation.mutate(user.id)}
+                        disabled={unbanUserMutation.isPending}
+                        title="Unban User"
+                      >
+                        <Shield className="w-4 h-4 mr-1" />
+                        Unban
+                      </Button>
+                    ) : !user.isDeleted ? (
+                      <>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-yellow-400 border-yellow-400"
+                          onClick={() => handleBanUser(user)}
+                          title="Ban User"
+                        >
+                          <Ban className="w-4 h-4 mr-1" />
+                          Ban
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-red-400 border-red-400"
+                          onClick={() => handleRemoveUser(user)}
+                          title="Permanently Remove User"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Remove
+                        </Button>
+                      </>
+                    ) : (
+                      <Badge variant="outline" className="text-gray-500">
+                        Deleted
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              {actionType === 'ban' ? (
+                <>
+                  <Ban className="w-5 h-5 text-yellow-400" />
+                  <span>Ban User Account</span>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-5 h-5 text-red-400" />
+                  <span>Remove User Account</span>
+                </>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-800 rounded-lg">
+              <div className="font-medium text-white">Target User: {selectedUser?.username}</div>
+              <div className="text-sm text-gray-400">Email: {selectedUser?.email}</div>
+              <div className="text-sm text-gray-400">Level: {selectedUser?.level}</div>
+            </div>
+
+            {actionType === 'ban' && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="banDuration">Ban Duration</Label>
+                  <Select value={banDuration} onValueChange={setBanDuration}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select ban duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Permanent Ban</SelectItem>
+                      <SelectItem value="1">1 Day</SelectItem>
+                      <SelectItem value="3">3 Days</SelectItem>
+                      <SelectItem value="7">1 Week</SelectItem>
+                      <SelectItem value="14">2 Weeks</SelectItem>
+                      <SelectItem value="30">1 Month</SelectItem>
+                      <SelectItem value="90">3 Months</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="banReason">Reason for Ban *</Label>
+                  <Textarea
+                    id="banReason"
+                    value={banReason}
+                    onChange={(e) => setBanReason(e.target.value)}
+                    placeholder="Provide a detailed reason for banning this user..."
+                    className="min-h-20"
+                  />
+                </div>
+              </>
+            )}
+
+            {actionType === 'remove' && (
+              <div className="space-y-2">
+                <Label htmlFor="removeReason">Reason for Removal *</Label>
+                <Textarea
+                  id="removeReason"
+                  value={removeReason}
+                  onChange={(e) => setRemoveReason(e.target.value)}
+                  placeholder="Provide a detailed reason for permanently removing this user account..."
+                  className="min-h-20"
+                />
+                <div className="p-3 bg-red-900/20 border border-red-500 rounded-lg">
+                  <div className="flex items-center space-x-2 text-red-400">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="font-medium">Warning: This action is irreversible</span>
+                  </div>
+                  <div className="text-sm text-red-300 mt-1">
+                    The user account and all associated data will be permanently deleted.
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeDialog}>
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmAction}
+              disabled={
+                (actionType === 'ban' && !banReason.trim()) ||
+                (actionType === 'remove' && !removeReason.trim()) ||
+                banUserMutation.isPending ||
+                removeUserMutation.isPending
+              }
+              className={actionType === 'ban' ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"}
+            >
+              {banUserMutation.isPending || removeUserMutation.isPending ? (
+                <>Processing...</>
+              ) : (
+                <>
+                  {actionType === 'ban' ? (
+                    <>
+                      <Ban className="w-4 h-4 mr-2" />
+                      Confirm Ban
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Confirm Removal
+                    </>
+                  )}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

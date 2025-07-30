@@ -2505,6 +2505,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User management routes
+  app.post("/api/admin/ban-user", isAdmin, async (req, res) => {
+    try {
+      const { userId, reason, duration } = req.body;
+      const adminUserId = currentUserId;
+      const adminUser = await storage.getUser(adminUserId);
+      
+      if (!userId || !reason) {
+        return res.status(400).json({ error: "User ID and reason are required" });
+      }
+
+      // Calculate ban expiry if duration is provided (in days)
+      let bannedUntil = null;
+      if (duration && parseInt(duration) > 0) {
+        bannedUntil = new Date();
+        bannedUntil.setDate(bannedUntil.getDate() + parseInt(duration));
+      }
+
+      const banData = {
+        isBanned: true,
+        banReason: reason,
+        bannedAt: new Date(),
+        bannedUntil,
+        bannedBy: adminUser?.username || 'Admin'
+      };
+
+      await storage.updateUser(userId, banData);
+      res.json({ success: true, message: "User banned successfully" });
+    } catch (error: any) {
+      console.error("Error banning user:", error);
+      res.status(500).json({ error: "Failed to ban user" });
+    }
+  });
+
+  app.post("/api/admin/unban-user", isAdmin, async (req, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      const unbanData = {
+        isBanned: false,
+        banReason: null,
+        bannedAt: null,
+        bannedUntil: null,
+        bannedBy: null
+      };
+
+      await storage.updateUser(userId, unbanData);
+      res.json({ success: true, message: "User unbanned successfully" });
+    } catch (error: any) {
+      console.error("Error unbanning user:", error);
+      res.status(500).json({ error: "Failed to unban user" });
+    }
+  });
+
+  app.post("/api/admin/remove-user", isAdmin, async (req, res) => {
+    try {
+      const { userId, reason } = req.body;
+      const adminUserId = currentUserId;
+      const adminUser = await storage.getUser(adminUserId);
+      
+      if (!userId || !reason) {
+        return res.status(400).json({ error: "User ID and reason are required" });
+      }
+
+      const removeData = {
+        isDeleted: true,
+        deletedAt: new Date(),
+        deleteReason: reason,
+        deletedBy: adminUser?.username || 'Admin'
+      };
+
+      await storage.updateUser(userId, removeData);
+      res.json({ success: true, message: "User removed successfully" });
+    } catch (error: any) {
+      console.error("Error removing user:", error);
+      res.status(500).json({ error: "Failed to remove user" });
+    }
+  });
+
   // Liability waiver acceptance route
   app.post("/api/accept-liability-waiver", async (req, res) => {
     try {

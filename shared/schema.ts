@@ -70,6 +70,16 @@ export const users = pgTable("users", {
   liabilityWaiverAccepted: boolean("liability_waiver_accepted").default(false),
   liabilityWaiverAcceptedAt: timestamp("liability_waiver_accepted_at"),
   liabilityWaiverIpAddress: text("liability_waiver_ip_address"),
+  // Account moderation fields
+  isBanned: boolean("is_banned").default(false),
+  banReason: text("ban_reason"),
+  bannedAt: timestamp("banned_at"),
+  bannedUntil: timestamp("banned_until"), // null = permanent ban
+  bannedBy: text("banned_by"), // admin username who issued the ban
+  isDeleted: boolean("is_deleted").default(false),
+  deletedAt: timestamp("deleted_at"),
+  deleteReason: text("delete_reason"),
+  deletedBy: text("deleted_by"), // admin username who deleted the account
   createdAt: timestamp("created_at").defaultNow(),
 });
 
