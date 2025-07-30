@@ -390,10 +390,7 @@ export default function Workouts() {
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <Dumbbell className="w-4 h-4 text-blue-500" />
-                          <h3 className="font-semibold text-foreground">{workout.name}</h3>
-                        </div>
+                        <h3 className="font-semibold text-foreground">{workout.name}</h3>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button 
@@ -501,8 +498,7 @@ export default function Workouts() {
                     onClick={() => handleStartProgram(program)}
                   >
                     <CardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Unlock className="w-4 h-4 text-amber-500" />
+                      <div className="mb-3">
                         <h3 className="font-semibold text-foreground">{program.name}</h3>
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
