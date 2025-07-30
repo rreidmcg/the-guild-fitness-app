@@ -33,7 +33,7 @@ interface WorkoutExercise {
 
 interface ExerciseSet {
   id: string;
-  type: 'W' | '2' | 'D' | 'F'; // W=warmup, 2=regular, D=drop, F=failure
+  type: 'W' | 'R' | 'D' | 'F'; // W=warmup, R=regular, D=drop, F=failure
   reps?: number;
   weight?: number;
   duration?: string;
@@ -394,7 +394,7 @@ export default function WorkoutBuilder() {
                           size="sm"
                           className={`h-8 w-8 p-0 text-sm font-bold ${
                             set.type === 'W' ? 'text-orange-500' :
-                            set.type === '2' ? 'text-blue-500' :
+                            set.type === 'R' ? 'text-blue-500' :
                             set.type === 'D' ? 'text-blue-400' :
                             'text-red-500'
                           }`}
@@ -403,7 +403,7 @@ export default function WorkoutBuilder() {
                             setShowSetTypeSelector(true);
                           }}
                         >
-                          {set.type}
+                          {set.type === 'R' ? index + 1 : set.type}
                         </Button>
                         <Input
                           type="number"
@@ -445,7 +445,7 @@ export default function WorkoutBuilder() {
                             ex.id === exercise.id 
                               ? {...ex, sets: [...ex.sets, {
                                   id: Date.now().toString(),
-                                  type: '2' as const,
+                                  type: 'R' as const,
                                   reps: 10,
                                   weight: 0,
                                   rest: '01:00'
@@ -609,7 +609,7 @@ export default function WorkoutBuilder() {
         exercise,
         sets: [{
           id: Date.now().toString() + Math.random(),
-          type: '2' as const,
+          type: 'R' as const,
           reps: 10,
           weight: 0,
           rest: '01:00'
@@ -900,7 +900,7 @@ export default function WorkoutBuilder() {
         <div className="space-y-4 pb-4">
           {[
             { type: 'W', name: 'Warmup', description: 'Light weight warmup set', color: 'text-orange-500' },
-            { type: '2', name: 'Regular', description: 'Standard working set', color: 'text-blue-500' },
+            { type: 'R', name: 'Regular', description: 'Standard working set', color: 'text-blue-500' },
             { type: 'D', name: 'Drop Set', description: 'Reduce weight and continue', color: 'text-blue-400' },
             { type: 'F', name: 'Failure', description: 'Go to complete failure', color: 'text-red-500' }
           ].map((setType) => (
@@ -909,7 +909,7 @@ export default function WorkoutBuilder() {
               className="flex items-center justify-between cursor-pointer py-3"
               onClick={() => {
                 if (editingSet) {
-                  updateSet(editingSet.exerciseId, editingSet.setId, 'type', setType.type as 'W' | '2' | 'D' | 'F');
+                  updateSet(editingSet.exerciseId, editingSet.setId, 'type', setType.type as 'W' | 'R' | 'D' | 'F');
                 }
                 setShowSetTypeSelector(false);
                 setEditingSet(null);
