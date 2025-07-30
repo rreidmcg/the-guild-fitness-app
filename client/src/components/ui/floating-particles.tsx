@@ -21,11 +21,11 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
 
   useEffect(() => {
     const colors = [
-      'rgba(255, 255, 255, 0.8)', // White
-      'rgba(107, 185, 230, 0.6)', // Cyan
-      'rgba(168, 85, 247, 0.5)', // Purple  
-      'rgba(34, 197, 94, 0.4)', // Green
-      'rgba(59, 130, 246, 0.5)', // Blue
+      'rgba(255, 215, 0, 0.8)', // Gold
+      'rgba(255, 165, 0, 0.7)', // Orange
+      'rgba(255, 255, 0, 0.6)', // Yellow
+      'rgba(255, 140, 0, 0.8)', // Dark orange
+      'rgba(255, 193, 7, 0.7)', // Amber
     ];
     
     const newParticles: Particle[] = Array.from({ length: count }, (_, i) => ({
@@ -56,7 +56,7 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
             opacity: particle.opacity,
             animationDuration: `${particle.duration}s`,
             animationDelay: `${particle.delay}s`,
-            boxShadow: `0 0 8px ${particle.color}`,
+            boxShadow: `0 0 12px ${particle.color}, 0 0 6px ${particle.color}`,
           }}
         />
       ))}
