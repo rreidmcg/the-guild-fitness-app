@@ -531,61 +531,7 @@ export default function Workouts() {
           </CardContent>
         </Card>
 
-        {/* Workout Programs */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground">Workout Programs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {availablePrograms.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="mb-4">{programs.length === 0 ? "No workout programs available yet." : "All available programs are already owned!"}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {availablePrograms.map((program: WorkoutProgram) => (
-                  <Card 
-                    key={program.id} 
-                    className="bg-card border-border hover:border-game-primary transition-colors cursor-pointer"
-                    onClick={() => handleProgramClick(program)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{program.name}</h3>
-                          {program.name === "Novice Program" && (
-                            <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-2 py-0.5 rounded text-xs font-medium">
-                              Free
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button 
-                            size="sm" 
-                            variant="ghost" 
-                            className="text-game-primary hover:bg-game-primary/20"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStartProgram(program);
-                            }}
-                          >
-                            <Play className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="bg-game-primary/20 text-game-primary px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
-                        <span className="text-muted-foreground font-medium">{program.durationWeeks} weeks</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+
 
         {/* Workout Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
