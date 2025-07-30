@@ -13,8 +13,6 @@ import { queryClient } from "@/lib/queryClient";
 import { Eye, EyeOff } from "lucide-react";
 import ForgotPasswordForm from "@/components/forgot-password-form";
 import { FloatingParticles } from "@/components/ui/floating-particles";
-import { FloatingSpeaker } from "@/components/ui/floating-speaker";
-import { useMusic } from "@/contexts/music-context";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 
 const loginSchema = z.object({
@@ -29,7 +27,6 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const { isPlaying, isMuted, toggleMute } = useMusic();
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -98,11 +95,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       <FloatingParticles count={25} />
-      <FloatingSpeaker 
-        isPlaying={isPlaying}
-        isMuted={isMuted}
-        onToggleMute={toggleMute}
-      />
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (

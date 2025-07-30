@@ -15,8 +15,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { validateUsername, formatUsernameInput } from "@/utils/username-validation";
 import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 import { FloatingParticles } from "@/components/ui/floating-particles";
-import { FloatingSpeaker } from "@/components/ui/floating-speaker";
-import { useMusic } from "@/contexts/music-context";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 
 const signupSchema = z.object({
@@ -48,7 +46,6 @@ export default function SignupPage() {
   const [step, setStep] = useState(1);
   const [showLiabilityWaiver, setShowLiabilityWaiver] = useState(false);
   const [pendingSignupData, setPendingSignupData] = useState<SignupForm | null>(null);
-  const { isPlaying, isMuted, toggleMute } = useMusic();
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -159,11 +156,6 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       <FloatingParticles count={20} />
-      <FloatingSpeaker 
-        isPlaying={isPlaying}
-        isMuted={isMuted}
-        onToggleMute={toggleMute}
-      />
       <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10 overflow-hidden">
         <FloatingParticles count={8} className="absolute inset-0 z-0" />
         <CardHeader className="text-center relative z-10">

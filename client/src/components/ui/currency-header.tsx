@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Coins, Backpack, Settings, Volume2, VolumeX, Flame, Snowflake, Mail, TrendingUp } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
+import { useBackgroundMusic } from "@/contexts/background-music-context";
+
 export function CurrencyHeader() {
   const navigate = useNavigate();
+  const { toggleMusic, isPlaying, isMuted } = useBackgroundMusic();
   
-  // Music is only available on auth pages, so we won't show speaker on other pages
-  const showMusicControls = false;
-  
-  // Music controls removed from currency header - only available on auth pages
+  const handleMusicToggle = () => {
+    console.log('Speaker button clicked, current state:', { isPlaying, isMuted });
+    toggleMusic();
+  };
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -25,7 +28,17 @@ export function CurrencyHeader() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            {/* Music controls only on auth pages now */}
+            <button
+              onClick={handleMusicToggle}
+              className="flex items-center hover:bg-muted/50 px-1.5 py-0.5 rounded transition-colors"
+              title="Toggle Music"
+            >
+              {isMuted || !isPlaying ? (
+                <VolumeX className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-muted-foreground" />
+              )}
+            </button>
           </div>
           <div className="flex items-center space-x-3 sm:space-x-4">
             {(userStats as any)?.currentStreak >= 3 && (

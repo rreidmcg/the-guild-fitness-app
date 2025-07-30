@@ -4,8 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { MusicProvider } from "@/contexts/music-context";
-import heroMusicSrc from "@assets/time-of-the-hero_1753848447367.mp3";
+import { BackgroundMusicProvider } from "@/contexts/background-music-context";
 import { useTimezone } from "@/hooks/use-timezone";
 import { CurrencyHeader } from "@/components/ui/currency-header";
 import { Button } from "@/components/ui/button";
@@ -213,9 +212,9 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <MusicProvider audioSrc={heroMusicSrc}>
+      <BackgroundMusicProvider>
         <AppContent />
-      </MusicProvider>
+      </BackgroundMusicProvider>
     </QueryClientProvider>
   );
 }

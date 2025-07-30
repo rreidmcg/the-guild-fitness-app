@@ -32,7 +32,7 @@ import goblinWarlordImage from "@assets/36CF820D-0CC0-4C99-A780-79B6D125B307_175
 import broodmotherImage from "@assets/CE5B8D2E-90AF-4DC0-A904-EDB98089C00A_1753845237897.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
-// Removed music import - using global music context from App level
+import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { queryClient } from "@/lib/queryClient";
 
 // User stats type to match the API response
