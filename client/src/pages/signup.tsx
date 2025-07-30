@@ -16,6 +16,7 @@ import { validateUsername, formatUsernameInput } from "@/utils/username-validati
 import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 import { FloatingParticles } from "@/components/ui/floating-particles";
 import { AuthMusicBanner } from "@/components/ui/auth-music-banner";
+import { Eye, EyeOff } from "lucide-react";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 import forestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
 
@@ -48,6 +49,8 @@ export default function SignupPage() {
   const [step, setStep] = useState(1);
   const [showLiabilityWaiver, setShowLiabilityWaiver] = useState(false);
   const [pendingSignupData, setPendingSignupData] = useState<SignupForm | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -247,12 +250,21 @@ export default function SignupPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Create a password" 
-                            type="password"
-                            {...field} 
-                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
-                          />
+                          <div className="relative">
+                            <Input 
+                              placeholder="Create a password" 
+                              type={showPassword ? "text" : "password"}
+                              {...field} 
+                              className="pr-10 bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -266,12 +278,21 @@ export default function SignupPage() {
                       <FormItem>
                         <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Confirm your password" 
-                            type="password"
-                            {...field} 
-                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
-                          />
+                          <div className="relative">
+                            <Input 
+                              placeholder="Confirm your password" 
+                              type={showConfirmPassword ? "text" : "password"}
+                              {...field} 
+                              className="pr-10 bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
