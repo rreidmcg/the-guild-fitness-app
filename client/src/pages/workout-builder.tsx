@@ -384,20 +384,34 @@ export default function WorkoutBuilder() {
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem onClick={() => handleDuplicateExercise(exercise.id)}>
+                      <DropdownMenuContent align="end" className="w-40 bg-card border-border">
+                        <DropdownMenuItem onClick={() => handleDuplicateExercise(exercise.id)} className="text-foreground hover:bg-accent hover:text-accent-foreground">
                           <Copy className="w-4 h-4 mr-2" />
                           Duplicate
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteExercise(exercise.id)}>
+                        <DropdownMenuItem onClick={() => handleDeleteExercise(exercise.id)} className="text-foreground hover:bg-accent hover:text-accent-foreground">
                           <Trash2 className="w-4 h-4 mr-2" />
                           Delete
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleChangeExercise(exercise.id)}>
+                        <DropdownMenuItem onClick={() => handleChangeExercise(exercise.id)} className="text-foreground hover:bg-accent hover:text-accent-foreground">
                           <RefreshCw className="w-4 h-4 mr-2" />
                           Change exercise
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setShowExerciseDetails(exercise)}>
+                        <DropdownMenuItem onClick={() => {
+                          // Open details modal directly in edit mode
+                          setShowExerciseDetails(exercise);
+                          setIsEditingExercise(true);
+                          setEditedExercise({
+                            name: exercise.exercise?.name || '',
+                            modality: 'strength',
+                            muscleGroups: exercise.exercise?.muscleGroups || [],
+                            category: exercise.exercise?.category || 'strength',
+                            fields: ['reps', 'weight', 'RPE'],
+                            instructions: exercise.exercise?.description || '',
+                            videoUrl: '',
+                            photos: []
+                          });
+                        }} className="text-foreground hover:bg-accent hover:text-accent-foreground">
                           <Info className="w-4 h-4 mr-2" />
                           Details
                         </DropdownMenuItem>
@@ -1168,14 +1182,14 @@ export default function WorkoutBuilder() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="strength">Strength</SelectItem>
-                      <SelectItem value="mobility">Mobility</SelectItem>
-                      <SelectItem value="cardio">Cardio</SelectItem>
-                      <SelectItem value="agility">Agility</SelectItem>
-                      <SelectItem value="myofascial-release">Myofascial Release</SelectItem>
-                      <SelectItem value="yoga">Yoga</SelectItem>
-                      <SelectItem value="activation">Activation</SelectItem>
-                      <SelectItem value="conditioning">Conditioning</SelectItem>
+                      <SelectItem value="strength" className="text-foreground hover:bg-accent hover:text-accent-foreground">Strength</SelectItem>
+                      <SelectItem value="mobility" className="text-foreground hover:bg-accent hover:text-accent-foreground">Mobility</SelectItem>
+                      <SelectItem value="cardio" className="text-foreground hover:bg-accent hover:text-accent-foreground">Cardio</SelectItem>
+                      <SelectItem value="agility" className="text-foreground hover:bg-accent hover:text-accent-foreground">Agility</SelectItem>
+                      <SelectItem value="myofascial-release" className="text-foreground hover:bg-accent hover:text-accent-foreground">Myofascial Release</SelectItem>
+                      <SelectItem value="yoga" className="text-foreground hover:bg-accent hover:text-accent-foreground">Yoga</SelectItem>
+                      <SelectItem value="activation" className="text-foreground hover:bg-accent hover:text-accent-foreground">Activation</SelectItem>
+                      <SelectItem value="conditioning" className="text-foreground hover:bg-accent hover:text-accent-foreground">Conditioning</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1191,11 +1205,11 @@ export default function WorkoutBuilder() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="strength">Strength</SelectItem>
-                      <SelectItem value="bodyweight">Bodyweight</SelectItem>
-                      <SelectItem value="timed">Timed</SelectItem>
-                      <SelectItem value="distance-short">Distance (Short) - yards/meters</SelectItem>
-                      <SelectItem value="distance-long">Distance (Long) - miles/kilometers</SelectItem>
+                      <SelectItem value="strength" className="text-foreground hover:bg-accent hover:text-accent-foreground">Strength</SelectItem>
+                      <SelectItem value="bodyweight" className="text-foreground hover:bg-accent hover:text-accent-foreground">Bodyweight</SelectItem>
+                      <SelectItem value="timed" className="text-foreground hover:bg-accent hover:text-accent-foreground">Timed</SelectItem>
+                      <SelectItem value="distance-short" className="text-foreground hover:bg-accent hover:text-accent-foreground">Distance (Short) - yards/meters</SelectItem>
+                      <SelectItem value="distance-long" className="text-foreground hover:bg-accent hover:text-accent-foreground">Distance (Long) - miles/kilometers</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
