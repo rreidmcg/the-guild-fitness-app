@@ -63,23 +63,23 @@ export default function AdminDashboard() {
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
-        <p className="text-gray-400">Manage your RPG fitness application</p>
+        <h1 className="text-4xl font-bold text-white mb-2">Administrative Control Panel</h1>
+        <p className="text-gray-400">Comprehensive management suite for The Guild: Gamified Fitness platform</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-game-slate">
           <TabsTrigger value="analytics" className="flex items-center space-x-2">
             <BarChart3 className="w-4 h-4" />
-            <span>Analytics</span>
+            <span>Analytics Dashboard</span>
           </TabsTrigger>
           <TabsTrigger value="content" className="flex items-center space-x-2">
             <Settings className="w-4 h-4" />
-            <span>Content Management</span>
+            <span>Content Manager</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="w-4 h-4" />
-            <span>User Management</span>
+            <span>User Administration</span>
           </TabsTrigger>
         </TabsList>
 
@@ -162,7 +162,7 @@ function AnalyticsOverview({ data }: { data: any }) {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Trophy className="w-5 h-5 text-yellow-400" />
-              <span>Top Achievements</span>
+              <span>Achievement Analytics</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -184,7 +184,7 @@ function AnalyticsOverview({ data }: { data: any }) {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Sword className="w-5 h-5 text-red-400" />
-              <span>Battle Statistics</span>
+              <span>Combat Analytics</span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -216,7 +216,7 @@ function AnalyticsOverview({ data }: { data: any }) {
       {/* User Progression */}
       <Card className="bg-game-slate border-gray-700">
         <CardHeader>
-          <CardTitle>User Progression Overview</CardTitle>
+          <CardTitle>Character Progression Analytics</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -250,10 +250,10 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         {/* Exercise Management */}
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Exercise Management</CardTitle>
+            <CardTitle>Exercise Library Management</CardTitle>
             <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
-              Add Exercise
+              Create New Exercise
             </Button>
           </CardHeader>
           <CardContent>
@@ -270,11 +270,13 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                       <div className="text-sm text-gray-400">{exercise.category}</div>
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline">
-                        <Edit className="w-4 h-4" />
+                      <Button size="sm" variant="outline" title="Edit Exercise Details">
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
                       </Button>
-                      <Button size="sm" variant="outline" className="text-red-400 border-red-400">
-                        <Trash2 className="w-4 h-4" />
+                      <Button size="sm" variant="outline" className="text-red-400 border-red-400" title="Remove Exercise">
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Remove
                       </Button>
                     </div>
                   </div>
@@ -287,10 +289,10 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         {/* Monster Management */}
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Monster Management</CardTitle>
+            <CardTitle>Battle Monster Management</CardTitle>
             <Button size="sm" className="bg-red-600 hover:bg-red-700">
               <Plus className="w-4 h-4 mr-2" />
-              Add Monster
+              Create New Monster
             </Button>
           </CardHeader>
           <CardContent>
@@ -307,11 +309,13 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                       <div className="text-sm text-gray-400">Level {monster.level} • {monster.tier}-rank</div>
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline">
-                        <Edit className="w-4 h-4" />
+                      <Button size="sm" variant="outline" title="Edit Monster Properties">
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
                       </Button>
-                      <Button size="sm" variant="outline" className="text-red-400 border-red-400">
-                        <Trash2 className="w-4 h-4" />
+                      <Button size="sm" variant="outline" className="text-red-400 border-red-400" title="Remove Monster">
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Remove
                       </Button>
                     </div>
                   </div>
@@ -328,14 +332,46 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
 function UserManagement() {
   return (
     <Card className="bg-game-slate border-gray-700">
-      <CardHeader>
-        <CardTitle>User Management</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>User Management Dashboard</CardTitle>
+        <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+          <Plus className="w-4 h-4 mr-2" />
+          Add Administrator
+        </Button>
       </CardHeader>
       <CardContent>
-        <div className="text-center py-8 text-gray-400">
-          <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>User management features coming soon</p>
-          <p className="text-sm">Ability to view, edit, and moderate user accounts</p>
+        <div className="space-y-6">
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button variant="outline" className="p-4 h-auto flex-col space-y-2" disabled>
+              <Users className="w-6 h-6 text-blue-400" />
+              <span>View All Users</span>
+              <span className="text-xs text-muted-foreground">Browse & Search Users</span>
+            </Button>
+            <Button variant="outline" className="p-4 h-auto flex-col space-y-2" disabled>
+              <Settings className="w-6 h-6 text-green-400" />
+              <span>User Permissions</span>
+              <span className="text-xs text-muted-foreground">Manage Access Levels</span>
+            </Button>
+            <Button variant="outline" className="p-4 h-auto flex-col space-y-2" disabled>
+              <Activity className="w-6 h-6 text-orange-400" />
+              <span>Account Moderation</span>
+              <span className="text-xs text-muted-foreground">Suspend/Restore Users</span>
+            </Button>
+          </div>
+          
+          {/* Coming Soon Notice */}
+          <div className="text-center py-6 border border-gray-700 rounded-lg bg-gray-800/50">
+            <Users className="w-10 h-10 mx-auto mb-3 text-blue-400 opacity-70" />
+            <h3 className="font-semibold text-white mb-2">Advanced User Management</h3>
+            <p className="text-gray-400 mb-3">Comprehensive user administration tools are being developed</p>
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>• Real-time user monitoring and activity tracking</p>
+              <p>• Automated moderation and content filtering</p>
+              <p>• Detailed user analytics and engagement metrics</p>
+              <p>• Bulk user operations and data export capabilities</p>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
