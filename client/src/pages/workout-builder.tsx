@@ -334,7 +334,7 @@ export default function WorkoutBuilder() {
             <Label className="text-sm font-medium text-muted-foreground mb-2 block">SECTION FORMAT</Label>
             <Button 
               variant="outline"
-              className="w-full justify-between text-left font-normal"
+              className="w-full justify-between text-left font-normal text-foreground hover:text-foreground hover:bg-accent"
               onClick={() => setShowFormatSelector(true)}
             >
               <span className="capitalize">{currentSection?.format || 'Regular'}</span>
@@ -346,7 +346,7 @@ export default function WorkoutBuilder() {
             <Label className="text-sm font-medium text-muted-foreground mb-2 block">SECTION TYPE</Label>
             <Button 
               variant="outline"
-              className="w-full justify-between text-left font-normal capitalize"
+              className="w-full justify-between text-left font-normal capitalize text-foreground hover:text-foreground hover:bg-accent"
               onClick={() => setShowTypeSelector(true)}
             >
               <span className="capitalize">{currentSection?.type || 'Workout'}</span>
