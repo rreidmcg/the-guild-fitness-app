@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown, Copy, Trash2, RefreshCw, Info, Edit3, Camera, Video } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Exercise } from "@shared/schema";
@@ -403,7 +403,7 @@ export default function WorkoutBuilder() {
                           setIsEditingExercise(true);
                           setEditedExercise({
                             name: exercise.exercise?.name || '',
-                            modality: 'strength',
+                            modality: exercise.exercise?.modality || 'strength',
                             muscleGroups: exercise.exercise?.muscleGroups || [],
                             category: exercise.exercise?.category || 'strength',
                             fields: ['reps', 'weight', 'RPE'],
@@ -1059,7 +1059,11 @@ export default function WorkoutBuilder() {
               ...ex,
               exercise: {
                 ...ex.exercise,
-                ...editedExercise
+                name: editedExercise.name,
+                modality: editedExercise.modality,
+                category: editedExercise.category,
+                muscleGroups: editedExercise.muscleGroups,
+                description: editedExercise.instructions
               }
             };
           }
@@ -1067,7 +1071,11 @@ export default function WorkoutBuilder() {
         }) || [];
 
         setCurrentSection({ ...currentSection, exercises: updatedExercises });
+        
+        // Close modal and reset states
+        setShowExerciseDetails(null);
         setIsEditingExercise(false);
+        setEditedExercise(null);
         
         toast({
           title: "Exercise updated",
@@ -1085,9 +1093,14 @@ export default function WorkoutBuilder() {
         <DialogContent className="max-w-2xl mx-auto bg-card border-border text-foreground max-h-[90vh] overflow-y-auto">
           <DialogHeader className="pb-6">
             <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-bold text-foreground">
-                {isEditingExercise ? 'Edit Exercise' : 'Exercise Details'}
-              </DialogTitle>
+              <div>
+                <DialogTitle className="text-xl font-bold text-foreground">
+                  {isEditingExercise ? 'Edit Exercise' : 'Exercise Details'}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground mt-1">
+                  {isEditingExercise ? 'Modify exercise details and save changes' : 'View exercise information and edit if needed'}
+                </DialogDescription>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -1126,7 +1139,7 @@ export default function WorkoutBuilder() {
                   <div className="bg-muted/50 p-3 rounded-lg">
                     <h4 className="font-medium text-foreground mb-1">Modality</h4>
                     <p className="text-sm text-muted-foreground capitalize">
-                      strength
+                      {showExerciseDetails.exercise?.modality || 'strength'}
                     </p>
                   </div>
                   <div className="bg-muted/50 p-3 rounded-lg">
