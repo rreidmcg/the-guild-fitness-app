@@ -136,7 +136,7 @@ export default function WorkoutSession() {
     <div className="min-h-screen bg-game-dark text-foreground pb-20">
       
       
-      <div className="bg-slate-800 border-b border-slate-600 px-4 py-6">
+      <div className="bg-card border-b border-border px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -170,7 +170,7 @@ export default function WorkoutSession() {
 
       <div className="max-w-4xl mx-auto p-6">
         {/* Progress Bar */}
-        <Card className="bg-slate-800 border-slate-600 mb-8">
+        <Card className="bg-card border-border mb-8">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-foreground">Progress</h2>
@@ -178,12 +178,12 @@ export default function WorkoutSession() {
                 {currentExerciseIndex} of {exerciseData.length} exercises
               </span>
             </div>
-            <Progress value={progress} className="h-3" />
+            <Progress value={progress} className="h-3 bg-muted" />
           </CardContent>
         </Card>
 
         {/* Current Exercise */}
-        <Card className="bg-slate-800 border-slate-600 mb-8">
+        <Card className="bg-card border-border mb-8">
           <CardHeader>
             <CardTitle className="text-foreground">Current Exercise</CardTitle>
           </CardHeader>
@@ -199,7 +199,7 @@ export default function WorkoutSession() {
         </Card>
 
         {/* Exercise List */}
-        <Card className="bg-slate-800 border-slate-600">
+        <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-foreground">Exercise List</CardTitle>
           </CardHeader>
@@ -246,7 +246,7 @@ export default function WorkoutSession() {
 
       {/* RPE Selection Modal */}
       <Dialog open={showRPESelection} onOpenChange={() => setShowRPESelection(false)}>
-        <DialogContent className="sm:max-w-md bg-slate-800 border-slate-600">
+        <DialogContent className="sm:max-w-md bg-card border-border">
           <DialogHeader>
             <DialogTitle className="text-center flex items-center justify-center gap-2">
               <Target className="w-5 h-5" />
