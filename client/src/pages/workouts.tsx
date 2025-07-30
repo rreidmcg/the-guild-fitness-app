@@ -34,7 +34,8 @@ import {
   MoreHorizontal,
   Copy,
   Edit3,
-  Book
+  Book,
+  FileText
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -470,7 +471,7 @@ export default function Workouts() {
           <CardHeader>
             <div className="flex items-center justify-between mb-3">
               <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                <Book className="w-5 h-5 text-amber-500" />
+                <FileText className="w-5 h-5 text-amber-500" />
                 Programs
               </CardTitle>
               <Button 
