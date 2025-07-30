@@ -136,7 +136,7 @@ export default function WorkoutSession() {
     <div className="min-h-screen bg-game-dark text-white pb-20">
       
       
-      <div className="bg-game-slate border-b border-gray-700 px-4 py-6">
+      <div className="bg-slate-800 border-b border-slate-600 px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -145,20 +145,20 @@ export default function WorkoutSession() {
                 onClick={() => setLocation("/workouts")}
                 className="text-gray-300 hover:text-white"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Workouts
+                <ArrowLeft className="w-4 h-4" />
               </Button>
-              <h1 className="text-3xl font-bold">Workout Session</h1>
+              <h1 className="text-xl sm:text-3xl font-bold">Workout Session</h1>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="text-right">
-                <div className="text-2xl font-bold">{formatTime(time)}</div>
-                <div className="text-sm text-gray-400">Duration</div>
+                <div className="text-xl sm:text-2xl font-bold">{formatTime(time)}</div>
+                <div className="text-xs sm:text-sm text-gray-400">Duration</div>
               </div>
               <Button 
                 onClick={handleStartPause}
                 className={isActive ? "bg-orange-600 hover:bg-orange-700" : "bg-game-primary hover:bg-blue-600"}
+                size="sm"
               >
                 {isActive ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
                 {isActive ? "Pause" : "Start"}
@@ -170,7 +170,7 @@ export default function WorkoutSession() {
 
       <div className="max-w-4xl mx-auto p-6">
         {/* Progress Bar */}
-        <Card className="bg-game-slate border-gray-700 mb-8">
+        <Card className="bg-slate-800 border-slate-600 mb-8">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Progress</h2>
@@ -183,7 +183,7 @@ export default function WorkoutSession() {
         </Card>
 
         {/* Current Exercise */}
-        <Card className="bg-game-slate border-gray-700 mb-8">
+        <Card className="bg-slate-800 border-slate-600 mb-8">
           <CardHeader>
             <CardTitle>Current Exercise</CardTitle>
           </CardHeader>
@@ -199,7 +199,7 @@ export default function WorkoutSession() {
         </Card>
 
         {/* Exercise List */}
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-slate-800 border-slate-600">
           <CardHeader>
             <CardTitle>Exercise List</CardTitle>
           </CardHeader>
@@ -246,7 +246,7 @@ export default function WorkoutSession() {
 
       {/* RPE Selection Modal */}
       <Dialog open={showRPESelection} onOpenChange={() => setShowRPESelection(false)}>
-        <DialogContent className="sm:max-w-md bg-game-slate border-gray-700">
+        <DialogContent className="sm:max-w-md bg-slate-800 border-slate-600">
           <DialogHeader>
             <DialogTitle className="text-center flex items-center justify-center gap-2">
               <Target className="w-5 h-5" />
