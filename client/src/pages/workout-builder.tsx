@@ -32,6 +32,7 @@ interface WorkoutExercise {
   sets: ExerciseSet[];
   notes?: string;
   eachSide?: boolean; // Indicates if exercise is performed unilaterally
+  tempo?: string[]; // Four-digit tempo notation [eccentric, pause, concentric, pause]
 }
 
 interface ExerciseSet {
@@ -541,6 +542,41 @@ export default function WorkoutBuilder() {
                         />
                         <span>Each side</span>
                       </label>
+                    </div>
+
+                    {/* Tempo Input */}
+                    <div className="flex items-center justify-center space-x-3">
+                      <label className="text-sm text-muted-foreground">Tempo</label>
+                      <div className="flex items-center space-x-1">
+                        {[0, 1, 2, 3].map((index) => (
+                          <div key={index} className="flex items-center">
+                            <Input
+                              type="text"
+                              maxLength={1}
+                              value={exercise.tempo?.[index] || '0'}
+                              onChange={(e) => {
+                                const value = e.target.value.toUpperCase();
+                                if (value === '' || /^[0-9X]$/.test(value)) {
+                                  if (currentSection && currentSection.exercises) {
+                                    const updatedExercises = currentSection.exercises.map(ex => {
+                                      if (ex.id === exercise.id) {
+                                        const currentTempo = ex.tempo || ['0', '0', '0', '0'];
+                                        const newTempo = [...currentTempo];
+                                        newTempo[index] = value || '0';
+                                        return {...ex, tempo: newTempo};
+                                      }
+                                      return ex;
+                                    });
+                                    setCurrentSection({...currentSection, exercises: updatedExercises});
+                                  }
+                                }
+                              }}
+                              className="w-8 h-8 text-center text-sm bg-muted border-border"
+                            />
+                            {index < 3 && <span className="text-muted-foreground mx-1">-</span>}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                     
                     <Textarea 
