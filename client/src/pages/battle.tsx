@@ -131,23 +131,17 @@ export default function BattlePage() {
         {/* PvP Card */}
         <Card className="border-2 border-purple-500/50 bg-gradient-to-br from-purple-900/20 to-pink-900/20 opacity-60">
           <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 p-4 bg-purple-500/20 rounded-full w-20 h-20 flex items-center justify-center">
-              <Users className="h-10 w-10 text-purple-400" />
-            </div>
-            <CardTitle className="text-2xl text-purple-400 flex items-center justify-center">
+            <CardTitle className="text-2xl text-purple-400 flex items-center justify-center mb-4">
               <img 
                 src={arenaTitle} 
                 alt="PvP Arena" 
-                className="h-8 object-contain"
+                className="h-12 object-contain"
                 style={{ 
                   imageRendering: 'pixelated',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
                 }}
               />
             </CardTitle>
-            <p className="text-muted-foreground">
-              Player vs Player
-            </p>
           </CardHeader>
           <CardContent className="text-center">
             <div className="space-y-4">
