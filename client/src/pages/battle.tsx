@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Crown
 } from "lucide-react";
+import dungeonsTitle from "@assets/9DCDA11D-2AD4-4DF9-AC4D-62C0709560C2_1753842591713.png";
 
 // User stats type to match the API response
 interface UserStats {
@@ -77,8 +78,15 @@ export default function BattlePage() {
               <Sword className="h-10 w-10 text-green-400" />
             </div>
             <CardTitle className="text-2xl text-green-400 flex items-center justify-center">
-              <Trophy className="h-6 w-6 mr-2" />
-              PvE Dungeons
+              <img 
+                src={dungeonsTitle} 
+                alt="PvE Dungeons" 
+                className="h-8 object-contain"
+                style={{ 
+                  imageRendering: 'pixelated',
+                  filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.8))'
+                }}
+              />
             </CardTitle>
             <p className="text-muted-foreground">
               Player vs Environment
