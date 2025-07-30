@@ -207,7 +207,7 @@ export default function PvEDungeonsPage() {
   const [selectedZone, setSelectedZone] = useState<DungeonZone | null>(null);
   const [showZoneDetails, setShowZoneDetails] = useState(false);
 
-  const { data: userStats } = useQuery({
+  const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],
   });
 

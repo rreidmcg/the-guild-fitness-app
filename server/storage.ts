@@ -941,7 +941,7 @@ export class DatabaseStorage implements IStorage {
     
     const [createdMail] = await db
       .insert(playerMail)
-      .values(mail)
+      .values(mail as any)
       .returning();
     return createdMail;
   }
@@ -1045,7 +1045,7 @@ export class DatabaseStorage implements IStorage {
       userId
     }));
 
-    await db.insert(playerMail).values(mailEntries);
+    await db.insert(playerMail).values(mailEntries as any);
     
     return mailEntries.length;
   }
@@ -1112,7 +1112,7 @@ export class DatabaseStorage implements IStorage {
     
     const [newShare] = await db
       .insert(socialShares)
-      .values(share)
+      .values(share as any)
       .returning();
     
     return newShare;
@@ -1377,7 +1377,7 @@ export class DatabaseStorage implements IStorage {
 
   async createWorkoutFeedback(feedback: InsertWorkoutFeedback): Promise<WorkoutFeedback> {
     await this.ensureInitialized();
-    const [result] = await db.insert(workoutFeedback).values(feedback).returning();
+    const [result] = await db.insert(workoutFeedback).values(feedback as any).returning();
     return result;
   }
 
