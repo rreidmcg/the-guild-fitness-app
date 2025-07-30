@@ -96,13 +96,13 @@ export default function LoginPage() {
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
-        <Card className="w-full max-w-md bg-card border-border">
+        <Card className="w-full max-w-sm sm:max-w-md bg-card border-border">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-6">
               <img 
                 src={logoImage} 
                 alt="The Guild: Gamified Fitness" 
-                className="w-64 h-auto"
+                className="w-48 sm:w-56 md:w-64 lg:w-72 h-auto"
               />
             </div>
             <CardTitle className="text-2xl font-bold text-foreground">

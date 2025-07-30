@@ -201,6 +201,12 @@ The application follows a monorepo structure with shared TypeScript schemas betw
   - Added quick action buttons to browse programs or create custom workouts
   - Enhanced UI with gradient backgrounds and professional status badges
 - **UI Enhancement**: Updated mail refresh button to use circular arrow icon (RotateCcw) for better user recognition
+- **Responsive Logo Scaling**: Implemented responsive logo sizing across all authentication pages
+  - Mobile (default): w-48 for compact display on small screens
+  - Small screens (sm:): w-56 for slightly larger visibility on small tablets
+  - Medium screens (md:): w-64 for optimal desktop viewing
+  - Large screens (lg:): w-72 for enhanced presence on large displays
+  - Updated both login and signup pages with responsive card containers
 
 **July 29, 2025 - Comprehensive Streak Bonus System Implementation:**
 - **Completed Streak Bonus System**: Implemented 1.5x XP multiplier for users with 3+ day streaks
