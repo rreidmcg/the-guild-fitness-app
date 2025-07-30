@@ -123,77 +123,7 @@
     border-color: hsl(215, 20%, 20%) !important;
   }
 
-  /* Multiple firefly animation variants with different fade patterns */
-  @keyframes firefly-early-fade {
-    0% {
-      transform: translateY(0) translateX(0px) scale(1);
-      opacity: 0;
-    }
-    20% {
-      transform: translateY(-40vh) translateX(5px) scale(1);
-      opacity: 0.9;
-    }
-    70% {
-      transform: translateY(-90vh) translateX(15px) scale(0.9);
-      opacity: 0.9;
-    }
-    100% {
-      transform: translateY(-140vh) translateX(20px) scale(0.8);
-      opacity: 0;
-    }
-  }
-
-  @keyframes firefly-mid-fade {
-    0% {
-      transform: translateY(0) translateX(0px) scale(1);
-      opacity: 0;
-    }
-    40% {
-      transform: translateY(-50vh) translateX(8px) scale(1);
-      opacity: 0.8;
-    }
-    80% {
-      transform: translateY(-100vh) translateX(12px) scale(0.9);
-      opacity: 0.8;
-    }
-    100% {
-      transform: translateY(-140vh) translateX(15px) scale(0.8);
-      opacity: 0;
-    }
-  }
-
-  @keyframes firefly-late-fade {
-    0% {
-      transform: translateY(0) translateX(0px) scale(1);
-      opacity: 0;
-    }
-    60% {
-      transform: translateY(-70vh) translateX(10px) scale(1);
-      opacity: 0.7;
-    }
-    90% {
-      transform: translateY(-110vh) translateX(20px) scale(0.9);
-      opacity: 0.7;
-    }
-    100% {
-      transform: translateY(-140vh) translateX(25px) scale(0.8);
-      opacity: 0;
-    }
-  }
-
-  .animate-firefly-early {
-    animation: firefly-early-fade linear infinite;
-  }
-
-  .animate-firefly-mid {
-    animation: firefly-mid-fade linear infinite;
-  }
-
-  .animate-firefly-late {
-    animation: firefly-late-fade linear infinite;
-  }
-
-  /* Legacy float animation for compatibility */
+  /* Floating particles animation */
   @keyframes float {
     0% {
       transform: translateY(100vh) translateX(0px) scale(1);
