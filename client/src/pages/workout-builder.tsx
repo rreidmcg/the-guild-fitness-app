@@ -1069,8 +1069,8 @@ export default function WorkoutBuilder() {
   // Main render based on step
   return (
     <>
-      {step === 'details' && renderDetails()}
-      {step === 'sections' && renderSections()}
+      {step === 'details' && renderDetailsStep()}
+      {step === 'sections' && renderSectionsStep()}
       {step === 'section-form' && renderSectionForm()}
       {step === 'exercise-selection' && renderExerciseSelection()}
       
