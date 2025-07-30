@@ -10,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown, Copy, Trash2, RefreshCw, Info } from "lucide-react";
+import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown, Copy, Trash2, RefreshCw, Info, Edit3, Camera, Video } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Exercise } from "@shared/schema";
 
 interface WorkoutSection {
@@ -72,6 +73,8 @@ export default function WorkoutBuilder() {
   const [editingSet, setEditingSet] = useState<{exerciseId: string, setId: string} | null>(null);
   const [showExerciseMenu, setShowExerciseMenu] = useState<string | null>(null);
   const [showExerciseDetails, setShowExerciseDetails] = useState<WorkoutExercise | null>(null);
+  const [isEditingExercise, setIsEditingExercise] = useState(false);
+  const [editedExercise, setEditedExercise] = useState<any>(null);
 
   const { data: exercises = [] } = useQuery({
     queryKey: ["/api/exercises"],
@@ -1016,119 +1019,348 @@ export default function WorkoutBuilder() {
   );
 
   // Exercise details modal
-  const renderExerciseDetailsModal = () => (
-    <Dialog open={!!showExerciseDetails} onOpenChange={() => setShowExerciseDetails(null)}>
-      <DialogContent className="max-w-lg mx-auto bg-card border-border text-foreground max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="pb-6">
-          <DialogTitle className="text-center text-xl font-bold text-foreground">
-            {showExerciseDetails?.exercise?.name}
-          </DialogTitle>
-        </DialogHeader>
+  const renderExerciseDetailsModal = () => {
+    const handleEditToggle = () => {
+      if (!isEditingExercise && showExerciseDetails) {
+        setEditedExercise({
+          name: showExerciseDetails.exercise?.name || '',
+          modality: 'strength',
+          muscleGroups: showExerciseDetails.exercise?.muscleGroups || [],
+          category: showExerciseDetails.exercise?.category || 'strength',
+          fields: ['reps', 'weight', 'RPE'],
+          instructions: showExerciseDetails.exercise?.description || '',
+          videoUrl: '',
+          photos: []
+        });
+      }
+      setIsEditingExercise(!isEditingExercise);
+    };
+
+    const handleSaveChanges = () => {
+      if (editedExercise && showExerciseDetails && currentSection) {
+        // Update the exercise in the current section
+        const updatedExercises = currentSection.exercises?.map(ex => {
+          if (ex.id === showExerciseDetails.id) {
+            return {
+              ...ex,
+              exercise: {
+                ...ex.exercise,
+                ...editedExercise
+              }
+            };
+          }
+          return ex;
+        }) || [];
+
+        setCurrentSection({ ...currentSection, exercises: updatedExercises });
+        setIsEditingExercise(false);
+        
+        toast({
+          title: "Exercise updated",
+          description: `${editedExercise.name} has been updated`,
+        });
+      }
+    };
+
+    return (
+      <Dialog open={!!showExerciseDetails} onOpenChange={() => {
+        setShowExerciseDetails(null);
+        setIsEditingExercise(false);
+        setEditedExercise(null);
+      }}>
+        <DialogContent className="max-w-2xl mx-auto bg-card border-border text-foreground max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="pb-6">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-bold text-foreground">
+                {isEditingExercise ? 'Edit Exercise' : 'Exercise Details'}
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEditToggle}
+                className="ml-2"
+              >
+                <Edit3 className="w-4 h-4" />
+                {isEditingExercise ? 'Cancel' : 'Edit'}
+              </Button>
+            </div>
+          </DialogHeader>
         
         {showExerciseDetails && (
           <div className="space-y-6 pb-4">
-            {/* Exercise Image Placeholder */}
-            <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <span className="text-2xl font-bold text-primary">Ex</span>
-                </div>
-                <p className="text-sm text-muted-foreground">Exercise Image</p>
-              </div>
-            </div>
-
-            {/* Exercise Information */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <h4 className="font-medium text-foreground mb-1">Category</h4>
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {showExerciseDetails.exercise?.category || 'Not specified'}
-                  </p>
-                </div>
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <h4 className="font-medium text-foreground mb-1">Equipment</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {showExerciseDetails.exercise?.equipment || 'Body weight'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Muscle Groups */}
-              <div className="bg-muted/50 p-3 rounded-lg">
-                <h4 className="font-medium text-foreground mb-2">Target Muscles</h4>
-                <div className="flex flex-wrap gap-2">
-                  {showExerciseDetails.exercise?.muscleGroups?.map((muscle, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {muscle}
-                    </Badge>
-                  )) || <span className="text-sm text-muted-foreground">Not specified</span>}
-                </div>
-              </div>
-
-              {/* Instructions */}
-              <div className="bg-muted/50 p-3 rounded-lg">
-                <h4 className="font-medium text-foreground mb-2">Instructions</h4>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <p>1. Set up in proper starting position</p>
-                  <p>2. Perform the movement with controlled form</p>
-                  <p>3. Focus on full range of motion</p>
-                  <p>4. Maintain proper breathing throughout</p>
-                </div>
-              </div>
-
-              {/* Current Workout Configuration */}
-              <div className="border-t pt-4">
-                <h4 className="font-medium text-foreground mb-3">Current Workout Configuration</h4>
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground mb-1">
-                    {showExerciseDetails.sets.length} set{showExerciseDetails.sets.length !== 1 ? 's' : ''} configured
-                  </div>
-                  
-                  {/* Sets Table */}
-                  <div className="bg-muted/30 rounded-lg p-3">
-                    <div className="grid grid-cols-5 gap-2 text-xs font-medium text-muted-foreground uppercase mb-2">
-                      <div>SET</div>
-                      <div>TYPE</div>
-                      <div>REPS</div>
-                      <div>WEIGHT</div>
-                      <div>REST</div>
+            {!isEditingExercise ? (
+              // View Mode
+              <>
+                {/* Exercise Image/Video Section */}
+                <div className="w-full h-48 bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <span className="text-2xl font-bold text-primary">Ex</span>
                     </div>
-                    {showExerciseDetails.sets.map((set, index) => (
-                      <div key={set.id} className="grid grid-cols-5 gap-2 text-sm py-1">
-                        <div className="font-medium">{index + 1}</div>
-                        <div className={`font-medium ${
-                          set.type === 'W' ? 'text-orange-500' :
-                          set.type === 'R' ? 'text-blue-500' :
-                          set.type === 'D' ? 'text-blue-400' :
-                          'text-red-500'
-                        }`}>
-                          {set.type === 'W' ? 'Warmup' : 
-                           set.type === 'R' ? 'Regular' : 
-                           set.type === 'D' ? 'Drop' : 'Failure'}
-                        </div>
-                        <div>{set.reps || '-'}</div>
-                        <div>{set.weight ? `${set.weight}lbs` : '-'}</div>
-                        <div>{set.rest || '-'}</div>
-                      </div>
+                    <p className="text-sm text-muted-foreground">Exercise Media</p>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-foreground mb-2">
+                    {showExerciseDetails.exercise?.name}
+                  </h2>
+                </div>
+
+                {/* Exercise Information */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-muted/50 p-3 rounded-lg">
+                    <h4 className="font-medium text-foreground mb-1">Modality</h4>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      strength
+                    </p>
+                  </div>
+                  <div className="bg-muted/50 p-3 rounded-lg">
+                    <h4 className="font-medium text-foreground mb-1">Category</h4>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      {showExerciseDetails.exercise?.category || 'strength'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Muscle Groups */}
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-2">Target Muscles</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {showExerciseDetails.exercise?.muscleGroups?.map((muscle, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {muscle}
+                      </Badge>
+                    )) || <span className="text-sm text-muted-foreground">Not specified</span>}
+                  </div>
+                </div>
+
+                {/* Instructions */}
+                <div className="bg-muted/50 p-3 rounded-lg">
+                  <h4 className="font-medium text-foreground mb-2">Instructions</h4>
+                  <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {showExerciseDetails.exercise?.description || 'No instructions provided'}
+                  </div>
+                </div>
+              </>
+            ) : (
+              // Edit Mode
+              <div className="space-y-4">
+                {/* Exercise Name */}
+                <div>
+                  <Label className="text-sm font-medium text-foreground">Exercise Name</Label>
+                  <Input
+                    value={editedExercise?.name || ''}
+                    onChange={(e) => setEditedExercise((prev: any) => ({ ...prev, name: e.target.value }))}
+                    className="mt-1"
+                    placeholder="Enter exercise name"
+                  />
+                </div>
+
+                {/* Modality */}
+                <div>
+                  <Label className="text-sm font-medium text-foreground">Modality</Label>
+                  <Select 
+                    value={editedExercise?.modality || 'strength'} 
+                    onValueChange={(value: string) => setEditedExercise((prev: any) => ({ ...prev, modality: value }))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="strength">Strength</SelectItem>
+                      <SelectItem value="mobility">Mobility</SelectItem>
+                      <SelectItem value="cardio">Cardio</SelectItem>
+                      <SelectItem value="agility">Agility</SelectItem>
+                      <SelectItem value="myofascial-release">Myofascial Release</SelectItem>
+                      <SelectItem value="yoga">Yoga</SelectItem>
+                      <SelectItem value="activation">Activation</SelectItem>
+                      <SelectItem value="conditioning">Conditioning</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Category */}
+                <div>
+                  <Label className="text-sm font-medium text-foreground">Category</Label>
+                  <Select 
+                    value={editedExercise?.category || 'strength'} 
+                    onValueChange={(value: string) => setEditedExercise((prev: any) => ({ ...prev, category: value }))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="strength">Strength</SelectItem>
+                      <SelectItem value="bodyweight">Bodyweight</SelectItem>
+                      <SelectItem value="timed">Timed</SelectItem>
+                      <SelectItem value="distance-short">Distance (Short) - yards/meters</SelectItem>
+                      <SelectItem value="distance-long">Distance (Long) - miles/kilometers</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Muscle Groups */}
+                <div>
+                  <Label className="text-sm font-medium text-foreground">Muscle Groups</Label>
+                  <div className="mt-1 grid grid-cols-3 gap-2">
+                    {[
+                      'Chest', 'Back', 'Shoulders', 'Arms', 'Biceps', 'Triceps',
+                      'Legs', 'Quadriceps', 'Hamstrings', 'Glutes', 'Calves',
+                      'Core', 'Abs', 'Cardio', 'Full Body'
+                    ].map((muscle) => (
+                      <label key={muscle} className="flex items-center space-x-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={editedExercise?.muscleGroups?.includes(muscle) || false}
+                          onChange={(e) => {
+                            const current = editedExercise?.muscleGroups || [];
+                            if (e.target.checked) {
+                              setEditedExercise((prev: any) => ({ 
+                                ...prev, 
+                                muscleGroups: [...current, muscle] 
+                              }));
+                            } else {
+                              setEditedExercise((prev: any) => ({ 
+                                ...prev, 
+                                muscleGroups: current.filter((m: string) => m !== muscle) 
+                              }));
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <span>{muscle}</span>
+                      </label>
                     ))}
                   </div>
                 </div>
-              </div>
 
-              {/* Notes Section */}
-              {showExerciseDetails.notes && (
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <h4 className="font-medium text-foreground mb-2">Notes</h4>
-                  <p className="text-sm text-muted-foreground">{showExerciseDetails.notes}</p>
+                {/* Fields */}
+                <div>
+                  <Label className="text-sm font-medium text-foreground">Tracking Fields</Label>
+                  <div className="mt-1 grid grid-cols-3 gap-2">
+                    {[
+                      'time', 'speed', 'cadence', 'distance-long', 'reps', '%1RM',
+                      'weight', 'RPE', 'RIR', 'heart-rate', '%HR', 'calories',
+                      'watts', 'RPM', 'rounds'
+                    ].map((field) => (
+                      <label key={field} className="flex items-center space-x-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={editedExercise?.fields?.includes(field) || false}
+                          onChange={(e) => {
+                            const current = editedExercise?.fields || [];
+                            if (e.target.checked) {
+                              setEditedExercise((prev: any) => ({ 
+                                ...prev, 
+                                fields: [...current, field] 
+                              }));
+                            } else {
+                              setEditedExercise((prev: any) => ({ 
+                                ...prev, 
+                                fields: current.filter((f: string) => f !== field) 
+                              }));
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <span className="capitalize">{field.replace('-', ' ')}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {/* Instructions */}
+                <div>
+                  <Label className="text-sm font-medium text-foreground">Instructions</Label>
+                  <Textarea
+                    value={editedExercise?.instructions || ''}
+                    onChange={(e) => setEditedExercise((prev: any) => ({ ...prev, instructions: e.target.value }))}
+                    className="mt-1 min-h-[100px]"
+                    placeholder="Enter exercise instructions..."
+                  />
+                </div>
+
+                {/* Media Upload Buttons */}
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Video className="w-4 h-4" />
+                    Add Video
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Camera className="w-4 h-4" />
+                    Add Photos
+                  </Button>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={handleEditToggle}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveChanges}>
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Current Workout Configuration - Only show in view mode */}
+            {!isEditingExercise && (
+              <>
+                <div className="border-t pt-4">
+                  <h4 className="font-medium text-foreground mb-3">Current Workout Configuration</h4>
+                  <div className="space-y-2">
+                    <div className="text-sm text-muted-foreground mb-1">
+                      {showExerciseDetails.sets.length} set{showExerciseDetails.sets.length !== 1 ? 's' : ''} configured
+                    </div>
+                    
+                    {/* Sets Table */}
+                    <div className="bg-muted/30 rounded-lg p-3">
+                      <div className="grid grid-cols-5 gap-2 text-xs font-medium text-muted-foreground uppercase mb-2">
+                        <div>SET</div>
+                        <div>TYPE</div>
+                        <div>REPS</div>
+                        <div>WEIGHT</div>
+                        <div>REST</div>
+                      </div>
+                      {showExerciseDetails.sets.map((set, index) => (
+                        <div key={set.id} className="grid grid-cols-5 gap-2 text-sm py-1">
+                          <div className="font-medium">{index + 1}</div>
+                          <div className={`font-medium ${
+                            set.type === 'W' ? 'text-orange-500' :
+                            set.type === 'R' ? 'text-blue-500' :
+                            set.type === 'D' ? 'text-blue-400' :
+                            'text-red-500'
+                          }`}>
+                            {set.type === 'W' ? 'Warmup' : 
+                             set.type === 'R' ? 'Regular' : 
+                             set.type === 'D' ? 'Drop' : 'Failure'}
+                          </div>
+                          <div>{set.reps || '-'}</div>
+                          <div>{set.weight ? `${set.weight}lbs` : '-'}</div>
+                          <div>{set.rest || '-'}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes Section */}
+                {showExerciseDetails.notes && (
+                  <div className="bg-muted/50 p-3 rounded-lg">
+                    <h4 className="font-medium text-foreground mb-2">Notes</h4>
+                    <p className="text-sm text-muted-foreground">{showExerciseDetails.notes}</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
       </DialogContent>
     </Dialog>
-  );
+    );
+  };
 
   // Main render based on step
   return (
