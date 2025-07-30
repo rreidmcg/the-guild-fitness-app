@@ -598,6 +598,33 @@ export default function WorkoutBuilder() {
   };
 
   const handleAddSelectedExercises = () => {
+    if (!currentSection || selectedExercises.length === 0) return;
+
+    // Add selected exercises to current section
+    const exercisesToAdd = selectedExercises.map(exerciseId => {
+      const exercise = (exercises as Exercise[]).find((ex: Exercise) => ex.id === exerciseId);
+      return {
+        id: Date.now().toString() + Math.random(),
+        exerciseId,
+        exercise,
+        sets: [{
+          id: Date.now().toString() + Math.random(),
+          type: '2' as const,
+          reps: 10,
+          weight: 0,
+          rest: '01:00'
+        }]
+      };
+    });
+
+    // Update current section with new exercises
+    setCurrentSection(prev => ({
+      ...prev!,
+      exercises: [...(prev?.exercises || []), ...exercisesToAdd]
+    }));
+
+    // Clear selection and go back to section form
+    setSelectedExercises([]);
     setStep('section-form');
   };
 
@@ -624,27 +651,7 @@ export default function WorkoutBuilder() {
   const handleSaveSection = () => {
     if (!currentSection?.name?.trim()) return;
 
-    // Add selected exercises to current section
-    const exercisesToAdd = selectedExercises.map(exerciseId => {
-      const exercise = (exercises as Exercise[]).find((ex: Exercise) => ex.id === exerciseId);
-      return {
-        id: Date.now().toString() + Math.random(),
-        exerciseId,
-        exercise,
-        sets: [{
-          id: Date.now().toString(),
-          type: '2' as const,
-          reps: 10,
-          weight: 0,
-          rest: '01:00'
-        }] // Start with one regular set
-      };
-    });
-
-    const finalSection = {
-      ...currentSection,
-      exercises: [...(currentSection.exercises || []), ...exercisesToAdd]
-    } as WorkoutSection;
+    const finalSection = { ...currentSection } as WorkoutSection;
 
     if (isEditingSection) {
       setSections(prev => prev.map(section => 
