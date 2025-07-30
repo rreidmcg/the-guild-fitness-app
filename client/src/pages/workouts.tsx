@@ -475,7 +475,7 @@ export default function Workouts() {
                 Programs
               </CardTitle>
               <Button 
-                onClick={() => navigate('/shop?tab=programs')}
+                onClick={() => navigate('/workout-builder')}
                 size="sm"
                 className="bg-amber-600 hover:bg-amber-700 text-white"
               >

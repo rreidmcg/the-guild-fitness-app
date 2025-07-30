@@ -173,6 +173,14 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 30, 2025 - Premium Programs & Founders Pack Temporarily Hidden:**
+- **Hidden Premium Content**: Temporarily removed premium programs and founders pack from shop interface
+  - Removed "Programs" and "Bundles" tabs from shop navigation (reduced from 5 to 3 tabs)
+  - Shop now only shows Consumables, Equipment, and Currency tabs
+  - Updated Programs button in workouts page to redirect to workout builder instead of shop
+  - Maintains focus on core workout tracking functionality during development phase
+  - Premium content infrastructure remains intact for future reactivation when workout system is complete
+
 **July 30, 2025 - Free Program Access Fix & Workout System Enhancement:**
 - **Fixed Free Novice Program Access Issue**: Resolved workout program system to allow free programs (price = 0) without purchase requirement
   - Updated workout program routes to check for free programs alongside purchased programs
