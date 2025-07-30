@@ -83,18 +83,11 @@
     background-color: hsl(215, 20%, 15%) !important;
   }
 
-  /* Additional input styling to ensure consistent dark background */
+  /* Additional input styling to ensure consistent text color */
   input[type="email"],
   input[type="password"],
   input[type="text"] {
-    background-color: hsl(215, 20%, 15%) !important;
     color: hsl(197, 100%, 90%) !important;
-  }
-
-  input[type="email"]:focus,
-  input[type="password"]:focus,
-  input[type="text"]:focus {
-    background-color: hsl(215, 20%, 18%) !important;
   }
   
   .xp-bar {
