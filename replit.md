@@ -174,9 +174,12 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 # Recent Changes
 
 **July 30, 2025 - Magical Floating Particle Effects & Background Music System:**
-- **Firefly Particle System**: Created enchanting firefly effects for authentication pages
+- **Dynamic Firefly Particle System**: Created enchanting firefly effects with realistic fade patterns
   - Multi-layered particle system with background and card-level particles
   - Golden firefly particles in yellow, orange, gold, and amber with enhanced glowing effects
+  - Three distinct animation types: early-fade (light up at 20%), mid-fade (40%), and late-fade (60%)
+  - Fireflies dynamically fade in at different journey points and fade out as they ascend
+  - Realistic firefly behavior with varied lighting patterns throughout their flight path
   - Smooth upward floating animation with varying speeds, sizes, and durations
   - Magical firefly atmosphere for login and signup pages with warm ambient lighting
   - Proper z-index layering ensures particles don't interfere with form interactions
