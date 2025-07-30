@@ -159,7 +159,7 @@ export default function SignupPage() {
       <AuthMusicBanner />
       <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden pt-16">
         <FloatingParticles count={20} />
-      <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10 overflow-hidden">
+      <Card className="w-full max-w-sm sm:max-w-md bg-card/30 backdrop-blur-xl border border-white/20 shadow-2xl relative z-10 overflow-hidden">
         <FloatingParticles count={8} className="absolute inset-0 z-0" />
         <CardHeader className="text-center relative z-10">
           <div className="flex justify-center mb-6">

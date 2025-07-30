@@ -101,7 +101,7 @@ export default function LoginPage() {
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
-        <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10 overflow-hidden">
+        <Card className="w-full max-w-sm sm:max-w-md bg-card/30 backdrop-blur-xl border border-white/20 shadow-2xl relative z-10 overflow-hidden">
           <FloatingParticles count={8} className="absolute inset-0 z-0" />
           <CardHeader className="text-center relative z-10">
             <div className="flex justify-center mb-6">
