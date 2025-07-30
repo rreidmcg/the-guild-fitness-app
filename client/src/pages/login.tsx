@@ -102,7 +102,7 @@ export default function LoginPage() {
               <img 
                 src={logoImage} 
                 alt="The Guild: Gamified Fitness" 
-                className="w-48 h-auto"
+                className="w-64 h-auto"
               />
             </div>
             <CardTitle className="text-2xl font-bold text-foreground">
