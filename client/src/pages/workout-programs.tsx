@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "@/hooks/use-navigate";
 import { 
   Trophy, 
   Clock, 
@@ -15,7 +16,8 @@ import {
   CreditCard,
   Target,
   Zap,
-  Activity
+  Activity,
+  Play
 } from "lucide-react";
 import { Elements, useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -69,8 +71,9 @@ function PurchaseForm({ program, onSuccess }: { program: WorkoutProgram; onSucce
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
       // Confirm the purchase on our backend
       try {
-        await apiRequest("POST", "/api/confirm-program-purchase", {
-          paymentIntentId: paymentIntent.id
+        await apiRequest("/api/confirm-program-purchase", {
+          method: "POST",
+          body: { paymentIntentId: paymentIntent.id }
         });
         
         toast({
@@ -104,6 +107,7 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
   const [showPayment, setShowPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const difficultyColors = {
     novice: "bg-green-500",
@@ -119,8 +123,9 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
 
   const purchaseMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", `/api/purchase-program/${program.id}`);
-      return response.json();
+      return await apiRequest(`/api/purchase-program/${program.id}`, {
+        method: "POST"
+      });
     },
     onSuccess: (data) => {
       setClientSecret(data.clientSecret);
@@ -237,12 +242,21 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
           </ul>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-4 space-y-2">
           {program.isPurchased ? (
-            <Button className="w-full" variant="outline">
-              <CheckCircle2 className="w-4 h-4 mr-2" />
-              Purchased - Access Anytime
-            </Button>
+            <>
+              <Button 
+                className="w-full" 
+                onClick={() => navigate(`/program-overview/${program.id}`)}
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Start Program
+              </Button>
+              <Button className="w-full" variant="outline" size="sm">
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Owned
+              </Button>
+            </>
           ) : (
             <Button 
               className="w-full" 
@@ -260,7 +274,7 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
 }
 
 export default function WorkoutPrograms() {
-  const { data: programs, isLoading } = useQuery({
+  const { data: programs, isLoading } = useQuery<WorkoutProgram[]>({
     queryKey: ["/api/workout-programs"],
   });
 
@@ -290,7 +304,7 @@ export default function WorkoutPrograms() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {programs?.map((program: WorkoutProgram) => (
+          {programs?.map((program) => (
             <ProgramCard key={program.id} program={program} />
           ))}
         </div>

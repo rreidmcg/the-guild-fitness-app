@@ -40,6 +40,9 @@ import NotFound from "@/pages/not-found";
 import Achievements from "@/pages/achievements";
 import Premium from "@/pages/premium";
 import AIWorkouts from "@/pages/ai-workouts";
+import ProgramOverview from "@/pages/program-overview";
+import ProgramDay from "@/pages/program-day";
+import ProgramWorkout from "@/pages/program-workout";
 
 function Router() {
   return (
@@ -135,6 +138,21 @@ function Router() {
       <Route path="/workout-programs">
         <AuthGuard>
           <WorkoutPrograms />
+        </AuthGuard>
+      </Route>
+      <Route path="/program-overview/:id">
+        <AuthGuard>
+          <ProgramOverview />
+        </AuthGuard>
+      </Route>
+      <Route path="/program-day/:programId/:workoutId">
+        <AuthGuard>
+          <ProgramDay />
+        </AuthGuard>
+      </Route>
+      <Route path="/program-workout/:programId/:workoutId">
+        <AuthGuard>
+          <ProgramWorkout />
         </AuthGuard>
       </Route>
       <Route path="/gem-shop">
