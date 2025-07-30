@@ -139,15 +139,15 @@ export default function WorkoutSession() {
       <div className="bg-slate-800 border-b border-slate-600 px-4 py-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation("/workouts")}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground p-2 sm:p-3"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
-              <h1 className="text-xl sm:text-3xl font-bold text-foreground">Workout Session</h1>
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-foreground">Workout Session</h1>
             </div>
             
             <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
@@ -157,10 +157,10 @@ export default function WorkoutSession() {
               </div>
               <Button 
                 onClick={handleStartPause}
-                className={isActive ? "bg-orange-600 hover:bg-orange-700" : "bg-game-primary hover:bg-blue-600"}
+                className={isActive ? "bg-orange-600 hover:bg-orange-700 text-white" : "bg-game-primary hover:bg-blue-600 text-white"}
                 size="sm"
               >
-                {isActive ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
+                {isActive ? <Pause className="w-4 h-4 mr-2 text-white" /> : <Play className="w-4 h-4 mr-2 text-white" />}
                 {isActive ? "Pause" : "Start"}
               </Button>
             </div>
@@ -216,9 +216,9 @@ export default function WorkoutSession() {
             size="lg"
             onClick={handleCompleteWorkout}
             disabled={completeWorkoutMutation.isPending}
-            className="bg-game-success hover:bg-green-600"
+            className="bg-game-success hover:bg-green-600 text-white"
           >
-            <Check className="w-6 h-6 mr-2" />
+            <Check className="w-6 h-6 mr-2 text-white" />
             Complete Workout
           </Button>
         </div>
