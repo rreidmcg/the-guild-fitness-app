@@ -31,6 +31,7 @@ interface WorkoutExercise {
   exercise?: Exercise;
   sets: ExerciseSet[];
   notes?: string;
+  eachSide?: boolean; // Indicates if exercise is performed unilaterally
 }
 
 interface ExerciseSet {
@@ -519,11 +520,44 @@ export default function WorkoutBuilder() {
                     </Button>
                   </div>
 
-                  <div className="mt-4">
+                  <div className="mt-4 space-y-3">
+                    {/* Each Side Checkbox */}
+                    <div className="flex items-center justify-end">
+                      <label className="flex items-center space-x-2 text-sm text-muted-foreground cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={exercise.eachSide || false}
+                          onChange={(e) => {
+                            if (currentSection && currentSection.exercises) {
+                              const updatedExercises = currentSection.exercises.map(ex => 
+                                ex.id === exercise.id 
+                                  ? {...ex, eachSide: e.target.checked}
+                                  : ex
+                              );
+                              setCurrentSection({...currentSection, exercises: updatedExercises});
+                            }
+                          }}
+                          className="rounded"
+                        />
+                        <span>Each side</span>
+                      </label>
+                    </div>
+                    
                     <Textarea 
                       placeholder="Add note..."
                       className="bg-muted border-0 text-sm resize-none"
                       rows={2}
+                      value={exercise.notes || ''}
+                      onChange={(e) => {
+                        if (currentSection && currentSection.exercises) {
+                          const updatedExercises = currentSection.exercises.map(ex => 
+                            ex.id === exercise.id 
+                              ? {...ex, notes: e.target.value}
+                              : ex
+                          );
+                          setCurrentSection({...currentSection, exercises: updatedExercises});
+                        }
+                      }}
                     />
                   </div>
                 </CardContent>

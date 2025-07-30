@@ -257,13 +257,32 @@ export default function WorkoutSession() {
             <CardTitle className="text-foreground animate-in fade-in duration-500 delay-300">Current Exercise</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-12">
-              <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-500 hover:scale-110 animate-in zoom-in delay-400">
-                <Play className="w-12 h-12 !text-white transition-transform duration-300 hover:scale-125" />
+            {exerciseData.length > 0 && currentExerciseIndex < exerciseData.length ? (
+              <div className="text-center py-8">
+                <div className="w-20 h-20 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-500 hover:scale-110 animate-in zoom-in delay-400">
+                  <Target className="w-10 h-10 !text-white transition-transform duration-300 hover:scale-125" />
+                </div>
+                <h3 className="text-2xl font-bold mb-1 text-foreground animate-in fade-in slide-in-from-bottom-2 delay-500">
+                  {exerciseData[currentExerciseIndex]?.name || "Exercise"}
+                </h3>
+                {exerciseData[currentExerciseIndex]?.eachSide && (
+                  <p className="text-sm text-orange-400 font-medium mb-2 animate-in fade-in slide-in-from-bottom-2 delay-600">
+                    Each side
+                  </p>
+                )}
+                <p className="text-muted-foreground animate-in fade-in slide-in-from-bottom-2 delay-700">
+                  {exerciseData[currentExerciseIndex]?.sets?.length || 0} sets configured
+                </p>
               </div>
-              <h3 className="text-2xl font-bold mb-2 text-foreground animate-in fade-in slide-in-from-bottom-2 delay-500">Start Your Workout</h3>
-              <p className="text-muted-foreground animate-in fade-in slide-in-from-bottom-2 delay-600">Press start to begin tracking your session</p>
-            </div>
+            ) : (
+              <div className="text-center py-12">
+                <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-500 hover:scale-110 animate-in zoom-in delay-400">
+                  <Play className="w-12 h-12 !text-white transition-transform duration-300 hover:scale-125" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2 text-foreground animate-in fade-in slide-in-from-bottom-2 delay-500">Start Your Workout</h3>
+                <p className="text-muted-foreground animate-in fade-in slide-in-from-bottom-2 delay-600">Press start to begin tracking your session</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -273,9 +292,36 @@ export default function WorkoutSession() {
             <CardTitle className="text-foreground animate-in fade-in duration-500 delay-700">Exercise List</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8 text-muted-foreground animate-in fade-in delay-800">
-              <p>Exercise list will be populated when workout is loaded</p>
-            </div>
+            {exerciseData.length > 0 ? (
+              <div className="space-y-3 animate-in fade-in delay-800">
+                {exerciseData.map((exercise, index) => (
+                  <div 
+                    key={index}
+                    className={`p-3 rounded-lg border transition-all duration-200 ${
+                      index === currentExerciseIndex 
+                        ? 'bg-primary/10 border-primary/30 text-foreground' 
+                        : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">{exercise.name}</h4>
+                        {exercise.eachSide && (
+                          <p className="text-xs text-orange-400">Each side</p>
+                        )}
+                      </div>
+                      <div className="text-sm">
+                        {exercise.sets?.length || 0} sets
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground animate-in fade-in delay-800">
+                <p>Exercise list will be populated when workout is loaded</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
