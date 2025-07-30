@@ -247,7 +247,10 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
             <>
               <Button 
                 className="w-full" 
-                onClick={() => navigate(`/program-overview/${program.id}`)}
+                onClick={() => {
+                  console.log('Navigating to program overview:', program.id);
+                  navigate(`/program-overview/${program.id}`);
+                }}
               >
                 <Play className="w-4 h-4 mr-2" />
                 Start Program

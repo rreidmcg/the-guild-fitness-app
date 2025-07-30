@@ -183,6 +183,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get individual program details
+  app.get("/api/workout-programs/:id", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const userId = currentUserId;
+      
+      const program = await storage.getWorkoutProgram(programId);
+      if (!program) {
+        return res.status(404).json({ error: "Program not found" });
+      }
+
+      const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
+      const isPurchased = purchasedPrograms.includes(programId.toString()) || program.price === 0;
+      
+      res.json({
+        ...program,
+        isPurchased,
+        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+      });
+    } catch (error) {
+      console.error("Error fetching program details:", error);
+      res.status(500).json({ error: "Failed to fetch program details" });
+    }
+  });
+
   app.get("/api/workout-programs/:id", async (req, res) => {
     try {
       const programId = parseInt(req.params.id);

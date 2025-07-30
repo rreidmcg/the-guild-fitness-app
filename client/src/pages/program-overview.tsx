@@ -45,13 +45,13 @@ export default function ProgramOverview() {
 
   // Fetch program details
   const { data: program, isLoading: programLoading } = useQuery<WorkoutProgram>({
-    queryKey: ["/api/workout-programs", programId],
+    queryKey: [`/api/workout-programs/${programId}`],
     enabled: !!programId,
   });
 
   // Fetch program workouts
   const { data: workouts, isLoading: workoutsLoading } = useQuery<ProgramWorkout[]>({
-    queryKey: ["/api/workout-programs", programId, "workouts"],
+    queryKey: [`/api/workout-programs/${programId}/workouts`],
     enabled: !!programId && program?.isPurchased,
   });
 

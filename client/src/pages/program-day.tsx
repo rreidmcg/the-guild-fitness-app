@@ -31,7 +31,7 @@ export default function ProgramDay() {
 
   // Fetch all workouts for the program to find the specific workout
   const { data: workouts, isLoading } = useQuery<ProgramWorkout[]>({
-    queryKey: ["/api/workout-programs", pId, "workouts"],
+    queryKey: [`/api/workout-programs/${pId}/workouts`],
     enabled: !!pId,
   });
 
