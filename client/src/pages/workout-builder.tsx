@@ -522,8 +522,8 @@ export default function WorkoutBuilder() {
                   </div>
 
                   <div className="mt-4 space-y-3">
-                    {/* Each Side Checkbox */}
-                    <div className="flex items-center justify-start">
+                    {/* Each Side Checkbox and Tempo Input */}
+                    <div className="flex items-center justify-between">
                       <label className="flex items-center space-x-2 text-sm text-muted-foreground cursor-pointer">
                         <input
                           type="checkbox"
@@ -542,40 +542,45 @@ export default function WorkoutBuilder() {
                         />
                         <span>Each side</span>
                       </label>
-                    </div>
 
-                    {/* Tempo Input */}
-                    <div className="flex items-center justify-center space-x-3">
-                      <label className="text-sm text-muted-foreground">Tempo</label>
-                      <div className="flex items-center space-x-1">
-                        {[0, 1, 2, 3].map((index) => (
-                          <div key={index} className="flex items-center">
-                            <Input
-                              type="text"
-                              maxLength={1}
-                              value={exercise.tempo?.[index] || '0'}
-                              onChange={(e) => {
-                                const value = e.target.value.toUpperCase();
-                                if (value === '' || /^[0-9X]$/.test(value)) {
-                                  if (currentSection && currentSection.exercises) {
-                                    const updatedExercises = currentSection.exercises.map(ex => {
-                                      if (ex.id === exercise.id) {
-                                        const currentTempo = ex.tempo || ['0', '0', '0', '0'];
-                                        const newTempo = [...currentTempo];
-                                        newTempo[index] = value || '0';
-                                        return {...ex, tempo: newTempo};
-                                      }
-                                      return ex;
-                                    });
-                                    setCurrentSection({...currentSection, exercises: updatedExercises});
-                                  }
-                                }
-                              }}
-                              className="w-8 h-8 text-center text-sm bg-muted border-border"
-                            />
-                            {index < 3 && <span className="text-muted-foreground mx-1">-</span>}
-                          </div>
-                        ))}
+                      <div className="flex items-center space-x-2">
+                        <label className="text-sm text-muted-foreground">Tempo</label>
+                        <Input
+                          type="text"
+                          placeholder="0-0-0-0"
+                          maxLength={7}
+                          value={exercise.tempo?.join('-') || '0-0-0-0'}
+                          onChange={(e) => {
+                            const value = e.target.value.toUpperCase();
+                            // Allow only digits, X, and dashes in the correct format
+                            if (/^[0-9X]-[0-9X]-[0-9X]-[0-9X]$/.test(value) || value === '') {
+                              if (currentSection && currentSection.exercises) {
+                                const tempoArray = value ? value.split('-') : ['0', '0', '0', '0'];
+                                const updatedExercises = currentSection.exercises.map(ex => 
+                                  ex.id === exercise.id 
+                                    ? {...ex, tempo: tempoArray}
+                                    : ex
+                                );
+                                setCurrentSection({...currentSection, exercises: updatedExercises});
+                              }
+                            }
+                          }}
+                          onBlur={(e) => {
+                            // Auto-format incomplete entries
+                            const value = e.target.value;
+                            if (!value || !/^[0-9X]-[0-9X]-[0-9X]-[0-9X]$/.test(value)) {
+                              if (currentSection && currentSection.exercises) {
+                                const updatedExercises = currentSection.exercises.map(ex => 
+                                  ex.id === exercise.id 
+                                    ? {...ex, tempo: ['0', '0', '0', '0']}
+                                    : ex
+                                );
+                                setCurrentSection({...currentSection, exercises: updatedExercises});
+                              }
+                            }
+                          }}
+                          className="w-20 text-center text-sm bg-muted border-border"
+                        />
                       </div>
                     </div>
                     
