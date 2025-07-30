@@ -169,10 +169,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const programs = await storage.getAllWorkoutPrograms();
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
       
-      // Add purchase status to each program
+      // Add purchase status to each program (free programs are always considered "purchased")
       const programsWithStatus = programs.map(program => ({
         ...program,
-        isPurchased: purchasedPrograms.includes(program.id.toString()),
+        isPurchased: purchasedPrograms.includes(program.id.toString()) || program.price === 0,
         priceFormatted: `$${(program.price / 100).toFixed(2)}`
       }));
       
@@ -194,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const userId = currentUserId;
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const isPurchased = purchasedPrograms.includes(programId.toString());
+      const isPurchased = purchasedPrograms.includes(programId.toString()) || program.price === 0;
       
       res.json({
         ...program,
@@ -212,11 +212,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const programId = parseInt(req.params.id);
       const userId = currentUserId;
       
-      // Check if user has purchased this program
+      // Get program details first to check if it's free
+      const program = await storage.getWorkoutProgram(programId);
+      if (!program) {
+        return res.status(404).json({ error: "Program not found" });
+      }
+      
+      // Check if user has purchased this program OR if it's a free program
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
       const isPurchased = purchasedPrograms.includes(programId.toString());
+      const isFreeProgram = program.price === 0;
       
-      if (!isPurchased) {
+      if (!isPurchased && !isFreeProgram) {
         return res.status(403).json({ error: "Program not purchased" });
       }
       

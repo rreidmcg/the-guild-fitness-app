@@ -173,6 +173,18 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 30, 2025 - Free Program Access Fix & Workout System Enhancement:**
+- **Fixed Free Novice Program Access Issue**: Resolved workout program system to allow free programs (price = 0) without purchase requirement
+  - Updated workout program routes to check for free programs alongside purchased programs
+  - Free programs now automatically considered "purchased" for access purposes
+  - All free program workouts (6 workout sessions) now properly accessible to all users
+  - Enhanced program purchase validation to treat free programs as universally accessible
+- **Enhanced Workout Program Logic**: Improved program access validation across all API endpoints
+  - Updated `/api/workout-programs` to mark free programs as purchased for UI consistency
+  - Updated `/api/workout-programs/:id` to show correct purchase status for free programs
+  - Updated `/api/workout-programs/:id/workouts` to allow access to free program workouts
+  - Maintains security for paid programs while opening free content to everyone
+
 **July 30, 2025 - Magical Floating Particle Effects & Navigation Enhancement:**
 - **Firefly Particle System**: Created enchanting firefly effects for authentication pages
   - Multi-layered particle system with background and card-level particles
