@@ -350,18 +350,18 @@ export default function Workouts() {
         {/* Workouts */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
-              <Dumbbell className="w-5 h-5 text-blue-500" />
-              Workouts
-            </CardTitle>
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between mb-3">
+              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Dumbbell className="w-5 h-5 text-blue-500" />
+                Workouts
+              </CardTitle>
               <Button 
                 onClick={() => navigate('/workout-builder')}
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="w-4 h-4 mr-1" />
-                New Workout
+                Workout
               </Button>
             </div>
           </CardHeader>
@@ -470,10 +470,20 @@ export default function Workouts() {
         {/* Programs */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
-              <Crown className="w-5 h-5 text-amber-500" />
-              Programs
-            </CardTitle>
+            <div className="flex items-center justify-between mb-3">
+              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Crown className="w-5 h-5 text-amber-500" />
+                Programs
+              </CardTitle>
+              <Button 
+                onClick={() => navigate('/shop?tab=programs')}
+                size="sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Program
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {myPurchasedPrograms.length === 0 ? (
