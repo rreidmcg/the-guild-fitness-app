@@ -388,7 +388,7 @@ export default function Workouts() {
                   <Card 
                     key={workout.id} 
                     className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/workout-builder?edit=${workout.id}`)}
+                    onClick={() => navigate(`/workout-session?workout=${workout.id}`)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
