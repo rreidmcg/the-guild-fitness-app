@@ -133,7 +133,7 @@ export default function WorkoutSession() {
   const progress = exerciseData.length > 0 ? (currentExerciseIndex / exerciseData.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-game-dark text-white pb-20">
+    <div className="min-h-screen bg-game-dark text-foreground pb-20">
       
       
       <div className="bg-slate-800 border-b border-slate-600 px-4 py-6">
@@ -143,17 +143,17 @@ export default function WorkoutSession() {
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation("/workouts")}
-                className="text-gray-300 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
-              <h1 className="text-xl sm:text-3xl font-bold">Workout Session</h1>
+              <h1 className="text-xl sm:text-3xl font-bold text-foreground">Workout Session</h1>
             </div>
             
             <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="text-right">
-                <div className="text-xl sm:text-2xl font-bold">{formatTime(time)}</div>
-                <div className="text-xs sm:text-sm text-gray-400">Duration</div>
+                <div className="text-xl sm:text-2xl font-bold text-foreground">{formatTime(time)}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Duration</div>
               </div>
               <Button 
                 onClick={handleStartPause}
@@ -173,8 +173,8 @@ export default function WorkoutSession() {
         <Card className="bg-slate-800 border-slate-600 mb-8">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold">Progress</h2>
-              <span className="text-sm text-gray-400">
+              <h2 className="text-xl font-bold text-foreground">Progress</h2>
+              <span className="text-sm text-muted-foreground">
                 {currentExerciseIndex} of {exerciseData.length} exercises
               </span>
             </div>
@@ -185,15 +185,15 @@ export default function WorkoutSession() {
         {/* Current Exercise */}
         <Card className="bg-slate-800 border-slate-600 mb-8">
           <CardHeader>
-            <CardTitle>Current Exercise</CardTitle>
+            <CardTitle className="text-foreground">Current Exercise</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-center py-12">
               <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4">
                 <Play className="w-12 h-12 text-white" />
               </div>
-              <h3 className="text-2xl font-bold mb-2">Start Your Workout</h3>
-              <p className="text-gray-400">Press start to begin tracking your session</p>
+              <h3 className="text-2xl font-bold mb-2 text-foreground">Start Your Workout</h3>
+              <p className="text-muted-foreground">Press start to begin tracking your session</p>
             </div>
           </CardContent>
         </Card>
@@ -201,10 +201,10 @@ export default function WorkoutSession() {
         {/* Exercise List */}
         <Card className="bg-slate-800 border-slate-600">
           <CardHeader>
-            <CardTitle>Exercise List</CardTitle>
+            <CardTitle className="text-foreground">Exercise List</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8 text-gray-400">
+            <div className="text-center py-8 text-muted-foreground">
               <p>Exercise list will be populated when workout is loaded</p>
             </div>
           </CardContent>
@@ -254,15 +254,15 @@ export default function WorkoutSession() {
             </DialogTitle>
           </DialogHeader>
           <div className="p-4 space-y-6">
-            <div className="text-center text-gray-300">
+            <div className="text-center text-foreground">
               <p className="mb-2">How hard did this workout feel?</p>
-              <p className="text-sm text-gray-400">Scale: 1 (Very Easy) to 10 (Maximum Effort)</p>
+              <p className="text-sm text-muted-foreground">Scale: 1 (Very Easy) to 10 (Maximum Effort)</p>
             </div>
             
             <div className="space-y-4">
               <div className="text-center">
-                <span className="text-3xl font-bold text-blue-400">{perceivedEffort}</span>
-                <p className="text-sm text-gray-400 mt-1">
+                <span className="text-3xl font-bold text-game-primary">{perceivedEffort}</span>
+                <p className="text-sm text-muted-foreground mt-1">
                   {perceivedEffort <= 2 ? "Very Easy" :
                    perceivedEffort <= 4 ? "Easy" :
                    perceivedEffort <= 6 ? "Moderate" :
@@ -280,7 +280,7 @@ export default function WorkoutSession() {
                 className="w-full"
               />
               
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Very Easy</span>
                 <span>Max Effort</span>
               </div>
