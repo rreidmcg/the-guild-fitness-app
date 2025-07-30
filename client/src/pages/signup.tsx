@@ -17,6 +17,7 @@ import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 import { FloatingParticles } from "@/components/ui/floating-particles";
 import { AuthMusicBanner } from "@/components/ui/auth-music-banner";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
+import forestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -157,7 +158,18 @@ export default function SignupPage() {
   return (
     <>
       <AuthMusicBanner />
-      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden pt-16">
+      <div 
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden pt-16"
+        style={{
+          backgroundImage: `url(${forestBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'pixelated'
+        }}
+      >
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40 z-0"></div>
         <FloatingParticles count={20} />
       <Card className="w-full max-w-sm sm:max-w-md bg-card/30 backdrop-blur-xl border border-white/20 shadow-2xl relative z-10 overflow-hidden">
         <FloatingParticles count={8} className="absolute inset-0 z-0" />
