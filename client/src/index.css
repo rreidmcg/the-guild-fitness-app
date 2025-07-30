@@ -72,6 +72,30 @@
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
   }
+
+  /* Fix autofill background color to maintain dark theme */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px hsl(215, 20%, 15%) inset !important;
+    -webkit-text-fill-color: hsl(197, 100%, 90%) !important;
+    background-color: hsl(215, 20%, 15%) !important;
+  }
+
+  /* Additional input styling to ensure consistent dark background */
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    background-color: hsl(215, 20%, 15%) !important;
+    color: hsl(197, 100%, 90%) !important;
+  }
+
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="text"]:focus {
+    background-color: hsl(215, 20%, 18%) !important;
+  }
   
   .xp-bar {
     background: linear-gradient(90deg, var(--game-success) 0%, hsl(142, 71%, 45%) 100%);
