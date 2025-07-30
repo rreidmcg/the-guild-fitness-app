@@ -171,7 +171,7 @@ export default function SignupPage() {
         {/* Dark overlay for better text readability */}
         <div className="absolute inset-0 bg-black/40 z-0"></div>
         <FloatingParticles count={20} />
-      <Card className="w-full max-w-sm sm:max-w-md bg-black/20 backdrop-blur-xl border border-white/20 shadow-2xl relative z-10 overflow-hidden">
+      <Card className="w-full max-w-sm sm:max-w-md bg-black/10 backdrop-blur-lg border border-white/30 shadow-2xl relative z-10 overflow-hidden">
         <FloatingParticles count={8} className="absolute inset-0 z-0" />
         <CardHeader className="text-center relative z-10">
           <div className="flex justify-center mb-6">
