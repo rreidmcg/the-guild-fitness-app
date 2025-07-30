@@ -170,7 +170,7 @@ export default function BattlePage() {
 
         {/* PvP Card */}
         <Card className="border-2 border-purple-500/50 bg-gradient-to-br from-purple-900/20 to-pink-900/20 opacity-60">
-          <CardHeader className="text-center -mt-10 -mb-5">
+          <CardHeader className="text-center -mt-10 -mb-10">
             <CardTitle className="text-2xl text-purple-400 flex items-center justify-center">
               <img 
                 src={arenaTitle} 
