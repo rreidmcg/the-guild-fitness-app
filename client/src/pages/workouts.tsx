@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { useToast } from "@/hooks/use-toast";
@@ -28,7 +29,11 @@ import {
   Sparkles,
   Snowflake,
   Brain,
-  Crown
+  Crown,
+  Unlock,
+  MoreHorizontal,
+  Copy,
+  Edit3
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -476,28 +481,69 @@ export default function Workouts() {
                         <Card 
                           key={workout.id} 
                           className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
-                          onClick={() => navigate(`/workout-session/${workout.id}`)}
+                          onClick={() => navigate(`/workout-builder?edit=${workout.id}`)}
                         >
                           <CardContent className="p-4">
                             <div className="flex items-center justify-between mb-3">
                               <div className="flex items-center gap-2">
-                                <Dumbbell className="w-4 h-4 text-blue-500" />
+                                <Unlock className="w-4 h-4 text-blue-500" />
                                 <h3 className="font-semibold text-foreground">{workout.name}</h3>
-                                <span className="bg-blue-500/10 text-blue-600 border border-blue-500/20 px-2 py-0.5 rounded text-xs font-medium">
-                                  Custom
-                                </span>
                               </div>
-                              <Button 
-                                size="sm" 
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/workout-session/${workout.id}`);
-                                }}
-                              >
-                                <Play className="w-3 h-3 mr-1" />
-                                Start
-                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <MoreHorizontal className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48">
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(`/workout-builder?edit=${workout.id}`);
+                                    }}
+                                  >
+                                    <Edit3 className="w-4 h-4 mr-2" />
+                                    Edit Workout
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      // Create a copy of the workout
+                                      const duplicateWorkout = async () => {
+                                        try {
+                                          await apiRequest("/api/workouts", {
+                                            method: "POST",
+                                            body: {
+                                              name: `${workout.name} (Copy)`,
+                                              description: workout.description,
+                                              exercises: workout.exercises || []
+                                            }
+                                          });
+                                          queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
+                                          toast({
+                                            title: "Success!",
+                                            description: "Workout duplicated successfully",
+                                          });
+                                        } catch (error) {
+                                          toast({
+                                            title: "Error",
+                                            description: "Failed to duplicate workout",
+                                            variant: "destructive",
+                                          });
+                                        }
+                                      };
+                                      duplicateWorkout();
+                                    }}
+                                  >
+                                    <Copy className="w-4 h-4 mr-2" />
+                                    Duplicate Workout
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                             <p className="text-sm text-muted-foreground mb-3">{workout.description || "Custom workout routine"}</p>
                             <div className="flex items-center justify-between text-xs">

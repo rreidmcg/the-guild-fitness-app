@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,6 +54,11 @@ export default function WorkoutBuilder() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Check for edit mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const editWorkoutId = urlParams.get('edit');
+  const isEditMode = !!editWorkoutId;
+
   // Main state
   const [step, setStep] = useState<WorkoutBuilderStep>('details');
   const [workoutName, setWorkoutName] = useState("");
@@ -83,25 +88,72 @@ export default function WorkoutBuilder() {
     queryKey: ["/api/exercises"],
   });
 
+  // Query for existing workout if in edit mode
+  const { data: existingWorkout } = useQuery({
+    queryKey: ["/api/workouts", editWorkoutId],
+    enabled: isEditMode && !!editWorkoutId,
+  });
+
+  // Load existing workout data when available
+  useEffect(() => {
+    if (existingWorkout && isEditMode) {
+      const workout = existingWorkout as any;
+      setWorkoutName(workout.name || "");
+      setWorkoutDescription(workout.description || "");
+      
+      // Convert exercises to sections format if needed
+      if (workout.exercises && Array.isArray(workout.exercises)) {
+        const workoutSection: WorkoutSection = {
+          id: 'main-section',
+          name: 'Main Workout',
+          format: 'regular',
+          type: 'workout',
+          exercises: workout.exercises.map((ex: any, index: number) => ({
+            id: `exercise-${index}`,
+            exerciseId: ex.exerciseId || ex.id,
+            exercise: ex.exercise || ex,
+            sets: ex.sets || [{ id: 'set-1', type: 'R', reps: 10, weight: 0 }],
+            notes: ex.notes || "",
+            eachSide: ex.eachSide || false,
+            tempo: ex.tempo || []
+          }))
+        };
+        setSections([workoutSection]);
+      }
+    }
+  }, [existingWorkout, isEditMode]);
+
   const createWorkoutMutation = useMutation({
     mutationFn: async (workoutData: any) => {
-      return await apiRequest("/api/workouts", {
-        method: "POST",
-        body: workoutData
-      });
+      if (isEditMode && editWorkoutId) {
+        // Update existing workout
+        return await apiRequest(`/api/workouts/${editWorkoutId}`, {
+          method: "PUT",
+          body: workoutData
+        });
+      } else {
+        // Create new workout
+        return await apiRequest("/api/workouts", {
+          method: "POST",
+          body: workoutData
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/workouts"] });
+      if (isEditMode) {
+        queryClient.invalidateQueries({ queryKey: ["/api/workouts", editWorkoutId] });
+      }
       toast({
         title: "Success!",
-        description: "Workout created successfully",
+        description: isEditMode ? "Workout updated successfully" : "Workout created successfully",
       });
       setLocation("/workouts");
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to create workout",
+        description: isEditMode ? "Failed to update workout" : "Failed to create workout",
         variant: "destructive",
       });
     },
@@ -122,7 +174,7 @@ export default function WorkoutBuilder() {
             <X className="w-5 h-5" />
           </Button>
           
-          <h1 className="text-lg font-semibold text-foreground">New Workout</h1>
+          <h1 className="text-lg font-semibold text-foreground">{isEditMode ? 'Edit Workout' : 'New Workout'}</h1>
           
           <Button 
             onClick={() => setStep('sections')}

@@ -990,6 +990,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/workouts/:id", async (req, res) => {
+    try {
+      const userId = currentUserId;
+      const workoutId = parseInt(req.params.id);
+      const workout = await storage.getWorkout(workoutId);
+      
+      if (!workout || workout.userId !== userId) {
+        return res.status(404).json({ error: "Workout not found" });
+      }
+      
+      res.json(workout);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch workout" });
+    }
+  });
+
   app.post("/api/workouts", async (req, res) => {
     try {
       const userId = currentUserId; // Use the current logged-in user
