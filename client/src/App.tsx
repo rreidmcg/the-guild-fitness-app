@@ -43,6 +43,7 @@ import AIWorkouts from "@/pages/ai-workouts";
 import ProgramOverview from "@/pages/program-overview";
 import ProgramDay from "@/pages/program-day";
 import ProgramWorkout from "@/pages/program-workout";
+import WorkoutOverview from "@/pages/workout-overview";
 
 function Router() {
   return (
@@ -93,6 +94,11 @@ function Router() {
       <Route path="/workout-builder">
         <AuthGuard>
           <WorkoutBuilder />
+        </AuthGuard>
+      </Route>
+      <Route path="/workout-overview">
+        <AuthGuard>
+          <WorkoutOverview />
         </AuthGuard>
       </Route>
       <Route path="/workout-session/:id">
