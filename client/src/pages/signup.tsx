@@ -156,8 +156,9 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       <FloatingParticles count={20} />
-      <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10">
-        <CardHeader className="text-center">
+      <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10 overflow-hidden">
+        <FloatingParticles count={8} className="absolute inset-0 z-0" />
+        <CardHeader className="text-center relative z-10">
           <div className="flex justify-center mb-6">
             <img 
               src={logoImage} 
@@ -172,7 +173,7 @@ export default function SignupPage() {
             {step === 1 ? "Create your account" : "Complete your profile"}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {step === 1 && (

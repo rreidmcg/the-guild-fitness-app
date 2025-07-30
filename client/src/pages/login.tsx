@@ -98,8 +98,9 @@ export default function LoginPage() {
       {showForgotPassword ? (
         <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />
       ) : (
-        <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10">
-          <CardHeader className="text-center">
+        <Card className="w-full max-w-sm sm:max-w-md bg-card border-border relative z-10 overflow-hidden">
+          <FloatingParticles count={8} className="absolute inset-0 z-0" />
+          <CardHeader className="text-center relative z-10">
             <div className="flex justify-center mb-6">
               <img 
                 src={logoImage} 
@@ -114,7 +115,7 @@ export default function LoginPage() {
               Sign in to your The Guild: Gamified Fitness account
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-10">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
