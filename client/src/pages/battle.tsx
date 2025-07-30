@@ -169,35 +169,6 @@ export default function BattlePage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Battle Stats Overview */}
-      <Card className="border-2 border-blue-500/30 bg-gradient-to-br from-blue-900/20 to-indigo-900/20">
-        <CardHeader>
-          <CardTitle className="text-xl text-blue-400 text-center">
-            Your Battle Stats
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div className="bg-blue-500/10 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-blue-400">{userLevel}</div>
-              <div className="text-sm text-muted-foreground">Level</div>
-            </div>
-            <div className="bg-red-500/10 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-red-400">{userStats.strength || 5}</div>
-              <div className="text-sm text-muted-foreground">Strength</div>
-            </div>
-            <div className="bg-green-500/10 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-green-400">{userStats.stamina || 5}</div>
-              <div className="text-sm text-muted-foreground">Stamina</div>
-            </div>
-            <div className="bg-yellow-500/10 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-400">{userStats.agility || 5}</div>
-              <div className="text-sm text-muted-foreground">Agility</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
