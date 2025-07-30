@@ -36,7 +36,7 @@ export const authUtils = {
   },
 
   generateJWT(userId: number): string {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h' });
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
   },
 
   verifyJWT(token: string): { userId: number } | null {
@@ -54,12 +54,12 @@ export const authUtils = {
       const verificationUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/verify-email?token=${token}`;
       
       await transporter.sendMail({
-        from: '"Dumbbells & Dragons" <noreply@dumbellsanddragons.app>',
+        from: '"The Guild: Gamified Fitness" <noreply@theguild.app>',
         to: email,
-        subject: 'Verify Your Dumbbells & Dragons Account',
+        subject: 'Verify Your The Guild Account',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2563eb;">Welcome to Dumbbells & Dragons, ${username}!</h2>
+            <h2 style="color: #2563eb;">Welcome to The Guild: Gamified Fitness, ${username}!</h2>
             <p>Thank you for joining our fitness RPG community. To complete your registration, please verify your email address.</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
@@ -85,14 +85,14 @@ export const authUtils = {
       const resetUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/reset-password?token=${token}`;
       
       await transporter.sendMail({
-        from: '"Dumbbells & Dragons" <noreply@dumbellsanddragons.app>',
+        from: '"The Guild: Gamified Fitness" <noreply@theguild.app>',
         to: email,
-        subject: 'Reset Your Dumbbells & Dragons Password',
+        subject: 'Reset Your The Guild Password',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #dc2626;">Password Reset Request</h2>
             <p>Hello ${username},</p>
-            <p>We received a request to reset your Dumbbells & Dragons account password. If you didn't make this request, you can ignore this email.</p>
+            <p>We received a request to reset your The Guild: Gamified Fitness account password. If you didn't make this request, you can ignore this email.</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${resetUrl}" style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
                 Reset Password

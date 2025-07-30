@@ -26,6 +26,12 @@ export function useTimezone() {
     // Auto-detect and set user's timezone on first app load
     const detectAndSetTimezone = async () => {
       try {
+        // Only attempt timezone setting if user has an auth token
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          return; // Skip timezone setting for unauthenticated users
+        }
+        
         // Only set timezone if we haven't set it before (check localStorage)
         const hasSetTimezone = localStorage.getItem('timezoneSet');
         
