@@ -96,19 +96,24 @@ export default function BattlePage() {
       </div>
 
       {/* Main Content with Backdrop */}
-      <div className="relative z-10 container mx-auto p-4 max-w-4xl backdrop-blur-sm">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
-          Battle Arena
-        </h1>
-        <p className="text-muted-foreground">
-          Choose your battle mode and test your strength
-        </p>
-      </div>
+      <div className="relative z-10 min-h-screen bg-background text-foreground pb-20">
+        {/* Header */}
+        <div className="bg-card border-b border-border px-4 py-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Battle Arena</h1>
+                <p className="text-muted-foreground mt-0.5 text-sm">Choose your battle mode and test your strength</p>
+              </div>
+              <Sword className="w-8 h-8 text-purple-500" />
+            </div>
+          </div>
+        </div>
 
-      {/* Battle Mode Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+
+        {/* Battle Mode Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* PvE Card */}
         <Card 
           className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
@@ -212,7 +217,8 @@ export default function BattlePage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+        </div>
       </div>
     </div>
   );
