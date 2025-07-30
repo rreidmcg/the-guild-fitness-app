@@ -28,7 +28,7 @@ import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753
 import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753833862493.png";
-import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753833846654.png";
+import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753839669430.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 
 import { useBackgroundMusic } from "@/contexts/background-music-context";
