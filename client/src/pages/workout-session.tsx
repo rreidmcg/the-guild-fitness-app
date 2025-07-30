@@ -157,11 +157,11 @@ export default function WorkoutSession() {
               </div>
               <Button 
                 onClick={handleStartPause}
-                className={isActive ? "bg-orange-600 hover:bg-orange-700 text-white" : "bg-game-primary hover:bg-blue-600 text-white"}
+                className={isActive ? "bg-orange-600 hover:bg-orange-700 !text-white" : "bg-game-primary hover:bg-blue-600 !text-white"}
                 size="sm"
               >
-                {isActive ? <Pause className="w-4 h-4 mr-2 text-white" /> : <Play className="w-4 h-4 mr-2 text-white" />}
-                {isActive ? "Pause" : "Start"}
+                {isActive ? <Pause className="w-4 h-4 mr-2 !text-white" /> : <Play className="w-4 h-4 mr-2 !text-white" />}
+                <span className="!text-white">{isActive ? "Pause" : "Start"}</span>
               </Button>
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function WorkoutSession() {
           <CardContent>
             <div className="text-center py-12">
               <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Play className="w-12 h-12 text-white" />
+                <Play className="w-12 h-12 !text-white" />
               </div>
               <h3 className="text-2xl font-bold mb-2 text-foreground">Start Your Workout</h3>
               <p className="text-muted-foreground">Press start to begin tracking your session</p>
