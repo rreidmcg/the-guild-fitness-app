@@ -2,7 +2,13 @@
 
 ## Overview
 
-The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, endurance, flexibility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
+The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, agility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
+
+## Recent Changes (July 31, 2025)
+- **CRITICAL SYSTEM FIXES**: Resolved atrophy system running backwards due to date comparison logic errors - now properly reduces XP/stats for inactive users
+- **HP/MP REGENERATION**: Fixed regeneration mechanics with proper formulas (1% HP per minute minimum, MP based on agility stat)
+- **POTION SYSTEM**: Eliminated JSON double-stringification bug causing "cannot use potion" errors - potions now work correctly
+- **DATABASE CONSISTENCY**: All backend systems now properly handle snake_case database columns vs camelCase TypeScript fields
 
 ## User Preferences
 
