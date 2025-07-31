@@ -211,18 +211,7 @@ export default function PvEDungeonsPage() {
     queryKey: ["/api/user/stats"],
   });
 
-  // Handle modal scroll lock
-  useEffect(() => {
-    if (showZoneDetails) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [showZoneDetails]);
+  // Removed scroll lock to allow scrolling to bottom of monster list
 
   if (!userStats) {
     return (
@@ -435,9 +424,8 @@ export default function PvEDungeonsPage() {
 
       {/* Zone Details Modal */}
       {showZoneDetails && selectedZone && (
-        <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-4 pt-20 overflow-y-auto">
-          <Card className="max-w-2xl w-full max-h-[80vh] overflow-y-auto"
-                style={{ marginTop: '0' }}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl">{selectedZone.name}</CardTitle>
@@ -451,22 +439,26 @@ export default function PvEDungeonsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-4">{selectedZone.storyIntro}</p>
+              <p className="text-muted-foreground mb-6">{selectedZone.storyIntro}</p>
               
-              <div className="space-y-2 mb-4">
+              {/* 2-Column Monster Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
                 {selectedZone.monsters.map(monster => (
-                  <div key={monster.id} className="flex items-center justify-between p-2 border rounded">
+                  <div key={monster.id} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
                     <div className="flex items-center space-x-3">
                       {monster.image && (
-                        <img src={monster.image} alt={monster.name} className="w-8 h-8" />
+                        <img src={monster.image} alt={monster.name} className="w-10 h-10 rounded" />
                       )}
                       <div>
                         <div className="font-medium">{monster.name}</div>
                         <div className="text-xs text-muted-foreground">Level {monster.level}</div>
+                        {monster.name.includes('🏆') && (
+                          <div className="text-xs text-yellow-400 font-medium">BOSS</div>
+                        )}
                       </div>
                     </div>
                     <div className="text-right text-sm">
-                      <div className="flex items-center text-red-400">
+                      <div className="flex items-center text-red-400 mb-1">
                         <Heart className="h-3 w-3 mr-1" />
                         {monster.maxHp}
                       </div>
