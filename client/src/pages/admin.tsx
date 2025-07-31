@@ -416,10 +416,14 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Exercise Management */}
-        <Card className="bg-game-slate border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Exercise Library Management</CardTitle>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => setShowAddExercise(true)}>
+        <Card className="bg-game-slate border-gray-700 shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-lg font-semibold text-white">Exercise Library Management</CardTitle>
+            <Button 
+              size="sm" 
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg" 
+              onClick={() => setShowAddExercise(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Create New Exercise
             </Button>
@@ -432,19 +436,29 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
             ) : (
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {exercises?.map((exercise: any) => (
-                  <div key={exercise.id} className="flex items-center justify-between p-3 bg-gray-800 rounded">
-                    <div>
+                  <div key={exercise.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-750 transition-colors duration-200">
+                    <div className="flex-1">
                       <div className="font-medium text-white">{exercise.name}</div>
                       <div className="text-sm text-gray-400">{exercise.category}</div>
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" title="Edit Exercise Details">
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200" 
+                        title="Edit Exercise Details"
+                      >
+                        <Edit className="w-4 h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Edit</span>
                       </Button>
-                      <Button size="sm" variant="outline" className="text-red-400 border-red-400" title="Remove Exercise">
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Remove
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-red-400 border-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200" 
+                        title="Remove Exercise"
+                      >
+                        <Trash2 className="w-4 h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Remove</span>
                       </Button>
                     </div>
                   </div>
@@ -455,10 +469,14 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         </Card>
 
         {/* Monster Management */}
-        <Card className="bg-game-slate border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Battle Monster Management</CardTitle>
-            <Button size="sm" className="bg-red-600 hover:bg-red-700" onClick={() => setShowAddMonster(true)}>
+        <Card className="bg-game-slate border-gray-700 shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-lg font-semibold text-white">Battle Monster Management</CardTitle>
+            <Button 
+              size="sm" 
+              className="bg-red-600 hover:bg-red-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg" 
+              onClick={() => setShowAddMonster(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Create New Monster
             </Button>
@@ -471,19 +489,29 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
             ) : (
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {monsters?.map((monster: any) => (
-                  <div key={monster.id} className="flex items-center justify-between p-3 bg-gray-800 rounded">
-                    <div>
+                  <div key={monster.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-750 transition-colors duration-200">
+                    <div className="flex-1">
                       <div className="font-medium text-white">{monster.name}</div>
                       <div className="text-sm text-gray-400">Level {monster.level} • {monster.tier}-rank</div>
                     </div>
                     <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" title="Edit Monster Properties">
-                        <Edit className="w-4 h-4 mr-1" />
-                        Edit
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200" 
+                        title="Edit Monster Properties"
+                      >
+                        <Edit className="w-4 h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Edit</span>
                       </Button>
-                      <Button size="sm" variant="outline" className="text-red-400 border-red-400" title="Remove Monster">
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Remove
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-red-400 border-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200" 
+                        title="Remove Monster"
+                      >
+                        <Trash2 className="w-4 h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Remove</span>
                       </Button>
                     </div>
                   </div>
@@ -856,20 +884,23 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
   return (
     <>
-      <Card className="bg-game-slate border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>User Account Management</CardTitle>
-          <div className="flex items-center space-x-2">
-            <div className="relative">
+      <Card className="bg-game-slate border-gray-700 shadow-lg">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 pb-4">
+          <CardTitle className="text-lg font-semibold text-white">User Account Management</CardTitle>
+          <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:flex-none">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64"
+                className="pl-10 w-full sm:w-64 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
               />
             </div>
-            <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+            <Button 
+              size="sm" 
+              className="bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Add Administrator
             </Button>
@@ -878,11 +909,13 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
         <CardContent>
           <div className="space-y-4">
             {/* User Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-gray-800 border-gray-600">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <Users className="w-5 h-5 text-blue-400" />
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <Users className="w-5 h-5 text-blue-400" />
+                    </div>
                     <div>
                       <div className="text-xl font-bold text-white">{users?.length || 0}</div>
                       <div className="text-sm text-gray-400">Total Users</div>
@@ -890,10 +923,12 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gray-800 border-gray-600">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <Shield className="w-5 h-5 text-green-400" />
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-green-500/10 rounded-lg">
+                      <Shield className="w-5 h-5 text-green-400" />
+                    </div>
                     <div>
                       <div className="text-xl font-bold text-white">
                         {users?.filter((u: any) => !u.isBanned && !u.isDeleted).length || 0}
@@ -903,10 +938,12 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gray-800 border-gray-600">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <Ban className="w-5 h-5 text-red-400" />
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-red-500/10 rounded-lg">
+                      <Ban className="w-5 h-5 text-red-400" />
+                    </div>
                     <div>
                       <div className="text-xl font-bold text-white">
                         {users?.filter((u: any) => u.isBanned).length || 0}
@@ -916,10 +953,12 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gray-800 border-gray-600">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
-                  <div className="flex items-center space-x-2">
-                    <UserX className="w-5 h-5 text-gray-400" />
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-gray-500/10 rounded-lg">
+                      <UserX className="w-5 h-5 text-gray-400" />
+                    </div>
                     <div>
                       <div className="text-xl font-bold text-white">
                         {users?.filter((u: any) => u.isDeleted).length || 0}
@@ -934,68 +973,71 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
             {/* User List */}
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {filteredUsers.map((user: any) => (
-                <div key={user.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium text-white">{user.username}</span>
-                        {getUserStatusBadge(user)}
-                        {user.currentTitle && (
-                          <Badge variant="outline" className="text-xs">
-                            {user.currentTitle}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        {user.email} • Level {user.level} • Joined {new Date(user.createdAt).toLocaleDateString()}
-                      </div>
-                      {user.isBanned && (
-                        <div className="text-xs text-red-400 mt-1">
-                          Banned: {user.banReason} 
-                          {user.bannedUntil && (
-                            <span> (until {new Date(user.bannedUntil).toLocaleDateString()})</span>
-                          )}
-                        </div>
+                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-750 transition-colors duration-200 space-y-3 sm:space-y-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="font-medium text-white truncate">{user.username}</span>
+                      {getUserStatusBadge(user)}
+                      {user.currentTitle && (
+                        <Badge variant="outline" className="text-xs">
+                          {user.currentTitle}
+                        </Badge>
                       )}
                     </div>
+                    <div className="text-sm text-gray-400 break-words">
+                      {user.email} • Level {user.level} • Joined {new Date(user.createdAt).toLocaleDateString()}
+                    </div>
+                    {user.isBanned && (
+                      <div className="text-xs text-red-400 mt-1">
+                        Banned: {user.banReason} 
+                        {user.bannedUntil && (
+                          <span> (until {new Date(user.bannedUntil).toLocaleDateString()})</span>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" title="View User Details">
+                  <div className="flex space-x-2 flex-shrink-0">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+                      title="View User Details"
+                    >
                       <Eye className="w-4 h-4" />
                     </Button>
                     {user.isBanned ? (
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="text-green-400 border-green-400"
+                        className="text-green-400 border-green-400 hover:bg-green-500/10 hover:text-green-300 transition-all duration-200"
                         onClick={() => unbanUserMutation.mutate({ userId: user.id })}
                         disabled={unbanUserMutation.isPending}
                         title="Unban User"
                       >
-                        <Shield className="w-4 h-4 mr-1" />
-                        Unban
+                        <Shield className="w-4 h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Unban</span>
                       </Button>
                     ) : !user.isDeleted ? (
                       <>
                         <Button 
                           size="sm" 
                           variant="outline" 
-                          className="text-yellow-400 border-yellow-400"
+                          className="text-yellow-400 border-yellow-400 hover:bg-yellow-500/10 hover:text-yellow-300 transition-all duration-200"
                           onClick={() => handleBanUser(user)}
                           title="Ban User"
                         >
-                          <Ban className="w-4 h-4 mr-1" />
-                          Ban
+                          <Ban className="w-4 h-4 sm:mr-1" />
+                          <span className="hidden sm:inline">Ban</span>
                         </Button>
                         <Button 
                           size="sm" 
                           variant="outline" 
-                          className="text-red-400 border-red-400"
+                          className="text-red-400 border-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200"
                           onClick={() => handleRemoveUser(user)}
                           title="Permanently Remove User"
                         >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Remove
+                          <Trash2 className="w-4 h-4 sm:mr-1" />
+                          <span className="hidden sm:inline">Remove</span>
                         </Button>
                       </>
                     ) : (
@@ -1092,8 +1134,12 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
             )}
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={closeDialog}>
+          <DialogFooter className="space-x-2">
+            <Button 
+              variant="outline" 
+              onClick={closeDialog}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+            >
               Cancel
             </Button>
             <Button
@@ -1104,7 +1150,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                 banUserMutation.isPending ||
                 removeUserMutation.isPending
               }
-              className={actionType === 'ban' ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"}
+              className={`${actionType === 'ban' ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"} text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {banUserMutation.isPending || removeUserMutation.isPending ? (
                 <>Processing...</>
@@ -1227,15 +1273,15 @@ function AdminMailbox() {
 
   return (
     <>
-      <Card className="bg-game-slate border-gray-700">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center space-x-2">
+      <Card className="bg-game-slate border-gray-700 shadow-lg">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 pb-4">
+          <CardTitle className="flex items-center space-x-2 text-lg font-semibold text-white">
             <Mail className="w-5 h-5 text-blue-400" />
             <span>Admin Notification Center</span>
           </CardTitle>
           <Button 
             onClick={() => setShowComposeDialog(true)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg w-full sm:w-auto"
           >
             <Send className="w-4 h-4 mr-2" />
             Compose Global Notification
@@ -1244,8 +1290,8 @@ function AdminMailbox() {
         <CardContent>
           <div className="space-y-6">
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="bg-gray-800 border-gray-600">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -1259,7 +1305,7 @@ function AdminMailbox() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gray-800 border-gray-600">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-purple-500/10 rounded-lg">
@@ -1273,7 +1319,7 @@ function AdminMailbox() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gray-800 border-gray-600">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-yellow-500/10 rounded-lg">
@@ -1287,7 +1333,7 @@ function AdminMailbox() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gray-800 border-gray-600">
+              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-green-500/10 rounded-lg">
@@ -1504,14 +1550,18 @@ function AdminMailbox() {
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={closeComposeDialog}>
+          <DialogFooter className="space-x-2">
+            <Button 
+              variant="outline" 
+              onClick={closeComposeDialog}
+              className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+            >
               Cancel
             </Button>
             <Button
               onClick={handleSendMail}
               disabled={!mailSubject.trim() || !mailContent.trim() || sendMailMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sendMailMutation.isPending ? (
                 <>Sending...</>
