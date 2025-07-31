@@ -162,14 +162,14 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
   const potions = Array.isArray(inventory) ? inventory.filter((item: any) => item.itemType === 'potion') : [];
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 text-left">
       {potions.length === 0 ? (
-        <div className="text-gray-400 text-xs">No items</div>
+        <div className="text-cyan-300 text-xs">No items</div>
       ) : (
         potions.slice(0, 3).map((potion: any) => (
           <button
             key={potion.id}
-            className="block w-full text-green-400 hover:text-green-300 text-xs font-semibold"
+            className="block w-full text-cyan-300 hover:text-cyan-200 text-xs font-semibold text-left"
             onClick={() => usePotionMutation.mutate(potion.itemId)}
             disabled={usePotionMutation.isPending}
           >
@@ -178,7 +178,7 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
         ))
       )}
       <button 
-        className="block w-full text-gray-400 hover:text-gray-300 text-xs mt-2"
+        className="block w-full text-cyan-300 hover:text-cyan-200 text-xs mt-2 text-left"
         onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
       >
         ← Back
@@ -377,11 +377,11 @@ export default function DungeonBattlePage() {
       </div>
 
       {/* Bottom Battle UI - 3 Column Layout */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/95 backdrop-blur-sm border-t border-blue-700">
+      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/80 backdrop-blur-md border-t-2 border-blue-500/60 shadow-lg shadow-blue-500/20">
         <div className="flex h-20">
           {/* Player Stats (Left Third) */}
-          <div className="flex-1 p-3 pt-2 border-r border-blue-600">
-            <div className="text-sm font-bold text-white mb-2">{userStats.username} <span className="text-xs text-blue-200">Lv.{userStats.level}</span></div>
+          <div className="flex-1 p-3 pt-2 border-r border-blue-500/60">
+            <div className="text-sm font-bold text-yellow-200 mb-2">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
             <div className="flex space-x-3">
               {/* HP Bar */}
               <div className="w-20">
@@ -391,7 +391,7 @@ export default function DungeonBattlePage() {
                     style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
                   />
                 </div>
-                <div className="text-xs text-white mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
+                <div className="text-xs text-green-200 mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
               </div>
               {/* MP Bar */}
               <div className="w-20">
@@ -401,31 +401,31 @@ export default function DungeonBattlePage() {
                     style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
                   />
                 </div>
-                <div className="text-xs text-white mt-0.5 font-medium">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
+                <div className="text-xs text-blue-200 mt-0.5 font-medium">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
               </div>
             </div>
           </div>
 
           {/* Action Menu (Center Third) */}
-          <div className="flex-1 p-3 pt-2 border-r border-blue-600 text-center">
+          <div className="flex-1 p-3 pt-2 border-r border-blue-500/60 bg-blue-900/20 backdrop-blur-sm">
             {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-              <div className="space-y-1">
+              <div className="space-y-1 text-left">
                 {battleState.actionMode === 'main' ? (
                   <>
                     <button 
-                      className="block w-full text-red-400 hover:text-red-300 text-sm font-semibold"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
                       onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'fight' }))}
                     >
                       Fight
                     </button>
                     <button 
-                      className="block w-full text-blue-400 hover:text-blue-300 text-sm font-semibold"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
                       onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'item' }))}
                     >
                       Item
                     </button>
                     <button 
-                      className="block w-full text-gray-400 hover:text-gray-300 text-sm font-semibold"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
                       onClick={handleRetreat}
                     >
                       Run
@@ -434,14 +434,14 @@ export default function DungeonBattlePage() {
                 ) : battleState.actionMode === 'fight' ? (
                   <>
                     <button 
-                      className="block w-full text-red-400 hover:text-red-300 text-sm font-semibold"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
                       onClick={handleAttack}
                       disabled={attackMutation.isPending}
                     >
                       {attackMutation.isPending ? "Attacking..." : "Attack"}
                     </button>
                     <button 
-                      className="block w-full text-blue-400 hover:text-blue-300 text-sm font-semibold"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
                       onClick={() => {
                         setBattleState(prev => ({ ...prev, actionMode: 'main' }));
                         toast({ title: "Defense", description: "You brace for the enemy's attack!" });
@@ -450,7 +450,7 @@ export default function DungeonBattlePage() {
                       Defend
                     </button>
                     <button 
-                      className="block w-full text-gray-400 hover:text-gray-300 text-xs"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-xs text-left"
                       onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
                     >
                       ← Back
@@ -461,14 +461,14 @@ export default function DungeonBattlePage() {
                 )}
               </div>
             ) : (
-              <div className="text-gray-400 text-sm font-semibold pt-4">Enemy Turn</div>
+              <div className="text-cyan-300 text-sm font-semibold pt-4 text-left">Enemy Turn</div>
             )}
           </div>
 
           {/* Monster Stats (Right Third) */}
           {battleState.monster && (
             <div className="flex-1 p-3 pt-2 text-right">
-              <div className="text-sm font-bold text-white mb-2"><span className="text-xs text-blue-200">Lv.{battleState.monster.level}</span> {battleState.monster.name}</div>
+              <div className="text-sm font-bold text-red-200 mb-2"><span className="text-xs text-blue-300">Lv.{battleState.monster.level}</span> {battleState.monster.name}</div>
               <div className="flex justify-end">
                 <div className="w-20">
                   <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
@@ -477,7 +477,7 @@ export default function DungeonBattlePage() {
                       style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
                     />
                   </div>
-                  <div className="text-xs text-white mt-0.5 font-medium">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
+                  <div className="text-xs text-red-200 mt-0.5 font-medium">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
                 </div>
               </div>
             </div>
