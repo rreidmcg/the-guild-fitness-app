@@ -31,6 +31,7 @@ import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753841
 import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753839669430.png";
 import goblinWarlordImage from "@assets/36CF820D-0CC0-4C99-A780-79B6D125B307_1753844608679.png";
 import broodmotherImage from "@assets/CE5B8D2E-90AF-4DC0-A904-EDB98089C00A_1753845237897.png";
+import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 
 interface UserStats {
   level: number;
@@ -263,235 +264,130 @@ export default function DungeonBattlePage() {
   const progressPercent = ((battleState.currentMonsterIndex + (battleState.battleResult === 'victory' ? 1 : 0)) / battleState.zone.monsters.length) * 100;
 
   return (
-    <ParallaxBackground showForestBackground={true}>
-      <div className="container mx-auto p-4 max-w-4xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/pve-dungeons")}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dungeons
-          </Button>
-          <div className="text-center">
-            <h1 className="text-xl font-bold">{battleState.zone.name}</h1>
-            <p className="text-sm text-muted-foreground">
-              Monster {battleState.currentMonsterIndex + 1} of {battleState.zone.monsters.length}
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-sm text-muted-foreground">Gold Earned</div>
-            <div className="text-lg font-bold text-yellow-400">{battleState.totalGoldEarned}</div>
-          </div>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Forest Background */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: `url(${forestBackgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          imageRendering: 'pixelated',
+        }}
+      />
+      
+      {/* Header */}
+      <div className="relative z-10 flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/pve-dungeons")}
+          className="text-white hover:text-white hover:bg-white/20"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+        <div className="text-center">
+          <h1 className="text-lg font-bold text-white">{battleState.zone.name}</h1>
         </div>
-
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between text-sm text-muted-foreground mb-2">
-            <span>Dungeon Progress</span>
-            <span>{Math.round(progressPercent)}%</span>
-          </div>
-          <Progress value={progressPercent} className="h-3" />
+        <div className="text-right text-white">
+          <div className="text-xs">Gold</div>
+          <div className="text-sm font-bold text-yellow-400">{battleState.totalGoldEarned}</div>
         </div>
-
-        {/* Battle Arena */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Player */}
-          <Card className="border-2 border-blue-500/50">
-            <CardHeader>
-              <CardTitle className="text-blue-400 flex items-center">
-                <Shield className="h-5 w-5 mr-2" />
-                {userStats.username}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-4 mb-4">
-                <Avatar2D 
-                  gender={userStats.gender || "male"}
-                  skinColor={userStats.skinColor}
-                  hairColor={userStats.hairColor}
-                  className="w-16 h-16"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium">Health</span>
-                    <span className="text-sm">{battleState.playerHp}/{battleState.playerMaxHp}</span>
-                  </div>
-                  <Progress 
-                    value={(battleState.playerHp / battleState.playerMaxHp) * 100} 
-                    className="h-2 mb-2"
-                  />
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium">Mana</span>
-                    <span className="text-sm">{battleState.playerMp}/{battleState.playerMaxMp}</span>
-                  </div>
-                  <Progress 
-                    value={(battleState.playerMp / battleState.playerMaxMp) * 100} 
-                    className="h-2"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-sm">
-                <div className="text-center">
-                  <div className="text-red-400">STR</div>
-                  <div>{userStats.strength}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-green-400">STA</div>
-                  <div>{userStats.stamina}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-blue-400">AGI</div>
-                  <div>{userStats.agility}</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Monster */}
-          <Card className="border-2 border-red-500/50">
-            <CardHeader>
-              <CardTitle className="text-red-400 flex items-center">
-                <Skull className="h-5 w-5 mr-2" />
-                {battleState.monster?.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {battleState.monster && (
-                <div className="flex items-center space-x-4 mb-4">
-                  {battleState.monster.image && (
-                    <img 
-                      src={battleState.monster.image} 
-                      alt={battleState.monster.name}
-                      className="w-16 h-16 object-contain"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium">Health</span>
-                      <span className="text-sm">{battleState.monster.currentHp}/{battleState.monster.maxHp}</span>
-                    </div>
-                    <Progress 
-                      value={(battleState.monster.currentHp / battleState.monster.maxHp) * 100} 
-                      className="h-3"
-                    />
-                  </div>
-                </div>
-              )}
-              {battleState.monster && (
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="text-center">
-                    <div className="text-yellow-400">Level</div>
-                    <div>{battleState.monster.level}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-orange-400">Attack</div>
-                    <div>{battleState.monster.attack}</div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Battle Actions */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex gap-3 justify-center">
-              <Button
-                onClick={handleAttack}
-                disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'ongoing' || attackMutation.isPending}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                <Sword className="h-4 w-4 mr-2" />
-                {attackMutation.isPending ? "Attacking..." : "Attack"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleRetreat}
-                disabled={attackMutation.isPending}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retreat
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Battle Log */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Battle Log</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1 max-h-40 overflow-y-auto">
-              {battleState.battleLog.map((log, index) => (
-                <div key={index} className="text-sm text-muted-foreground">
-                  {log}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Victory/Defeat Modal */}
-        {battleState.battleResult !== 'ongoing' && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card className="max-w-md w-full">
-              <CardHeader>
-                <CardTitle className={`text-xl text-center ${
-                  battleState.battleResult === 'victory' ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  {battleState.battleResult === 'victory' ? (
-                    <>
-                      <Trophy className="h-6 w-6 mx-auto mb-2" />
-                      Victory!
-                    </>
-                  ) : (
-                    <>
-                      <Skull className="h-6 w-6 mx-auto mb-2" />
-                      Defeat
-                    </>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                {battleState.battleResult === 'victory' ? (
-                  <div className="space-y-3">
-                    <p>You have defeated {battleState.monster?.name}!</p>
-                    <div className="flex items-center justify-center space-x-2 text-yellow-400">
-                      <Coins className="h-4 w-4" />
-                      <span>+{battleState.monster?.goldReward} Gold</span>
-                    </div>
-                    {battleState.currentMonsterIndex === battleState.zone!.monsters.length - 1 ? (
-                      <div>
-                        <p className="text-green-400 font-bold">Dungeon Complete!</p>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          {battleState.zone!.completionStory}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Preparing next battle...
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <p>You have been defeated...</p>
-                    <Button onClick={handleRetreat} className="w-full">
-                      Return to Dungeons
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
-    </ParallaxBackground>
+
+      {/* Battle Scene */}
+      <div className="relative z-10 flex-1 flex flex-col justify-between min-h-[calc(100vh-140px)]">
+        {/* HP/MP Bars - Top Overlay */}
+        <div className="p-4 space-y-2">
+          {/* Player HP/MP */}
+          <div className="w-48">
+            <div className="bg-green-600 rounded-full h-4 relative overflow-hidden">
+              <div 
+                className="absolute inset-0 bg-green-400 transition-all duration-300"
+                style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
+                HP: {battleState.playerHp}/{battleState.playerMaxHp}
+              </div>
+            </div>
+            <div className="bg-blue-600 rounded-full h-4 relative overflow-hidden mt-1">
+              <div 
+                className="absolute inset-0 bg-blue-400 transition-all duration-300"
+                style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
+                MP: {battleState.playerMp}/{battleState.playerMaxMp}
+              </div>
+            </div>
+          </div>
+          
+          {/* Monster HP - Top Right */}
+          {battleState.monster && (
+            <div className="absolute top-4 right-4 w-48">
+              <div className="bg-red-600 rounded-full h-4 relative overflow-hidden">
+                <div 
+                  className="absolute inset-0 bg-red-400 transition-all duration-300"
+                  style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
+                  {battleState.monster.currentHp}/{battleState.monster.maxHp}
+                </div>
+              </div>
+              <div className="text-center text-xs text-white bg-black/50 rounded mt-1 px-2 py-1">
+                {battleState.monster.name}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Character Sprites - Battle Field */}
+        <div className="flex-1 flex items-end justify-between px-8 pb-32">
+          {/* Player Character */}
+          <div className="flex flex-col items-center">
+            <Avatar2D 
+              playerStats={userStats}
+              className="w-24 h-24 mb-2"
+            />
+          </div>
+          
+          {/* Monster Sprite */}
+          {battleState.monster && battleState.monster.image && (
+            <div className="flex flex-col items-center">
+              <img 
+                src={battleState.monster.image} 
+                alt={battleState.monster.name}
+                className="w-24 h-24 object-contain mb-2"
+                style={{ imageRendering: 'pixelated' }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Battle Actions - Bottom UI */}
+      <div className="fixed bottom-16 left-0 right-0 z-20 p-4 bg-blue-900/90 backdrop-blur-sm border-t border-blue-700">
+        <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
+          <Button
+            onClick={handleAttack}
+            disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'ongoing' || attackMutation.isPending}
+            className="bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
+          >
+            <Sword className="h-4 w-4 mr-2" />
+            {attackMutation.isPending ? "ATK..." : "ATK"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleRetreat}
+            disabled={attackMutation.isPending}
+            className="border-blue-600 text-blue-200 hover:bg-blue-800/50 font-bold py-3"
+          >
+            <Shield className="h-4 w-4 mr-2" />
+            DEF
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
