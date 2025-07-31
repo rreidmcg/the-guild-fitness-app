@@ -105,21 +105,25 @@ export default function AdminDashboard() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 bg-game-slate">
-          <TabsTrigger value="analytics" className="flex items-center space-x-2">
+          <TabsTrigger value="analytics" className="flex items-center space-x-1 text-xs sm:text-sm">
             <BarChart3 className="w-4 h-4" />
-            <span>Analytics Dashboard</span>
+            <span className="hidden sm:inline">Analytics Dashboard</span>
+            <span className="sm:hidden">Analytics</span>
           </TabsTrigger>
-          <TabsTrigger value="content" className="flex items-center space-x-2">
+          <TabsTrigger value="content" className="flex items-center space-x-1 text-xs sm:text-sm">
             <Settings className="w-4 h-4" />
-            <span>Content Manager</span>
+            <span className="hidden sm:inline">Content Manager</span>
+            <span className="sm:hidden">Content</span>
           </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center space-x-2">
+          <TabsTrigger value="users" className="flex items-center space-x-1 text-xs sm:text-sm">
             <Users className="w-4 h-4" />
-            <span>User Administration</span>
+            <span className="hidden sm:inline">User Administration</span>
+            <span className="sm:hidden">Users</span>
           </TabsTrigger>
-          <TabsTrigger value="mailbox" className="flex items-center space-x-2">
+          <TabsTrigger value="mailbox" className="flex items-center space-x-1 text-xs sm:text-sm">
             <Mail className="w-4 h-4" />
-            <span>Admin Mailbox</span>
+            <span className="hidden sm:inline">Admin Mailbox</span>
+            <span className="sm:hidden">Mailbox</span>
           </TabsTrigger>
         </TabsList>
 
@@ -163,7 +167,7 @@ function AnalyticsOverview({ data }: { data: any }) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Total Users</CardTitle>
             <Users className="h-4 w-4 text-blue-400" />
           </CardHeader>
           <CardContent>
@@ -174,7 +178,7 @@ function AnalyticsOverview({ data }: { data: any }) {
 
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Active Users (24h)</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Active Users (24h)</CardTitle>
             <Activity className="h-4 w-4 text-green-400" />
           </CardHeader>
           <CardContent>
@@ -185,7 +189,7 @@ function AnalyticsOverview({ data }: { data: any }) {
 
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Retention Rate</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Retention Rate</CardTitle>
             <TrendingUp className="h-4 w-4 text-yellow-400" />
           </CardHeader>
           <CardContent>
@@ -196,7 +200,7 @@ function AnalyticsOverview({ data }: { data: any }) {
 
         <Card className="bg-game-slate border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-300">Total Workouts</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">Total Workouts</CardTitle>
             <Activity className="h-4 w-4 text-purple-400" />
           </CardHeader>
           <CardContent>
@@ -210,7 +214,7 @@ function AnalyticsOverview({ data }: { data: any }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="bg-game-slate border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+            <CardTitle className="flex items-center space-x-2 text-white">
               <Trophy className="w-5 h-5 text-yellow-400" />
               <span>Achievement Analytics</span>
             </CardTitle>
@@ -219,7 +223,7 @@ function AnalyticsOverview({ data }: { data: any }) {
             <div className="space-y-3">
               {data.achievementStats.topAchievements.map((achievement: any, index: number) => (
                 <div key={index} className="flex justify-between items-center">
-                  <span className="text-gray-300">{achievement.name}</span>
+                  <span className="text-gray-200">{achievement.name}</span>
                   <div className="text-right">
                     <div className="text-white font-semibold">{achievement.unlocks} unlocks</div>
                     <div className="text-xs text-gray-400">{achievement.percentage}% of users</div>
@@ -232,7 +236,7 @@ function AnalyticsOverview({ data }: { data: any }) {
 
         <Card className="bg-game-slate border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+            <CardTitle className="flex items-center space-x-2 text-white">
               <Sword className="w-5 h-5 text-red-400" />
               <span>Combat Analytics</span>
             </CardTitle>
@@ -240,19 +244,19 @@ function AnalyticsOverview({ data }: { data: any }) {
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-gray-300">Total Battles</span>
+                <span className="text-gray-200">Total Battles</span>
                 <span className="text-white font-semibold">{data.battleStats.totalBattles}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-300">Avg per User</span>
+                <span className="text-gray-200">Avg per User</span>
                 <span className="text-white font-semibold">{data.battleStats.averageBattlesPerUser}</span>
               </div>
               <div className="mt-4">
-                <h4 className="text-sm font-medium text-gray-300 mb-2">Most Defeated Monsters</h4>
+                <h4 className="text-sm font-medium text-white mb-2">Most Defeated Monsters</h4>
                 <div className="space-y-2">
                   {data.battleStats.topMonsters.slice(0, 3).map((monster: any, index: number) => (
                     <div key={index} className="flex justify-between text-sm">
-                      <span className="text-gray-400">{monster.name}</span>
+                      <span className="text-gray-200">{monster.name}</span>
                       <span className="text-white">{monster.defeatedCount}</span>
                     </div>
                   ))}
@@ -266,7 +270,7 @@ function AnalyticsOverview({ data }: { data: any }) {
       {/* User Progression */}
       <Card className="bg-game-slate border-gray-700">
         <CardHeader>
-          <CardTitle>Character Progression Analytics</CardTitle>
+          <CardTitle className="text-white">Character Progression Analytics</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -910,7 +914,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
           <div className="space-y-4">
             {/* User Statistics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -923,7 +927,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-green-500/10 rounded-lg">
@@ -938,7 +942,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-red-500/10 rounded-lg">
@@ -953,7 +957,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-gray-500/10 rounded-lg">
@@ -1055,9 +1059,9 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="bg-card border-border">
+        <DialogContent className="bg-game-slate border-gray-700">
           <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
+            <DialogTitle className="flex items-center space-x-2 text-white">
               {actionType === 'ban' ? (
                 <>
                   <Ban className="w-5 h-5 text-yellow-400" />
@@ -1073,7 +1077,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="p-4 bg-gray-800 rounded-lg">
+            <div className="p-4 bg-game-slate rounded-lg border border-gray-700">
               <div className="font-medium text-white">Target User: {selectedUser?.username}</div>
               <div className="text-sm text-gray-400">Email: {selectedUser?.email}</div>
               <div className="text-sm text-gray-400">Level: {selectedUser?.level}</div>
@@ -1099,13 +1103,13 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="banReason">Reason for Ban *</Label>
+                  <Label htmlFor="banReason" className="text-white">Reason for Ban *</Label>
                   <Textarea
                     id="banReason"
                     value={banReason}
                     onChange={(e) => setBanReason(e.target.value)}
                     placeholder="Provide a detailed reason for banning this user..."
-                    className="min-h-20 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                    className="min-h-20 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
                   />
                 </div>
               </>
@@ -1113,13 +1117,13 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
             {actionType === 'remove' && (
               <div className="space-y-2">
-                <Label htmlFor="removeReason">Reason for Removal *</Label>
+                <Label htmlFor="removeReason" className="text-white">Reason for Removal *</Label>
                 <Textarea
                   id="removeReason"
                   value={removeReason}
                   onChange={(e) => setRemoveReason(e.target.value)}
                   placeholder="Provide a detailed reason for permanently removing this user account..."
-                  className="min-h-20 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                  className="min-h-20 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
                 />
                 <div className="p-3 bg-red-900/20 border border-red-500 rounded-lg">
                   <div className="flex items-center space-x-2 text-red-400">
@@ -1291,7 +1295,7 @@ function AdminMailbox() {
           <div className="space-y-6">
             {/* Quick Actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -1305,7 +1309,7 @@ function AdminMailbox() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-purple-500/10 rounded-lg">
@@ -1319,7 +1323,7 @@ function AdminMailbox() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-yellow-500/10 rounded-lg">
@@ -1333,7 +1337,7 @@ function AdminMailbox() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-gray-800 border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-green-500/10 rounded-lg">
@@ -1349,17 +1353,17 @@ function AdminMailbox() {
             </div>
             
             {/* Information Panel */}
-            <div className="p-6 bg-gray-800/50 border border-gray-700 rounded-lg">
+            <div className="p-6 bg-game-slate/50 border border-gray-700 rounded-lg">
               <h3 className="font-semibold text-white mb-3 flex items-center space-x-2">
                 <Send className="w-5 h-5 text-blue-400" />
                 <span>Global Notification System</span>
               </h3>
-              <div className="text-gray-300 space-y-2">
+              <div className="text-gray-200 space-y-2">
                 <p>Send notifications to all active users in the platform. You can include various types of rewards and set expiry dates for time-sensitive content.</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-sm">
                   <div>
                     <h4 className="font-medium text-white mb-2">Notification Types:</h4>
-                    <ul className="space-y-1 text-gray-400">
+                    <ul className="space-y-1 text-gray-300">
                       <li>• <span className="text-blue-400">News:</span> Platform updates and announcements</li>
                       <li>• <span className="text-purple-400">Rewards:</span> Send gold, XP, or items to users</li>
                       <li>• <span className="text-yellow-400">Announcements:</span> Important system notices</li>
@@ -1368,7 +1372,7 @@ function AdminMailbox() {
                   </div>
                   <div>
                     <h4 className="font-medium text-white mb-2">Available Rewards:</h4>
-                    <ul className="space-y-1 text-gray-400">
+                    <ul className="space-y-1 text-gray-300">
                       <li>• <span className="text-yellow-400">Gold Coins:</span> In-game currency</li>
                       <li>• <span className="text-blue-400">Experience Points:</span> Character progression</li>
                       <li>• <span className="text-purple-400">Streak Freezes:</span> Protect daily streaks</li>
@@ -1384,9 +1388,9 @@ function AdminMailbox() {
 
       {/* Compose Mail Dialog */}
       <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
-        <DialogContent className="bg-card border-border max-w-2xl">
+        <DialogContent className="bg-game-slate border-gray-700 max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
+            <DialogTitle className="flex items-center space-x-2 text-white">
               <Send className="w-5 h-5 text-blue-400" />
               <span>Compose Global Notification</span>
             </DialogTitle>
@@ -1395,9 +1399,9 @@ function AdminMailbox() {
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {/* Mail Type */}
             <div className="space-y-2">
-              <Label htmlFor="mailType">Notification Type</Label>
+              <Label htmlFor="mailType" className="text-white">Notification Type</Label>
               <Select value={mailType} onValueChange={setMailType}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1431,25 +1435,25 @@ function AdminMailbox() {
 
             {/* Subject */}
             <div className="space-y-2">
-              <Label htmlFor="subject">Subject *</Label>
+              <Label htmlFor="subject" className="text-white">Subject *</Label>
               <Input
                 id="subject"
                 value={mailSubject}
                 onChange={(e) => setMailSubject(e.target.value)}
                 placeholder="Enter notification subject..."
-                className="w-full placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                className="w-full bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
 
             {/* Content */}
             <div className="space-y-2">
-              <Label htmlFor="content">Message Content *</Label>
+              <Label htmlFor="content" className="text-white">Message Content *</Label>
               <Textarea
                 id="content"
                 value={mailContent}
                 onChange={(e) => setMailContent(e.target.value)}
                 placeholder="Enter your message content here..."
-                className="min-h-24 resize-none placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                className="min-h-24 resize-none bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
 
