@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import heroMusicFile from '@assets/time-of-the-hero_1753851442796.mp3';
+import heroMusicFile from '@assets/the-road-goes-ever-on_1753972961480.mp3';
 
 export function AuthMusicBanner() {
   const [isPlaying, setIsPlaying] = useState(false);
