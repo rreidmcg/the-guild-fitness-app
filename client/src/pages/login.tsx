@@ -141,8 +141,9 @@ export default function LoginPage() {
                         <Input 
                           placeholder="Enter your email address" 
                           type="email"
+                          autoComplete="email"
                           {...field} 
-                          className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                          className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0 autofill-fix"
                         />
                       </FormControl>
                       <FormMessage />
@@ -161,8 +162,9 @@ export default function LoginPage() {
                           <Input 
                             placeholder="Enter your password" 
                             type={showPassword ? "text" : "password"}
+                            autoComplete="current-password"
                             {...field} 
-                            className="pr-10 bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                            className="pr-10 bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0 autofill-fix"
                           />
                           <button
                             type="button"

@@ -73,6 +73,33 @@
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
   }
 
+  /* Prevent autofill from changing input background colors */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.3) inset !important;
+    -webkit-text-fill-color: hsl(197, 100%, 90%) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* Firefox autofill styling */
+  input:-moz-autofill {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    color: hsl(197, 100%, 90%) !important;
+  }
+
+  /* Additional autofill fix class for consistent styling */
+  .autofill-fix:-webkit-autofill,
+  .autofill-fix:-webkit-autofill:hover,
+  .autofill-fix:-webkit-autofill:focus,
+  .autofill-fix:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.3) inset !important;
+    -webkit-text-fill-color: hsl(197, 100%, 90%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+  }
+
   /* Fix autofill background color to maintain dark theme */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
