@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { users } from "../shared/schema";
-import { eq, and, lt } from "drizzle-orm";
+import { eq, and, lt, or, isNull } from "drizzle-orm";
 
 export class AtrophySystem {
   /**
@@ -40,11 +40,23 @@ export class AtrophySystem {
             // Last activity was before yesterday or is null
             lt(users.lastActivityDate, yesterday),
             // Atrophy immunity has expired or is null
-            lt(users.atrophyImmunityUntil, today)
+            or(
+              isNull(users.atrophyImmunityUntil),
+              lt(users.atrophyImmunityUntil, today)
+            )
           )
         );
 
       console.log(`Processing atrophy for ${inactiveUsers.length} inactive users`);
+      console.log(`Query conditions: today=${today}, yesterday=${yesterday}`);
+      if (inactiveUsers.length === 0) {
+        // Debug: Let's see all users and their activity dates
+        const allUsers = await db.select().from(users);
+        console.log('All users activity status:');
+        for (const user of allUsers) {
+          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeYesterday=${user.lastActivityDate < yesterday}`);
+        }
+      }
 
       for (const user of inactiveUsers) {
         await this.applyAtrophy(user.id, user);
