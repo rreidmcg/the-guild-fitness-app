@@ -424,8 +424,8 @@ export default function PvEDungeonsPage() {
 
       {/* Zone Details Modal */}
       {showZoneDetails && selectedZone && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-4xl w-full max-h-[85vh] overflow-y-auto">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl">{selectedZone.name}</CardTitle>
