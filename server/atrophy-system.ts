@@ -38,7 +38,10 @@ export class AtrophySystem {
         .where(
           and(
             // Last activity was before yesterday or is null
-            lt(users.lastActivityDate, yesterday),
+            or(
+              isNull(users.lastActivityDate),
+              lt(users.lastActivityDate, yesterday)
+            ),
             // Atrophy immunity has expired or is null
             or(
               isNull(users.atrophyImmunityUntil),
@@ -54,7 +57,7 @@ export class AtrophySystem {
         const allUsers = await db.select().from(users);
         console.log('All users activity status:');
         for (const user of allUsers) {
-          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeYesterday=${user.lastActivityDate < yesterday}`);
+          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeYesterday=${user.lastActivityDate ? user.lastActivityDate < yesterday : 'null'}`);
         }
       }
 

@@ -1340,28 +1340,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           const currentTime = Date.now();
           
-          // Apply HP regeneration if not at max HP
-          const lastHpUpdateTime = userWithStats.lastHpUpdateAt ? new Date(userWithStats.lastHpUpdateAt).getTime() : Date.now();
+          // Apply HP regeneration if not at max HP and out of combat
+          const lastHpUpdateTime = userWithStats.lastHpUpdateAt ? new Date(userWithStats.lastHpUpdateAt).getTime() : currentTime;
           const hpMinutesElapsed = Math.floor((currentTime - lastHpUpdateTime) / (1000 * 60));
           
           let hpChanged = false;
           if (currentHp < maxHp && hpMinutesElapsed > 0) {
-            const hpRegenAmount = Math.floor(maxHp * 0.01) * hpMinutesElapsed; // 1% per minute
+            const hpRegenAmount = Math.max(1, Math.floor(maxHp * 0.01)) * hpMinutesElapsed; // At least 1 HP per minute
             currentHp = Math.min(maxHp, currentHp + hpRegenAmount);
             hpChanged = hpRegenAmount > 0;
+            if (hpChanged) {
+              console.log(`HP regeneration: +${hpRegenAmount} HP over ${hpMinutesElapsed} minutes (${currentHp}/${maxHp})`);
+            }
           }
           
-          // Apply MP regeneration if not at max MP
-          const lastMpUpdateTime = userWithStats.lastMpUpdateAt ? new Date(userWithStats.lastMpUpdateAt).getTime() : Date.now();
+          // Apply MP regeneration if not at max MP and out of combat
+          const lastMpUpdateTime = userWithStats.lastMpUpdateAt ? new Date(userWithStats.lastMpUpdateAt).getTime() : currentTime;
           const mpMinutesElapsed = Math.floor((currentTime - lastMpUpdateTime) / (1000 * 60));
           
           let mpChanged = false;
           if (currentMp < maxMp && mpMinutesElapsed > 0) {
-            // MP Regen = (Agility ÷ 2)% of Max MP per minute
-            const mpRegenRate = Math.max(0.01, ((user.agility || 0) / 2) / 100); // At least 1% regen
-            const mpRegenAmount = Math.floor(maxMp * mpRegenRate) * mpMinutesElapsed;
+            // MP Regen = (Agility ÷ 2)% of Max MP per minute, minimum 1% regen
+            const mpRegenRate = Math.max(0.01, ((user.agility || 0) / 2) / 100);
+            const mpRegenAmount = Math.max(1, Math.floor(maxMp * mpRegenRate)) * mpMinutesElapsed;
             currentMp = Math.min(maxMp, currentMp + mpRegenAmount);
             mpChanged = mpRegenAmount > 0;
+            if (mpChanged) {
+              console.log(`MP regeneration: +${mpRegenAmount} MP over ${mpMinutesElapsed} minutes (${currentMp}/${maxMp})`);
+            }
           }
           
           // Update HP and/or MP in database if they changed
