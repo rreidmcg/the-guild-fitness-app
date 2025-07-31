@@ -237,6 +237,30 @@ export default function DungeonBattlePage() {
     }
   }, [battleState.isPlayerTurn, battleState.battleResult]);
 
+  // Prevent scrolling on battle page
+  useEffect(() => {
+    // Save current body styles
+    const originalStyle = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      height: document.body.style.height,
+    };
+    
+    // Apply scroll lock
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.height = '100vh';
+    document.body.style.width = '100%';
+    
+    // Cleanup function to restore original styles
+    return () => {
+      document.body.style.overflow = originalStyle.overflow;
+      document.body.style.position = originalStyle.position;
+      document.body.style.height = originalStyle.height;
+      document.body.style.width = '';
+    };
+  }, []);
+
   const initializeBattle = (zone: DungeonZone) => {
     const firstMonster = zone.monsters[0];
     setBattleState({
@@ -337,7 +361,7 @@ export default function DungeonBattlePage() {
   const progressPercent = ((battleState.currentMonsterIndex + (battleState.battleResult === 'victory' ? 1 : 0)) / battleState.zone.monsters.length) * 100;
 
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
       {/* Forest Background */}
       <div 
         className="fixed inset-0 z-0"
@@ -353,9 +377,9 @@ export default function DungeonBattlePage() {
 
 
       {/* Battle Scene */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]">
+      <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]" style={{ touchAction: 'none' }}>
         {/* Character Sprites - Battle Field */}
-        <div className="flex-1 flex items-end justify-between px-4 md:px-8 pb-32 relative">
+        <div className="flex-1 flex items-end justify-between px-4 md:px-8 pb-32 relative" style={{ touchAction: 'none', userSelect: 'none' }}>
           {/* Player Character */}
           <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
             <Avatar2D 
