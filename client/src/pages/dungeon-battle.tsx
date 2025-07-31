@@ -131,6 +131,62 @@ interface BattleState {
   actionMode?: 'main' | 'fight' | 'item';
 }
 
+// Inline item menu component for battle usage
+function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
+  const { toast } = useToast();
+  const { data: inventory } = useQuery({
+    queryKey: ["/api/inventory"],
+  });
+
+  const usePotionMutation = useMutation({
+    mutationFn: async (potionType: string) => {
+      return apiRequest("/api/use-potion", {
+        method: "POST",
+        body: { potionType }
+      });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      // No success toast - only show errors
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Cannot Use Potion",
+        description: error.message || "You don't have this potion or are already at full capacity",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const potions = Array.isArray(inventory) ? inventory.filter((item: any) => item.itemType === 'potion') : [];
+
+  return (
+    <div className="space-y-1">
+      {potions.length === 0 ? (
+        <div className="text-gray-400 text-xs">No items</div>
+      ) : (
+        potions.slice(0, 3).map((potion: any) => (
+          <button
+            key={potion.id}
+            className="block w-full text-green-400 hover:text-green-300 text-xs font-semibold"
+            onClick={() => usePotionMutation.mutate(potion.itemId)}
+            disabled={usePotionMutation.isPending}
+          >
+            {potion.itemId.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())} x{potion.quantity}
+          </button>
+        ))
+      )}
+      <button 
+        className="block w-full text-gray-400 hover:text-gray-300 text-xs mt-2"
+        onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
+      >
+        ← Back
+      </button>
+    </div>
+  );
+}
+
 export default function DungeonBattlePage() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -174,12 +230,12 @@ export default function DungeonBattlePage() {
     }
   }, [userStats, zoneId]);
 
-  // Auto-open action modal when it's the player's turn
+  // Reset action mode when it's the player's turn
   useEffect(() => {
-    if (battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && !battleState.showActionModal) {
-      setBattleState(prev => ({ ...prev, showActionModal: true, actionMode: 'main' }));
+    if (battleState.isPlayerTurn && battleState.battleResult === 'ongoing') {
+      setBattleState(prev => ({ ...prev, actionMode: 'main' }));
     }
-  }, [battleState.isPlayerTurn, battleState.battleResult, battleState.showActionModal]);
+  }, [battleState.isPlayerTurn, battleState.battleResult]);
 
   const initializeBattle = (zone: DungeonZone) => {
     const firstMonster = zone.monsters[0];
@@ -320,13 +376,12 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Bottom Battle UI */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 bg-black/90 backdrop-blur-sm border-t border-gray-600">
-        {/* Character Stats Row */}
+      {/* Bottom Battle UI - 3 Column Layout */}
+      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/95 backdrop-blur-sm border-t border-blue-700">
         <div className="flex h-20">
-          {/* Player Stats (Left) */}
-          <div className="flex-1 p-3 pt-2 border-r border-gray-600">
-            <div className="text-xs text-gray-300 mb-1">Lv.{userStats.level}</div>
+          {/* Player Stats (Left Third) */}
+          <div className="flex-1 p-3 pt-2 border-r border-blue-600">
+            <div className="text-xs text-blue-200 mb-1">Lv.{userStats.level}</div>
             <div className="text-sm font-bold text-white mb-2">{userStats.username}</div>
             <div className="space-y-1">
               {/* HP Bar */}
@@ -352,10 +407,69 @@ export default function DungeonBattlePage() {
             </div>
           </div>
 
-          {/* Monster Stats (Right) */}
+          {/* Action Menu (Center Third) */}
+          <div className="flex-1 p-3 pt-2 border-r border-blue-600 text-center">
+            {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
+              <div className="space-y-1">
+                {battleState.actionMode === 'main' ? (
+                  <>
+                    <button 
+                      className="block w-full text-red-400 hover:text-red-300 text-sm font-semibold"
+                      onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'fight' }))}
+                    >
+                      Fight
+                    </button>
+                    <button 
+                      className="block w-full text-blue-400 hover:text-blue-300 text-sm font-semibold"
+                      onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'item' }))}
+                    >
+                      Item
+                    </button>
+                    <button 
+                      className="block w-full text-gray-400 hover:text-gray-300 text-sm font-semibold"
+                      onClick={handleRetreat}
+                    >
+                      Run
+                    </button>
+                  </>
+                ) : battleState.actionMode === 'fight' ? (
+                  <>
+                    <button 
+                      className="block w-full text-red-400 hover:text-red-300 text-sm font-semibold"
+                      onClick={handleAttack}
+                      disabled={attackMutation.isPending}
+                    >
+                      {attackMutation.isPending ? "Attacking..." : "Attack"}
+                    </button>
+                    <button 
+                      className="block w-full text-blue-400 hover:text-blue-300 text-sm font-semibold"
+                      onClick={() => {
+                        setBattleState(prev => ({ ...prev, actionMode: 'main' }));
+                        toast({ title: "Defense", description: "You brace for the enemy's attack!" });
+                      }}
+                    >
+                      Defend
+                    </button>
+                    <button 
+                      className="block w-full text-gray-400 hover:text-gray-300 text-xs"
+                      onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
+                    >
+                      ← Back
+                    </button>
+                  </>
+                ) : (
+                  <InlineItemMenu setBattleState={setBattleState} />
+                )}
+              </div>
+            ) : (
+              <div className="text-gray-400 text-sm font-semibold pt-4">Enemy Turn</div>
+            )}
+          </div>
+
+          {/* Monster Stats (Right Third) */}
           {battleState.monster && (
             <div className="flex-1 p-3 pt-2 text-right">
-              <div className="text-xs text-gray-300 mb-1">Lv.{battleState.monster.level}</div>
+              <div className="text-xs text-blue-200 mb-1">Lv.{battleState.monster.level}</div>
               <div className="text-sm font-bold text-white mb-2">{battleState.monster.name}</div>
               <div className="flex justify-end">
                 <div className="w-24">
@@ -373,145 +487,8 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Battle Action Modal */}
-      <Dialog open={battleState.showActionModal} onOpenChange={(open) => setBattleState(prev => ({ ...prev, showActionModal: open, actionMode: 'main' }))}>
-        <DialogContent className="bg-gray-900 border-gray-700">
-          <DialogHeader>
-            <DialogTitle className="text-white">Choose Action</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-3">
-            {battleState.actionMode === 'main' && (
-              <>
-                <Button 
-                  className="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3"
-                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'fight' }))}
-                >
-                  <Sword className="h-4 w-4 mr-2" />
-                  Fight
-                </Button>
-                <Button 
-                  className="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
-                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'item' }))}
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  Item
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="w-full border-gray-600 text-gray-200 hover:bg-gray-800 font-bold py-3"
-                  onClick={() => {
-                    setBattleState(prev => ({ ...prev, showActionModal: false }));
-                    handleRetreat();
-                  }}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Run
-                </Button>
-              </>
-            )}
 
-            {battleState.actionMode === 'fight' && (
-              <>
-                <Button 
-                  className="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3"
-                  onClick={() => {
-                    setBattleState(prev => ({ ...prev, showActionModal: false, actionMode: 'main' }));
-                    handleAttack();
-                  }}
-                >
-                  <Sword className="h-4 w-4 mr-2" />
-                  Attack
-                </Button>
-                <Button 
-                  className="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
-                  onClick={() => {
-                    setBattleState(prev => ({ ...prev, showActionModal: false, actionMode: 'main' }));
-                    // Defend action - for now just ends turn
-                    toast({ title: "Defense", description: "You brace for the enemy's attack!" });
-                  }}
-                >
-                  <Shield className="h-4 w-4 mr-2" />
-                  Defend
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="w-full border-gray-600 text-gray-200 hover:bg-gray-800"
-                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
-                >
-                  ← Back
-                </Button>
-              </>
-            )}
-
-            {battleState.actionMode === 'item' && (
-              <>
-                <PotionButtons />
-                <Button 
-                  variant="outline"
-                  className="w-full border-gray-600 text-gray-200 hover:bg-gray-800"
-                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
-                >
-                  ← Back
-                </Button>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
 
-// Potion component for battle usage
-function PotionButtons() {
-  const { toast } = useToast();
-  const { data: inventory } = useQuery({
-    queryKey: ["/api/inventory"],
-  });
-
-  const usePotionMutation = useMutation({
-    mutationFn: async (potionType: string) => {
-      return apiRequest("/api/use-potion", {
-        method: "POST",
-        body: { potionType }
-      });
-    },
-    onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      // No success toast - only show errors
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Cannot Use Potion",
-        description: error.message || "You don't have this potion or are already at full capacity",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const potions = Array.isArray(inventory) ? inventory.filter((item: any) => item.itemType === 'potion') : [];
-
-  if (potions.length === 0) {
-    return <div className="text-gray-400 text-center py-3">No potions available</div>;
-  }
-
-  return (
-    <div className="grid gap-2">
-      {potions.map((potion: any) => (
-        <Button
-          key={potion.id}
-          variant="outline"
-          className="w-full text-left border-gray-600 text-gray-200 hover:bg-gray-800"
-          onClick={() => usePotionMutation.mutate(potion.itemId)}
-          disabled={usePotionMutation.isPending}
-        >
-          <div className="flex justify-between items-center w-full">
-            <span>{potion.itemId.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</span>
-            <span className="text-xs text-gray-400">x{potion.quantity}</span>
-          </div>
-        </Button>
-      ))}
-    </div>
-  );
-}
