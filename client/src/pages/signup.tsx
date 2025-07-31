@@ -495,7 +495,7 @@ export default function SignupPage() {
                             placeholder={form.watch("measurementUnit") === "imperial" ? "e.g. 70" : "e.g. 175"} 
                             type="number"
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value) || "")}
                             className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
@@ -517,7 +517,7 @@ export default function SignupPage() {
                             placeholder={form.watch("measurementUnit") === "imperial" ? "e.g. 150" : "e.g. 70"} 
                             type="number"
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            onChange={(e) => field.onChange(e.target.value === "" ? "" : parseInt(e.target.value) || "")}
                             className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
                           />
                         </FormControl>
