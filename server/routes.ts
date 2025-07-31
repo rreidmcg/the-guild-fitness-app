@@ -2957,6 +2957,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Battle system routes
+  app.post("/api/battle/attack", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const { monsterId, zoneId } = req.body;
+      
+      if (!monsterId || !zoneId) {
+        return res.status(400).json({ error: "Monster ID and Zone ID are required" });
+      }
+
+      // Get user stats for battle calculations
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Get monster data
+      const monster = await storage.getMonster(monsterId);
+      if (!monster) {
+        return res.status(404).json({ error: "Monster not found" });
+      }
+
+      // Calculate player stats with equipment bonuses
+      const playerAttack = user.strength + Math.floor(user.agility / 2);
+      const playerDefense = user.stamina + Math.floor(user.strength / 3);
+      
+      // Calculate monster stats
+      const monsterAttack = monster.attack;
+      const monsterDefense = Math.floor(monster.level * 1.5);
+      
+      // Calculate damage dealt by player to monster
+      const baseDamage = Math.max(1, playerAttack - monsterDefense);
+      const damageVariance = Math.floor(Math.random() * Math.max(1, baseDamage * 0.3));
+      const playerDamage = baseDamage + damageVariance;
+      
+      // Apply damage to monster
+      const newMonsterHp = Math.max(0, (monster.currentHp || monster.maxHp) - playerDamage);
+      
+      // Initialize battle log
+      const battleLog = [`You deal ${playerDamage} damage to ${monster.name}!`];
+      
+      // Check if monster is defeated
+      let battleResult = 'ongoing';
+      let goldEarned = 0;
+      let experienceGained = 0;
+      
+      if (newMonsterHp <= 0) {
+        battleResult = 'victory';
+        goldEarned = monster.goldReward || 25;
+        experienceGained = monster.level * 15 + 35; // Base XP based on monster level
+        
+        battleLog.push(`${monster.name} is defeated!`);
+        battleLog.push(`You gained ${goldEarned} gold and ${experienceGained} XP!`);
+        
+        // Update user stats
+        const newGold = (user.gold || 0) + goldEarned;
+        const newExperience = (user.experience || 0) + experienceGained;
+        const newLevel = calculateLevel(newExperience);
+        const newBattlesWon = (user.battlesWon || 0) + 1;
+        
+        await storage.updateUser(userId, {
+          gold: newGold,
+          experience: newExperience,
+          level: newLevel,
+          battlesWon: newBattlesWon
+        });
+        
+        // Record activity to prevent atrophy
+        await AtrophySystem.recordActivity(userId);
+        
+        // Update monster HP to 0
+        await storage.updateMonster(monsterId, { currentHp: 0 });
+        
+        return res.json({
+          playerHp: user.currentHp || user.maxHp || 100,
+          playerMp: user.currentMp || user.maxMp || 50,
+          monster: { ...monster, currentHp: 0 },
+          battleLog,
+          battleResult,
+          goldEarned,
+          experienceGained
+        });
+      }
+      
+      // Monster counter-attack if still alive
+      const monsterDamage = Math.max(1, monsterAttack - playerDefense);
+      const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
+      const actualMonsterDamage = monsterDamage + monsterDamageVariance;
+      
+      const newPlayerHp = Math.max(0, (user.currentHp || user.maxHp || 100) - actualMonsterDamage);
+      
+      battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!`);
+      
+      if (newPlayerHp <= 0) {
+        battleResult = 'defeat';
+        battleLog.push("You have been defeated!");
+      }
+      
+      // Update monster and player HP
+      await storage.updateMonster(monsterId, { currentHp: newMonsterHp });
+      await storage.updateUser(userId, { currentHp: newPlayerHp });
+      
+      res.json({
+        playerHp: newPlayerHp,
+        playerMp: user.currentMp || user.maxMp || 50,
+        monster: { ...monster, currentHp: newMonsterHp },
+        battleLog,
+        battleResult,
+        goldEarned: 0
+      });
+      
+    } catch (error) {
+      console.error("Battle attack error:", error);
+      res.status(500).json({ error: "Battle attack failed" });
+    }
+  });
+
   // Push notification routes
   app.post("/api/push/subscribe", async (req, res) => {
     try {
