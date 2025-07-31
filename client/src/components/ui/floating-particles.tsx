@@ -9,6 +9,7 @@ interface Particle {
   duration: number;
   delay: number;
   color: string;
+  direction: 'left' | 'right' | 'center';
 }
 
 interface FloatingParticlesProps {
@@ -28,15 +29,18 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
       'rgba(255, 193, 7, 0.85)', // Amber
     ];
     
+    const directions: ('left' | 'right' | 'center')[] = ['left', 'right', 'center'];
+    
     const newParticles: Particle[] = Array.from({ length: count }, (_, i) => ({
       id: i,
-      x: Math.random() * 100,
+      x: Math.random() * 100, // Full width distribution
       y: Math.random() * 100,
       size: Math.random() * 4 + 2, // 2-6px (increased from 1-4px)
       opacity: Math.random() * 0.5 + 0.5, // 0.5-1.0 (increased from 0.3-0.7)
       duration: Math.random() * 25 + 20, // 20-45 seconds
       delay: Math.random() * 8, // 0-8 second delay
       color: colors[Math.floor(Math.random() * colors.length)],
+      direction: directions[Math.floor(Math.random() * directions.length)],
     }));
     setParticles(newParticles);
   }, [count]);
@@ -46,7 +50,7 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
       {particles.map((particle) => (
         <div
           key={particle.id}
-          className="absolute rounded-full animate-float"
+          className={`absolute rounded-full animate-float-${particle.direction}`}
           style={{
             left: `${particle.x}%`,
             top: `${particle.y}%`,
