@@ -379,7 +379,7 @@ export default function DungeonBattlePage() {
       </div>
 
       {/* Bottom Battle UI - 3 Column Layout */}
-      <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2 z-20 bg-gray-900/80 backdrop-blur-md border-2 border-blue-500/60 shadow-lg shadow-blue-500/20 rounded-lg max-w-4xl w-full mx-4">
+      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/80 backdrop-blur-md border-t-2 border-blue-500/60 shadow-lg shadow-blue-500/20">
         <div className="flex h-20">
           {/* Player Stats (Left - Larger) */}
           <div className="w-2/5 p-3 pt-2 border-r border-blue-500/60">
@@ -409,9 +409,9 @@ export default function DungeonBattlePage() {
           </div>
 
           {/* Action Menu (Center - Smaller) */}
-          <div className="w-1/5 p-2 pt-1 border-r border-blue-500/60 bg-gray-900/80 backdrop-blur-md">
+          <div className="w-1/5 p-2 pt-1 border-r border-blue-500/60">
             {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-              <div className="space-y-0.5 text-left">
+              <div className="space-y-0.5 text-center">
                 {battleState.actionMode === 'main' ? (
                   <>
                     <button 
@@ -463,7 +463,7 @@ export default function DungeonBattlePage() {
                 )}
               </div>
             ) : (
-              <div className="text-cyan-300 text-xs font-semibold pt-3 text-left">Enemy Turn</div>
+              <div className="text-cyan-300 text-xs font-semibold pt-3 text-center">Enemy Turn</div>
             )}
           </div>
 
