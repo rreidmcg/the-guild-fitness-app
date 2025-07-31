@@ -76,16 +76,7 @@ export default function Stats() {
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      
-      const isHealing = data.healedAmount !== undefined;
-      const isMana = data.restoredAmount !== undefined;
-      
-      toast({
-        title: "Potion Used",
-        description: isHealing 
-          ? `Healed ${data.healedAmount} HP!`
-          : `Restored ${data.restoredAmount} MP!`,
-      });
+      // No success toast - only show errors
     },
     onError: (error: any) => {
       toast({
