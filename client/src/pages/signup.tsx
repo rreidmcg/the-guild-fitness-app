@@ -384,7 +384,7 @@ export default function SignupPage() {
                           >
                             <div className="text-center">
                               <Avatar2D 
-                                user={{ gender: "male", level: 1, strength: 1, stamina: 1, agility: 1 }} 
+                                user={{ gender: "male", level: 1, strength: 1, stamina: 1, agility: 1 } as any} 
                                 size="sm" 
                               />
                               <p className="text-sm font-medium mt-2 text-foreground">Male</p>
@@ -401,7 +401,7 @@ export default function SignupPage() {
                           >
                             <div className="text-center">
                               <Avatar2D 
-                                user={{ gender: "female", level: 1, strength: 1, stamina: 1, agility: 1 }} 
+                                user={{ gender: "female", level: 1, strength: 1, stamina: 1, agility: 1 } as any} 
                                 size="sm" 
                               />
                               <p className="text-sm font-medium mt-2 text-foreground">Female</p>

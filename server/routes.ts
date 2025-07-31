@@ -2764,19 +2764,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Liability waiver acceptance route
+  // Liability waiver acceptance route (no auth required - part of signup process)
   app.post("/api/accept-liability-waiver", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
       const { fullName, email, ipAddress, userAgent } = req.body;
 
       if (!fullName || !email) {
         return res.status(400).json({ error: "Full name and email are required" });
       }
 
+      // Find user by email for liability waiver tracking
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
       // Create liability waiver record
       await storage.createLiabilityWaiver({
-        userId,
+        userId: user.id,
         fullName,
         email,
         ipAddress: ipAddress || 'unknown',
@@ -2785,7 +2790,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Update user's liability waiver status
-      await storage.updateUserLiabilityWaiverStatus(userId, true, ipAddress);
+      await storage.updateUserLiabilityWaiverStatus(user.id, true, ipAddress);
 
       // Send confirmation email to user
       try {
