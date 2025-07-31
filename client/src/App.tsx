@@ -19,6 +19,7 @@ import WorkoutBuilder from "@/pages/workout-builder";
 import WorkoutSession from "@/pages/workout-session";
 import Battle from "@/pages/battle";
 import PvEDungeons from "@/pages/pve-dungeons";
+import DungeonBattle from "@/pages/dungeon-battle";
 import Wardrobe from "@/pages/wardrobe";
 import Shop from "@/pages/shop";
 import Profile from "@/pages/profile";
@@ -114,6 +115,11 @@ function Router() {
       <Route path="/pve-dungeons">
         <AuthGuard>
           <PvEDungeons />
+        </AuthGuard>
+      </Route>
+      <Route path="/dungeon-battle/:id">
+        <AuthGuard>
+          <DungeonBattle />
         </AuthGuard>
       </Route>
       <Route path="/wardrobe">

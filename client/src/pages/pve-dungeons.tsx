@@ -211,6 +211,19 @@ export default function PvEDungeonsPage() {
     queryKey: ["/api/user/stats"],
   });
 
+  // Handle modal scroll lock
+  useEffect(() => {
+    if (showZoneDetails) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showZoneDetails]);
+
   if (!userStats) {
     return (
       <div className="container mx-auto p-4 max-w-4xl">
@@ -420,10 +433,11 @@ export default function PvEDungeonsPage() {
         </CardContent>
       </Card>
 
-      {/* Zone Details Modal would go here - simplified for now */}
+      {/* Zone Details Modal */}
       {showZoneDetails && selectedZone && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-4 pt-20 overflow-y-auto">
+          <Card className="max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+                style={{ marginTop: '0' }}>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl">{selectedZone.name}</CardTitle>
@@ -468,8 +482,8 @@ export default function PvEDungeonsPage() {
               <Button 
                 className="w-full"
                 onClick={() => {
-                  // Navigate to battle with selected zone
-                  navigate(`/battle?zone=${selectedZone.id}`);
+                  // Navigate to dungeon battle with selected zone
+                  navigate(`/dungeon-battle/${selectedZone.id}`);
                 }}
               >
                 Enter Dungeon
