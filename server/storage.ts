@@ -695,6 +695,10 @@ export class DatabaseStorage implements IStorage {
         await this.updateUser(userId, {
           experience: (user.experience ?? 0) + streakBonus.finalXp
         });
+        
+        // Record activity to prevent atrophy
+        const { AtrophySystem } = await import("./atrophy-system.js");
+        await AtrophySystem.recordActivity(userId);
       }
       
       // Award additional 5 XP bonus for completing all daily quests

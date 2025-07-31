@@ -1517,6 +1517,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         battlesWon: newBattlesWon,
       });
       
+      // Record activity to prevent atrophy if it was a battle win
+      if (battleWon) {
+        await AtrophySystem.recordActivity(userId);
+      }
+      
       // Check for achievements after stat/gold gains
       const newAchievements = await storage.checkAndUnlockAchievements(userId);
       

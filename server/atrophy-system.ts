@@ -4,6 +4,25 @@ import { eq, and, lt } from "drizzle-orm";
 
 export class AtrophySystem {
   /**
+   * Record user activity to prevent atrophy
+   * Updates lastActivityDate to current date
+   */
+  static async recordActivity(userId: number): Promise<void> {
+    const today = new Date().toISOString().split('T')[0];
+    
+    try {
+      await db
+        .update(users)
+        .set({
+          lastActivityDate: today,
+        })
+        .where(eq(users.id, userId));
+    } catch (error) {
+      console.error(`Error recording activity for user ${userId}:`, error);
+    }
+  }
+
+  /**
    * Check for users who need atrophy applied and apply it
    * Should be called daily via a scheduled job
    */
