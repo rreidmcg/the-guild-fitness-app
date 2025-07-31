@@ -278,87 +278,84 @@ export default function DungeonBattlePage() {
       />
       
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between p-4 bg-black/50 backdrop-blur-sm">
+      <div className="relative z-10 flex items-center justify-between p-4 bg-black/70 backdrop-blur-sm">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate("/pve-dungeons")}
-          className="text-white hover:text-white hover:bg-white/20"
+          className="text-white hover:text-white hover:bg-white/20 font-semibold"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
         <div className="text-center">
-          <h1 className="text-lg font-bold text-white">{battleState.zone.name}</h1>
+          <h1 className="text-lg font-bold text-white drop-shadow-lg">{battleState.zone.name}</h1>
         </div>
         <div className="text-right text-white">
-          <div className="text-xs">Gold</div>
-          <div className="text-sm font-bold text-yellow-400">{battleState.totalGoldEarned}</div>
+          <div className="text-xs font-semibold">Gold</div>
+          <div className="text-sm font-bold text-yellow-400 drop-shadow-lg">{battleState.totalGoldEarned}</div>
         </div>
       </div>
 
       {/* Battle Scene */}
-      <div className="relative z-10 flex-1 flex flex-col justify-between min-h-[calc(100vh-140px)]">
-        {/* HP/MP Bars - Top Overlay */}
-        <div className="p-4 space-y-2">
-          {/* Player HP/MP */}
-          <div className="w-48">
-            <div className="bg-green-600 rounded-full h-4 relative overflow-hidden">
-              <div 
-                className="absolute inset-0 bg-green-400 transition-all duration-300"
-                style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
-                HP: {battleState.playerHp}/{battleState.playerMaxHp}
-              </div>
-            </div>
-            <div className="bg-blue-600 rounded-full h-4 relative overflow-hidden mt-1">
-              <div 
-                className="absolute inset-0 bg-blue-400 transition-all duration-300"
-                style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
-                MP: {battleState.playerMp}/{battleState.playerMaxMp}
-              </div>
-            </div>
-          </div>
-          
-          {/* Monster HP - Top Right */}
-          {battleState.monster && (
-            <div className="absolute top-4 right-4 w-48">
-              <div className="bg-red-600 rounded-full h-4 relative overflow-hidden">
-                <div 
-                  className="absolute inset-0 bg-red-400 transition-all duration-300"
-                  style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
-                  {battleState.monster.currentHp}/{battleState.monster.maxHp}
+      <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-140px)]">
+        {/* Character Sprites - Battle Field */}
+        <div className="flex-1 flex items-end justify-between px-4 md:px-8 pb-32 relative">
+          {/* Player Character with HP/MP bars above */}
+          <div className="flex flex-col items-center relative">
+            {/* Player HP/MP bars above character */}
+            <div className="mb-4 space-y-1">
+              <div className="w-32 md:w-40">
+                <div className="bg-black/60 rounded-full h-3 relative overflow-hidden shadow-lg border border-gray-400">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300 shadow-inner"
+                    style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                    HP: {battleState.playerHp}/{battleState.playerMaxHp}
+                  </div>
+                </div>
+                <div className="bg-black/60 rounded-full h-3 relative overflow-hidden mt-1 shadow-lg border border-gray-400">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300 shadow-inner"
+                    style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                    MP: {battleState.playerMp}/{battleState.playerMaxMp}
+                  </div>
                 </div>
               </div>
-              <div className="text-center text-xs text-white bg-black/50 rounded mt-1 px-2 py-1">
-                {battleState.monster.name}
-              </div>
             </div>
-          )}
-        </div>
-
-        {/* Character Sprites - Battle Field */}
-        <div className="flex-1 flex items-end justify-between px-8 pb-32">
-          {/* Player Character */}
-          <div className="flex flex-col items-center">
             <Avatar2D 
               playerStats={userStats}
-              className="w-24 h-24 mb-2"
+              className="w-20 h-20 md:w-32 md:h-32"
             />
           </div>
           
-          {/* Monster Sprite */}
+          {/* Monster Sprite with HP bar above */}
           {battleState.monster && battleState.monster.image && (
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center relative">
+              {/* Monster name and HP bar above monster */}
+              <div className="mb-4">
+                <div className="text-center text-sm font-bold text-white bg-black/70 rounded px-3 py-1 mb-2 drop-shadow-lg border border-gray-600">
+                  Lv.{battleState.monster.level} {battleState.monster.name}
+                </div>
+                <div className="w-32 md:w-40">
+                  <div className="bg-black/60 rounded-full h-3 relative overflow-hidden shadow-lg border border-gray-400">
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300 shadow-inner"
+                      style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                      {battleState.monster.currentHp}/{battleState.monster.maxHp}
+                    </div>
+                  </div>
+                </div>
+              </div>
               <img 
                 src={battleState.monster.image} 
                 alt={battleState.monster.name}
-                className="w-24 h-24 object-contain mb-2"
+                className="w-20 h-20 md:w-32 md:h-32 object-contain"
                 style={{ imageRendering: 'pixelated' }}
               />
             </div>
