@@ -34,7 +34,7 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
     const newParticles: Particle[] = Array.from({ length: count }, (_, i) => ({
       id: i,
       x: Math.random() * 100, // Full width distribution
-      y: Math.random() * 100,
+      y: 100 + Math.random() * 20, // Start below screen
       size: Math.random() * 4 + 2, // 2-6px (increased from 1-4px)
       opacity: Math.random() * 0.5 + 0.5, // 0.5-1.0 (increased from 0.3-0.7)
       duration: Math.random() * 25 + 20, // 20-45 seconds
@@ -50,7 +50,7 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
       {particles.map((particle) => (
         <div
           key={particle.id}
-          className={`absolute rounded-full animate-float-${particle.direction}`}
+          className="absolute rounded-full"
           style={{
             left: `${particle.x}%`,
             top: `${particle.y}%`,
@@ -58,7 +58,7 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
             height: `${particle.size}px`,
             backgroundColor: particle.color,
             opacity: particle.opacity,
-            animationDuration: `${particle.duration}s`,
+            animation: `float-${particle.direction} ${particle.duration}s linear infinite`,
             animationDelay: `${particle.delay}s`,
             boxShadow: `0 0 20px ${particle.color}, 0 0 10px ${particle.color}, 0 0 5px ${particle.color}`,
           }}
