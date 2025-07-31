@@ -48,12 +48,12 @@ export function LiabilityWaiverModal({
       // Submit liability waiver acceptance
       await apiRequest("/api/accept-liability-waiver", {
         method: "POST",
-        body: JSON.stringify({
+        body: {
           fullName: userName,
           email: userEmail,
           ipAddress,
           userAgent: navigator.userAgent,
-        }),
+        },
       });
 
       toast({
@@ -76,7 +76,7 @@ export function LiabilityWaiverModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-4xl max-h-[85vh] p-0 flex flex-col">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center text-xl font-bold text-red-600 dark:text-red-400">
             <Shield className="w-6 h-6 mr-2" />
@@ -87,7 +87,7 @@ export function LiabilityWaiverModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-6 max-h-[60vh]">
+        <ScrollArea className="flex-1 px-6 max-h-[50vh] overflow-y-auto">
           <div className="space-y-6 text-sm">
             {/* Medical Disclaimer Section */}
             <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4">
@@ -215,7 +215,7 @@ export function LiabilityWaiverModal({
           </div>
         </ScrollArea>
 
-        <div className="border-t p-6 space-y-4">
+        <div className="border-t p-6 space-y-4 flex-shrink-0">
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               <Checkbox
