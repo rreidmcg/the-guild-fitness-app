@@ -162,7 +162,7 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
   const potions = Array.isArray(inventory) ? inventory.filter((item: any) => item.itemType === 'potion') : [];
 
   return (
-    <div className="space-y-1 text-left">
+    <div className="space-y-0.5 text-left">
       {potions.length === 0 ? (
         <div className="text-cyan-300 text-xs">No items</div>
       ) : (
@@ -178,7 +178,7 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
         ))
       )}
       <button 
-        className="block w-full text-cyan-300 hover:text-cyan-200 text-xs mt-2 text-left"
+        className="block w-full text-cyan-300 hover:text-cyan-200 text-xs text-left"
         onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
       >
         ← Back
@@ -335,7 +335,7 @@ export default function DungeonBattlePage() {
   const progressPercent = ((battleState.currentMonsterIndex + (battleState.battleResult === 'victory' ? 1 : 0)) / battleState.zone.monsters.length) * 100;
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative h-screen overflow-hidden">
       {/* Forest Background */}
       <div 
         className="fixed inset-0 z-0"
@@ -379,12 +379,14 @@ export default function DungeonBattlePage() {
       {/* Bottom Battle UI - 3 Column Layout */}
       <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/80 backdrop-blur-md border-t-2 border-blue-500/60 shadow-lg shadow-blue-500/20">
         <div className="flex h-20">
-          {/* Player Stats (Left Third) */}
-          <div className="flex-1 p-3 pt-2 border-r border-blue-500/60">
-            <div className="text-sm font-bold text-yellow-200 mb-2">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
-            <div className="flex space-x-3">
+          {/* Player Stats (Left - Larger) */}
+          <div className="w-2/5 p-3 pt-2 border-r border-blue-500/60">
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-sm font-bold text-yellow-200">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
+            </div>
+            <div className="flex space-x-2">
               {/* HP Bar */}
-              <div className="w-20">
+              <div className="flex-1">
                 <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
@@ -394,7 +396,7 @@ export default function DungeonBattlePage() {
                 <div className="text-xs text-green-200 mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
               </div>
               {/* MP Bar */}
-              <div className="w-20">
+              <div className="flex-1">
                 <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
@@ -406,26 +408,26 @@ export default function DungeonBattlePage() {
             </div>
           </div>
 
-          {/* Action Menu (Center Third) */}
-          <div className="flex-1 p-3 pt-2 border-r border-blue-500/60 bg-blue-900/20 backdrop-blur-sm">
+          {/* Action Menu (Center - Smaller) */}
+          <div className="w-1/5 p-2 pt-1 border-r border-blue-500/60 bg-blue-900/20 backdrop-blur-sm">
             {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-              <div className="space-y-1 text-left">
+              <div className="space-y-0.5 text-left">
                 {battleState.actionMode === 'main' ? (
                   <>
                     <button 
-                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-xs font-semibold text-left"
                       onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'fight' }))}
                     >
                       Fight
                     </button>
                     <button 
-                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-xs font-semibold text-left"
                       onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'item' }))}
                     >
                       Item
                     </button>
                     <button 
-                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-xs font-semibold text-left"
                       onClick={handleRetreat}
                     >
                       Run
@@ -434,14 +436,14 @@ export default function DungeonBattlePage() {
                 ) : battleState.actionMode === 'fight' ? (
                   <>
                     <button 
-                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-xs font-semibold text-left"
                       onClick={handleAttack}
                       disabled={attackMutation.isPending}
                     >
                       {attackMutation.isPending ? "Attacking..." : "Attack"}
                     </button>
                     <button 
-                      className="block w-full text-cyan-300 hover:text-cyan-200 text-sm font-semibold text-left"
+                      className="block w-full text-cyan-300 hover:text-cyan-200 text-xs font-semibold text-left"
                       onClick={() => {
                         setBattleState(prev => ({ ...prev, actionMode: 'main' }));
                         toast({ title: "Defense", description: "You brace for the enemy's attack!" });
@@ -461,16 +463,19 @@ export default function DungeonBattlePage() {
                 )}
               </div>
             ) : (
-              <div className="text-cyan-300 text-sm font-semibold pt-4 text-left">Enemy Turn</div>
+              <div className="text-cyan-300 text-xs font-semibold pt-3 text-left">Enemy Turn</div>
             )}
           </div>
 
-          {/* Monster Stats (Right Third) */}
+          {/* Monster Stats (Right - Larger) */}
           {battleState.monster && (
-            <div className="flex-1 p-3 pt-2 text-right">
-              <div className="text-sm font-bold text-red-200 mb-2"><span className="text-xs text-blue-300">Lv.{battleState.monster.level}</span> {battleState.monster.name}</div>
+            <div className="w-2/5 p-3 pt-2 text-right">
+              <div className="flex items-center justify-between mb-1">
+                <div></div>
+                <div className="text-sm font-bold text-red-200"><span className="text-xs text-blue-300">Lv.{battleState.monster.level}</span> {battleState.monster.name}</div>
+              </div>
               <div className="flex justify-end">
-                <div className="w-20">
+                <div className="flex-1 max-w-32">
                   <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                     <div 
                       className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300"
