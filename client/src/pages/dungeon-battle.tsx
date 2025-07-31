@@ -164,12 +164,13 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
   return (
     <div className="space-y-0.5 text-center">
       {potions.length === 0 ? (
-        <div className="text-white text-xs tracking-wider uppercase">No Items</div>
+        <div className="text-white text-xs tracking-wider uppercase" style={{ color: 'white' }}>NO ITEMS</div>
       ) : (
         potions.slice(0, 3).map((potion: any) => (
           <button
             key={potion.id}
             className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
+            style={{ color: 'white' }}
             onClick={() => usePotionMutation.mutate(potion.itemId)}
             disabled={usePotionMutation.isPending}
           >
@@ -179,9 +180,10 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
       )}
       <button 
         className="block w-full text-white hover:text-gray-200 text-xs text-center tracking-wider uppercase"
+        style={{ color: 'white' }}
         onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
       >
-        ← Back
+        ← BACK
       </button>
     </div>
   );
@@ -383,27 +385,29 @@ export default function DungeonBattlePage() {
         <div className="flex h-20">
           {/* Player Stats (Left - Larger) */}
           <div className="w-2/5 p-3 pt-2 border-r-4 border-gray-400">
-            <div className="flex items-center space-x-3 mb-1">
+            <div className="flex items-center justify-between mb-1">
               <div className="text-sm font-bold text-yellow-200">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
-              {/* HP Bar */}
-              <div className="w-32">
-                <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
-                    style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
-                  />
+              <div className="flex items-center space-x-2">
+                {/* HP Bar */}
+                <div className="w-32">
+                  <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
+                      style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-green-200 mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
                 </div>
-                <div className="text-xs text-green-200 mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
-              </div>
-              {/* MP Bar */}
-              <div className="w-24">
-                <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
-                    style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
-                  />
+                {/* MP Bar */}
+                <div className="w-24">
+                  <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
+                      style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-blue-200 mt-0.5 font-medium">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
                 </div>
-                <div className="text-xs text-blue-200 mt-0.5 font-medium">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
               </div>
             </div>
           </div>
@@ -416,18 +420,21 @@ export default function DungeonBattlePage() {
                   <>
                     <button 
                       className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
+                      style={{ color: 'white' }}
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
                     >
                       Fight
                     </button>
                     <button 
                       className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
+                      style={{ color: 'white' }}
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
                     >
                       Item
                     </button>
                     <button 
                       className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
+                      style={{ color: 'white' }}
                       onClick={handleRetreat}
                     >
                       Run
@@ -437,6 +444,7 @@ export default function DungeonBattlePage() {
                   <>
                     <button 
                       className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
+                      style={{ color: 'white' }}
                       onClick={handleAttack}
                       disabled={attackMutation.isPending}
                     >
@@ -444,6 +452,7 @@ export default function DungeonBattlePage() {
                     </button>
                     <button 
                       className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
+                      style={{ color: 'white' }}
                       onClick={() => {
                         setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
                         toast({ title: "Defense", description: "You brace for the enemy's attack!" });
@@ -453,6 +462,7 @@ export default function DungeonBattlePage() {
                     </button>
                     <button 
                       className="block w-full text-white hover:text-gray-200 text-xs text-center tracking-wider uppercase"
+                      style={{ color: 'white' }}
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
                     >
                       ← Back
@@ -463,14 +473,14 @@ export default function DungeonBattlePage() {
                 )}
               </div>
             ) : (
-              <div className="text-white text-xs font-semibold pt-3 text-center tracking-wider uppercase">Enemy Turn</div>
+              <div className="text-white text-xs font-semibold pt-3 text-center tracking-wider uppercase" style={{ color: 'white' }}>ENEMY TURN</div>
             )}
           </div>
 
           {/* Monster Stats (Right - Larger) */}
           {battleState.monster && (
             <div className="w-2/5 p-3 pt-2 text-right">
-              <div className="flex items-center justify-end space-x-3 mb-1">
+              <div className="flex items-center justify-between mb-1">
                 <div className="w-32">
                   <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
                     <div 
