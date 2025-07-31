@@ -164,13 +164,12 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
   return (
     <div className="space-y-0.5 text-center">
       {potions.length === 0 ? (
-        <div className="text-white text-xs tracking-wider uppercase" style={{ color: 'white' }}>NO ITEMS</div>
+        <div className="text-xs tracking-wider uppercase battle-menu-text">NO ITEMS</div>
       ) : (
         potions.slice(0, 3).map((potion: any) => (
           <button
             key={potion.id}
-            className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
-            style={{ color: 'white' }}
+            className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
             onClick={() => usePotionMutation.mutate(potion.itemId)}
             disabled={usePotionMutation.isPending}
           >
@@ -179,8 +178,7 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
         ))
       )}
       <button 
-        className="block w-full text-white hover:text-gray-200 text-xs text-center tracking-wider uppercase"
-        style={{ color: 'white' }}
+        className="block w-full text-xs text-center tracking-wider uppercase battle-menu-text"
         onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
       >
         ← BACK
@@ -381,10 +379,10 @@ export default function DungeonBattlePage() {
       </div>
 
       {/* Bottom Battle UI - 3 Column Layout */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/80 backdrop-blur-md border-t-4 border-gray-400 shadow-lg shadow-gray-400/20">
+      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/80 backdrop-blur-md border-t-4 border-gray-400 shadow-lg shadow-gray-400/20" style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3), 0 -2px 8px rgba(156,163,175,0.4), 0 0 0 1px rgba(156,163,175,0.6)' }}>
         <div className="flex h-20">
           {/* Player Stats (Left - Larger) */}
-          <div className="w-2/5 p-3 pt-2 border-r-4 border-gray-400">
+          <div className="w-2/5 p-3 pt-2 border-r-4 border-gray-400" style={{ boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.2), 2px 0 4px rgba(156,163,175,0.3)' }}>
             <div className="flex items-center justify-between mb-1">
               <div className="text-sm font-bold text-yellow-200">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
               <div className="flex items-center space-x-2">
@@ -413,59 +411,53 @@ export default function DungeonBattlePage() {
           </div>
 
           {/* Action Menu (Center - Smaller) */}
-          <div className="w-1/5 p-2 pt-1 border-r-4 border-gray-400">
+          <div className="w-1/5 p-2 pt-1 border-r-4 border-gray-400" style={{ boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.2), inset 2px 0 4px rgba(0,0,0,0.2), 2px 0 4px rgba(156,163,175,0.3)' }}>
             {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
               <div className="space-y-0.5 text-center">
                 {battleState.actionMode === 'main' ? (
                   <>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
-                      style={{ color: 'white' }}
+                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
                     >
-                      Fight
+                      FIGHT
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
-                      style={{ color: 'white' }}
+                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
                     >
-                      Item
+                      ITEM
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
-                      style={{ color: 'white' }}
+                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
                       onClick={handleRetreat}
                     >
-                      Run
+                      RUN
                     </button>
                   </>
                 ) : battleState.actionMode === 'fight' ? (
                   <>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
-                      style={{ color: 'white' }}
+                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
                       onClick={handleAttack}
                       disabled={attackMutation.isPending}
                     >
                       {attackMutation.isPending ? "ATTACKING..." : "ATTACK"}
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
-                      style={{ color: 'white' }}
+                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
                       onClick={() => {
                         setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
                         toast({ title: "Defense", description: "You brace for the enemy's attack!" });
                       }}
                     >
-                      Defend
+                      DEFEND
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs text-center tracking-wider uppercase"
-                      style={{ color: 'white' }}
+                      className="block w-full text-xs text-center tracking-wider uppercase battle-menu-text"
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
                     >
-                      ← Back
+                      ← BACK
                     </button>
                   </>
                 ) : (
@@ -473,13 +465,13 @@ export default function DungeonBattlePage() {
                 )}
               </div>
             ) : (
-              <div className="text-white text-xs font-semibold pt-3 text-center tracking-wider uppercase" style={{ color: 'white' }}>ENEMY TURN</div>
+              <div className="text-xs font-semibold pt-3 text-center tracking-wider uppercase battle-menu-text">ENEMY TURN</div>
             )}
           </div>
 
           {/* Monster Stats (Right - Larger) */}
           {battleState.monster && (
-            <div className="w-2/5 p-3 pt-2 text-right">
+            <div className="w-2/5 p-3 pt-2 text-right" style={{ boxShadow: 'inset 2px 0 4px rgba(0,0,0,0.2), -2px 0 4px rgba(156,163,175,0.3)' }}>
               <div className="flex items-center justify-between mb-1">
                 <div className="w-32">
                   <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">

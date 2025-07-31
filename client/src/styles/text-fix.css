@@ -4,6 +4,11 @@
   font-weight: 700 !important;
 }
 
+/* Battle menu text override */
+.battle-menu-text {
+  color: white !important;
+}
+
 .text-gray-300, .text-gray-400 {
   color: rgb(40, 40, 40) !important;
   font-weight: 600 !important;
