@@ -70,7 +70,7 @@ export default function Stats() {
     mutationFn: async (potionType: string) => {
       return apiRequest("/api/use-potion", {
         method: "POST",
-        body: JSON.stringify({ potionType })
+        body: { potionType }
       });
     },
     onSuccess: (data: any) => {
