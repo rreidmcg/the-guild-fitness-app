@@ -9,7 +9,7 @@ interface Particle {
   duration: number;
   delay: number;
   color: string;
-  direction: 'left' | 'right' | 'center';
+  drift: number; // horizontal drift amount
 }
 
 interface FloatingParticlesProps {
@@ -29,18 +29,16 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
       'rgba(255, 193, 7, 0.85)', // Amber
     ];
     
-    const directions: ('left' | 'right' | 'center')[] = ['left', 'right', 'center'];
-    
     const newParticles: Particle[] = Array.from({ length: count }, (_, i) => ({
       id: i,
       x: Math.random() * 100, // Full width distribution
-      y: 100 + Math.random() * 20, // Start below screen
-      size: Math.random() * 4 + 2, // 2-6px (increased from 1-4px)
-      opacity: Math.random() * 0.5 + 0.5, // 0.5-1.0 (increased from 0.3-0.7)
+      y: Math.random() * 100, // Spread across screen
+      size: Math.random() * 4 + 2, // 2-6px
+      opacity: Math.random() * 0.5 + 0.5, // 0.5-1.0
       duration: Math.random() * 25 + 20, // 20-45 seconds
       delay: Math.random() * 8, // 0-8 second delay
       color: colors[Math.floor(Math.random() * colors.length)],
-      direction: directions[Math.floor(Math.random() * directions.length)],
+      drift: (Math.random() - 0.5) * 200, // -100px to 100px horizontal drift
     }));
     setParticles(newParticles);
   }, [count]);
@@ -50,7 +48,7 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
       {particles.map((particle) => (
         <div
           key={particle.id}
-          className="absolute rounded-full"
+          className="absolute rounded-full animate-float"
           style={{
             left: `${particle.x}%`,
             top: `${particle.y}%`,
@@ -58,10 +56,11 @@ export function FloatingParticles({ count = 20, className = "" }: FloatingPartic
             height: `${particle.size}px`,
             backgroundColor: particle.color,
             opacity: particle.opacity,
-            animation: `float-${particle.direction} ${particle.duration}s linear infinite`,
+            animationDuration: `${particle.duration}s`,
             animationDelay: `${particle.delay}s`,
+            '--drift': `${particle.drift}px`,
             boxShadow: `0 0 20px ${particle.color}, 0 0 10px ${particle.color}, 0 0 5px ${particle.color}`,
-          }}
+          } as React.CSSProperties}
         />
       ))}
     </div>
