@@ -164,12 +164,12 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
   return (
     <div className="space-y-0.5 text-center">
       {potions.length === 0 ? (
-        <div className="text-white text-xs">No items</div>
+        <div className="text-white text-xs tracking-wider uppercase">No Items</div>
       ) : (
         potions.slice(0, 3).map((potion: any) => (
           <button
             key={potion.id}
-            className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center"
+            className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
             onClick={() => usePotionMutation.mutate(potion.itemId)}
             disabled={usePotionMutation.isPending}
           >
@@ -178,7 +178,7 @@ function InlineItemMenu({ setBattleState }: { setBattleState: any }) {
         ))
       )}
       <button 
-        className="block w-full text-white hover:text-gray-200 text-xs text-center"
+        className="block w-full text-white hover:text-gray-200 text-xs text-center tracking-wider uppercase"
         onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
       >
         ← Back
@@ -386,7 +386,7 @@ export default function DungeonBattlePage() {
             <div className="flex items-center space-x-3 mb-1">
               <div className="text-sm font-bold text-yellow-200">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
               {/* HP Bar */}
-              <div className="w-24">
+              <div className="w-32">
                 <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
@@ -415,19 +415,19 @@ export default function DungeonBattlePage() {
                 {battleState.actionMode === 'main' ? (
                   <>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center"
+                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
                     >
                       Fight
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center"
+                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
                     >
                       Item
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center"
+                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
                       onClick={handleRetreat}
                     >
                       Run
@@ -436,14 +436,14 @@ export default function DungeonBattlePage() {
                 ) : battleState.actionMode === 'fight' ? (
                   <>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center"
+                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
                       onClick={handleAttack}
                       disabled={attackMutation.isPending}
                     >
-                      {attackMutation.isPending ? "Attacking..." : "Attack"}
+                      {attackMutation.isPending ? "ATTACKING..." : "ATTACK"}
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center"
+                      className="block w-full text-white hover:text-gray-200 text-xs font-semibold text-center tracking-wider uppercase"
                       onClick={() => {
                         setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
                         toast({ title: "Defense", description: "You brace for the enemy's attack!" });
@@ -452,7 +452,7 @@ export default function DungeonBattlePage() {
                       Defend
                     </button>
                     <button 
-                      className="block w-full text-white hover:text-gray-200 text-xs text-center"
+                      className="block w-full text-white hover:text-gray-200 text-xs text-center tracking-wider uppercase"
                       onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
                     >
                       ← Back
@@ -463,7 +463,7 @@ export default function DungeonBattlePage() {
                 )}
               </div>
             ) : (
-              <div className="text-white text-xs font-semibold pt-3 text-center">Enemy Turn</div>
+              <div className="text-white text-xs font-semibold pt-3 text-center tracking-wider uppercase">Enemy Turn</div>
             )}
           </div>
 
