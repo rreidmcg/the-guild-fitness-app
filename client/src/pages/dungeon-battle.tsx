@@ -263,7 +263,7 @@ export default function DungeonBattlePage() {
   const progressPercent = ((battleState.currentMonsterIndex + (battleState.battleResult === 'victory' ? 1 : 0)) / battleState.zone.monsters.length) * 100;
 
   return (
-    <ParallaxBackground>
+    <ParallaxBackground showForestBackground={true}>
       <div className="container mx-auto p-4 max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

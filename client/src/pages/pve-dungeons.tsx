@@ -223,7 +223,7 @@ export default function PvEDungeonsPage() {
   const userLevel = userStats.level || 1;
 
   return (
-    <ParallaxBackground>
+    <ParallaxBackground showForestBackground={true}>
       <div className="container mx-auto p-4 max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
