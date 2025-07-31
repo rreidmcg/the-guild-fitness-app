@@ -5,6 +5,7 @@ import { useParams } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Sword, 
@@ -16,7 +17,10 @@ import {
   Coins,
   Clock,
   Trophy,
-  Star
+  Star,
+  Package,
+  Play,
+  LogOut
 } from "lucide-react";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { Avatar2D } from "@/components/ui/avatar-2d";
@@ -123,6 +127,8 @@ interface BattleState {
   currentMonsterIndex: number;
   totalGoldEarned: number;
   zone: DungeonZone | null;
+  showActionModal: boolean;
+  actionMode?: 'main' | 'fight' | 'item';
 }
 
 export default function DungeonBattlePage() {
@@ -142,7 +148,9 @@ export default function DungeonBattlePage() {
     battleResult: 'ongoing',
     currentMonsterIndex: 0,
     totalGoldEarned: 0,
-    zone: null
+    zone: null,
+    showActionModal: false,
+    actionMode: 'main'
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -301,61 +309,21 @@ export default function DungeonBattlePage() {
       <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-140px)]">
         {/* Character Sprites - Battle Field */}
         <div className="flex-1 flex items-end justify-between px-4 md:px-8 pb-32 relative">
-          {/* Player Character with HP/MP bars above */}
+          {/* Player Character */}
           <div className="flex flex-col items-center relative">
-            {/* Player HP/MP bars above character */}
-            <div className="mb-4 space-y-1">
-              <div className="w-32 md:w-40">
-                <div className="bg-black/60 rounded-full h-3 relative overflow-hidden shadow-lg border border-gray-400">
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300 shadow-inner"
-                    style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)' }}>
-                    HP: {battleState.playerHp}/{battleState.playerMaxHp}
-                  </div>
-                </div>
-                <div className="bg-black/60 rounded-full h-3 relative overflow-hidden mt-1 shadow-lg border border-gray-400">
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300 shadow-inner"
-                    style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)' }}>
-                    MP: {battleState.playerMp}/{battleState.playerMaxMp}
-                  </div>
-                </div>
-              </div>
-            </div>
             <Avatar2D 
               playerStats={userStats}
-              className="w-20 h-20 md:w-32 md:h-32"
+              className="w-24 h-24 md:w-40 md:h-40"
             />
           </div>
           
-          {/* Monster Sprite with HP bar above */}
+          {/* Monster Sprite */}
           {battleState.monster && battleState.monster.image && (
             <div className="flex flex-col items-center relative">
-              {/* Monster name and HP bar above monster */}
-              <div className="mb-4">
-                <div className="text-center text-sm font-bold text-white bg-black/70 rounded px-3 py-1 mb-2 drop-shadow-lg border border-gray-600">
-                  Lv.{battleState.monster.level} {battleState.monster.name}
-                </div>
-                <div className="w-32 md:w-40">
-                  <div className="bg-black/60 rounded-full h-3 relative overflow-hidden shadow-lg border border-gray-400">
-                    <div 
-                      className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300 shadow-inner"
-                      style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
-                      {battleState.monster.currentHp}/{battleState.monster.maxHp}
-                    </div>
-                  </div>
-                </div>
-              </div>
               <img 
                 src={battleState.monster.image} 
                 alt={battleState.monster.name}
-                className="w-20 h-20 md:w-32 md:h-32 object-contain"
+                className="w-24 h-24 md:w-40 md:h-40 object-contain"
                 style={{ imageRendering: 'pixelated' }}
               />
             </div>
@@ -363,28 +331,209 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Battle Actions - Bottom UI */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 p-4 bg-blue-900/90 backdrop-blur-sm border-t border-blue-700">
-        <div className="grid grid-cols-2 gap-3 max-w-md mx-auto">
+      {/* Bottom Battle UI */}
+      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700">
+        {/* Character Stats Row */}
+        <div className="flex justify-between items-center p-3 border-b border-gray-700">
+          {/* Player Stats (Left) */}
+          <div className="flex-1">
+            <div className="text-xs text-gray-400 mb-1">Lv.{userStats.level}</div>
+            <div className="text-sm font-bold text-white mb-1">{userStats.username}</div>
+            <div className="flex space-x-3">
+              {/* HP Bar */}
+              <div className="flex-1 min-w-0">
+                <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
+                    style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
+                  />
+                </div>
+                <div className="text-xs text-white mt-1">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
+              </div>
+              {/* MP Bar */}
+              <div className="flex-1 min-w-0">
+                <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden">
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
+                    style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
+                  />
+                </div>
+                <div className="text-xs text-white mt-1">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Monster Stats (Right) */}
+          {battleState.monster && (
+            <div className="flex-1 text-right">
+              <div className="text-xs text-gray-400 mb-1">Lv.{battleState.monster.level}</div>
+              <div className="text-sm font-bold text-white mb-1">{battleState.monster.name}</div>
+              <div className="flex justify-end">
+                <div className="flex-1 min-w-0 max-w-32">
+                  <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300"
+                      style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-white mt-1">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action Button */}
+        <div className="p-4">
           <Button
-            onClick={handleAttack}
+            onClick={() => setBattleState(prev => ({ ...prev, showActionModal: true }))}
             disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'ongoing' || attackMutation.isPending}
-            className="bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
+            className="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
           >
-            <Sword className="h-4 w-4 mr-2" />
-            {attackMutation.isPending ? "ATK..." : "ATK"}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleRetreat}
-            disabled={attackMutation.isPending}
-            className="border-blue-600 text-blue-200 hover:bg-blue-800/50 font-bold py-3"
-          >
-            <Shield className="h-4 w-4 mr-2" />
-            DEF
+            {battleState.isPlayerTurn ? "Your Turn" : "Enemy Turn"}
           </Button>
         </div>
       </div>
+
+      {/* Battle Action Modal */}
+      <Dialog open={battleState.showActionModal} onOpenChange={(open) => setBattleState(prev => ({ ...prev, showActionModal: open, actionMode: 'main' }))}>
+        <DialogContent className="bg-gray-900 border-gray-700">
+          <DialogHeader>
+            <DialogTitle className="text-white">Choose Action</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-3">
+            {battleState.actionMode === 'main' && (
+              <>
+                <Button 
+                  className="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3"
+                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'fight' }))}
+                >
+                  <Sword className="h-4 w-4 mr-2" />
+                  Fight
+                </Button>
+                <Button 
+                  className="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
+                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'item' }))}
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Item
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="w-full border-gray-600 text-gray-200 hover:bg-gray-800 font-bold py-3"
+                  onClick={() => {
+                    setBattleState(prev => ({ ...prev, showActionModal: false }));
+                    handleRetreat();
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Run
+                </Button>
+              </>
+            )}
+
+            {battleState.actionMode === 'fight' && (
+              <>
+                <Button 
+                  className="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3"
+                  onClick={() => {
+                    setBattleState(prev => ({ ...prev, showActionModal: false, actionMode: 'main' }));
+                    handleAttack();
+                  }}
+                >
+                  <Sword className="h-4 w-4 mr-2" />
+                  Attack
+                </Button>
+                <Button 
+                  className="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
+                  onClick={() => {
+                    setBattleState(prev => ({ ...prev, showActionModal: false, actionMode: 'main' }));
+                    // Defend action - for now just ends turn
+                    toast({ title: "Defense", description: "You brace for the enemy's attack!" });
+                  }}
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Defend
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="w-full border-gray-600 text-gray-200 hover:bg-gray-800"
+                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
+                >
+                  ← Back
+                </Button>
+              </>
+            )}
+
+            {battleState.actionMode === 'item' && (
+              <>
+                <PotionButtons />
+                <Button 
+                  variant="outline"
+                  className="w-full border-gray-600 text-gray-200 hover:bg-gray-800"
+                  onClick={() => setBattleState(prev => ({ ...prev, actionMode: 'main' }))}
+                >
+                  ← Back
+                </Button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// Potion component for battle usage
+function PotionButtons() {
+  const { toast } = useToast();
+  const { data: inventory } = useQuery({
+    queryKey: ["/api/inventory"],
+  });
+
+  const usePotionMutation = useMutation({
+    mutationFn: async (potionType: string) => {
+      return apiRequest("/api/use-potion", {
+        method: "POST",
+        body: { potionType }
+      });
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
+      // No success toast - only show errors
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Cannot Use Potion",
+        description: error.message || "You don't have this potion or are already at full capacity",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const potions = Array.isArray(inventory) ? inventory.filter((item: any) => item.itemType === 'potion') : [];
+
+  if (potions.length === 0) {
+    return <div className="text-gray-400 text-center py-3">No potions available</div>;
+  }
+
+  return (
+    <div className="grid gap-2">
+      {potions.map((potion: any) => (
+        <Button
+          key={potion.id}
+          variant="outline"
+          className="w-full text-left border-gray-600 text-gray-200 hover:bg-gray-800"
+          onClick={() => usePotionMutation.mutate(potion.itemId)}
+          disabled={usePotionMutation.isPending}
+        >
+          <div className="flex justify-between items-center w-full">
+            <span>{potion.itemId.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</span>
+            <span className="text-xs text-gray-400">x{potion.quantity}</span>
+          </div>
+        </Button>
+      ))}
     </div>
   );
 }
