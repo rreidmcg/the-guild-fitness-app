@@ -16,6 +16,7 @@ import { validateUsername, formatUsernameInput } from "@/utils/username-validati
 import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 import { FloatingParticles } from "@/components/ui/floating-particles";
 import { AuthMusicBanner } from "@/components/ui/auth-music-banner";
+import { Avatar2D } from "@/components/ui/avatar-2d";
 import { Eye, EyeOff } from "lucide-react";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 import forestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
@@ -367,29 +368,47 @@ export default function SignupPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Avatar Appearance</FormLabel>
-                        <div className="text-sm text-muted-foreground mb-2">
+                        <div className="text-sm text-muted-foreground mb-4">
                           Choose your character's visual appearance
                         </div>
-                        <div className="flex space-x-2">
-                          <Button
-                            type="button"
-                            variant={field.value === "male" ? "default" : "outline"}
-                            size="sm"
+                        
+                        {/* Avatar Preview Images */}
+                        <div className="flex space-x-6 justify-center mb-4">
+                          <div 
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all ${
+                              field.value === "male" 
+                                ? "border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/25" 
+                                : "border-gray-600 hover:border-gray-400"
+                            }`}
                             onClick={() => field.onChange("male")}
-                            className="flex-1"
                           >
-                            Male Avatar
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={field.value === "female" ? "default" : "outline"}
-                            size="sm"
+                            <div className="text-center">
+                              <Avatar2D 
+                                user={{ gender: "male", level: 1, strength: 1, stamina: 1, agility: 1 }} 
+                                size="sm" 
+                              />
+                              <p className="text-sm font-medium mt-2 text-foreground">Male</p>
+                            </div>
+                          </div>
+                          
+                          <div 
+                            className={`cursor-pointer p-3 rounded-lg border-2 transition-all ${
+                              field.value === "female" 
+                                ? "border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/25" 
+                                : "border-gray-600 hover:border-gray-400"
+                            }`}
                             onClick={() => field.onChange("female")}
-                            className="flex-1"
                           >
-                            Female Avatar
-                          </Button>
+                            <div className="text-center">
+                              <Avatar2D 
+                                user={{ gender: "female", level: 1, strength: 1, stamina: 1, agility: 1 }} 
+                                size="sm" 
+                              />
+                              <p className="text-sm font-medium mt-2 text-foreground">Female</p>
+                            </div>
+                          </div>
                         </div>
+                        
                         <FormMessage />
                       </FormItem>
                     )}
