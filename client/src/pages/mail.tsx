@@ -12,7 +12,8 @@ import {
   Calendar,
   Coins,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  AlertCircle
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
+import { AppRequestModal } from "@/components/app-request-modal";
 
 interface PlayerMail {
   id: number;
@@ -48,9 +50,10 @@ interface PlayerMail {
 
 export default function MailPage() {
   const [selectedMail, setSelectedMail] = useState<PlayerMail | null>(null);
+  const [showAppRequestModal, setShowAppRequestModal] = useState(false);
   const { toast } = useToast();
 
-  const { data: mail = [], isLoading, refetch } = useQuery({
+  const { data: mail = [], isLoading, refetch } = useQuery<PlayerMail[]>({
     queryKey: ["/api/mail"],
   });
 
@@ -172,15 +175,26 @@ export default function MailPage() {
                 News, rewards, and announcements from the developers
               </p>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => refetch()}
-              disabled={isLoading}
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowAppRequestModal(true)}
+                className="bg-orange-600/20 border-orange-600/30 text-orange-600 hover:bg-orange-600/30"
+              >
+                <AlertCircle className="w-4 h-4 mr-2" />
+                Feedback
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => refetch()}
+                disabled={isLoading}
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -351,6 +365,12 @@ export default function MailPage() {
           </div>
         )}
       </div>
+
+      {/* App Request Modal */}
+      <AppRequestModal 
+        isOpen={showAppRequestModal}
+        onClose={() => setShowAppRequestModal(false)}
+      />
     </div>
   );
 }

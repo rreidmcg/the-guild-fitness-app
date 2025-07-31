@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -17,7 +17,8 @@ import {
   type LiabilityWaiver, type InsertLiabilityWaiver,
   type WorkoutPreferences, type InsertWorkoutPreferences,
   type WorkoutFeedback, type InsertWorkoutFeedback,
-  type Monster, type InsertMonster
+  type Monster, type InsertMonster,
+  type AppRequest, type InsertAppRequest
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -122,6 +123,13 @@ export interface IStorage {
 
   // Mail system operations
   getPlayerMail(userId: number): Promise<PlayerMail[]>;
+  sendWelcomeEmail(userId: number): Promise<void>;
+
+  // App request operations
+  createAppRequest(request: InsertAppRequest): Promise<AppRequest>;
+  getUserAppRequests(userId: number): Promise<AppRequest[]>;
+  getAllAppRequests(): Promise<AppRequest[]>;
+  updateAppRequestStatus(requestId: number, status: string, adminNotes?: string, adminUserId?: number): Promise<AppRequest>;
   createPlayerMail(mail: InsertPlayerMail): Promise<PlayerMail>;
   markMailAsRead(mailId: number, userId: number): Promise<void>;
   claimMailRewards(mailId: number, userId: number): Promise<{ success: boolean; rewards?: any }>;
@@ -152,6 +160,12 @@ export interface IStorage {
   createWorkoutFeedback(feedback: any): Promise<any>;
   getUserStats(userId: number): Promise<any>;
   getExercises(): Promise<Exercise[]>;
+
+  // App request operations
+  createAppRequest(request: InsertAppRequest): Promise<AppRequest>;
+  getAllAppRequests(): Promise<AppRequest[]>;
+  getUserAppRequests(userId: number): Promise<AppRequest[]>;
+  updateAppRequestStatus(id: number, status: string, adminNotes?: string, reviewedBy?: number): Promise<AppRequest>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1548,6 +1562,97 @@ export class DatabaseStorage implements IStorage {
       message: `Founders Pack #${claimNumber} claimed! Welcome, First Flame!`,
       claimNumber 
     };
+  }
+
+  // App request operations
+  async createAppRequest(request: InsertAppRequest): Promise<AppRequest> {
+    await this.ensureInitialized();
+    
+    const [createdRequest] = await db
+      .insert(appRequests)
+      .values(request as any)
+      .returning();
+    return createdRequest;
+  }
+
+  async getAllAppRequests(): Promise<AppRequest[]> {
+    await this.ensureInitialized();
+    
+    return await db
+      .select()
+      .from(appRequests)
+      .orderBy(desc(appRequests.submittedAt));
+  }
+
+  async getUserAppRequests(userId: number): Promise<AppRequest[]> {
+    await this.ensureInitialized();
+    
+    return await db
+      .select()
+      .from(appRequests)
+      .where(eq(appRequests.userId, userId))
+      .orderBy(desc(appRequests.submittedAt));
+  }
+
+  async updateAppRequestStatus(id: number, status: string, adminNotes?: string, reviewedBy?: number): Promise<AppRequest> {
+    await this.ensureInitialized();
+    
+    const [updatedRequest] = await db
+      .update(appRequests)
+      .set({
+        status,
+        adminNotes,
+        reviewedBy,
+        reviewedAt: new Date()
+      })
+      .where(eq(appRequests.id, id))
+      .returning();
+    
+    return updatedRequest;
+  }
+
+  // Welcome email system
+  async sendWelcomeEmail(userId: number): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) return;
+
+    const welcomeMail: InsertPlayerMail = {
+      userId,
+      senderType: "system",
+      senderName: "The Guild Development Team",
+      subject: "Welcome to The Guild: Gamified Fitness!",
+      content: `Welcome to The Guild, ${user.username}!
+
+Thank you for joining this exciting project! You're now part of a community that's transforming fitness through gamification.
+
+🎮 **What You Can Expect:**
+• RPG-style character progression as you workout
+• Earn XP and level up your Strength, Stamina, and Agility
+• Battle monsters in progressive dungeons to earn gold
+• Daily quests to maintain your fitness streak
+• Compete on leaderboards with other guild members
+
+🚀 **This Project Will Continue to Evolve**
+The Guild is actively being developed with new features, content, and improvements based on community feedback. Your experience will keep getting better as we add:
+• New workout programs and exercises
+• Additional RPG mechanics and rewards
+• Enhanced social features
+• More dungeon content and challenges
+
+💬 **Have Ideas or Feedback?**
+We value your input! Use the feedback button in your mail to submit suggestions, report issues, or request new features. Your feedback directly shapes the future of The Guild.
+
+Start your fitness journey today and watch your character grow stronger with every workout!
+
+**The Guild Development Team**`,
+      mailType: "announcement",
+      isRead: false,
+      rewards: null,
+      rewardsClaimed: false,
+      expiresAt: null
+    };
+
+    await this.createPlayerMail(welcomeMail);
   }
 }
 

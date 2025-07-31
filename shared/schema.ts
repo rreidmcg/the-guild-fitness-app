@@ -616,6 +616,31 @@ export const insertLiabilityWaiverSchema = createInsertSchema(liabilityWaivers).
   acceptedAt: true,
 });
 
+// App requests/feedback system
+export const appRequests = pgTable("app_requests", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  category: text("category").notNull(), // "feature_request", "bug_report", "improvement", "general_feedback"
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  priority: text("priority").notNull().default("medium"), // "low", "medium", "high", "critical"
+  status: text("status").notNull().default("submitted"), // "submitted", "reviewing", "in_progress", "completed", "declined"
+  currentPage: text("current_page"), // Which page/section they were on when submitting
+  deviceInfo: text("device_info"), // Browser/device information
+  submittedAt: timestamp("submitted_at").defaultNow(),
+  reviewedAt: timestamp("reviewed_at"),
+  reviewedBy: integer("reviewed_by").references(() => users.id),
+  adminNotes: text("admin_notes"),
+});
+
+export const insertAppRequestSchema = createInsertSchema(appRequests).omit({
+  id: true,
+  submittedAt: true,
+  reviewedAt: true,
+  reviewedBy: true,
+  adminNotes: true,
+});
+
 export type PlayerMail = typeof playerMail.$inferSelect;
 export type InsertPlayerMail = z.infer<typeof insertPlayerMailSchema>;
 export type SocialShare = typeof socialShares.$inferSelect;
@@ -624,6 +649,8 @@ export type SocialShareLike = typeof socialShareLikes.$inferSelect;
 export type InsertSocialShareLike = z.infer<typeof insertSocialShareLikeSchema>;
 export type LiabilityWaiver = typeof liabilityWaivers.$inferSelect;
 export type InsertLiabilityWaiver = z.infer<typeof insertLiabilityWaiverSchema>;
+export type AppRequest = typeof appRequests.$inferSelect;
+export type InsertAppRequest = z.infer<typeof insertAppRequestSchema>;
 
 // Shop items for real money and gem purchases
 export const shopItems = pgTable("shop_items", {

@@ -799,6 +799,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Send welcome email to player mail system
+      await storage.sendWelcomeEmail(newUser.id);
+
       res.json({ 
         user: { ...newUser, password: undefined }, // Don't send password back
         message: "Account created successfully! Please check your email to verify your account.",
@@ -2585,6 +2588,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // App request/feedback routes
+  app.post("/api/app-requests", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const { category, title, description, priority, currentPage } = req.body;
+      
+      if (!category || !title || !description) {
+        return res.status(400).json({ error: "Category, title, and description are required" });
+      }
+
+      // Get device information from request headers
+      const deviceInfo = req.headers['user-agent'] || 'Unknown device';
+
+      const appRequest = await storage.createAppRequest({
+        userId,
+        category,
+        title,
+        description,
+        priority: priority || 'medium',
+        currentPage: currentPage || null,
+        deviceInfo,
+        status: 'submitted'
+      });
+
+      res.json({ 
+        success: true, 
+        message: "Request submitted successfully! Thanks for your feedback.",
+        request: appRequest 
+      });
+    } catch (error) {
+      console.error("Error creating app request:", error);
+      res.status(500).json({ error: "Failed to submit request" });
+    }
+  });
+
+  app.get("/api/app-requests", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const userRequests = await storage.getUserAppRequests(userId);
+      res.json(userRequests);
+    } catch (error) {
+      console.error("Error fetching user app requests:", error);
+      res.status(500).json({ error: "Failed to fetch your requests" });
+    }
+  });
+
   // Admin routes (restricted to G.M. users)
   const isAdmin = async (req: any, res: any, next: any) => {
     try {
@@ -2618,6 +2667,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(exercises);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch exercises" });
+    }
+  });
+
+  // Admin app request management
+  app.get("/api/admin/app-requests", isAdmin, async (req, res) => {
+    try {
+      const allRequests = await storage.getAllAppRequests();
+      res.json(allRequests);
+    } catch (error) {
+      console.error("Error fetching all app requests:", error);
+      res.status(500).json({ error: "Failed to fetch app requests" });
+    }
+  });
+
+  app.patch("/api/admin/app-requests/:id", isAdmin, async (req, res) => {
+    try {
+      const requestId = parseInt(req.params.id);
+      const { status, adminNotes } = req.body;
+      const adminUserId = getCurrentUserId(req);
+      
+      if (!requestId || isNaN(requestId)) {
+        return res.status(400).json({ error: "Invalid request ID" });
+      }
+
+      const updatedRequest = await storage.updateAppRequestStatus(requestId, status, adminNotes, adminUserId);
+      res.json(updatedRequest);
+    } catch (error) {
+      console.error("Error updating app request:", error);
+      res.status(500).json({ error: "Failed to update request" });
     }
   });
 
