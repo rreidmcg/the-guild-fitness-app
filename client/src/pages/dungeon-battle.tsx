@@ -311,7 +311,7 @@ export default function DungeonBattlePage() {
                     className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300 shadow-inner"
                     style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)' }}>
                     HP: {battleState.playerHp}/{battleState.playerMaxHp}
                   </div>
                 </div>
@@ -320,7 +320,7 @@ export default function DungeonBattlePage() {
                     className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300 shadow-inner"
                     style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow">
+                  <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8)' }}>
                     MP: {battleState.playerMp}/{battleState.playerMaxMp}
                   </div>
                 </div>
