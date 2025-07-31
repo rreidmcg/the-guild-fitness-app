@@ -61,50 +61,99 @@ export class AtrophySystem {
     try {
       // Calculate 1% reduction (minimum 1 point loss if they have any)
       const xpLoss = Math.max(1, Math.floor(userData.experience * 0.01));
-      const strengthLoss = Math.max(userData.strength > 0 ? 1 : 0, Math.floor(userData.strength * 0.01));
-      const staminaLoss = Math.max(userData.stamina > 0 ? 1 : 0, Math.floor(userData.stamina * 0.01));
-      const agilityLoss = Math.max(userData.agility > 0 ? 1 : 0, Math.floor(userData.agility * 0.01));
+      
+      // Calculate 1% XP loss for individual stats (use XP fields, not stat levels)
+      const strengthXpLoss = Math.max(userData.strengthXp > 0 ? 1 : 0, Math.floor((userData.strengthXp || 0) * 0.01));
+      const staminaXpLoss = Math.max(userData.staminaXp > 0 ? 1 : 0, Math.floor((userData.staminaXp || 0) * 0.01));
+      const agilityXpLoss = Math.max(userData.agilityXp > 0 ? 1 : 0, Math.floor((userData.agilityXp || 0) * 0.01));
 
-      // Don't let stats go below 0
+      // Don't let XP go below 0
       const newExperience = Math.max(0, userData.experience - xpLoss);
-      const newStrength = Math.max(0, userData.strength - strengthLoss);
-      const newStamina = Math.max(0, userData.stamina - staminaLoss);
-      const newAgility = Math.max(0, userData.agility - agilityLoss);
+      const newStrengthXp = Math.max(0, (userData.strengthXp || 0) - strengthXpLoss);
+      const newStaminaXp = Math.max(0, (userData.staminaXp || 0) - staminaXpLoss);
+      const newAgilityXp = Math.max(0, (userData.agilityXp || 0) - agilityXpLoss);
 
-      // Update the user's stats
+      // Recalculate levels based on new XP (allows for level-down)
+      const newLevel = this.calculateLevel(newExperience);
+      const newStrength = this.calculateStatLevel(newStrengthXp);
+      const newStamina = this.calculateStatLevel(newStaminaXp);
+      const newAgility = this.calculateStatLevel(newAgilityXp);
+
+      // Update the user's stats including levels and XP
       await db
         .update(users)
         .set({
           experience: newExperience,
+          level: newLevel,
+          strengthXp: newStrengthXp,
+          staminaXp: newStaminaXp,
+          agilityXp: newAgilityXp,
           strength: newStrength,
           stamina: newStamina,
           agility: newAgility,
         })
         .where(eq(users.id, userId));
 
-      console.log(`Applied atrophy to user ${userId}: -${xpLoss} XP, -${strengthLoss} STR, -${staminaLoss} STA, -${agilityLoss} AGI`);
+      console.log(`Applied atrophy to user ${userId}: -${xpLoss} XP (Level ${userData.level} → ${newLevel}), STR: ${userData.strength} → ${newStrength}, STA: ${userData.stamina} → ${newStamina}, AGI: ${userData.agility} → ${newAgility}`);
     } catch (error) {
       console.error(`Error applying atrophy to user ${userId}:`, error);
     }
   }
 
   /**
-   * Record user activity to prevent atrophy
+   * Calculate level from total XP (same logic as backend)
    */
-  static async recordActivity(userId: number): Promise<void> {
-    const today = new Date().toISOString().split('T')[0];
+  static calculateLevel(experience: number): number {
+    if (experience < 0) return 1;
     
-    try {
-      await db
-        .update(users)
-        .set({
-          lastActivityDate: today,
-        })
-        .where(eq(users.id, userId));
-    } catch (error) {
-      console.error(`Error recording activity for user ${userId}:`, error);
+    let level = 1;
+    let xpRequired = 0;
+    
+    // Keep incrementing level until we find where the player's XP fits
+    while (xpRequired <= experience) {
+      level++;
+      xpRequired = this.getXpRequiredForLevel(level);
     }
+    
+    return level - 1;
   }
+
+  /**
+   * Calculate XP required for a specific level (matches backend formula)
+   */
+  static getXpRequiredForLevel(level: number): number {
+    if (level <= 1) return 0;
+    // Exponential formula: level^1.8 * 16 (same as backend)
+    return Math.floor(Math.pow(level - 1, 1.8) * 16);
+  }
+
+  /**
+   * Calculate stat level from total XP (same logic as stat-progression.ts)
+   */
+  static calculateStatLevel(totalXp: number): number {
+    if (totalXp < 0) return 0;
+    
+    let level = 1;
+    let xpRequired = 0;
+    
+    while (xpRequired <= totalXp) {
+      level++;
+      xpRequired = this.getStatXpRequiredForLevel(level);
+    }
+    
+    return level - 1;
+  }
+
+  /**
+   * Calculate XP required for a specific stat level (matches stat-progression.ts)
+   */
+  static getStatXpRequiredForLevel(level: number): number {
+    if (level <= 1) return 0;
+    // Exponential formula: level^2.5 * 10 (same as stat-progression.ts)
+    return Math.floor(Math.pow(level - 1, 2.5) * 10);
+  }
+
+
 
   /**
    * Use a streak freeze to prevent atrophy
@@ -118,7 +167,7 @@ export class AtrophySystem {
         .where(eq(users.id, userId))
         .limit(1);
 
-      if (!user[0] || user[0].streakFreezeCount <= 0) {
+      if (!user[0] || (user[0].streakFreezeCount || 0) <= 0) {
         return false; // No streak freezes available
       }
 
@@ -128,7 +177,7 @@ export class AtrophySystem {
       await db
         .update(users)
         .set({
-          streakFreezeCount: user[0].streakFreezeCount - 1,
+          streakFreezeCount: (user[0].streakFreezeCount || 0) - 1,
           lastActivityDate: today,
         })
         .where(eq(users.id, userId));
