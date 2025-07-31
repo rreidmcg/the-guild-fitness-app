@@ -204,8 +204,7 @@ const DRANK_DUNGEON_ZONES: DungeonZone[] = [
 export default function PvEDungeonsPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [selectedZone, setSelectedZone] = useState<DungeonZone | null>(null);
-  const [showZoneDetails, setShowZoneDetails] = useState(false);
+  // Removed modal state - dungeons now navigate directly to battle
 
   const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],
@@ -279,8 +278,7 @@ export default function PvEDungeonsPage() {
                   }`}
                   onClick={() => {
                     if (isAccessible) {
-                      setSelectedZone(zone);
-                      setShowZoneDetails(true);
+                      navigate(`/dungeon-battle/${zone.id}`);
                     }
                   }}
                 >
@@ -358,8 +356,7 @@ export default function PvEDungeonsPage() {
                   }`}
                   onClick={() => {
                     if (isAccessible) {
-                      setSelectedZone(zone);
-                      setShowZoneDetails(true);
+                      navigate(`/dungeon-battle/${zone.id}`);
                     }
                   }}
                 >
@@ -422,68 +419,7 @@ export default function PvEDungeonsPage() {
         </CardContent>
       </Card>
 
-      {/* Zone Details Modal */}
-      {showZoneDetails && selectedZone && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-4xl w-full max-h-[85vh] overflow-y-auto">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">{selectedZone.name}</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowZoneDetails(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-6">{selectedZone.storyIntro}</p>
-              
-              {/* 2-Column Monster Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                {selectedZone.monsters.map(monster => (
-                  <div key={monster.id} className="flex items-center justify-between p-3 border rounded-lg bg-card/50">
-                    <div className="flex items-center space-x-3">
-                      {monster.image && (
-                        <img src={monster.image} alt={monster.name} className="w-10 h-10 rounded" />
-                      )}
-                      <div>
-                        <div className="font-medium">{monster.name}</div>
-                        <div className="text-xs text-muted-foreground">Level {monster.level}</div>
-                        {monster.name.includes('🏆') && (
-                          <div className="text-xs text-yellow-400 font-medium">BOSS</div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-right text-sm">
-                      <div className="flex items-center text-red-400 mb-1">
-                        <Heart className="h-3 w-3 mr-1" />
-                        {monster.maxHp}
-                      </div>
-                      <div className="flex items-center text-yellow-400">
-                        <Coins className="h-3 w-3 mr-1" />
-                        {monster.goldReward}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <Button 
-                className="w-full"
-                onClick={() => {
-                  // Navigate to dungeon battle with selected zone
-                  navigate(`/dungeon-battle/${selectedZone.id}`);
-                }}
-              >
-                Enter Dungeon
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {/* Modal removed - dungeons now navigate directly to battle */}
       </div>
     </ParallaxBackground>
   );
