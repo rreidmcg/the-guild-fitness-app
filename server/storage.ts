@@ -35,6 +35,7 @@ export interface IStorage {
   getUserByResetToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<User>): Promise<User>;
+  deleteUser(id: number): Promise<void>;
   updateStripeCustomerId(userId: number, customerId: string): Promise<User>;
   updateUserStripeInfo(userId: number, stripeInfo: { customerId: string; subscriptionId: string }): Promise<User>;
 
@@ -314,6 +315,10 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!user) throw new Error("User not found");
     return user;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
   }
 
   // Exercise operations

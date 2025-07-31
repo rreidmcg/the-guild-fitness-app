@@ -122,12 +122,27 @@ export default function SignupPage() {
     setLocation("/");
   };
 
-  const handleLiabilityWaiverDecline = () => {
+  const handleLiabilityWaiverDecline = async () => {
+    if (pendingSignupData) {
+      try {
+        // Delete the account that was just created since waiver was declined
+        await apiRequest("/api/auth/cleanup-incomplete-signup", {
+          method: "POST",
+          body: {
+            email: pendingSignupData.email,
+            username: pendingSignupData.username
+          }
+        });
+      } catch (error) {
+        console.error("Error cleaning up incomplete signup:", error);
+      }
+    }
+    
     setShowLiabilityWaiver(false);
     setPendingSignupData(null);
     toast({
       title: "Account creation cancelled",
-      description: "You must accept the liability waiver to use The Guild: Gamified Fitness.",
+      description: "You must accept the liability waiver to use The Guild: Gamified Fitness. You can try again later with the same email and username.",
       variant: "destructive",
     });
   };

@@ -2820,6 +2820,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cleanup incomplete signup (when liability waiver is declined)
+  app.post("/api/auth/cleanup-incomplete-signup", async (req, res) => {
+    try {
+      const { email, username } = req.body;
+
+      if (!email || !username) {
+        return res.status(400).json({ error: "Email and username are required" });
+      }
+
+      // Find and delete the user account that was created but waiver was declined
+      const user = await storage.getUserByEmail(email);
+      if (user && user.username === username) {
+        // Only delete if liability waiver was not accepted
+        if (!user.liabilityWaiverAccepted) {
+          await storage.deleteUser(user.id);
+          console.log(`Cleaned up incomplete signup for user: ${username} (${email})`);
+        }
+      }
+
+      res.json({ success: true, message: "Cleanup completed" });
+    } catch (error) {
+      console.error("Cleanup incomplete signup error:", error);
+      res.status(500).json({ error: "Failed to cleanup incomplete signup" });
+    }
+  });
+
   // Push notification routes
   app.post("/api/push/subscribe", async (req, res) => {
     try {

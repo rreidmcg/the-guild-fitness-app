@@ -173,6 +173,15 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
+**July 31, 2025 - Enhanced Signup Flow & Incomplete Registration Cleanup:**
+- **Fixed Liability Waiver Authentication Issue**: Removed authentication requirement from liability waiver endpoint since it's part of signup process before user login
+- **Added Avatar Preview Images**: Signup profile questions now display actual male and female character previews using Avatar2D component instead of text buttons
+- **Implemented Registration Cleanup System**: When liability waiver is declined, automatically deletes the user account to free up username and email for future attempts
+  - Added cleanup endpoint `/api/auth/cleanup-incomplete-signup` for removing incomplete registrations
+  - Added `deleteUser` method to storage interface for complete account removal
+  - Enhanced signup flow to call cleanup when waiver is declined, allowing users to retry with same credentials
+- **Improved User Experience**: Enhanced visual selection with colored borders, hover effects, and proper placeholder text behavior
+
 **July 30, 2025 - Premium Programs & Founders Pack Temporarily Hidden:**
 - **Hidden Premium Content**: Temporarily removed premium programs and founders pack from shop interface
   - Removed "Programs" and "Bundles" tabs from shop navigation (reduced from 5 to 3 tabs)
