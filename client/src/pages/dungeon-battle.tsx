@@ -355,7 +355,7 @@ export default function DungeonBattlePage() {
         {/* Character Sprites - Battle Field */}
         <div className="flex-1 flex items-end justify-between px-4 md:px-8 pb-32 relative">
           {/* Player Character */}
-          <div className="flex flex-col items-center relative">
+          <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
             <Avatar2D 
               playerStats={userStats}
               className="w-24 h-24 md:w-40 md:h-40"
@@ -381,11 +381,10 @@ export default function DungeonBattlePage() {
         <div className="flex h-20">
           {/* Player Stats (Left Third) */}
           <div className="flex-1 p-3 pt-2 border-r border-blue-600">
-            <div className="text-xs text-blue-200 mb-1">Lv.{userStats.level}</div>
-            <div className="text-sm font-bold text-white mb-2">{userStats.username}</div>
-            <div className="space-y-1">
+            <div className="text-sm font-bold text-white mb-2">{userStats.username} <span className="text-xs text-blue-200">Lv.{userStats.level}</span></div>
+            <div className="flex space-x-3">
               {/* HP Bar */}
-              <div className="w-24">
+              <div className="w-20">
                 <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
@@ -395,7 +394,7 @@ export default function DungeonBattlePage() {
                 <div className="text-xs text-white mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
               </div>
               {/* MP Bar */}
-              <div className="w-24">
+              <div className="w-20">
                 <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
@@ -469,10 +468,9 @@ export default function DungeonBattlePage() {
           {/* Monster Stats (Right Third) */}
           {battleState.monster && (
             <div className="flex-1 p-3 pt-2 text-right">
-              <div className="text-xs text-blue-200 mb-1">Lv.{battleState.monster.level}</div>
-              <div className="text-sm font-bold text-white mb-2">{battleState.monster.name}</div>
+              <div className="text-sm font-bold text-white mb-2"><span className="text-xs text-blue-200">Lv.{battleState.monster.level}</span> {battleState.monster.name}</div>
               <div className="flex justify-end">
-                <div className="w-24">
+                <div className="w-20">
                   <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                     <div 
                       className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300"
