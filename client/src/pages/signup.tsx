@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { LiabilityWaiverModal } from "@/components/liability-waiver-modal";
 import { FloatingParticles } from "@/components/ui/floating-particles";
 import { AuthMusicBanner } from "@/components/ui/auth-music-banner";
 import { Avatar2D } from "@/components/ui/avatar-2d";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check, X, Loader2 } from "lucide-react";
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 import forestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
 
@@ -52,6 +52,19 @@ export default function SignupPage() {
   const [pendingSignupData, setPendingSignupData] = useState<SignupForm | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [usernameToCheck, setUsernameToCheck] = useState<string>("");
+
+  // Username availability check query
+  const { data: usernameCheck, isLoading: isCheckingUsername } = useQuery({
+    queryKey: ['/api/check-username', usernameToCheck],
+    queryFn: async () => {
+      if (!usernameToCheck || usernameToCheck.length < 2) return null;
+      const response = await fetch(`/api/check-username/${encodeURIComponent(usernameToCheck)}`);
+      return response.json();
+    },
+    enabled: usernameToCheck.length >= 2,
+    staleTime: 5000, // Don't refetch for 5 seconds
+  });
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
@@ -68,6 +81,21 @@ export default function SignupPage() {
       avatarGender: "male"
     },
   });
+
+  // Debounce username input
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      if (name === "username" && type === "change") {
+        const timer = setTimeout(() => {
+          setUsernameToCheck(value.username || "");
+        }, 500); // Wait 500ms after user stops typing
+        
+        return () => clearTimeout(timer);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const signupMutation = useMutation({
     mutationFn: async (data: SignupForm) => {
@@ -240,18 +268,43 @@ export default function SignupPage() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input 
-                            placeholder="Choose a username (letters and spaces only)" 
-                            {...field}
-                            maxLength={20}
-                            onChange={(e) => {
-                              const formatted = formatUsernameInput(e.target.value);
-                              field.onChange(formatted);
-                            }}
-                            className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
-                          />
+                          <div className="relative">
+                            <Input 
+                              placeholder="Choose a username (letters and spaces only)" 
+                              {...field}
+                              maxLength={20}
+                              onChange={(e) => {
+                                const formatted = formatUsernameInput(e.target.value);
+                                field.onChange(formatted);
+                              }}
+                              className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0 pr-10"
+                            />
+                            {/* Username availability indicator */}
+                            {field.value && field.value.length >= 2 && (
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                {isCheckingUsername ? (
+                                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                ) : usernameCheck ? (
+                                  usernameCheck.available ? (
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <X className="h-4 w-4 text-red-500" />
+                                  )
+                                ) : null}
+                              </div>
+                            )}
+                          </div>
                         </FormControl>
                         <FormMessage />
+                        {/* Show availability message */}
+                        {field.value && field.value.length >= 2 && usernameCheck && !isCheckingUsername && (
+                          <div className={`text-xs ${usernameCheck.available ? 'text-green-400' : 'text-red-400'}`}>
+                            {usernameCheck.available ? 
+                              `✓ "${field.value}" is available` : 
+                              usernameCheck.error || `✗ "${field.value}" is already taken`
+                            }
+                          </div>
+                        )}
                         <p className="text-xs text-muted-foreground">
                           2-20 characters, letters and spaces only
                         </p>

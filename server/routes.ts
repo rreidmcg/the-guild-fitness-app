@@ -2846,6 +2846,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check username availability (no auth required - for signup form)
+  app.get("/api/check-username/:username", async (req, res) => {
+    try {
+      const { username } = req.params;
+      
+      if (!username || username.length < 2 || username.length > 20) {
+        return res.json({ available: false, error: "Username must be 2-20 characters" });
+      }
+
+      // Validate username format
+      const validation = validateUsername(username);
+      if (!validation.isValid) {
+        return res.json({ available: false, error: validation.error });
+      }
+
+      // Check if username exists
+      const existingUser = await storage.getUserByUsername(username);
+      const available = !existingUser;
+
+      console.log(`Username check: ${username}, found user:`, existingUser ? 'YES' : 'NO', `available: ${available}`);
+      res.json({ available, username });
+    } catch (error) {
+      console.error("Username check error:", error);
+      res.status(500).json({ available: false, error: "Failed to check username" });
+    }
+  });
+
   // Push notification routes
   app.post("/api/push/subscribe", async (req, res) => {
     try {

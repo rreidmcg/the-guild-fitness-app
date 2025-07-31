@@ -173,13 +173,20 @@ The application follows a monorepo structure with shared TypeScript schemas betw
 
 # Recent Changes
 
-**July 31, 2025 - Enhanced Signup Flow & Incomplete Registration Cleanup:**
+**July 31, 2025 - Enhanced Signup Flow & Real-Time Username Validation:**
 - **Fixed Liability Waiver Authentication Issue**: Removed authentication requirement from liability waiver endpoint since it's part of signup process before user login
 - **Added Avatar Preview Images**: Signup profile questions now display actual male and female character previews using Avatar2D component instead of text buttons
 - **Implemented Registration Cleanup System**: When liability waiver is declined, automatically deletes the user account to free up username and email for future attempts
   - Added cleanup endpoint `/api/auth/cleanup-incomplete-signup` for removing incomplete registrations
   - Added `deleteUser` method to storage interface for complete account removal
   - Enhanced signup flow to call cleanup when waiver is declined, allowing users to retry with same credentials
+- **Real-Time Username Availability Checker**: Added live username validation with visual feedback
+  - Green checkmark (✓) appears when username is available
+  - Red X (✗) appears when username is already taken
+  - Spinning loader shows while checking availability
+  - Case-insensitive checking prevents duplicate usernames
+  - Debounced input (500ms delay) prevents excessive API calls
+  - Helpful availability messages display below input field
 - **Improved User Experience**: Enhanced visual selection with colored borders, hover effects, and proper placeholder text behavior
 
 **July 30, 2025 - Premium Programs & Founders Pack Temporarily Hidden:**
