@@ -174,6 +174,13 @@ export default function DungeonBattlePage() {
     }
   }, [userStats, zoneId]);
 
+  // Auto-open action modal when it's the player's turn
+  useEffect(() => {
+    if (battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && !battleState.showActionModal) {
+      setBattleState(prev => ({ ...prev, showActionModal: true, actionMode: 'main' }));
+    }
+  }, [battleState.isPlayerTurn, battleState.battleResult, battleState.showActionModal]);
+
   const initializeBattle = (zone: DungeonZone) => {
     const firstMonster = zone.monsters[0];
     setBattleState({
@@ -285,28 +292,10 @@ export default function DungeonBattlePage() {
         }}
       />
       
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between p-4 bg-black/70 backdrop-blur-sm">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/pve-dungeons")}
-          className="text-white hover:text-white hover:bg-white/20 font-semibold"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
-        <div className="text-center">
-          <h1 className="text-lg font-bold text-white drop-shadow-lg">{battleState.zone.name}</h1>
-        </div>
-        <div className="text-right text-white">
-          <div className="text-xs font-semibold">Gold</div>
-          <div className="text-sm font-bold text-yellow-400 drop-shadow-lg">{battleState.totalGoldEarned}</div>
-        </div>
-      </div>
+
 
       {/* Battle Scene */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-140px)]">
+      <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]">
         {/* Character Sprites - Battle Field */}
         <div className="flex-1 flex items-end justify-between px-4 md:px-8 pb-32 relative">
           {/* Player Character */}
@@ -332,66 +321,55 @@ export default function DungeonBattlePage() {
       </div>
 
       {/* Bottom Battle UI */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/95 backdrop-blur-sm border-t border-gray-700">
+      <div className="fixed bottom-16 left-0 right-0 z-20 bg-black/90 backdrop-blur-sm border-t border-gray-600">
         {/* Character Stats Row */}
-        <div className="flex justify-between items-center p-3 border-b border-gray-700">
+        <div className="flex h-20">
           {/* Player Stats (Left) */}
-          <div className="flex-1">
-            <div className="text-xs text-gray-400 mb-1">Lv.{userStats.level}</div>
-            <div className="text-sm font-bold text-white mb-1">{userStats.username}</div>
-            <div className="flex space-x-3">
+          <div className="flex-1 p-3 pt-2 border-r border-gray-600">
+            <div className="text-xs text-gray-300 mb-1">Lv.{userStats.level}</div>
+            <div className="text-sm font-bold text-white mb-2">{userStats.username}</div>
+            <div className="space-y-1">
               {/* HP Bar */}
-              <div className="flex-1 min-w-0">
-                <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden">
+              <div className="w-24">
+                <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
                     style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
                   />
                 </div>
-                <div className="text-xs text-white mt-1">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
+                <div className="text-xs text-white mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
               </div>
               {/* MP Bar */}
-              <div className="flex-1 min-w-0">
-                <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden">
+              <div className="w-24">
+                <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
                     style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
                   />
                 </div>
-                <div className="text-xs text-white mt-1">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
+                <div className="text-xs text-white mt-0.5 font-medium">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
               </div>
             </div>
           </div>
 
           {/* Monster Stats (Right) */}
           {battleState.monster && (
-            <div className="flex-1 text-right">
-              <div className="text-xs text-gray-400 mb-1">Lv.{battleState.monster.level}</div>
-              <div className="text-sm font-bold text-white mb-1">{battleState.monster.name}</div>
+            <div className="flex-1 p-3 pt-2 text-right">
+              <div className="text-xs text-gray-300 mb-1">Lv.{battleState.monster.level}</div>
+              <div className="text-sm font-bold text-white mb-2">{battleState.monster.name}</div>
               <div className="flex justify-end">
-                <div className="flex-1 min-w-0 max-w-32">
-                  <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden">
+                <div className="w-24">
+                  <div className="bg-gray-700 rounded-full h-2 relative overflow-hidden border border-gray-500">
                     <div 
                       className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300"
                       style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
                     />
                   </div>
-                  <div className="text-xs text-white mt-1">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
+                  <div className="text-xs text-white mt-0.5 font-medium">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
                 </div>
               </div>
             </div>
           )}
-        </div>
-
-        {/* Action Button */}
-        <div className="p-4">
-          <Button
-            onClick={() => setBattleState(prev => ({ ...prev, showActionModal: true }))}
-            disabled={!battleState.isPlayerTurn || battleState.battleResult !== 'ongoing' || attackMutation.isPending}
-            className="w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-3"
-          >
-            {battleState.isPlayerTurn ? "Your Turn" : "Enemy Turn"}
-          </Button>
         </div>
       </div>
 
