@@ -731,7 +731,7 @@ export default function WorkoutBuilder() {
                   </div>
 
                   {/* Sets Table */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-4">
                     {(() => {
                       // Get tracking fields for this exercise
                       const trackingFields = (exercise as any)?.trackingFields || ['reps', 'weight', 'RIR'];
