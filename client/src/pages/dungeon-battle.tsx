@@ -393,11 +393,11 @@ export default function DungeonBattlePage() {
 
   return (
     <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
-      {/* Dynamic Background based on zone */}
+      {/* Forest Background */}
       <div 
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: `url(${battleState.zone?.id === 'slime_caverns' ? sunsetForestBg : forestBackgroundImage})`,
+          backgroundImage: `url(${forestBackgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -514,8 +514,8 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Circular Icon Battle Interface */}
-      <div className="fixed bottom-16 left-0 right-0 z-30 bg-black/80 backdrop-blur-md border-t-2 border-blue-400/50" style={{ boxShadow: '0 -4px 20px rgba(0,0,0,0.6), inset 0 2px 4px rgba(59, 130, 246, 0.2)' }}>
+      {/* Circular Icon Battle Interface - Transparent */}
+      <div className="fixed bottom-16 left-0 right-0 z-30">
         {/* Mobile & Desktop Layout - Circular buttons */}
         <div className="p-4 md:p-6">
           {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
