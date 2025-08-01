@@ -166,6 +166,10 @@ interface BattleState {
   currentMonsterIndex: number;
   totalGoldEarned: number;
   zone: DungeonZone | null;
+  playerLunging: boolean;
+  monsterLunging: boolean;
+  playerDamage: number | null;
+  monsterDamage: number | null;
 }
 
 
@@ -187,7 +191,11 @@ export default function DungeonBattlePage() {
     battleResult: 'ongoing',
     currentMonsterIndex: 0,
     totalGoldEarned: 0,
-    zone: null
+    zone: null,
+    playerLunging: false,
+    monsterLunging: false,
+    playerDamage: null,
+    monsterDamage: null
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -280,16 +288,48 @@ export default function DungeonBattlePage() {
   });
 
   const handleBattleResult = (data: any) => {
+    // Extract damage numbers from battle log
+    const playerDamageMatch = data.battleLog[0]?.match(/You deal (\d+) damage/);
+    const monsterDamageMatch = data.battleLog[1]?.match(/attacks for (\d+) damage/);
+    
+    const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
+    const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
+
+    // Start lunge animation
     setBattleState(prev => ({
       ...prev,
-      playerHp: data.playerHp,
-      playerMp: data.playerMp,
-      monster: data.monster,
-      battleLog: [...prev.battleLog, ...data.battleLog],
-      battleResult: data.battleResult,
-      totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-      isPlayerTurn: data.battleResult === 'ongoing' ? false : true // Toggle turns properly
+      playerLunging: true,
+      playerDamage: playerDamage
     }));
+
+    // After player lunge, show monster counter if applicable
+    setTimeout(() => {
+      setBattleState(prev => ({
+        ...prev,
+        playerHp: data.playerHp,
+        playerMp: data.playerMp,
+        monster: data.monster,
+        battleLog: [...prev.battleLog, ...data.battleLog],
+        battleResult: data.battleResult,
+        totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
+        isPlayerTurn: data.battleResult === 'ongoing' ? true : true, // Keep player turn active for continuous attacks
+        playerLunging: false,
+        monsterLunging: monsterDamage !== null,
+        monsterDamage: monsterDamage,
+        playerDamage: null
+      }));
+
+      // Clear monster animation after delay
+      if (monsterDamage !== null) {
+        setTimeout(() => {
+          setBattleState(prev => ({
+            ...prev,
+            monsterLunging: false,
+            monsterDamage: null
+          }));
+        }, 800);
+      }
+    }, 800);
 
     if (data.battleResult === 'victory') {
       // Move to next monster or complete dungeon
@@ -461,10 +501,26 @@ export default function DungeonBattlePage() {
               className="absolute bottom-0 w-16 h-4 bg-black/30 rounded-full blur-sm"
               style={{ transform: 'translateY(10px)' }}
             />
-            <Avatar2D 
-              playerStats={userStats}
-              className="w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10"
-            />
+            <div className="relative">
+              <Avatar2D 
+                playerStats={userStats}
+                className={`w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10 transition-transform duration-300 ${
+                  battleState.playerLunging ? 'translate-x-8 scale-110' : ''
+                }`}
+              />
+              {/* Player Damage Number */}
+              {battleState.playerDamage && (
+                <div 
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-orange-400 animate-bounce z-20"
+                  style={{ 
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                    animation: 'float-up 1s ease-out forwards'
+                  }}
+                >
+                  -{battleState.playerDamage}
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Monster Sprite with shadow and positioning */}
@@ -475,15 +531,31 @@ export default function DungeonBattlePage() {
                 className="absolute bottom-0 w-24 h-6 bg-black/30 rounded-full blur-sm"
                 style={{ transform: 'translateY(-5px)' }}
               />
-              <img 
-                src={battleState.monster.image} 
-                alt={battleState.monster.name}
-                className="w-36 h-36 sm:w-48 sm:h-48 md:w-72 md:h-72 object-contain relative z-10"
-                style={{ 
-                  imageRendering: 'pixelated',
-                  filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
-                }}
-              />
+              <div className="relative">
+                <img 
+                  src={battleState.monster.image} 
+                  alt={battleState.monster.name}
+                  className={`w-36 h-36 sm:w-48 sm:h-48 md:w-72 md:h-72 object-contain relative z-10 transition-transform duration-300 ${
+                    battleState.monsterLunging ? '-translate-x-8 scale-110' : ''
+                  }`}
+                  style={{ 
+                    imageRendering: 'pixelated',
+                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                  }}
+                />
+                {/* Monster Damage Number */}
+                {battleState.monsterDamage && (
+                  <div 
+                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-red-400 animate-bounce z-20"
+                    style={{ 
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                      animation: 'float-up 1s ease-out forwards'
+                    }}
+                  >
+                    -{battleState.monsterDamage}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
