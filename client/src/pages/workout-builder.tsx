@@ -14,6 +14,8 @@ import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, Chevro
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import type { Exercise } from "@shared/schema";
 
 interface WorkoutSection {
@@ -83,6 +85,7 @@ export default function WorkoutBuilder() {
   const [showExerciseDetails, setShowExerciseDetails] = useState<WorkoutExercise | null>(null);
   const [isEditingExercise, setIsEditingExercise] = useState(false);
   const [editedExercise, setEditedExercise] = useState<any>(null);
+  const [openExerciseCombobox, setOpenExerciseCombobox] = useState<string | null>(null);
 
   const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
     queryKey: ["/api/exercises"],
@@ -552,34 +555,60 @@ export default function WorkoutBuilder() {
                         <span className="text-xs font-medium">Ex</span>
                       </div>
                       <div className="flex-1">
-                        {/* Editable Exercise Name */}
-                        <Select 
-                          value={exercise.exerciseId?.toString() || ''} 
-                          onValueChange={(value) => {
-                            if (currentSection && currentSection.exercises) {
-                              const selectedExercise = Array.isArray(exercises) ? exercises.find((ex: any) => ex.id === parseInt(value)) : null;
-                              const updatedExercises = currentSection.exercises.map(ex => 
-                                ex.id === exercise.id 
-                                  ? {...ex, exerciseId: parseInt(value), exercise: selectedExercise}
-                                  : ex
-                              );
-                              setCurrentSection({...currentSection, exercises: updatedExercises});
-                            }
-                          }}
+                        {/* Editable Exercise Name with Combobox */}
+                        <Popover 
+                          open={openExerciseCombobox === exercise.id} 
+                          onOpenChange={(open) => setOpenExerciseCombobox(open ? exercise.id : null)}
                         >
-                          <SelectTrigger className="h-8 border-0 bg-transparent p-0 text-left font-semibold text-foreground hover:text-primary focus:ring-0">
-                            <SelectValue placeholder="Select exercise">
-                              {exercise.exercise?.name || 'Select exercise'}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent className="max-h-48">
-                            {Array.isArray(exercises) && exercises.map((ex: any) => (
-                              <SelectItem key={ex.id} value={ex.id.toString()} className="text-foreground">
-                                {ex.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              role="combobox"
+                              className="h-8 border-0 bg-transparent p-0 text-left font-semibold text-foreground hover:text-primary focus:ring-0 justify-start"
+                            >
+                              {exercise.exercise?.name || 'Select exercise...'}
+                              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80 p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search exercises..." />
+                              <CommandEmpty>No exercise found.</CommandEmpty>
+                              <CommandGroup className="max-h-48 overflow-y-auto">
+                                {Array.isArray(exercises) && exercises.map((ex: any) => (
+                                  <CommandItem
+                                    key={ex.id}
+                                    value={ex.name}
+                                    onSelect={() => {
+                                      if (currentSection && currentSection.exercises) {
+                                        const updatedExercises = currentSection.exercises.map(currentEx => 
+                                          currentEx.id === exercise.id 
+                                            ? {...currentEx, exerciseId: ex.id, exercise: ex}
+                                            : currentEx
+                                        );
+                                        setCurrentSection({...currentSection, exercises: updatedExercises});
+                                      }
+                                      setOpenExerciseCombobox(null);
+                                    }}
+                                    className="cursor-pointer"
+                                  >
+                                    <Check
+                                      className={`mr-2 h-4 w-4 ${
+                                        exercise.exerciseId === ex.id ? "opacity-100" : "opacity-0"
+                                      }`}
+                                    />
+                                    <div>
+                                      <div className="font-medium">{ex.name}</div>
+                                      <div className="text-xs text-muted-foreground capitalize">
+                                        {ex.category} • {ex.muscleGroups?.join(', ') || 'No muscle groups'}
+                                      </div>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         {exercise.supersetGroup && (
                           <Badge variant="secondary" className="text-xs mt-1">
                             Superset {exercise.supersetGroup}
