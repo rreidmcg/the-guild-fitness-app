@@ -1,5 +1,5 @@
-/* Text readability fixes - exclude admin panel */
-body:not(:has([data-admin-panel])) .text-white {
+/* Text readability fixes */
+.text-white {
   color: rgb(20, 20, 20) !important;
   font-weight: 700 !important;
 }
@@ -9,18 +9,17 @@ body:not(:has([data-admin-panel])) .text-white {
   color: white !important;
 }
 
-body:not(:has([data-admin-panel])) .text-gray-300,
-body:not(:has([data-admin-panel])) .text-gray-400 {
+.text-gray-300, .text-gray-400 {
   color: rgb(40, 40, 40) !important;
   font-weight: 600 !important;
 }
 
-body:not(:has([data-admin-panel])) .text-muted-foreground {
+.text-muted-foreground {
   color: rgb(60, 60, 60) !important;
   font-weight: 600 !important;
 }
 
-body:not(:has([data-admin-panel])) .text-foreground {
+.text-foreground {
   color: rgb(30, 30, 30) !important;
   font-weight: 600 !important;
 }
@@ -41,9 +40,8 @@ p, span, div, h1, h2, h3, h4, h5, h6 {
   font-weight: 800 !important;
 }
 
-/* Card text improvements - exclude admin panel */
-body:not(:has([data-admin-panel])) .bg-game-slate,
-body:not(:has([data-admin-panel])) .bg-card {
+/* Card text improvements */
+.bg-game-slate, .bg-card {
   background-color: rgb(255, 255, 255) !important;
   border: 1px solid rgb(229, 231, 235) !important;
 }

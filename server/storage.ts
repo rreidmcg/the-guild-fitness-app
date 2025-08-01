@@ -1656,7 +1656,9 @@ Start your fitness journey today and watch your character grow stronger with eve
 
 **The Guild Development Team**`,
       mailType: "announcement",
+      isRead: false,
       rewards: null,
+      rewardsClaimed: false,
       expiresAt: null
     };
 

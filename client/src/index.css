@@ -72,10 +72,6 @@
   .stat-bar {
     background: linear-gradient(90deg, var(--game-primary) 0%, var(--game-secondary) 100%);
   }
-  
-  .bg-game-slate {
-    background-color: var(--game-slate);
-  }
 
   /* Prevent autofill from changing input background colors */
   input:-webkit-autofill,
