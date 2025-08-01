@@ -12,7 +12,7 @@ import {
   Crown
 } from "lucide-react";
 import dungeonsTitle from "@assets/9DCDA11D-2AD4-4DF9-AC4D-62C0709560C2_1753842591713.png";
-import arenaTitle from "@assets/8766C8BA-47EA-492D-89E1-F4B7417B2A77_1753842660569.png";
+import arenaTitle from "@assets/68542DD6-45F1-4C55-B33F-CC59C71FE8FA_1754018912124.png";
 
 // User stats type to match the API response
 interface UserStats {
