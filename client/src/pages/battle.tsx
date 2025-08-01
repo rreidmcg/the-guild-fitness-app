@@ -156,18 +156,11 @@ export default function BattlePage() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-between">
-                <div className="text-left">
+              <div className="flex items-center justify-center">
+                <div className="text-center">
                   <div className="text-sm text-muted-foreground">Your Level</div>
                   <div className="text-xl font-bold text-green-400">{userLevel}</div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  className="border-green-500 text-green-400 hover:bg-green-500/20"
-                >
-                  Enter Dungeons
-                  <ChevronRight className="h-4 w-4 ml-2" />
-                </Button>
               </div>
             </div>
           </CardContent>
