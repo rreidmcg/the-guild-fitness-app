@@ -9,7 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { BattleLoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Sword, 
   Shield, 
   Heart, 
   Zap, 
@@ -23,6 +22,7 @@ import {
   Play,
   LogOut
 } from "lucide-react";
+import swordIconImage from "@assets/IMG_3799_1754013496468.png";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -466,7 +466,11 @@ export default function DungeonBattlePage() {
                 {attackMutation.isPending ? (
                   <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-white"></div>
                 ) : (
-                  <Sword className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                  <img 
+                    src={swordIconImage} 
+                    alt="Attack" 
+                    className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                  />
                 )}
               </button>
               
