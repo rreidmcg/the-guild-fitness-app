@@ -212,7 +212,7 @@ export default function WorkoutOverview() {
                               {Array.from({length: setsCount}, (_, i) => {
                                 const setDisplay = isTimeBasedExercise && displayDuration ? 
                                   `${displayDuration} min` : 
-                                  `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`;
+                                  `${reps} reps`;
                                 return setDisplay;
                               }).join(', ')}
                             </div>
@@ -269,7 +269,7 @@ export default function WorkoutOverview() {
                                   {Array.from({length: setsCount}, (_, i) => {
                                     const setDisplay = isTimeBasedExercise && displayDuration ? 
                                       `${displayDuration} min` : 
-                                      `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`;
+                                      `${reps} reps`;
                                     return setDisplay;
                                   }).join(', ')}
                                 </div>
