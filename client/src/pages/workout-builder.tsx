@@ -96,7 +96,7 @@ export default function WorkoutBuilder() {
 
   // Load existing workout data when available
   useEffect(() => {
-    if (existingWorkout && isEditMode && exercises && exercises.length > 0 && !exercisesLoading && !workoutLoading) {
+    if (existingWorkout && isEditMode && Array.isArray(exercises) && exercises.length > 0 && !exercisesLoading && !workoutLoading) {
       const workout = existingWorkout as any;
       setWorkoutName(workout.name || "");
       setWorkoutDescription(workout.description || "");
@@ -111,7 +111,7 @@ export default function WorkoutBuilder() {
           
           // If no section is specified, auto-group by exercise category
           if (!sectionName) {
-            const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
+            const exerciseDetails = Array.isArray(exercises) ? exercises.find((ex: any) => ex.id === exercise.exerciseId) : null;
             const category = exerciseDetails?.category;
             
             switch (category) {
@@ -144,22 +144,26 @@ export default function WorkoutBuilder() {
           name: sectionName,
           format: 'regular',
           type: sectionName === 'Warm Up' ? 'warmup' : sectionName === 'Cool Down' ? 'cooldown' : 'workout',
-          exercises: sectionExercises.map((ex: any, index: number) => ({
-            id: `exercise-${sectionIndex}-${index}`,
-            exerciseId: ex.exerciseId || ex.id,
-            exercise: ex.exercise || ex,
-            sets: Array.isArray(ex.sets) ? ex.sets : Array.from({length: ex.sets || 1}, (_, i) => ({
-              id: `set-${i+1}`,
-              type: 'R' as const,
-              reps: ex.reps || 10,
-              weight: ex.weight || 0,
-              duration: ex.duration || undefined,
-              rest: ex.restTime ? `${ex.restTime}s` : undefined
-            })),
-            notes: ex.notes || "",
-            eachSide: ex.eachSide || false,
-            tempo: ex.tempo || []
-          }))
+          exercises: sectionExercises.map((ex: any, index: number) => {
+            // Find the exercise details from the exercises database
+            const exerciseDetails = Array.isArray(exercises) ? exercises.find((e: any) => e.id === (ex.exerciseId || ex.id)) : null;
+            return {
+              id: `exercise-${sectionIndex}-${index}`,
+              exerciseId: ex.exerciseId || ex.id,
+              exercise: exerciseDetails || ex.exercise || ex,
+              sets: Array.isArray(ex.sets) ? ex.sets : Array.from({length: ex.sets || 1}, (_, i) => ({
+                id: `set-${i+1}`,
+                type: 'R' as const,
+                reps: ex.reps || 10,
+                weight: ex.weight || 0,
+                duration: ex.duration || undefined,
+                rest: ex.restTime ? `${ex.restTime}s` : undefined
+              })),
+              notes: ex.notes || "",
+              eachSide: ex.eachSide || false,
+              tempo: ex.tempo || []
+            };
+          })
         }));
         
         setSections(workoutSections);
