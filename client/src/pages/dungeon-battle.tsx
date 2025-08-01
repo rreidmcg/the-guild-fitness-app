@@ -455,26 +455,27 @@ export default function DungeonBattlePage() {
         {/* Mobile & Desktop Layout - Circular buttons */}
         <div className="p-4 md:p-6">
           {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-            <div className="flex justify-center items-center space-x-8 md:space-x-12">
-              {/* Attack Button */}
+            <div className="flex justify-center items-center space-x-8 md:space-x-12 relative">
+              {/* Attack Button - Larger and positioned */}
               <button 
-                className="w-16 h-16 md:w-20 md:h-20 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-32 h-32 md:w-40 md:h-40 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 onClick={handleAttack}
                 disabled={attackMutation.isPending}
+                style={{ transform: 'translate(50px, 50px)' }}
               >
                 {attackMutation.isPending ? (
-                  <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-2 border-white"></div>
                 ) : (
                   <img 
                     src={swordIconImage} 
                     alt="Attack" 
-                    className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                    className="w-32 h-32 md:w-40 md:h-40 object-contain"
                     style={{ imageRendering: 'pixelated' }}
                   />
                 )}
               </button>
               
-              {/* Flee Button */}
+              {/* Flee Button - Same size, moved down only */}
               <button 
                 className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                 onClick={() => {
@@ -482,6 +483,7 @@ export default function DungeonBattlePage() {
                     handleRetreat();
                   }
                 }}
+                style={{ transform: 'translate(0px, 50px)' }}
               >
                 <img 
                   src={fleeButtonIcon} 
