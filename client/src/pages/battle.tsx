@@ -3,6 +3,7 @@ import { useNavigate } from "@/hooks/use-navigate";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BottomNav } from "@/components/ui/bottom-nav";
 import { BattleLoadingState } from "@/components/ui/loading-spinner";
 import { 
   Sword, 
@@ -210,6 +211,9 @@ export default function BattlePage() {
         </div>
         </div>
       </div>
+      
+      {/* Bottom Navigation */}
+      <BottomNav />
     </div>
   );
 }
