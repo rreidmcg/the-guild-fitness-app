@@ -557,89 +557,95 @@ export default function WorkoutBuilder() {
                       </div>
                       <div className="flex-1">
                         {/* Editable Exercise Name with Inline Combobox */}
-                        <Popover 
-                          open={openExerciseCombobox === exercise.id} 
-                          onOpenChange={(open) => setOpenExerciseCombobox(open ? exercise.id : null)}
-                        >
-                          <PopoverTrigger asChild>
-                            <div className="relative">
-                              <Input
-                                value={exerciseSearchTerms[exercise.id] || exercise.exercise?.name || ''}
-                                placeholder="Type to search exercises..."
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  setExerciseSearchTerms(prev => ({
-                                    ...prev,
-                                    [exercise.id]: value
-                                  }));
-                                  // Open dropdown when typing
-                                  if (!openExerciseCombobox) {
-                                    setOpenExerciseCombobox(exercise.id);
-                                  }
-                                }}
-                                onFocus={() => {
-                                  setOpenExerciseCombobox(exercise.id);
-                                  // Initialize search term with current exercise name if not already set
-                                  if (!exerciseSearchTerms[exercise.id]) {
+                        <div className="relative">
+                          <Input
+                            value={exerciseSearchTerms[exercise.id] !== undefined ? exerciseSearchTerms[exercise.id] : exercise.exercise?.name || ''}
+                            placeholder="Type to search exercises..."
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setExerciseSearchTerms(prev => ({
+                                ...prev,
+                                [exercise.id]: value
+                              }));
+                              // Open dropdown when typing
+                              setOpenExerciseCombobox(exercise.id);
+                            }}
+                            onFocus={() => {
+                              setOpenExerciseCombobox(exercise.id);
+                              // Initialize search term with current exercise name if not already set
+                              if (exerciseSearchTerms[exercise.id] === undefined) {
+                                setExerciseSearchTerms(prev => ({
+                                  ...prev,
+                                  [exercise.id]: exercise.exercise?.name || ''
+                                }));
+                              }
+                            }}
+                            onBlur={(e) => {
+                              // Delay closing to allow for clicks on dropdown items
+                              setTimeout(() => {
+                                if (!e.currentTarget.contains(document.activeElement)) {
+                                  setOpenExerciseCombobox(null);
+                                }
+                              }, 150);
+                            }}
+                            className="h-8 border-0 bg-transparent p-0 pr-6 text-left font-semibold text-foreground focus:ring-0 focus-visible:ring-0 cursor-text"
+                          />
+                          <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          
+                          {/* Dropdown */}
+                          {openExerciseCombobox === exercise.id && (
+                            <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border rounded-md shadow-md max-h-48 overflow-y-auto">
+                              {Array.isArray(exercises) && exercises
+                                .filter((ex: any) => {
+                                  const searchTerm = exerciseSearchTerms[exercise.id] || '';
+                                  return ex.name.toLowerCase().includes(searchTerm.toLowerCase());
+                                })
+                                .map((ex: any) => (
+                                <div
+                                  key={ex.id}
+                                  onClick={() => {
+                                    if (currentSection && currentSection.exercises) {
+                                      const updatedExercises = currentSection.exercises.map(currentEx => 
+                                        currentEx.id === exercise.id 
+                                          ? {...currentEx, exerciseId: ex.id, exercise: ex}
+                                          : currentEx
+                                      );
+                                      setCurrentSection({...currentSection, exercises: updatedExercises});
+                                    }
+                                    // Update search term and close dropdown
                                     setExerciseSearchTerms(prev => ({
                                       ...prev,
-                                      [exercise.id]: exercise.exercise?.name || ''
+                                      [exercise.id]: ex.name
                                     }));
-                                  }
-                                }}
-                                className="h-8 border-0 bg-transparent p-0 text-left font-semibold text-foreground focus:ring-0 focus-visible:ring-0"
-                              />
-                              <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                            </div>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-80 p-0" align="start">
-                            <Command>
-                              <CommandEmpty>No exercise found.</CommandEmpty>
-                              <CommandGroup className="max-h-48 overflow-y-auto">
-                                {Array.isArray(exercises) && exercises
-                                  .filter((ex: any) => {
-                                    const searchTerm = exerciseSearchTerms[exercise.id] || '';
-                                    return ex.name.toLowerCase().includes(searchTerm.toLowerCase());
-                                  })
-                                  .map((ex: any) => (
-                                  <CommandItem
-                                    key={ex.id}
-                                    value={ex.name}
-                                    onSelect={() => {
-                                      if (currentSection && currentSection.exercises) {
-                                        const updatedExercises = currentSection.exercises.map(currentEx => 
-                                          currentEx.id === exercise.id 
-                                            ? {...currentEx, exerciseId: ex.id, exercise: ex}
-                                            : currentEx
-                                        );
-                                        setCurrentSection({...currentSection, exercises: updatedExercises});
-                                      }
-                                      // Clear search term and close dropdown
-                                      setExerciseSearchTerms(prev => ({
-                                        ...prev,
-                                        [exercise.id]: ex.name
-                                      }));
-                                      setOpenExerciseCombobox(null);
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    <Check
-                                      className={`mr-2 h-4 w-4 ${
-                                        exercise.exerciseId === ex.id ? "opacity-100" : "opacity-0"
-                                      }`}
-                                    />
-                                    <div>
-                                      <div className="font-medium">{ex.name}</div>
-                                      <div className="text-xs text-muted-foreground capitalize">
-                                        {ex.category} • {ex.muscleGroups?.join(', ') || 'No muscle groups'}
-                                      </div>
+                                    setOpenExerciseCombobox(null);
+                                  }}
+                                  className="flex items-center gap-2 px-3 py-2 hover:bg-accent cursor-pointer text-sm"
+                                >
+                                  <Check
+                                    className={`h-4 w-4 ${
+                                      exercise.exerciseId === ex.id ? "opacity-100" : "opacity-0"
+                                    }`}
+                                  />
+                                  <div className="flex-1">
+                                    <div className="font-medium">{ex.name}</div>
+                                    <div className="text-xs text-muted-foreground capitalize">
+                                      {ex.category} • {ex.muscleGroups?.join(', ') || 'No muscle groups'}
                                     </div>
-                                  </CommandItem>
-                                ))}
-                              </CommandGroup>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
+                                  </div>
+                                </div>
+                              ))}
+                              {Array.isArray(exercises) && exercises
+                                .filter((ex: any) => {
+                                  const searchTerm = exerciseSearchTerms[exercise.id] || '';
+                                  return ex.name.toLowerCase().includes(searchTerm.toLowerCase());
+                                }).length === 0 && (
+                                <div className="px-3 py-2 text-sm text-muted-foreground">
+                                  No exercises found
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                         {exercise.supersetGroup && (
                           <Badge variant="secondary" className="text-xs mt-1">
                             Superset {exercise.supersetGroup}
