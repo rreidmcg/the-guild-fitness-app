@@ -307,34 +307,55 @@ export default function DungeonBattlePage() {
       monsterFlashing: playerDamage !== null
     }));
 
-    // After player lunge, show monster counter if applicable
+    // After player lunge, clear player attack effects
     setTimeout(() => {
       setBattleState(prev => ({
         ...prev,
-        playerHp: data.playerHp,
-        playerMp: data.playerMp,
-        monster: data.monster,
-        battleLog: [...prev.battleLog, ...data.battleLog],
-        battleResult: data.battleResult,
-        totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-        isPlayerTurn: data.battleResult === 'ongoing' ? true : true, // Keep player turn active for continuous attacks
         playerLunging: false,
-        monsterLunging: monsterDamage !== null,
-        monsterDamage: monsterDamage,
         playerDamage: null,
-        monsterFlashing: false,
-        playerFlashing: monsterDamage !== null
+        monsterFlashing: false
       }));
 
-      // Clear all animations after delay
-      setTimeout(() => {
+      // Pause before monster counter-attack
+      if (monsterDamage !== null) {
+        setTimeout(() => {
+          setBattleState(prev => ({
+            ...prev,
+            playerHp: data.playerHp,
+            playerMp: data.playerMp,
+            monster: data.monster,
+            battleLog: [...prev.battleLog, ...data.battleLog],
+            battleResult: data.battleResult,
+            totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
+            isPlayerTurn: data.battleResult === 'ongoing' ? true : true, // Keep player turn active for continuous attacks
+            monsterLunging: true,
+            monsterDamage: monsterDamage,
+            playerFlashing: true
+          }));
+
+          // Clear monster attack effects
+          setTimeout(() => {
+            setBattleState(prev => ({
+              ...prev,
+              monsterLunging: false,
+              monsterDamage: null,
+              playerFlashing: false
+            }));
+          }, 800);
+        }, 600); // Pause between attacks
+      } else {
+        // No monster counter-attack, just update state
         setBattleState(prev => ({
           ...prev,
-          monsterLunging: false,
-          monsterDamage: null,
-          playerFlashing: false
+          playerHp: data.playerHp,
+          playerMp: data.playerMp,
+          monster: data.monster,
+          battleLog: [...prev.battleLog, ...data.battleLog],
+          battleResult: data.battleResult,
+          totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
+          isPlayerTurn: data.battleResult === 'ongoing' ? true : true
         }));
-      }, 800);
+      }
     }, 800);
 
     if (data.battleResult === 'victory') {
