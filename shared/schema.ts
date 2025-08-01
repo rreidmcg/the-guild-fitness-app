@@ -252,6 +252,7 @@ export const monsters = pgTable("monsters", {
   tier: text("tier").notNull(), // E, D, C, B, A, S
   level: integer("level").notNull(),
   maxHp: integer("max_hp").notNull(),
+  currentHp: integer("current_hp").notNull().default(0), // Current HP for battle tracking
   attack: integer("attack").notNull(),
   goldReward: integer("gold_reward").default(0),
   description: text("description"),

@@ -10,6 +10,7 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const [, setLocation] = useLocation();
+  const [location] = useLocation();
   const [isChecking, setIsChecking] = useState(true);
 
   // Check authentication status
@@ -42,16 +43,20 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }
 
   // If we get here, user is authenticated - show with UI chrome
+  const isBattlePage = location.startsWith('/battle') || location.includes('dungeon-battle');
+  
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Fixed Currency Header */}
-      <CurrencyHeader />
+      {/* Fixed Currency Header - also hide on battle pages */}
+      {!isBattlePage && <CurrencyHeader />}
       
-      {/* Main content with top padding to account for fixed header */}
-      <div className="pt-12 pb-20">
+      {/* Main content with conditional padding */}
+      <div className={isBattlePage ? "" : "pt-12 pb-20"}>
         {children}
       </div>
-      <BottomNav />
+      
+      {/* Bottom Navigation - hide on battle pages */}
+      {!isBattlePage && <BottomNav />}
     </div>
   );
 }
