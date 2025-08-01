@@ -13,7 +13,7 @@ import { WorkoutLoadingState } from "@/components/ui/loading-spinner";
 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Play, Pause, Square, Check, Target } from "lucide-react";
+import { ArrowLeft, Play, Pause, Square, Check, Target, ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react";
 import type { User } from "@shared/schema";
 
 export default function WorkoutSession() {
@@ -26,6 +26,7 @@ export default function WorkoutSession() {
   const [time, setTime] = useState(0);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [exerciseData, setExerciseData] = useState<any[]>([]);
+  const [completedSets, setCompletedSets] = useState<Record<string, boolean>>({});
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [completedSession, setCompletedSession] = useState<any>(null);
   const [perceivedEffort, setPerceivedEffort] = useState(7); // RPE scale 1-10
@@ -102,6 +103,51 @@ export default function WorkoutSession() {
 
   const handleStartPause = () => {
     setIsActive(!isActive);
+  };
+
+  const toggleSetCompletion = (exerciseIndex: number, setIndex: number) => {
+    const setKey = `${exerciseIndex}-${setIndex}`;
+    setCompletedSets(prev => ({
+      ...prev,
+      [setKey]: !prev[setKey]
+    }));
+  };
+
+  const isSetCompleted = (exerciseIndex: number, setIndex: number) => {
+    const setKey = `${exerciseIndex}-${setIndex}`;
+    return completedSets[setKey] || false;
+  };
+
+  const getCurrentExerciseSets = () => {
+    if (currentExerciseIndex >= exerciseData.length) return [];
+    const currentExercise = exerciseData[currentExerciseIndex];
+    
+    // Generate sets based on the exercise data structure
+    if (currentExercise.sets && Array.isArray(currentExercise.sets)) {
+      return currentExercise.sets;
+    } else if (currentExercise.sets && typeof currentExercise.sets === 'number') {
+      // If sets is a number, create that many sets with reps/duration from exercise
+      return Array.from({ length: currentExercise.sets }, (_, index) => ({
+        id: `set-${index}`,
+        reps: currentExercise.reps,
+        weight: currentExercise.weight,
+        duration: currentExercise.duration,
+        type: 'R' // Regular set
+      }));
+    }
+    return [];
+  };
+
+  const goToNextExercise = () => {
+    if (currentExerciseIndex < exerciseData.length - 1) {
+      setCurrentExerciseIndex(currentExerciseIndex + 1);
+    }
+  };
+
+  const goToPreviousExercise = () => {
+    if (currentExerciseIndex > 0) {
+      setCurrentExerciseIndex(currentExerciseIndex - 1);
+    }
   };
 
   // Loading skeleton component
@@ -270,28 +316,127 @@ export default function WorkoutSession() {
           </CardContent>
         </Card>
 
-        {/* Current Exercise */}
+        {/* Current Exercise Card */}
         <Card className="bg-card border-border mb-8 transform transition-all duration-300 hover:scale-105 animate-in fade-in slide-in-from-bottom-4 delay-150">
           <CardHeader>
-            <CardTitle className="text-foreground animate-in fade-in duration-500 delay-300">Current Exercise</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-foreground animate-in fade-in duration-500 delay-300">
+                {exerciseData.length > 0 && currentExerciseIndex < exerciseData.length 
+                  ? `Exercise ${currentExerciseIndex + 1} of ${exerciseData.length}`
+                  : 'Start Your Workout'
+                }
+              </CardTitle>
+              {exerciseData.length > 0 && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousExercise}
+                    disabled={currentExerciseIndex === 0}
+                    className="p-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextExercise}
+                    disabled={currentExerciseIndex >= exerciseData.length - 1}
+                    className="p-2"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {exerciseData.length > 0 && currentExerciseIndex < exerciseData.length ? (
-              <div className="text-center py-8">
-                <div className="w-20 h-20 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-500 hover:scale-110 animate-in zoom-in delay-400">
-                  <Target className="w-10 h-10 !text-white transition-transform duration-300 hover:scale-125" />
+              <div className="space-y-6">
+                {/* Exercise Info */}
+                <div className="text-center pb-4 border-b border-border">
+                  <div className="w-20 h-20 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4 transform transition-all duration-500 hover:scale-110 animate-in zoom-in delay-400">
+                    <Target className="w-10 h-10 !text-white transition-transform duration-300 hover:scale-125" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-1 text-foreground animate-in fade-in slide-in-from-bottom-2 delay-500">
+                    {exerciseData[currentExerciseIndex]?.name || "Exercise"}
+                  </h3>
+                  {exerciseData[currentExerciseIndex]?.eachSide && (
+                    <p className="text-sm text-orange-400 font-medium mb-2 animate-in fade-in slide-in-from-bottom-2 delay-600">
+                      Each side
+                    </p>
+                  )}
                 </div>
-                <h3 className="text-2xl font-bold mb-1 text-foreground animate-in fade-in slide-in-from-bottom-2 delay-500">
-                  {exerciseData[currentExerciseIndex]?.name || "Exercise"}
-                </h3>
-                {exerciseData[currentExerciseIndex]?.eachSide && (
-                  <p className="text-sm text-orange-400 font-medium mb-2 animate-in fade-in slide-in-from-bottom-2 delay-600">
-                    Each side
-                  </p>
+
+                {/* Sets List */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-foreground mb-3">Sets</h4>
+                  {getCurrentExerciseSets().map((set: any, setIndex: number) => {
+                    const isCompleted = isSetCompleted(currentExerciseIndex, setIndex);
+                    return (
+                      <div
+                        key={setIndex}
+                        className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-200 ${
+                          isCompleted 
+                            ? 'bg-green-500/10 border-green-500/30 text-foreground' 
+                            : 'bg-muted/30 border-border hover:bg-muted/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+                            {setIndex + 1}
+                          </span>
+                          <div>
+                            <div className="font-medium text-foreground">
+                              {set.duration 
+                                ? `${set.duration} ${typeof set.duration === 'number' ? 'sec' : ''}`
+                                : `${set.reps || 12} reps`
+                              }
+                              {set.weight && ` @ ${set.weight}lbs`}
+                            </div>
+                            {set.type && set.type !== 'R' && (
+                              <div className="text-xs text-muted-foreground">
+                                {set.type === 'W' ? 'Warm-up' : 
+                                 set.type === 'D' ? 'Drop set' : 
+                                 set.type === 'F' ? 'To failure' : 'Regular'}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <Button
+                          variant={isCompleted ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => toggleSetCompletion(currentExerciseIndex, setIndex)}
+                          className={`${isCompleted 
+                            ? 'bg-green-600 hover:bg-green-700 text-white' 
+                            : 'hover:bg-green-50 hover:border-green-300 dark:hover:bg-green-900/20'
+                          } transition-all duration-200`}
+                        >
+                          {isCompleted ? (
+                            <CheckCircle2 className="w-4 h-4" />
+                          ) : (
+                            <Check className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Next Exercise Button */}
+                {currentExerciseIndex < exerciseData.length - 1 && (
+                  <div className="pt-4 border-t border-border">
+                    <Button
+                      onClick={goToNextExercise}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      size="lg"
+                    >
+                      Next Exercise
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
                 )}
-                <p className="text-muted-foreground animate-in fade-in slide-in-from-bottom-2 delay-700">
-                  {exerciseData[currentExerciseIndex]?.sets?.length || 0} sets configured
-                </p>
               </div>
             ) : (
               <div className="text-center py-12">
@@ -313,28 +458,52 @@ export default function WorkoutSession() {
           <CardContent>
             {exerciseData.length > 0 ? (
               <div className="space-y-3 animate-in fade-in delay-800">
-                {exerciseData.map((exercise, index) => (
-                  <div 
-                    key={index}
-                    className={`p-3 rounded-lg border transition-all duration-200 ${
-                      index === currentExerciseIndex 
-                        ? 'bg-primary/10 border-primary/30 text-foreground' 
-                        : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium">{exercise.name}</h4>
-                        {exercise.eachSide && (
-                          <p className="text-xs text-orange-400">Each side</p>
-                        )}
-                      </div>
-                      <div className="text-sm">
-                        {exercise.sets?.length || 0} sets
+                {exerciseData.map((exercise, index) => {
+                  const exerciseSets = exercise.sets && Array.isArray(exercise.sets) 
+                    ? exercise.sets 
+                    : Array.from({ length: exercise.sets || 0 }, (_: any, i: number) => ({ id: `set-${i}` }));
+                  
+                  const completedSetsCount = exerciseSets.filter((_: any, setIndex: number) => 
+                    isSetCompleted(index, setIndex)
+                  ).length;
+                  
+                  const totalSets = exerciseSets.length;
+                  const allSetsCompleted = totalSets > 0 && completedSetsCount === totalSets;
+                  
+                  return (
+                    <div 
+                      key={index}
+                      className={`p-3 rounded-lg border transition-all duration-200 cursor-pointer ${
+                        index === currentExerciseIndex 
+                          ? 'bg-primary/10 border-primary/30 text-foreground' 
+                          : allSetsCompleted
+                          ? 'bg-green-500/10 border-green-500/30 text-foreground'
+                          : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/50'
+                      }`}
+                      onClick={() => setCurrentExerciseIndex(index)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {allSetsCompleted && (
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                          )}
+                          <div>
+                            <h4 className="font-medium">{exercise.name}</h4>
+                            {exercise.eachSide && (
+                              <p className="text-xs text-orange-400">Each side</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-sm">
+                          <span className={completedSetsCount > 0 ? 'text-green-600 font-medium' : ''}>
+                            {completedSetsCount}
+                          </span>
+                          /{totalSets} sets
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground animate-in fade-in delay-800">
