@@ -101,24 +101,68 @@ export default function WorkoutBuilder() {
       setWorkoutName(workout.name || "");
       setWorkoutDescription(workout.description || "");
       
-      // Convert exercises to sections format if needed
+      // Convert exercises to sections format with intelligent grouping
       if (workout.exercises && Array.isArray(workout.exercises)) {
-        const workoutSection: WorkoutSection = {
-          id: 'main-section',
-          name: 'Main Workout',
+        // Group exercises by section (using same logic as overview)
+        const groupedExercises: Record<string, any[]> = {};
+        
+        workout.exercises.forEach((exercise: any) => {
+          let sectionName = exercise.section;
+          
+          // If no section is specified, auto-group by exercise category
+          if (!sectionName) {
+            const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
+            const category = exerciseDetails?.category;
+            
+            switch (category) {
+              case 'warmup':
+                sectionName = 'Warm Up';
+                break;
+              case 'strength':
+                sectionName = 'Main Workout';
+                break;
+              case 'cardio':
+                sectionName = 'Cool Down';
+                break;
+              case 'bodyweight':
+                sectionName = 'Warm Up';
+                break;
+              default:
+                sectionName = 'Main Workout';
+            }
+          }
+          
+          if (!groupedExercises[sectionName]) {
+            groupedExercises[sectionName] = [];
+          }
+          groupedExercises[sectionName].push(exercise);
+        });
+
+        // Convert to sections format
+        const workoutSections: WorkoutSection[] = Object.entries(groupedExercises).map(([sectionName, sectionExercises], sectionIndex) => ({
+          id: `section-${sectionIndex}`,
+          name: sectionName,
           format: 'regular',
-          type: 'workout',
-          exercises: workout.exercises.map((ex: any, index: number) => ({
-            id: `exercise-${index}`,
+          type: sectionName === 'Warm Up' ? 'warmup' : sectionName === 'Cool Down' ? 'cooldown' : 'workout',
+          exercises: sectionExercises.map((ex: any, index: number) => ({
+            id: `exercise-${sectionIndex}-${index}`,
             exerciseId: ex.exerciseId || ex.id,
             exercise: ex.exercise || ex,
-            sets: ex.sets || [{ id: 'set-1', type: 'R', reps: 10, weight: 0 }],
+            sets: Array.isArray(ex.sets) ? ex.sets : Array.from({length: ex.sets || 1}, (_, i) => ({
+              id: `set-${i+1}`,
+              type: 'R' as const,
+              reps: ex.reps || 10,
+              weight: ex.weight || 0,
+              duration: ex.duration || undefined,
+              rest: ex.restTime ? `${ex.restTime}s` : undefined
+            })),
             notes: ex.notes || "",
             eachSide: ex.eachSide || false,
             tempo: ex.tempo || []
           }))
-        };
-        setSections([workoutSection]);
+        }));
+        
+        setSections(workoutSections);
       }
     }
   }, [existingWorkout, isEditMode]);
