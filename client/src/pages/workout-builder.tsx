@@ -471,7 +471,14 @@ export default function WorkoutBuilder() {
                       <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                         <span className="text-xs font-medium">Ex</span>
                       </div>
-                      <h3 className="font-semibold text-foreground">{exercise.exercise?.name}</h3>
+                      <div>
+                        <h3 className="font-semibold text-foreground">{exercise.exercise?.name}</h3>
+                        {exercise.supersetGroup && (
+                          <Badge variant="secondary" className="text-xs mt-1">
+                            Superset {exercise.supersetGroup}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -491,6 +498,10 @@ export default function WorkoutBuilder() {
                         <DropdownMenuItem onClick={() => handleChangeExercise(exercise.id)} className="text-foreground hover:bg-accent hover:text-accent-foreground">
                           <RefreshCw className="w-4 h-4 mr-2" />
                           Change exercise
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleCreateSuperset(exercise.id)} className="text-foreground hover:bg-accent hover:text-accent-foreground">
+                          <span className="w-4 h-4 mr-2 flex items-center justify-center text-xs font-bold">SS</span>
+                          {exercise.supersetGroup ? 'Modify Superset' : 'Create Superset'}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => {
                           // Open details modal directly in edit mode
@@ -915,6 +926,31 @@ export default function WorkoutBuilder() {
     toast({
       title: "Exercise deleted",
       description: `${exerciseToDelete?.exercise?.name} has been removed`,
+    });
+  };
+
+  const handleCreateSuperset = (exerciseId: string) => {
+    if (!currentSection) return;
+    
+    const exercise = currentSection.exercises?.find(ex => ex.id === exerciseId);
+    if (!exercise) return;
+    
+    // Generate a unique superset identifier
+    const supersetId = `SS${Date.now().toString().slice(-3)}`;
+    
+    // Update the exercise with superset group
+    setCurrentSection(prev => ({
+      ...prev!,
+      exercises: prev?.exercises?.map(ex => 
+        ex.id === exerciseId 
+          ? { ...ex, supersetGroup: supersetId }
+          : ex
+      ) || []
+    }));
+
+    toast({
+      title: "Superset created",
+      description: `${exercise.exercise?.name} is now part of superset ${supersetId}. Add more exercises to this superset by using the same option.`,
     });
   };
 

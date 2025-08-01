@@ -103,13 +103,17 @@ export const workouts = pgTable("workouts", {
   userId: integer("user_id").references(() => users.id),
   name: text("name").notNull(),
   description: text("description"),
+  // Updated to support sections, supersets, and better exercise data
   exercises: json("exercises").$type<Array<{
     exerciseId: number;
     sets: number;
-    reps: number;
+    reps?: number;
+    duration?: number; // for time-based exercises
     weight?: number;
-    duration?: number;
     restTime?: number;
+    section?: string; // section name (e.g., "Warm-up", "Main", "Cool-down")
+    supersetGroup?: string; // identifier for superset grouping
+    order?: number; // order within section
   }>>().notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });

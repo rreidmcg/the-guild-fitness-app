@@ -121,63 +121,183 @@ export default function WorkoutOverview() {
           </CardContent>
         </Card>
 
-        {/* Exercise List */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-green-500" />
-              Exercises
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {workoutExercises.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Dumbbell className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No exercises found in this workout</p>
-                <p className="text-sm">The workout data may be structured differently or exercises may not be properly saved.</p>
-              </div>
-            ) : (
-              workoutExercises.map((exercise: any, index: number) => {
-                console.log('Exercise:', exercise);
-                // Handle different data structures based on actual console logs
-                const exerciseName = getExerciseName(exercise.exerciseId);
-                const setsCount = exercise.sets || 1; // Based on console logs, sets is a number, not array
-                const reps = exercise.reps || '';
-                const weight = exercise.weight || 0;
-                const restTime = exercise.restTime || 0;
-                
-                return (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-foreground">{exerciseName}</h3>
-                      <Badge variant="outline">{setsCount} sets</Badge>
-                    </div>
-                
-                    <div className="grid grid-cols-1 gap-2">
-                      <div className="flex items-center justify-between text-sm bg-muted/50 rounded p-2">
-                        <span className="font-medium">Set Configuration</span>
-                        <div className="flex gap-4 text-muted-foreground">
-                          {reps && <span>{reps} reps</span>}
-                          {weight > 0 && <span>{weight} lbs</span>}
-                          {restTime > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {restTime}s
-                            </span>
-                          )}
+        {/* Workout Sections */}
+        {(() => {
+          // Group exercises by section (legacy support for flat exercise lists)
+          const groupedExercises: Record<string, any[]> = {};
+          
+          workoutExercises.forEach((exercise: any) => {
+            const sectionName = exercise.section || 'Main Workout';
+            if (!groupedExercises[sectionName]) {
+              groupedExercises[sectionName] = [];
+            }
+            groupedExercises[sectionName].push(exercise);
+          });
+
+          // Group supersets within each section
+          const groupExercisesBySuperset = (exercises: any[]) => {
+            const supersets: Record<string, any[]> = {};
+            const regularExercises: any[] = [];
+            
+            exercises.forEach(exercise => {
+              if (exercise.supersetGroup) {
+                if (!supersets[exercise.supersetGroup]) {
+                  supersets[exercise.supersetGroup] = [];
+                }
+                supersets[exercise.supersetGroup].push(exercise);
+              } else {
+                regularExercises.push(exercise);
+              }
+            });
+            
+            return { supersets, regularExercises };
+          };
+
+          if (workoutExercises.length === 0) {
+            return (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="w-5 h-5 text-green-500" />
+                    Exercises
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Dumbbell className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No exercises found in this workout</p>
+                    <p className="text-sm">The workout data may be structured differently or exercises may not be properly saved.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          }
+
+          return Object.entries(groupedExercises).map(([sectionName, sectionExercises]) => {
+            const { supersets, regularExercises } = groupExercisesBySuperset(sectionExercises);
+            
+            return (
+              <Card key={sectionName}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="w-5 h-5 text-green-500" />
+                    {sectionName}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Regular exercises */}
+                  {regularExercises.map((exercise: any, index: number) => {
+                    const exerciseName = getExerciseName(exercise.exerciseId);
+                    const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
+                    const setsCount = exercise.sets || 1;
+                    const reps = exercise.reps || '';
+                    const duration = exercise.duration || '';
+                    const weight = exercise.weight || 0;
+                    const restTime = exercise.restTime || 0;
+                    
+                    const isTimeBasedExercise = exerciseDetails?.category === 'cardio' || duration;
+                    const displayDuration = duration || (isTimeBasedExercise && reps ? reps : null);
+                    
+                    return (
+                      <div key={`${sectionName}-${index}`} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-semibold text-foreground">{exerciseName}</h3>
+                          <Badge variant="outline">{setsCount} sets</Badge>
+                        </div>
+                    
+                        <div className="grid grid-cols-1 gap-2">
+                          <div className="flex items-center justify-between text-sm bg-muted/50 rounded p-2">
+                            <span className="font-medium">Set Configuration</span>
+                            <div className="flex gap-4 text-muted-foreground">
+                              {isTimeBasedExercise && displayDuration ? (
+                                <span>{displayDuration} minutes</span>
+                              ) : !isTimeBasedExercise && reps ? (
+                                <span>{reps} reps</span>
+                              ) : null}
+                              {weight > 0 && <span>{weight} lbs</span>}
+                              {restTime > 0 && !isTimeBasedExercise ? (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  {restTime}s rest
+                                </span>
+                              ) : isTimeBasedExercise && restTime === 0 ? (
+                                <span className="text-muted-foreground">No rest</span>
+                              ) : null}
+                            </div>
+                          </div>
+                        </div>
+
+                        {exercise.notes && (
+                          <p className="text-sm text-muted-foreground mt-2 italic">{exercise.notes}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {/* Supersets */}
+                  {Object.entries(supersets).map(([supersetId, supersetExercises]) => (
+                    <div key={`${sectionName}-${supersetId}`} className="border-2 border-dashed border-primary/30 rounded-lg p-4 bg-primary/5">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Badge variant="default" className="bg-primary/20 text-primary border-primary/50">
+                          Superset {supersetId}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          {supersetExercises.length} exercises - perform back-to-back
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {supersetExercises.map((exercise: any, index: number) => {
+                          const exerciseName = getExerciseName(exercise.exerciseId);
+                          const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
+                          const setsCount = exercise.sets || 1;
+                          const reps = exercise.reps || '';
+                          const duration = exercise.duration || '';
+                          const weight = exercise.weight || 0;
+                          const restTime = exercise.restTime || 0;
+                          
+                          const isTimeBasedExercise = exerciseDetails?.category === 'cardio' || duration;
+                          const displayDuration = duration || (isTimeBasedExercise && reps ? reps : null);
+                          
+                          return (
+                            <div key={`${supersetId}-${index}`} className="bg-background border rounded-lg p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+                                    {String.fromCharCode(65 + index)}
+                                  </span>
+                                  <h4 className="font-medium text-foreground">{exerciseName}</h4>
+                                </div>
+                                <Badge variant="outline" size="sm">{setsCount} sets</Badge>
+                              </div>
+                          
+                              <div className="flex items-center justify-between text-sm bg-muted/50 rounded p-2">
+                                <span className="font-medium">Configuration</span>
+                                <div className="flex gap-3 text-muted-foreground">
+                                  {isTimeBasedExercise && displayDuration ? (
+                                    <span>{displayDuration} min</span>
+                                  ) : !isTimeBasedExercise && reps ? (
+                                    <span>{reps} reps</span>
+                                  ) : null}
+                                  {weight > 0 && <span>{weight} lbs</span>}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        
+                        {/* Superset rest info */}
+                        <div className="text-center text-sm text-muted-foreground bg-muted/30 rounded p-2">
+                          Rest {supersetExercises[0]?.restTime || 60}s after completing all exercises in this superset
                         </div>
                       </div>
                     </div>
-
-                    {exercise.notes && (
-                      <p className="text-sm text-muted-foreground mt-2 italic">{exercise.notes}</p>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </CardContent>
+              </Card>
+            );
+          });
+        })()}
       </div>
     </div>
   );
