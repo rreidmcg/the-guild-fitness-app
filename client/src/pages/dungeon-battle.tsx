@@ -433,8 +433,8 @@ export default function DungeonBattlePage() {
             <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
               {/* Monster shadow */}
               <div 
-                className="absolute bottom-0 w-16 h-4 bg-black/30 rounded-full blur-sm"
-                style={{ transform: 'translateY(10px)' }}
+                className="absolute bottom-0 w-24 h-6 bg-black/30 rounded-full blur-sm"
+                style={{ transform: 'translateY(-5px)' }}
               />
               <img 
                 src={battleState.monster.image} 
