@@ -354,22 +354,27 @@ export default function WorkoutBuilder() {
         ) : (
           <div className="space-y-4">
             {sections.map((section) => (
-              <Card key={section.id} className="bg-card border-border">
+              <Card 
+                key={section.id} 
+                className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors group"
+                onClick={() => {
+                  setCurrentSection(section);
+                  setIsEditingSection(true);
+                  setStep('section-form');
+                }}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 
-                      className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
-                      onClick={() => {
-                        setCurrentSection(section);
-                        setIsEditingSection(true);
-                        setStep('section-form');
-                      }}
-                    >
+                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                       {section.name}
                     </h3>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
