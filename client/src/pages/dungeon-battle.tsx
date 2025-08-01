@@ -475,7 +475,7 @@ export default function DungeonBattlePage() {
                 )}
               </button>
               
-              {/* Flee Button - Same size, moved down only */}
+              {/* Flee Button - Same size, moved down and right */}
               <button 
                 className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                 onClick={() => {
@@ -483,7 +483,7 @@ export default function DungeonBattlePage() {
                     handleRetreat();
                   }
                 }}
-                style={{ transform: 'translate(0px, 50px)' }}
+                style={{ transform: 'translate(20px, 50px)' }}
               >
                 <img 
                   src={fleeButtonIcon} 
