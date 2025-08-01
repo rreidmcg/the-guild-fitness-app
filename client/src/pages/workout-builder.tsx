@@ -563,7 +563,7 @@ export default function WorkoutBuilder() {
                           variant="ghost"
                           size="sm"
                           onClick={() => unlinkExercise(exerciseIndex)}
-                          className="text-muted-foreground hover:text-destructive"
+                          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         >
                           <Unlink className="w-4 h-4 mr-2" />
                           Unlink
@@ -573,7 +573,7 @@ export default function WorkoutBuilder() {
                           variant="ghost"
                           size="sm"
                           onClick={() => linkExercises(exerciseIndex - 1)}
-                          className="text-muted-foreground hover:text-primary"
+                          className="text-muted-foreground hover:text-foreground hover:bg-accent"
                         >
                           <Link className="w-4 h-4 mr-2" />
                           Link to Superset
