@@ -119,6 +119,38 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
       { id: 11, name: "Giant Rat", level: 6, maxHp: 30, currentHp: 30, attack: 8, goldReward: 7, description: "A massive rat the size of a dog", image: caveRatImage },
       { id: 12, name: "Rat Chieftain", level: 7, maxHp: 49, currentHp: 49, attack: 9, goldReward: 14, description: "🏆 BOSS: The alpha rat ruling the warrens", image: ratChieftainImage }
     ]
+  },
+  {
+    id: "spider_forest",
+    name: "The Spider Forest",
+    description: "Dark woods where massive spiders weave deadly webs",
+    background: "#1a3d1a",
+    storyIntro: "You enter the shadowy forest where enormous webs block your path and eight-legged creatures lurk in the canopy...",
+    completionStory: "The forest grows quiet as the last spider retreats. You notice rare herbs growing beneath the cleared webs.",
+    monsters: [
+      { id: 13, name: "Web Spinner", level: 3, maxHp: 21, currentHp: 21, attack: 5, goldReward: 4, description: "A nimble spider that sets traps", image: forestSpiderImage },
+      { id: 14, name: "Venom Spider", level: 4, maxHp: 24, currentHp: 24, attack: 6, goldReward: 5, description: "A spider with deadly poison", image: forestSpiderImage },
+      { id: 15, name: "Hunter Spider", level: 5, maxHp: 27, currentHp: 27, attack: 7, goldReward: 6, description: "An aggressive predator spider", image: forestSpiderImage },
+      { id: 16, name: "Shadow Spider", level: 6, maxHp: 30, currentHp: 30, attack: 8, goldReward: 7, description: "A spider that strikes from darkness", image: forestSpiderImage },
+      { id: 17, name: "Giant Spider", level: 7, maxHp: 33, currentHp: 33, attack: 9, goldReward: 8, description: "A massive arachnid with thick chitin", image: forestSpiderImage },
+      { id: 18, name: "Broodmother", level: 8, maxHp: 56, currentHp: 56, attack: 10, goldReward: 16, description: "🏆 BOSS: The queen of all forest spiders", image: broodmotherImage }
+    ]
+  },
+  {
+    id: "goblin_camps",
+    name: "The Goblin Camps",
+    description: "Crude settlements where savage goblins plot their raids",
+    background: "#3d2b1f",
+    storyIntro: "You approach the chaotic goblin encampment where crude weapons glint in firelight and war drums echo...",
+    completionStory: "The camps fall silent as goblin resistance crumbles. You discover stolen treasures and crude maps.",
+    monsters: [
+      { id: 19, name: "Goblin Scout", level: 4, maxHp: 24, currentHp: 24, attack: 6, goldReward: 5, description: "A sneaky goblin with a rusty blade", image: wildGoblinImage },
+      { id: 20, name: "Forest Spider", level: 7, maxHp: 30, currentHp: 30, attack: 6, goldReward: 4, description: "A venomous hunter with razor-sharp fangs", image: forestSpiderImage },
+      { id: 21, name: "Goblin Warrior", level: 5, maxHp: 27, currentHp: 27, attack: 7, goldReward: 6, description: "A battle-hardened goblin fighter", image: wildGoblinImage },
+      { id: 22, name: "Goblin Shaman", level: 6, maxHp: 30, currentHp: 30, attack: 8, goldReward: 7, description: "A goblin wielding dark magic", image: wildGoblinImage },
+      { id: 23, name: "Goblin Berserker", level: 7, maxHp: 33, currentHp: 33, attack: 9, goldReward: 8, description: "A frenzied goblin warrior", image: wildGoblinImage },
+      { id: 24, name: "Goblin Warlord", level: 8, maxHp: 56, currentHp: 56, attack: 10, goldReward: 16, description: "🏆 BOSS: The brutal leader of the goblin horde", image: goblinWarlordImage }
+    ]
   }
 ];
 
