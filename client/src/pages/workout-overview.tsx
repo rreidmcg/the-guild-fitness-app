@@ -234,17 +234,14 @@ export default function WorkoutOverview() {
                           <h3 className="font-semibold text-foreground">{exerciseName}</h3>
                         </div>
                     
-                        <div className="grid grid-cols-1 gap-2">
-                          <div className="text-sm bg-muted/50 rounded p-2">
-                            <div className="font-medium mb-2">{setsCount} Sets</div>
-                            <div className="text-muted-foreground">
-                              {Array.from({length: setsCount}, (_, i) => {
-                                const setDisplay = isTimeBasedExercise && displayDuration ? 
-                                  `${displayDuration} min` : 
-                                  `${reps} reps`;
-                                return setDisplay;
-                              }).join(', ')}
-                            </div>
+                        <div className="text-sm bg-muted/50 rounded p-2">
+                          <div className="text-muted-foreground">
+                            {setsCount}x {Array.from({length: setsCount}, (_, i) => {
+                              const setDisplay = isTimeBasedExercise && displayDuration ? 
+                                `${displayDuration} min` : 
+                                `${reps} reps`;
+                              return setDisplay;
+                            }).join(', ')}
                           </div>
                         </div>
 
@@ -290,9 +287,8 @@ export default function WorkoutOverview() {
                               </div>
                           
                               <div className="text-sm bg-muted/50 rounded p-2">
-                                <div className="font-medium mb-2">{setsCount} Sets</div>
                                 <div className="text-muted-foreground">
-                                  {Array.from({length: setsCount}, (_, i) => {
+                                  {setsCount}x {Array.from({length: setsCount}, (_, i) => {
                                     const setDisplay = isTimeBasedExercise && displayDuration ? 
                                       `${displayDuration} min` : 
                                       `${reps} reps`;
