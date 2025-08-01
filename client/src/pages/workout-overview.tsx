@@ -107,7 +107,10 @@ export default function WorkoutOverview() {
             </div>
             
             {workout.description && (
-              <p className="text-muted-foreground mb-4">{workout.description}</p>
+              <div className="mb-4">
+                <div className="text-sm font-medium text-foreground mb-1">Description</div>
+                <p className="text-muted-foreground">{workout.description}</p>
+              </div>
             )}
 
             <Button 
@@ -127,7 +130,7 @@ export default function WorkoutOverview() {
           const groupedExercises: Record<string, any[]> = {};
           
           workoutExercises.forEach((exercise: any) => {
-            const sectionName = exercise.section || 'Main Workout';
+            const sectionName = exercise.section || 'Exercises';
             if (!groupedExercises[sectionName]) {
               groupedExercises[sectionName] = [];
             }
@@ -176,14 +179,16 @@ export default function WorkoutOverview() {
           return Object.entries(groupedExercises).map(([sectionName, sectionExercises]) => {
             const { supersets, regularExercises } = groupExercisesBySuperset(sectionExercises);
             
+            // Skip showing header for "Exercises" section (legacy workouts)
+            const showSectionHeader = sectionName !== 'Exercises';
+            
             return (
               <Card key={sectionName}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5 text-green-500" />
-                    {sectionName}
-                  </CardTitle>
-                </CardHeader>
+                {showSectionHeader && (
+                  <CardHeader>
+                    <CardTitle>{sectionName}</CardTitle>
+                  </CardHeader>
+                )}
                 <CardContent className="space-y-4">
                   {/* Regular exercises */}
                   {regularExercises.map((exercise: any, index: number) => {
