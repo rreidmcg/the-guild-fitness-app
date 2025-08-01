@@ -35,7 +35,11 @@ import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753841
 import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753839669430.png";
 import goblinWarlordImage from "@assets/36CF820D-0CC0-4C99-A780-79B6D125B307_1753844608679.png";
 import broodmotherImage from "@assets/CE5B8D2E-90AF-4DC0-A904-EDB98089C00A_1753845237897.png";
+
+// Import background images for different environments
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
+import sunsetForestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
+import battleArenaReference from "@assets/IMG_3695_1753992393781.png";
 
 interface UserStats {
   level: number;
@@ -389,11 +393,11 @@ export default function DungeonBattlePage() {
 
   return (
     <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
-      {/* Forest Background */}
+      {/* Dynamic Background based on zone */}
       <div 
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: `url(${forestBackgroundImage})`,
+          backgroundImage: `url(${battleState.zone?.id === 'slime_caverns' ? sunsetForestBg : forestBackgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -401,255 +405,251 @@ export default function DungeonBattlePage() {
         }}
       />
       
-
+      {/* Atmospheric overlay for depth */}
+      <div className="fixed inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-black/20" />
 
       {/* Battle Scene */}
       <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]" style={{ touchAction: 'none' }}>
-        {/* Character Sprites - Battle Field */}
-        <div className="flex-1 flex items-end justify-between px-4 md:px-8 pb-24 md:pb-32 relative" style={{ touchAction: 'none', userSelect: 'none' }}>
-          {/* Player Character */}
-          <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-10px) translateX(10px)' }}>
+        {/* Enhanced HP/MP Display - Floating above characters */}
+        <div className="absolute top-20 left-0 right-0 z-20 px-4 md:px-8">
+          <div className="flex justify-between items-start">
+            {/* Player Health Display */}
+            <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-green-500/30">
+              <div className="text-sm font-bold text-yellow-200 mb-2">
+                {userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span>
+              </div>
+              <div className="space-y-2">
+                {/* HP Bar with glow effect */}
+                <div className="relative">
+                  <div className="bg-black/50 rounded-full h-3 w-40 border border-green-500/50 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-green-400 to-green-300 transition-all duration-500 shadow-inner"
+                      style={{ 
+                        width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%`,
+                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(34, 197, 94, 0.4)'
+                      }}
+                    />
+                  </div>
+                  <div className="text-xs text-green-200 mt-1 font-medium text-center">
+                    HP: {battleState.playerHp}/{battleState.playerMaxHp}
+                  </div>
+                </div>
+                {/* MP Bar with glow effect */}
+                <div className="relative">
+                  <div className="bg-black/50 rounded-full h-3 w-32 border border-blue-500/50 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-400 to-blue-300 transition-all duration-500 shadow-inner"
+                      style={{ 
+                        width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%`,
+                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(59, 130, 246, 0.4)'
+                      }}
+                    />
+                  </div>
+                  <div className="text-xs text-blue-200 mt-1 font-medium text-center">
+                    MP: {battleState.playerMp}/{battleState.playerMaxMp}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Monster Health Display */}
+            {battleState.monster && (
+              <div className="bg-black/60 backdrop-blur-sm rounded-lg p-3 border border-red-500/30">
+                <div className="text-sm font-bold text-red-200 mb-2 text-right">
+                  <span className="text-xs text-blue-300">Lv.{battleState.monster.level}</span> {battleState.monster.name}
+                </div>
+                <div className="relative">
+                  <div className="bg-black/50 rounded-full h-3 w-40 border border-red-500/50 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-red-400 to-red-300 transition-all duration-500 shadow-inner"
+                      style={{ 
+                        width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%`,
+                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(239, 68, 68, 0.4)'
+                      }}
+                    />
+                  </div>
+                  <div className="text-xs text-red-200 mt-1 font-medium text-center">
+                    HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Character Sprites - Battle Field with enhanced positioning */}
+        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
+          {/* Player Character with shadow and positioning */}
+          <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
+            {/* Character shadow */}
+            <div 
+              className="absolute bottom-0 w-16 h-4 bg-black/30 rounded-full blur-sm"
+              style={{ transform: 'translateY(10px)' }}
+            />
             <Avatar2D 
               playerStats={userStats}
-              className="w-20 h-20 sm:w-24 sm:h-24 md:w-40 md:h-40"
+              className="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 relative z-10"
             />
           </div>
           
-          {/* Monster Sprite */}
+          {/* Monster Sprite with shadow and positioning */}
           {battleState.monster && battleState.monster.image && (
-            <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-10px) translateX(-10px)' }}>
+            <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
+              {/* Monster shadow */}
+              <div 
+                className="absolute bottom-0 w-16 h-4 bg-black/30 rounded-full blur-sm"
+                style={{ transform: 'translateY(10px)' }}
+              />
               <img 
                 src={battleState.monster.image} 
                 alt={battleState.monster.name}
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-40 md:h-40 object-contain"
-                style={{ imageRendering: 'pixelated' }}
+                className="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 object-contain relative z-10"
+                style={{ 
+                  imageRendering: 'pixelated',
+                  filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                }}
               />
             </div>
           )}
         </div>
       </div>
 
-      {/* Bottom Battle UI - Mobile Responsive */}
-      <div className="fixed bottom-16 left-0 right-0 z-20 bg-gray-900/80 backdrop-blur-md border-t-4 border-gray-400 shadow-lg shadow-gray-400/20" style={{ boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3), 0 -2px 8px rgba(156,163,175,0.4), 0 0 0 1px rgba(156,163,175,0.6)' }}>
-        {/* Mobile Layout - Stacked */}
-        <div className="block md:hidden">
-          {/* Mobile Stats Row */}
-          <div className="flex h-12 border-b-2 border-gray-400/50">
-            {/* Player Stats */}
-            <div className="flex-1 p-2 border-r-2 border-gray-400/50" style={{ boxShadow: 'inset -1px 0 2px rgba(0,0,0,0.2)' }}>
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-bold text-yellow-200">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
-                <div className="flex items-center space-x-1">
-                  {/* HP Bar - Smaller */}
-                  <div className="w-16">
-                    <div className="bg-gray-700 rounded-full h-1.5 relative overflow-hidden border border-gray-500">
-                      <div 
-                        className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
-                        style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-green-200 text-center">HP: {battleState.playerHp}</div>
-                  </div>
-                  {/* MP Bar - Smaller */}
-                  <div className="w-12">
-                    <div className="bg-gray-700 rounded-full h-1.5 relative overflow-hidden border border-gray-500">
-                      <div 
-                        className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
-                        style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-blue-200 text-center">MP: {battleState.playerMp}</div>
-                  </div>
+      {/* Enhanced Action Interface - Inspired by classic RPG design */}
+      <div className="fixed bottom-16 left-0 right-0 z-30 bg-black/80 backdrop-blur-md border-t-2 border-blue-400/50" style={{ boxShadow: '0 -4px 20px rgba(0,0,0,0.6), inset 0 2px 4px rgba(59, 130, 246, 0.2)' }}>
+        {/* Mobile Layout - Clean and accessible */}
+        <div className="block md:hidden p-4">
+          {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
+            <div className="grid grid-cols-3 gap-3">
+              {battleState.actionMode === 'main' ? (
+                <>
+                  <button 
+                    className="bg-blue-600/80 hover:bg-blue-500 border border-blue-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
+                    style={{ boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
+                  >
+                    ⚔️ FIGHT
+                  </button>
+                  <button 
+                    className="bg-green-600/80 hover:bg-green-500 border border-green-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
+                    style={{ boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
+                  >
+                    🧪 ITEM
+                  </button>
+                  <button 
+                    className="bg-gray-600/80 hover:bg-gray-500 border border-gray-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={handleRetreat}
+                    style={{ boxShadow: '0 2px 8px rgba(75, 85, 99, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
+                  >
+                    🏃 RUN
+                  </button>
+                </>
+              ) : battleState.actionMode === 'fight' ? (
+                <>
+                  <button 
+                    className="bg-red-600/80 hover:bg-red-500 border border-red-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    onClick={handleAttack}
+                    disabled={attackMutation.isPending}
+                    style={{ boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
+                  >
+                    {attackMutation.isPending ? "⏳ ATTACKING..." : "💥 ATTACK"}
+                  </button>
+                  <button 
+                    className="bg-yellow-600/80 hover:bg-yellow-500 border border-yellow-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => {
+                      setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
+                      toast({ title: "Defense", description: "You brace for the enemy's attack!" });
+                    }}
+                    style={{ boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
+                  >
+                    🛡️ DEFEND
+                  </button>
+                  <button 
+                    className="bg-gray-600/80 hover:bg-gray-500 border border-gray-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
+                    style={{ boxShadow: '0 2px 8px rgba(75, 85, 99, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
+                  >
+                    ← BACK
+                  </button>
+                </>
+              ) : (
+                <div className="col-span-3">
+                  <InlineItemMenu setBattleState={setBattleState} isMobile={true} />
                 </div>
-              </div>
+              )}
             </div>
-            
-            {/* Monster Stats */}
-            {battleState.monster && (
-              <div className="flex-1 p-2" style={{ boxShadow: 'inset 1px 0 2px rgba(0,0,0,0.2)' }}>
-                <div className="flex items-center justify-between">
-                  <div className="w-16">
-                    <div className="bg-gray-700 rounded-full h-1.5 relative overflow-hidden border border-gray-500">
-                      <div 
-                        className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300"
-                        style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-red-200 text-center">HP: {battleState.monster.currentHp}</div>
-                  </div>
-                  <div className="text-xs font-bold text-red-200"><span className="text-xs text-blue-300">Lv.{battleState.monster.level}</span> {battleState.monster.name}</div>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Mobile Action Menu Row */}
-          <div className="h-12 p-2" style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)' }}>
-            {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-              <div className="flex justify-center space-x-4 h-full">
-                {battleState.actionMode === 'main' ? (
-                  <>
-                    <button 
-                      className="flex-1 text-xs font-semibold text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-                      onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
-                    >
-                      FIGHT
-                    </button>
-                    <button 
-                      className="flex-1 text-xs font-semibold text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-                      onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
-                    >
-                      ITEM
-                    </button>
-                    <button 
-                      className="flex-1 text-xs font-semibold text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-                      onClick={handleRetreat}
-                    >
-                      RUN
-                    </button>
-                  </>
-                ) : battleState.actionMode === 'fight' ? (
-                  <>
-                    <button 
-                      className="flex-1 text-xs font-semibold text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-                      onClick={handleAttack}
-                      disabled={attackMutation.isPending}
-                    >
-                      {attackMutation.isPending ? "ATTACKING..." : "ATTACK"}
-                    </button>
-                    <button 
-                      className="flex-1 text-xs font-semibold text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-                      onClick={() => {
-                        setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
-                        toast({ title: "Defense", description: "You brace for the enemy's attack!" });
-                      }}
-                    >
-                      DEFEND
-                    </button>
-                    <button 
-                      className="flex-1 text-xs text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-                      onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
-                    >
-                      ← BACK
-                    </button>
-                  </>
-                ) : (
-                  <div className="w-full">
-                    <InlineItemMenu setBattleState={setBattleState} isMobile={true} />
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-xs font-semibold text-center tracking-wider uppercase battle-menu-text flex items-center justify-center h-full">ENEMY TURN</div>
-            )}
-          </div>
+          ) : (
+            <div className="text-center text-lg font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border border-red-400/50">
+              ⏳ ENEMY TURN
+            </div>
+          )}
         </div>
 
-        {/* Desktop Layout - 3 Column */}
-        <div className="hidden md:flex h-20">
-          {/* Player Stats (Left - Larger) */}
-          <div className="w-2/5 p-3 pt-2 border-r-4 border-gray-400" style={{ boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.2), 2px 0 4px rgba(156,163,175,0.3)' }}>
-            <div className="flex items-center justify-between mb-1">
-              <div className="text-sm font-bold text-yellow-200">{userStats.username} <span className="text-xs text-blue-300">Lv.{userStats.level}</span></div>
-              <div className="flex items-center space-x-2">
-                {/* HP Bar */}
-                <div className="w-32">
-                  <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
-                    <div 
-                      className="absolute inset-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-300"
-                      style={{ width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-green-200 mt-0.5 font-medium">HP: {battleState.playerHp}/{battleState.playerMaxHp}</div>
-                </div>
-                {/* MP Bar */}
-                <div className="w-24">
-                  <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
-                    <div 
-                      className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-300"
-                      style={{ width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-blue-200 mt-0.5 font-medium">MP: {battleState.playerMp}/{battleState.playerMaxMp}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Menu (Center - Smaller) */}
-          <div className="w-1/5 p-2 pt-1 border-r-4 border-gray-400" style={{ boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.2), inset 2px 0 4px rgba(0,0,0,0.2), 2px 0 4px rgba(156,163,175,0.3)' }}>
-            {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-              <div className="space-y-0.5 text-center">
-                {battleState.actionMode === 'main' ? (
-                  <>
-                    <button 
-                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
-                      onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
-                    >
-                      FIGHT
-                    </button>
-                    <button 
-                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
-                      onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
-                    >
-                      ITEM
-                    </button>
-                    <button 
-                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
-                      onClick={handleRetreat}
-                    >
-                      RUN
-                    </button>
-                  </>
-                ) : battleState.actionMode === 'fight' ? (
-                  <>
-                    <button 
-                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
-                      onClick={handleAttack}
-                      disabled={attackMutation.isPending}
-                    >
-                      {attackMutation.isPending ? "ATTACKING..." : "ATTACK"}
-                    </button>
-                    <button 
-                      className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
-                      onClick={() => {
-                        setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
-                        toast({ title: "Defense", description: "You brace for the enemy's attack!" });
-                      }}
-                    >
-                      DEFEND
-                    </button>
-                    <button 
-                      className="block w-full text-xs text-center tracking-wider uppercase battle-menu-text"
-                      onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
-                    >
-                      ← BACK
-                    </button>
-                  </>
-                ) : (
+        {/* Desktop Layout - Enhanced visual design */}
+        <div className="hidden md:flex h-20 items-center px-6">
+          {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
+            <div className="flex space-x-4 mx-auto">
+              {battleState.actionMode === 'main' ? (
+                <>
+                  <button 
+                    className="bg-blue-600/80 hover:bg-blue-500 border-2 border-blue-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
+                    style={{ boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+                  >
+                    ⚔️ FIGHT
+                  </button>
+                  <button 
+                    className="bg-green-600/80 hover:bg-green-500 border-2 border-green-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
+                    style={{ boxShadow: '0 4px 12px rgba(34, 197, 94, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+                  >
+                    🧪 ITEM
+                  </button>
+                  <button 
+                    className="bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={handleRetreat}
+                    style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+                  >
+                    🏃 RUN
+                  </button>
+                </>
+              ) : battleState.actionMode === 'fight' ? (
+                <>
+                  <button 
+                    className="bg-red-600/80 hover:bg-red-500 border-2 border-red-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    onClick={handleAttack}
+                    disabled={attackMutation.isPending}
+                    style={{ boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+                  >
+                    {attackMutation.isPending ? "⏳ ATTACKING..." : "💥 ATTACK"}
+                  </button>
+                  <button 
+                    className="bg-yellow-600/80 hover:bg-yellow-500 border-2 border-yellow-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => {
+                      setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
+                      toast({ title: "Defense", description: "You brace for the enemy's attack!" });
+                    }}
+                    style={{ boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+                  >
+                    🛡️ DEFEND
+                  </button>
+                  <button 
+                    className="bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
+                    style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+                  >
+                    ← BACK
+                  </button>
+                </>
+              ) : (
+                <div className="flex space-x-4">
                   <InlineItemMenu setBattleState={setBattleState} />
-                )}
-              </div>
-            ) : (
-              <div className="text-xs font-semibold pt-3 text-center tracking-wider uppercase battle-menu-text">ENEMY TURN</div>
-            )}
-          </div>
-
-          {/* Monster Stats (Right - Larger) */}
-          {battleState.monster && (
-            <div className="w-2/5 p-3 pt-2 text-right" style={{ boxShadow: 'inset 2px 0 4px rgba(0,0,0,0.2), -2px 0 4px rgba(156,163,175,0.3)' }}>
-              <div className="flex items-center justify-between mb-1">
-                <div className="w-32">
-                  <div className="bg-gray-700 rounded-full h-2.5 relative overflow-hidden border border-gray-500">
-                    <div 
-                      className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-400 transition-all duration-300"
-                      style={{ width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%` }}
-                    />
-                  </div>
-                  <div className="text-xs text-red-200 mt-0.5 font-medium">HP: {battleState.monster.currentHp}/{battleState.monster.maxHp}</div>
                 </div>
-                <div className="text-sm font-bold text-red-200"><span className="text-xs text-blue-300">Lv.{battleState.monster.level}</span> {battleState.monster.name}</div>
-              </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50 mx-auto px-8">
+              ⏳ ENEMY TURN
             </div>
           )}
         </div>
