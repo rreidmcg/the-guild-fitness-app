@@ -1,4 +1,5 @@
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "./button";
 import { Dumbbell, BarChart3, Sword, ShoppingBag, Trophy } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
