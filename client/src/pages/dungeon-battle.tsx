@@ -439,7 +439,7 @@ export default function DungeonBattlePage() {
               <img 
                 src={battleState.monster.image} 
                 alt={battleState.monster.name}
-                className="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 object-contain relative z-10"
+                className="w-36 h-36 sm:w-48 sm:h-48 md:w-72 md:h-72 object-contain relative z-10"
                 style={{ 
                   imageRendering: 'pixelated',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
