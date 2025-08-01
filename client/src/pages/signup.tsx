@@ -205,7 +205,7 @@ export default function SignupPage() {
   return (
     <>
       <AuthMusicBanner />
-      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden pt-16">
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden pt-4">
         {/* Fixed parallax background */}
         <div 
           className="fixed inset-0 w-full h-full z-0"
