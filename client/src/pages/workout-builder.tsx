@@ -59,8 +59,8 @@ export default function WorkoutBuilder() {
   const editWorkoutId = urlParams.get('edit');
   const isEditMode = !!editWorkoutId;
 
-  // Main state
-  const [step, setStep] = useState<WorkoutBuilderStep>('details');
+  // Main state - start at sections if editing, details if creating
+  const [step, setStep] = useState<WorkoutBuilderStep>(isEditMode ? 'sections' : 'details');
   const [workoutName, setWorkoutName] = useState("");
   const [workoutDescription, setWorkoutDescription] = useState("");
   const [sections, setSections] = useState<WorkoutSection[]>([]);
@@ -284,6 +284,26 @@ export default function WorkoutBuilder() {
       </div>
 
       <div className="p-6 max-w-4xl mx-auto">
+        {/* Workout Title Header */}
+        {isEditMode && workoutName && (
+          <div className="mb-6 pb-4 border-b border-border">
+            <h2 
+              className="text-2xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors"
+              onClick={() => setStep('details')}
+            >
+              {workoutName}
+            </h2>
+            {workoutDescription && (
+              <p 
+                className="text-muted-foreground mt-1 cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => setStep('details')}
+              >
+                {workoutDescription}
+              </p>
+            )}
+          </div>
+        )}
+
         {sections.length === 0 ? (
           <div className="text-center py-16 space-y-6">
             <div className="mx-auto w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
@@ -337,7 +357,16 @@ export default function WorkoutBuilder() {
               <Card key={section.id} className="bg-card border-border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-foreground">{section.name}</h3>
+                    <h3 
+                      className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                      onClick={() => {
+                        setCurrentSection(section);
+                        setIsEditingSection(true);
+                        setStep('section-form');
+                      }}
+                    >
+                      {section.name}
+                    </h3>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm">
@@ -345,17 +374,7 @@ export default function WorkoutBuilder() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem 
-                          onClick={() => {
-                            // Save section (edit mode)
-                            setCurrentSection(section);
-                            setIsEditingSection(true);
-                            setStep('section-form');
-                          }}
-                        >
-                          <Edit3 className="w-4 h-4 mr-2" />
-                          Edit Section
-                        </DropdownMenuItem>
+
                         <DropdownMenuItem 
                           onClick={() => {
                             // Duplicate section
@@ -396,7 +415,15 @@ export default function WorkoutBuilder() {
                   <div className="space-y-2">
                     {section.exercises.map((exercise) => (
                       <div key={exercise.id} className="pl-4 border-l-2 border-muted">
-                        <p className="text-sm font-medium text-foreground">{exercise.exercise?.name}</p>
+                        <p 
+                          className="text-sm font-medium text-foreground cursor-pointer hover:text-primary transition-colors"
+                          onClick={() => {
+                            setCurrentSection(section);
+                            setStep('section-form');
+                          }}
+                        >
+                          {exercise.exercise?.name}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -516,7 +543,16 @@ export default function WorkoutBuilder() {
                         <span className="text-xs font-medium">Ex</span>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">{exercise.exercise?.name}</h3>
+                        <h3 
+                          className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
+                          onClick={() => {
+                            setShowExerciseDetails(exercise);
+                            setIsEditingExercise(true);
+                            setEditedExercise(exercise.exercise);
+                          }}
+                        >
+                          {exercise.exercise?.name}
+                        </h3>
                         {exercise.supersetGroup && (
                           <Badge variant="secondary" className="text-xs mt-1">
                             Superset {exercise.supersetGroup}
