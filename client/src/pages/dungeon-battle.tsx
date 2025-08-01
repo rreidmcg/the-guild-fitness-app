@@ -319,29 +319,29 @@ export default function DungeonBattlePage() {
 
       {/* Battle Scene */}
       <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]" style={{ touchAction: 'none' }}>
-        {/* Monster HP Bar - Top Center Prominent */}
+        {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
         <div className="absolute top-20 left-0 right-0 z-20 px-4 md:px-8">
           <div className="max-w-2xl mx-auto">
             {battleState.monster && (
-              <div className="bg-black/80 backdrop-blur-md rounded-lg p-4 md:p-6 border-2 border-red-400/50 text-center" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.6)' }}>
-                {/* Monster Name and Level */}
-                <div className="mb-3">
+              <div className="text-center">
+                {/* Monster Name and Level - Same Row Centered */}
+                <div className="mb-3 flex items-center justify-center gap-4">
                   <h3 className="text-xl md:text-2xl font-bold text-red-300">{battleState.monster.name}</h3>
                   <p className="text-sm md:text-base text-red-200/80">Level {battleState.monster.level}</p>
                 </div>
                 
-                {/* Large Monster HP Bar with text inside */}
+                {/* Large Monster HP Bar with darker red and white text */}
                 <div className="relative">
-                  <div className="bg-black/50 rounded-full h-6 md:h-8 border-2 border-red-500/50 overflow-hidden">
+                  <div className="bg-black/50 rounded-full h-6 md:h-8 border-2 border-red-700/50 overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-red-400 to-red-300 transition-all duration-500 shadow-inner"
+                      className="h-full bg-gradient-to-r from-red-800 to-red-700 transition-all duration-500 shadow-inner"
                       style={{ 
                         width: `${(battleState.monster.currentHp / battleState.monster.maxHp) * 100}%`,
-                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(239, 68, 68, 0.4)'
+                        boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(153, 27, 27, 0.4)'
                       }}
                     />
                   </div>
-                  {/* HP Ratio Text Inside Bar */}
+                  {/* HP Ratio Text Inside Bar - White */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <span className="text-white font-bold text-sm md:text-base drop-shadow-lg">
                       {battleState.monster.currentHp} / {battleState.monster.maxHp}
