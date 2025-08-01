@@ -86,6 +86,7 @@ export default function WorkoutBuilder() {
   const [isEditingExercise, setIsEditingExercise] = useState(false);
   const [editedExercise, setEditedExercise] = useState<any>(null);
   const [openExerciseCombobox, setOpenExerciseCombobox] = useState<string | null>(null);
+  const [exerciseSearchTerms, setExerciseSearchTerms] = useState<{[key: string]: string}>({});
 
   const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
     queryKey: ["/api/exercises"],
@@ -555,27 +556,52 @@ export default function WorkoutBuilder() {
                         <span className="text-xs font-medium">Ex</span>
                       </div>
                       <div className="flex-1">
-                        {/* Editable Exercise Name with Combobox */}
+                        {/* Editable Exercise Name with Inline Combobox */}
                         <Popover 
                           open={openExerciseCombobox === exercise.id} 
                           onOpenChange={(open) => setOpenExerciseCombobox(open ? exercise.id : null)}
                         >
                           <PopoverTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              role="combobox"
-                              className="h-8 border-0 bg-transparent p-0 text-left font-semibold text-foreground hover:text-primary focus:ring-0 justify-start"
-                            >
-                              {exercise.exercise?.name || 'Select exercise...'}
-                              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
+                            <div className="relative">
+                              <Input
+                                value={exerciseSearchTerms[exercise.id] || exercise.exercise?.name || ''}
+                                placeholder="Type to search exercises..."
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  setExerciseSearchTerms(prev => ({
+                                    ...prev,
+                                    [exercise.id]: value
+                                  }));
+                                  // Open dropdown when typing
+                                  if (!openExerciseCombobox) {
+                                    setOpenExerciseCombobox(exercise.id);
+                                  }
+                                }}
+                                onFocus={() => {
+                                  setOpenExerciseCombobox(exercise.id);
+                                  // Initialize search term with current exercise name if not already set
+                                  if (!exerciseSearchTerms[exercise.id]) {
+                                    setExerciseSearchTerms(prev => ({
+                                      ...prev,
+                                      [exercise.id]: exercise.exercise?.name || ''
+                                    }));
+                                  }
+                                }}
+                                className="h-8 border-0 bg-transparent p-0 text-left font-semibold text-foreground focus:ring-0 focus-visible:ring-0"
+                              />
+                              <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                            </div>
                           </PopoverTrigger>
                           <PopoverContent className="w-80 p-0" align="start">
                             <Command>
-                              <CommandInput placeholder="Search exercises..." />
                               <CommandEmpty>No exercise found.</CommandEmpty>
                               <CommandGroup className="max-h-48 overflow-y-auto">
-                                {Array.isArray(exercises) && exercises.map((ex: any) => (
+                                {Array.isArray(exercises) && exercises
+                                  .filter((ex: any) => {
+                                    const searchTerm = exerciseSearchTerms[exercise.id] || '';
+                                    return ex.name.toLowerCase().includes(searchTerm.toLowerCase());
+                                  })
+                                  .map((ex: any) => (
                                   <CommandItem
                                     key={ex.id}
                                     value={ex.name}
@@ -588,6 +614,11 @@ export default function WorkoutBuilder() {
                                         );
                                         setCurrentSection({...currentSection, exercises: updatedExercises});
                                       }
+                                      // Clear search term and close dropdown
+                                      setExerciseSearchTerms(prev => ({
+                                        ...prev,
+                                        [exercise.id]: ex.name
+                                      }));
                                       setOpenExerciseCombobox(null);
                                     }}
                                     className="cursor-pointer"
