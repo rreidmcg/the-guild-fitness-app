@@ -2961,10 +2961,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/battle/attack", async (req, res) => {
     try {
       const userId = requireAuth(req);
-      const { monsterId, zoneId } = req.body;
+      const { monster, playerHp, playerMp } = req.body;
       
-      if (!monsterId || !zoneId) {
-        return res.status(400).json({ error: "Monster ID and Zone ID are required" });
+      if (!monster) {
+        return res.status(400).json({ error: "Monster data is required" });
       }
 
       // Get user stats for battle calculations
@@ -2973,27 +2973,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Get monster data
-      const monster = await storage.getMonster(monsterId);
-      if (!monster) {
-        return res.status(404).json({ error: "Monster not found" });
-      }
-
       // Calculate player stats with equipment bonuses
-      const playerAttack = user.strength + Math.floor(user.agility / 2);
-      const playerDefense = user.stamina + Math.floor(user.strength / 3);
-      
-      // Calculate monster stats
-      const monsterAttack = monster.attack;
-      const monsterDefense = Math.floor(monster.level * 1.5);
+      const playerAttack = (user.strength || 0) + Math.floor((user.agility || 0) / 2);
+      const playerDefense = (user.stamina || 0) + Math.floor((user.strength || 0) / 3);
       
       // Calculate damage dealt by player to monster
-      const baseDamage = Math.max(1, playerAttack - monsterDefense);
+      const baseDamage = Math.max(1, playerAttack - Math.floor(monster.level * 1.5));
       const damageVariance = Math.floor(Math.random() * Math.max(1, baseDamage * 0.3));
       const playerDamage = baseDamage + damageVariance;
       
       // Apply damage to monster
-      const newMonsterHp = Math.max(0, (monster.currentHp || monster.maxHp) - playerDamage);
+      const newMonsterHp = Math.max(0, monster.currentHp - playerDamage);
       
       // Initialize battle log
       const battleLog = [`You deal ${playerDamage} damage to ${monster.name}!`];
@@ -3021,12 +3011,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Record activity to prevent atrophy
         await AtrophySystem.recordActivity(userId);
         
-        // Update monster HP to 0
-        await storage.updateMonster(monsterId, { currentHp: 0 });
-        
         return res.json({
-          playerHp: user.currentHp || user.maxHp || 100,
-          playerMp: user.currentMp || user.maxMp || 50,
+          playerHp: playerHp,
+          playerMp: playerMp,
           monster: { ...monster, currentHp: 0 },
           battleLog,
           battleResult,
@@ -3035,11 +3022,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Monster counter-attack if still alive
-      const monsterDamage = Math.max(1, monsterAttack - playerDefense);
+      const monsterDamage = Math.max(1, monster.attack - playerDefense);
       const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
       const actualMonsterDamage = monsterDamage + monsterDamageVariance;
       
-      const newPlayerHp = Math.max(0, (user.currentHp || user.maxHp || 100) - actualMonsterDamage);
+      const newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
       
       battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!`);
       
@@ -3048,13 +3035,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         battleLog.push("You have been defeated!");
       }
       
-      // Update monster and player HP
-      await storage.updateMonster(monsterId, { currentHp: newMonsterHp });
+      // Update player HP in database
       await storage.updateUser(userId, { currentHp: newPlayerHp });
       
       res.json({
         playerHp: newPlayerHp,
-        playerMp: user.currentMp || user.maxMp || 50,
+        playerMp: playerMp,
         monster: { ...monster, currentHp: newMonsterHp },
         battleLog,
         battleResult,

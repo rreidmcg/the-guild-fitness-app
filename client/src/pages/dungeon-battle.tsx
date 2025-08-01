@@ -261,8 +261,9 @@ export default function DungeonBattlePage() {
       return await apiRequest("/api/battle/attack", {
         method: "POST",
         body: {
-          monsterId: battleState.monster?.id,
-          zoneId: battleState.zone?.id
+          monster: battleState.monster,
+          playerHp: battleState.playerHp,
+          playerMp: battleState.playerMp
         }
       });
     },
@@ -286,7 +287,8 @@ export default function DungeonBattlePage() {
       monster: data.monster,
       battleLog: [...prev.battleLog, ...data.battleLog],
       battleResult: data.battleResult,
-      totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0)
+      totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
+      isPlayerTurn: data.battleResult === 'ongoing' ? false : true // Toggle turns properly
     }));
 
     if (data.battleResult === 'victory') {
@@ -313,6 +315,11 @@ export default function DungeonBattlePage() {
         });
         queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       }
+    } else if (data.battleResult === 'defeat') {
+      // Player defeated
+      setTimeout(() => {
+        navigate("/pve-dungeons");
+      }, 3000);
     }
   };
 
