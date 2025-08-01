@@ -326,8 +326,8 @@ export default function DungeonBattlePage() {
               <div className="text-center">
                 {/* Monster Name and Level - Same Row Centered with Lv. abbreviation */}
                 <div className="mb-3 flex items-center justify-center gap-2">
-                  <p className="text-sm md:text-base text-red-200/80">Lv. {battleState.monster.level}</p>
-                  <h3 className="text-xl md:text-2xl font-bold text-red-300">{battleState.monster.name}</h3>
+                  <p className="text-sm md:text-base text-red-900 font-bold drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>Lv. {battleState.monster.level}</p>
+                  <h3 className="text-xl md:text-2xl font-bold text-red-900 drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>{battleState.monster.name}</h3>
                 </div>
                 
                 {/* Large Monster HP Bar with darker red and white text */}
