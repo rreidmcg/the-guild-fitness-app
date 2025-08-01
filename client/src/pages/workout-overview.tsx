@@ -209,18 +209,12 @@ export default function WorkoutOverview() {
                           <div className="text-sm bg-muted/50 rounded p-2">
                             <div className="font-medium mb-2">{setsCount} Sets</div>
                             <div className="text-muted-foreground">
-                              {Array.from({length: setsCount}, (_, i) => (
-                                <div key={i} className="flex justify-between items-center py-1">
-                                  <span>Set {i + 1}:</span>
-                                  <span>
-                                    {isTimeBasedExercise && displayDuration ? (
-                                      `${displayDuration} minutes`
-                                    ) : (
-                                      `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`
-                                    )}
-                                  </span>
-                                </div>
-                              ))}
+                              {Array.from({length: setsCount}, (_, i) => {
+                                const setDisplay = isTimeBasedExercise && displayDuration ? 
+                                  `${displayDuration} min` : 
+                                  `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`;
+                                return setDisplay;
+                              }).join(', ')}
                             </div>
                           </div>
                         </div>
@@ -272,18 +266,12 @@ export default function WorkoutOverview() {
                               <div className="text-sm bg-muted/50 rounded p-2">
                                 <div className="font-medium mb-2">{setsCount} Sets</div>
                                 <div className="text-muted-foreground">
-                                  {Array.from({length: setsCount}, (_, i) => (
-                                    <div key={i} className="flex justify-between items-center py-1">
-                                      <span>Set {i + 1}:</span>
-                                      <span>
-                                        {isTimeBasedExercise && displayDuration ? (
-                                          `${displayDuration} minutes`
-                                        ) : (
-                                          `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`
-                                        )}
-                                      </span>
-                                    </div>
-                                  ))}
+                                  {Array.from({length: setsCount}, (_, i) => {
+                                    const setDisplay = isTimeBasedExercise && displayDuration ? 
+                                      `${displayDuration} min` : 
+                                      `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`;
+                                    return setDisplay;
+                                  }).join(', ')}
                                 </div>
                               </div>
                             </div>
