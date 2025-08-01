@@ -551,17 +551,35 @@ export default function WorkoutBuilder() {
                       <div className="w-10 h-10 bg-muted rounded flex items-center justify-center">
                         <span className="text-xs font-medium">Ex</span>
                       </div>
-                      <div>
-                        <h3 
-                          className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
-                          onClick={() => {
-                            setShowExerciseDetails(exercise);
-                            setIsEditingExercise(true);
-                            setEditedExercise(exercise.exercise);
+                      <div className="flex-1">
+                        {/* Editable Exercise Name */}
+                        <Select 
+                          value={exercise.exerciseId?.toString() || ''} 
+                          onValueChange={(value) => {
+                            if (currentSection && currentSection.exercises) {
+                              const selectedExercise = Array.isArray(exercises) ? exercises.find((ex: any) => ex.id === parseInt(value)) : null;
+                              const updatedExercises = currentSection.exercises.map(ex => 
+                                ex.id === exercise.id 
+                                  ? {...ex, exerciseId: parseInt(value), exercise: selectedExercise}
+                                  : ex
+                              );
+                              setCurrentSection({...currentSection, exercises: updatedExercises});
+                            }
                           }}
                         >
-                          {exercise.exercise?.name}
-                        </h3>
+                          <SelectTrigger className="h-8 border-0 bg-transparent p-0 text-left font-semibold text-foreground hover:text-primary focus:ring-0">
+                            <SelectValue placeholder="Select exercise">
+                              {exercise.exercise?.name || 'Select exercise'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent className="max-h-48">
+                            {Array.isArray(exercises) && exercises.map((ex: any) => (
+                              <SelectItem key={ex.id} value={ex.id.toString()} className="text-foreground">
+                                {ex.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         {exercise.supersetGroup && (
                           <Badge variant="secondary" className="text-xs mt-1">
                             Superset {exercise.supersetGroup}
@@ -614,6 +632,75 @@ export default function WorkoutBuilder() {
                     </DropdownMenu>
                   </div>
 
+                  {/* Editable Tracking Metrics */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium text-muted-foreground">TRACKING METRICS</Label>
+                      <div className="flex space-x-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-6 text-xs">
+                              <Plus className="w-3 h-3 mr-1" />
+                              Add Metric
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {['reps', 'weight', 'RIR', 'RPE', 'duration', 'distance'].map(metric => {
+                              const currentFields = (exercise as any)?.trackingFields || ['reps', 'weight', 'RIR'];
+                              const isSelected = currentFields.includes(metric);
+                              return (
+                                <DropdownMenuItem 
+                                  key={metric}
+                                  disabled={isSelected}
+                                  onClick={() => {
+                                    if (currentSection && currentSection.exercises && !isSelected) {
+                                      const updatedExercises = currentSection.exercises.map(ex => 
+                                        ex.id === exercise.id 
+                                          ? {...ex, trackingFields: [...currentFields, metric]}
+                                          : ex
+                                      );
+                                      setCurrentSection({...currentSection, exercises: updatedExercises});
+                                    }
+                                  }}
+                                >
+                                  {metric.toUpperCase()} {isSelected && '✓'}
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                    
+                    {/* Tracking Fields Display */}
+                    <div className="flex flex-wrap gap-2">
+                      {((exercise as any)?.trackingFields || ['reps', 'weight', 'RIR']).map((field: string) => (
+                        <div key={field} className="flex items-center bg-muted rounded px-2 py-1">
+                          <span className="text-xs font-medium uppercase">{field}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
+                            onClick={() => {
+                              if (currentSection && currentSection.exercises) {
+                                const currentFields = (exercise as any)?.trackingFields || ['reps', 'weight', 'RIR'];
+                                const updatedFields = currentFields.filter((f: string) => f !== field);
+                                const updatedExercises = currentSection.exercises.map(ex => 
+                                  ex.id === exercise.id 
+                                    ? {...ex, trackingFields: updatedFields}
+                                    : ex
+                                );
+                                setCurrentSection({...currentSection, exercises: updatedExercises});
+                              }
+                            }}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Sets Table */}
                   <div className="space-y-2">
                     {(() => {
@@ -633,19 +720,20 @@ export default function WorkoutBuilder() {
                       
                       // Always show rest as the last column
                       const visibleFields = [...trackingFields.filter((f: string) => f !== 'rest'), 'rest'];
-                      const gridCols = visibleFields.length + 1; // +1 for SET column
+                      const gridCols = visibleFields.length + 2; // +1 for SET column, +1 for delete button
                       
                       return (
                         <>
-                          <div className={`grid grid-cols-${gridCols} gap-2 text-xs font-medium text-muted-foreground uppercase`} style={{gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`}}>
+                          <div className={`grid gap-2 text-xs font-medium text-muted-foreground uppercase`} style={{gridTemplateColumns: `auto repeat(${visibleFields.length}, minmax(0, 1fr)) auto`}}>
                             <div>SET</div>
                             {visibleFields.map(field => (
                               <div key={field}>{fieldMap[field as keyof typeof fieldMap]?.label || field.toUpperCase()}</div>
                             ))}
+                            <div></div>
                           </div>
                           
                           {exercise.sets.map((set, index) => (
-                            <div key={set.id} className={`grid grid-cols-${gridCols} gap-2 items-center py-2`} style={{gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`}}>
+                            <div key={set.id} className={`grid gap-2 items-center py-2`} style={{gridTemplateColumns: `auto repeat(${visibleFields.length}, minmax(0, 1fr)) auto`}}>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -682,6 +770,23 @@ export default function WorkoutBuilder() {
                                   />
                                 );
                               })}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                                onClick={() => {
+                                  if (currentSection && currentSection.exercises) {
+                                    const updatedExercises = currentSection.exercises.map(ex => 
+                                      ex.id === exercise.id 
+                                        ? {...ex, sets: ex.sets.filter(s => s.id !== set.id)}
+                                        : ex
+                                    );
+                                    setCurrentSection({...currentSection, exercises: updatedExercises});
+                                  }
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             </div>
                           ))}
                         </>
