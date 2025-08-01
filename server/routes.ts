@@ -190,8 +190,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add purchase status to each program (free programs are always considered "purchased")
       const programsWithStatus = programs.map(program => ({
         ...program,
-        isPurchased: purchasedPrograms.includes(program.id.toString()) || program.price === 0,
-        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+        isPurchased: purchasedPrograms.includes(program.id.toString()) || (program.price || 0) === 0,
+        priceFormatted: `$${((program.price || 0) / 100).toFixed(2)}`
       }));
       
       res.json(programsWithStatus);
@@ -213,12 +213,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const isPurchased = purchasedPrograms.includes(programId.toString()) || program.price === 0;
+      const isPurchased = purchasedPrograms.includes(programId.toString()) || (program.price || 0) === 0;
       
       res.json({
         ...program,
         isPurchased,
-        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+        priceFormatted: `$${((program.price || 0) / 100).toFixed(2)}`
       });
     } catch (error) {
       console.error("Error fetching program details:", error);
@@ -237,12 +237,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const isPurchased = purchasedPrograms.includes(programId.toString()) || program.price === 0;
+      const isPurchased = purchasedPrograms.includes(programId.toString()) || (program.price || 0) === 0;
       
       res.json({
         ...program,
         isPurchased,
-        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+        priceFormatted: `$${((program.price || 0) / 100).toFixed(2)}`
       });
     } catch (error) {
       console.error("Error fetching workout program:", error);
@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has purchased this program OR if it's a free program
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
       const isPurchased = purchasedPrograms.includes(programId.toString());
-      const isFreeProgram = program.price === 0;
+      const isFreeProgram = (program.price || 0) === 0;
       
       if (!isPurchased && !isFreeProgram) {
         return res.status(403).json({ error: "Program not purchased" });
@@ -298,7 +298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create Stripe payment intent for one-time purchase
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: program.price, // Already in cents
+        amount: program.price || 0, // Already in cents
         currency: "usd",
         metadata: {
           userId: userId.toString(),
@@ -601,7 +601,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         subscriptionId: subscription.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        clientSecret: (typeof subscription.latest_invoice === 'object' && subscription.latest_invoice?.payment_intent && typeof subscription.latest_invoice.payment_intent === 'object') ? subscription.latest_invoice.payment_intent.client_secret : undefined,
         planDetails: {
           name: 'Premium AI Fitness Coach',
           duration: '3 months minimum',
@@ -908,7 +908,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hashedNewPassword = await authUtils.hashPassword(newPassword);
       
       // Update password in database
-      await storage.updateUser(getCurrentUserId(req), { password: hashedNewPassword });
+      await storage.updateUser(getCurrentUserId(req)!, { password: hashedNewPassword });
       
       res.json({ message: "Password changed successfully" });
     } catch (error) {
@@ -2216,7 +2216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currency: "usd",
         metadata: {
           goldAmount: goldAmount?.toString() || "0",
-          userId: getCurrentUserId(req).toString(),
+          userId: getCurrentUserId(req)!.toString(),
           description: description || "Gold purchase"
         }
       });
@@ -2347,7 +2347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.json({
           subscriptionId: subscription.id,
-          clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+          clientSecret: (typeof subscription.latest_invoice === 'object' && subscription.latest_invoice?.payment_intent && typeof subscription.latest_invoice.payment_intent === 'object') ? subscription.latest_invoice.payment_intent.client_secret : undefined,
         });
         return;
       }
@@ -2380,7 +2380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
       res.json({
         subscriptionId: subscription.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        clientSecret: (typeof subscription.latest_invoice === 'object' && subscription.latest_invoice?.payment_intent && typeof subscription.latest_invoice.payment_intent === 'object') ? subscription.latest_invoice.payment_intent.client_secret : undefined,
       });
     } catch (error: any) {
       console.error('Subscription creation error:', error);
@@ -2697,7 +2697,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid request ID" });
       }
 
-      const updatedRequest = await storage.updateAppRequestStatus(requestId, status, adminNotes, adminUserId);
+      const updatedRequest = await storage.updateAppRequestStatus(requestId, status, adminNotes, adminUserId!);
       res.json(updatedRequest);
     } catch (error) {
       console.error("Error updating app request:", error);
@@ -2751,11 +2751,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         level,
         tier,
-        health,
+        maxHp: health,
+        currentHp: health,
         attack,
-        defense,
         goldReward,
-        imageUrl: imageUrl || null
+        description: null,
+        isBoss: false
       });
 
       res.json(monster);
@@ -2770,7 +2771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, reason, duration } = req.body;
       const adminUserId = getCurrentUserId(req);
-      const adminUser = await storage.getUser(adminUserId);
+      const adminUser = await storage.getUser(adminUserId!);
       
       if (!userId || !reason) {
         return res.status(400).json({ error: "User ID and reason are required" });
@@ -2827,7 +2828,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, reason } = req.body;
       const adminUserId = getCurrentUserId(req);
-      const adminUser = await storage.getUser(adminUserId);
+      const adminUser = await storage.getUser(adminUserId!);
       
       if (!userId || !reason) {
         return res.status(400).json({ error: "User ID and reason are required" });
@@ -2980,8 +2981,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Calculate player stats with equipment bonuses
-      const playerAttack = user.strength + Math.floor(user.agility / 2);
-      const playerDefense = user.stamina + Math.floor(user.strength / 3);
+      const playerAttack = (user.strength || 0) + Math.floor((user.agility || 0) / 2);
+      const playerDefense = (user.stamina || 0) + Math.floor((user.strength || 0) / 3);
       
       // Calculate monster stats
       const monsterAttack = monster.attack;
@@ -3031,8 +3032,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateMonster(monsterId, { currentHp: 0 });
         
         return res.json({
-          playerHp: user.currentHp || user.maxHp || 100,
-          playerMp: user.currentMp || user.maxMp || 50,
+          playerHp: user.currentHp || 100,
+          playerMp: user.currentMp || 50,
           monster: { ...monster, currentHp: 0 },
           battleLog,
           battleResult,
@@ -3046,7 +3047,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
       const actualMonsterDamage = monsterDamage + monsterDamageVariance;
       
-      const newPlayerHp = Math.max(0, (user.currentHp || user.maxHp || 100) - actualMonsterDamage);
+      const newPlayerHp = Math.max(0, (user.currentHp || 100) - actualMonsterDamage);
       
       battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!`);
       
@@ -3061,7 +3062,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         playerHp: newPlayerHp,
-        playerMp: user.currentMp || user.maxMp || 50,
+        playerMp: user.currentMp || 50,
         monster: { ...monster, currentHp: newMonsterHp },
         battleLog,
         battleResult,
