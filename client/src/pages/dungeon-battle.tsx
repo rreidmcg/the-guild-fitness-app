@@ -324,10 +324,10 @@ export default function DungeonBattlePage() {
           <div className="max-w-2xl mx-auto">
             {battleState.monster && (
               <div className="text-center">
-                {/* Monster Name and Level - Same Row Centered */}
-                <div className="mb-3 flex items-center justify-center gap-4">
+                {/* Monster Name and Level - Same Row Centered with Lv. abbreviation */}
+                <div className="mb-3 flex items-center justify-center gap-2">
+                  <p className="text-sm md:text-base text-red-200/80">Lv. {battleState.monster.level}</p>
                   <h3 className="text-xl md:text-2xl font-bold text-red-300">{battleState.monster.name}</h3>
-                  <p className="text-sm md:text-base text-red-200/80">Level {battleState.monster.level}</p>
                 </div>
                 
                 {/* Large Monster HP Bar with darker red and white text */}
@@ -355,40 +355,44 @@ export default function DungeonBattlePage() {
 
         {/* Character Sprites - Battle Field with enhanced positioning */}
         <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
-          {/* Player Character with HP/MP bars above */}
+          {/* Player Character with HP/MP bars above (Invisible Card) */}
           <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
-            {/* Player HP/MP Bars above character */}
-            <div className="mb-4 bg-black/60 backdrop-blur-sm rounded-lg p-2 border border-green-500/30">
-              <div className="space-y-1">
-                {/* HP Bar */}
-                <div className="relative">
-                  <div className="bg-black/50 rounded-full h-2 w-32 border border-green-500/50 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-green-400 to-green-300 transition-all duration-500"
-                      style={{ 
-                        width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%`,
-                        boxShadow: '0 0 6px rgba(34, 197, 94, 0.4)'
-                      }}
-                    />
-                  </div>
-                  <div className="text-xs text-green-200 font-medium text-center">
-                    HP: {battleState.playerHp}/{battleState.playerMaxHp}
-                  </div>
+            {/* Player HP/MP Bars above character - No visible card */}
+            <div className="mb-4 space-y-1">
+              {/* HP Bar */}
+              <div className="relative">
+                <div className="bg-black/50 rounded-full h-3 w-32 border border-green-500/50 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-green-400 to-green-300 transition-all duration-500"
+                    style={{ 
+                      width: `${(battleState.playerHp / battleState.playerMaxHp) * 100}%`,
+                      boxShadow: '0 0 6px rgba(34, 197, 94, 0.4)'
+                    }}
+                  />
                 </div>
-                {/* MP Bar */}
-                <div className="relative">
-                  <div className="bg-black/50 rounded-full h-2 w-28 border border-blue-500/50 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-400 to-blue-300 transition-all duration-500"
-                      style={{ 
-                        width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%`,
-                        boxShadow: '0 0 6px rgba(59, 130, 246, 0.4)'
-                      }}
-                    />
-                  </div>
-                  <div className="text-xs text-blue-200 font-medium text-center">
-                    MP: {battleState.playerMp}/{battleState.playerMaxMp}
-                  </div>
+                {/* HP Ratio Text Inside Bar */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="text-white font-bold text-xs drop-shadow-lg">
+                    {battleState.playerHp}/{battleState.playerMaxHp}
+                  </span>
+                </div>
+              </div>
+              {/* MP Bar */}
+              <div className="relative">
+                <div className="bg-black/50 rounded-full h-3 w-28 border border-blue-500/50 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-400 to-blue-300 transition-all duration-500"
+                    style={{ 
+                      width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%`,
+                      boxShadow: '0 0 6px rgba(59, 130, 246, 0.4)'
+                    }}
+                  />
+                </div>
+                {/* MP Ratio Text Inside Bar */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="text-white font-bold text-xs drop-shadow-lg">
+                    {battleState.playerMp}/{battleState.playerMaxMp}
+                  </span>
                 </div>
               </div>
             </div>
