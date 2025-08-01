@@ -424,7 +424,7 @@ export default function DungeonBattlePage() {
             />
             <Avatar2D 
               playerStats={userStats}
-              className="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 relative z-10"
+              className="w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10"
             />
           </div>
           
