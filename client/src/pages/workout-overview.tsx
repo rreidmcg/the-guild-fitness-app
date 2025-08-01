@@ -130,12 +130,37 @@ export default function WorkoutOverview() {
           const groupedExercises: Record<string, any[]> = {};
           
           workoutExercises.forEach((exercise: any) => {
-            const sectionName = exercise.section || 'Exercises';
+            let sectionName = exercise.section;
+            
+            // If no section is specified, auto-group by exercise category
+            if (!sectionName) {
+              const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
+              const category = exerciseDetails?.category;
+              
+              switch (category) {
+                case 'warmup':
+                  sectionName = 'Warm Up';
+                  break;
+                case 'strength':
+                  sectionName = 'Main Workout';
+                  break;
+                case 'cardio':
+                  sectionName = 'Cool Down';
+                  break;
+                case 'bodyweight':
+                  sectionName = 'Warm Up';  // Group bodyweight with warm up
+                  break;
+                default:
+                  sectionName = 'Main Workout';
+              }
+            }
+            
             if (!groupedExercises[sectionName]) {
               groupedExercises[sectionName] = [];
             }
             groupedExercises[sectionName].push(exercise);
           });
+
 
           // Group supersets within each section
           const groupExercisesBySuperset = (exercises: any[]) => {
@@ -179,8 +204,8 @@ export default function WorkoutOverview() {
           return Object.entries(groupedExercises).map(([sectionName, sectionExercises]) => {
             const { supersets, regularExercises } = groupExercisesBySuperset(sectionExercises);
             
-            // Skip showing header for "Exercises" section (legacy workouts)
-            const showSectionHeader = sectionName !== 'Exercises';
+            // Show header for all sections now
+            const showSectionHeader = true;
             
             return (
               <Card key={sectionName}>
