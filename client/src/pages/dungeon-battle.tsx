@@ -458,18 +458,18 @@ export default function DungeonBattlePage() {
             <div className="flex justify-center items-center space-x-8 md:space-x-12 relative">
               {/* Attack Button - Larger and positioned */}
               <button 
-                className="w-32 h-32 md:w-40 md:h-40 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-24 h-24 md:w-30 md:h-30 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 onClick={handleAttack}
                 disabled={attackMutation.isPending}
                 style={{ transform: 'translate(50px, 50px)' }}
               >
                 {attackMutation.isPending ? (
-                  <div className="animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-9 w-9 md:h-12 md:w-12 border-b-2 border-white"></div>
                 ) : (
                   <img 
                     src={swordIconImage} 
                     alt="Attack" 
-                    className="w-32 h-32 md:w-40 md:h-40 object-contain"
+                    className="w-24 h-24 md:w-30 md:h-30 object-contain"
                     style={{ imageRendering: 'pixelated' }}
                   />
                 )}
