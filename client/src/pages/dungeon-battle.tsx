@@ -40,6 +40,7 @@ import broodmotherImage from "@assets/CE5B8D2E-90AF-4DC0-A904-EDB98089C00A_17538
 import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
 import sunsetForestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
 import battleArenaReference from "@assets/IMG_3695_1753992393781.png";
+import attackButtonIcon from "@assets/IMG_3799_1754013496468.png";
 
 interface UserStats {
   level: number;
@@ -557,15 +558,19 @@ export default function DungeonBattlePage() {
                 <>
                   {/* Attack Button */}
                   <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-red-600/80 hover:bg-red-500 border-2 border-red-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     onClick={handleAttack}
                     disabled={attackMutation.isPending}
-                    style={{ boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
                   >
                     {attackMutation.isPending ? (
                       <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-white"></div>
                     ) : (
-                      <Sword className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                      <img 
+                        src={attackButtonIcon} 
+                        alt="Attack" 
+                        className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                        style={{ imageRendering: 'pixelated' }}
+                      />
                     )}
                   </button>
                   
