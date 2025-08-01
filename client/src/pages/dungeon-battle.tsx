@@ -534,8 +534,11 @@ export default function DungeonBattlePage() {
                 className={`w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10 transition-all duration-300 ${
                   battleState.playerLunging ? 'translate-x-8 scale-110' : ''
                 } ${
-                  battleState.playerFlashing ? 'brightness-200 saturate-0' : ''
+                  battleState.playerFlashing ? 'brightness-150' : ''
                 }`}
+                style={{
+                  filter: battleState.playerFlashing ? 'brightness(1.5) hue-rotate(0deg) saturate(2) sepia(1) contrast(1.2) drop-shadow(0 0 10px rgba(255,0,0,0.8))' : undefined
+                }}
               />
               {/* Monster Damage to Player */}
               {battleState.monsterDamage && (
@@ -567,19 +570,22 @@ export default function DungeonBattlePage() {
                   className={`w-36 h-36 sm:w-48 sm:h-48 md:w-72 md:h-72 object-contain relative z-10 transition-all duration-300 ${
                     battleState.monsterLunging ? '-translate-x-8 scale-110' : ''
                   } ${
-                    battleState.monsterFlashing ? 'brightness-200 saturate-0' : ''
+                    battleState.monsterFlashing ? 'brightness-150' : ''
                   }`}
                   style={{ 
                     imageRendering: 'pixelated',
-                    filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                    filter: battleState.monsterFlashing 
+                      ? 'brightness(1.5) hue-rotate(0deg) saturate(2) sepia(1) contrast(1.2) drop-shadow(0 0 10px rgba(255,0,0,0.8))' 
+                      : 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
                   }}
                 />
                 {/* Player Damage to Monster */}
                 {battleState.playerDamage && (
                   <div 
-                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-white animate-bounce z-20"
+                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold z-20"
                     style={{ 
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                      color: '#ffffff',
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255,255,255,0.5)',
                       animation: 'float-up 1s ease-out forwards'
                     }}
                   >
