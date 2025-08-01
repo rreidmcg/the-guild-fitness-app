@@ -132,92 +132,9 @@ interface BattleState {
   currentMonsterIndex: number;
   totalGoldEarned: number;
   zone: DungeonZone | null;
-  showActionModal: boolean;
-  actionMode?: 'main' | 'fight' | 'item';
 }
 
-// Inline item menu component for battle usage
-function InlineItemMenu({ setBattleState, isMobile = false }: { setBattleState: any, isMobile?: boolean }) {
-  const { toast } = useToast();
-  const { data: inventory } = useQuery({
-    queryKey: ["/api/inventory"],
-  });
 
-  const usePotionMutation = useMutation({
-    mutationFn: async (potionType: string) => {
-      return apiRequest("/api/use-potion", {
-        method: "POST",
-        body: { potionType }
-      });
-    },
-    onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/inventory"] });
-      // No success toast - only show errors
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Cannot Use Potion",
-        description: error.message || "You don't have this potion or are already at full capacity",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const potions = Array.isArray(inventory) ? inventory.filter((item: any) => item.itemType === 'potion') : [];
-
-  if (isMobile) {
-    return (
-      <div className="flex space-x-2 w-full">
-        {potions.length === 0 ? (
-          <div className="flex-1 text-xs tracking-wider uppercase battle-menu-text text-center">NO ITEMS</div>
-        ) : (
-          potions.slice(0, 2).map((potion: any) => (
-            <button
-              key={potion.id}
-              className="flex-1 text-xs font-semibold text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-              onClick={() => usePotionMutation.mutate(potion.itemId)}
-              disabled={usePotionMutation.isPending}
-            >
-              {potion.itemId.split('_')[0].toUpperCase()} x{potion.quantity}
-            </button>
-          ))
-        )}
-        <button 
-          className="flex-1 text-xs text-center tracking-wider uppercase battle-menu-text hover:bg-white/10 rounded transition-colors"
-          onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
-        >
-          ← BACK
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-0.5 text-center">
-      {potions.length === 0 ? (
-        <div className="text-xs tracking-wider uppercase battle-menu-text">NO ITEMS</div>
-      ) : (
-        potions.slice(0, 3).map((potion: any) => (
-          <button
-            key={potion.id}
-            className="block w-full text-xs font-semibold text-center tracking-wider uppercase battle-menu-text"
-            onClick={() => usePotionMutation.mutate(potion.itemId)}
-            disabled={usePotionMutation.isPending}
-          >
-            {potion.itemId.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())} x{potion.quantity}
-          </button>
-        ))
-      )}
-      <button 
-        className="block w-full text-xs text-center tracking-wider uppercase battle-menu-text"
-        onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
-      >
-        ← BACK
-      </button>
-    </div>
-  );
-}
 
 export default function DungeonBattlePage() {
   const navigate = useNavigate();
@@ -236,9 +153,7 @@ export default function DungeonBattlePage() {
     battleResult: 'ongoing',
     currentMonsterIndex: 0,
     totalGoldEarned: 0,
-    zone: null,
-    showActionModal: false,
-    actionMode: 'main'
+    zone: null
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -262,12 +177,7 @@ export default function DungeonBattlePage() {
     }
   }, [userStats, zoneId]);
 
-  // Reset action mode when it's the player's turn
-  useEffect(() => {
-    if (battleState.isPlayerTurn && battleState.battleResult === 'ongoing') {
-      setBattleState(prev => ({ ...prev, actionMode: 'main' }));
-    }
-  }, [battleState.isPlayerTurn, battleState.battleResult]);
+
 
   // Prevent scrolling on battle page
   useEffect(() => {
@@ -523,93 +433,33 @@ export default function DungeonBattlePage() {
         {/* Mobile & Desktop Layout - Circular buttons */}
         <div className="p-4 md:p-6">
           {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-            <div className="flex justify-center items-center space-x-4 md:space-x-6">
-              {battleState.actionMode === 'main' ? (
-                <>
-                  {/* Fight Button */}
-                  <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
-                  >
-                    <img 
-                      src={attackButtonIcon} 
-                      alt="Fight" 
-                      className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                      style={{ imageRendering: 'pixelated' }}
-                    />
-                  </button>
-                  
-                  {/* Items Button */}
-                  <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-green-600/80 hover:bg-green-500 border-2 border-green-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
-                    style={{ boxShadow: '0 4px 12px rgba(34, 197, 94, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
-                  >
-                    <Package className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                  </button>
-                  
-                  {/* Flee Button */}
-                  <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                    onClick={() => {
-                      if (window.confirm("Are you sure you want to flee from battle?")) {
-                        handleRetreat();
-                      }
-                    }}
-                    style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
-                  >
-                    <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                  </button>
-                </>
-              ) : battleState.actionMode === 'fight' ? (
-                <>
-                  {/* Attack Button */}
-                  <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-red-600/80 hover:bg-red-500 border-2 border-red-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    onClick={handleAttack}
-                    disabled={attackMutation.isPending}
-                    style={{ boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
-                  >
-                    {attackMutation.isPending ? (
-                      <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-white"></div>
-                    ) : (
-                      <Sword className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                    )}
-                  </button>
-                  
-                  {/* Defend Button */}
-                  <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-yellow-600/80 hover:bg-yellow-500 border-2 border-yellow-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                    onClick={() => {
-                      setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
-                      toast({ title: "Defense", description: "You brace for the enemy's attack!" });
-                    }}
-                    style={{ boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
-                  >
-                    <Shield className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                  </button>
-                  
-                  {/* Back Button */}
-                  <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
-                    style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
-                  >
-                    <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                  </button>
-                </>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <InlineItemMenu setBattleState={setBattleState} />
-                  <button 
-                    className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
-                    style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
-                  >
-                    <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
-                  </button>
-                </div>
-              )}
+            <div className="flex justify-center items-center space-x-8 md:space-x-12">
+              {/* Attack Button */}
+              <button 
+                className="w-16 h-16 md:w-20 md:h-20 bg-red-600/80 hover:bg-red-500 border-2 border-red-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                onClick={handleAttack}
+                disabled={attackMutation.isPending}
+                style={{ boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+              >
+                {attackMutation.isPending ? (
+                  <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-white"></div>
+                ) : (
+                  <Sword className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                )}
+              </button>
+              
+              {/* Flee Button */}
+              <button 
+                className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to flee from battle?")) {
+                    handleRetreat();
+                  }
+                }}
+                style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+              >
+                <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
+              </button>
             </div>
           ) : (
             <div className="text-center text-lg md:text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50">
