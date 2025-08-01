@@ -514,141 +514,97 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Enhanced Action Interface - Inspired by classic RPG design */}
+      {/* Circular Icon Battle Interface */}
       <div className="fixed bottom-16 left-0 right-0 z-30 bg-black/80 backdrop-blur-md border-t-2 border-blue-400/50" style={{ boxShadow: '0 -4px 20px rgba(0,0,0,0.6), inset 0 2px 4px rgba(59, 130, 246, 0.2)' }}>
-        {/* Mobile Layout - Clean and accessible */}
-        <div className="block md:hidden p-4">
+        {/* Mobile & Desktop Layout - Circular buttons */}
+        <div className="p-4 md:p-6">
           {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="flex justify-center items-center space-x-4 md:space-x-6">
               {battleState.actionMode === 'main' ? (
                 <>
+                  {/* Fight Button */}
                   <button 
-                    className="bg-blue-600/80 hover:bg-blue-500 border border-blue-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
-                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
-                    style={{ boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
-                  >
-                    ⚔️ FIGHT
-                  </button>
-                  <button 
-                    className="bg-green-600/80 hover:bg-green-500 border border-green-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
-                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
-                    style={{ boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
-                  >
-                    🧪 ITEM
-                  </button>
-                  <button 
-                    className="bg-gray-600/80 hover:bg-gray-500 border border-gray-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
-                    onClick={handleRetreat}
-                    style={{ boxShadow: '0 2px 8px rgba(75, 85, 99, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
-                  >
-                    🏃 RUN
-                  </button>
-                </>
-              ) : battleState.actionMode === 'fight' ? (
-                <>
-                  <button 
-                    className="bg-red-600/80 hover:bg-red-500 border border-red-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    onClick={handleAttack}
-                    disabled={attackMutation.isPending}
-                    style={{ boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
-                  >
-                    {attackMutation.isPending ? "⏳ ATTACKING..." : "💥 ATTACK"}
-                  </button>
-                  <button 
-                    className="bg-yellow-600/80 hover:bg-yellow-500 border border-yellow-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
-                    onClick={() => {
-                      setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
-                      toast({ title: "Defense", description: "You brace for the enemy's attack!" });
-                    }}
-                    style={{ boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
-                  >
-                    🛡️ DEFEND
-                  </button>
-                  <button 
-                    className="bg-gray-600/80 hover:bg-gray-500 border border-gray-400/50 rounded-lg p-3 text-sm font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
-                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
-                    style={{ boxShadow: '0 2px 8px rgba(75, 85, 99, 0.3), inset 0 1px 2px rgba(255,255,255,0.1)' }}
-                  >
-                    ← BACK
-                  </button>
-                </>
-              ) : (
-                <div className="col-span-3">
-                  <InlineItemMenu setBattleState={setBattleState} isMobile={true} />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center text-lg font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border border-red-400/50">
-              ⏳ ENEMY TURN
-            </div>
-          )}
-        </div>
-
-        {/* Desktop Layout - Enhanced visual design */}
-        <div className="hidden md:flex h-20 items-center px-6">
-          {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-            <div className="flex space-x-4 mx-auto">
-              {battleState.actionMode === 'main' ? (
-                <>
-                  <button 
-                    className="bg-blue-600/80 hover:bg-blue-500 border-2 border-blue-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    className="w-16 h-16 md:w-20 md:h-20 bg-blue-600/80 hover:bg-blue-500 border-2 border-blue-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                     onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'fight' }))}
                     style={{ boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
                   >
-                    ⚔️ FIGHT
+                    <Sword className="w-6 h-6 md:w-8 md:h-8 text-white" />
                   </button>
+                  
+                  {/* Items Button */}
                   <button 
-                    className="bg-green-600/80 hover:bg-green-500 border-2 border-green-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    className="w-16 h-16 md:w-20 md:h-20 bg-green-600/80 hover:bg-green-500 border-2 border-green-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                     onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'item' }))}
                     style={{ boxShadow: '0 4px 12px rgba(34, 197, 94, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
                   >
-                    🧪 ITEM
+                    <Package className="w-6 h-6 md:w-8 md:h-8 text-white" />
                   </button>
+                  
+                  {/* Flee Button */}
                   <button 
-                    className="bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
-                    onClick={handleRetreat}
+                    className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
+                    onClick={() => {
+                      if (window.confirm("Are you sure you want to flee from battle?")) {
+                        handleRetreat();
+                      }
+                    }}
                     style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
                   >
-                    🏃 RUN
+                    <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
                   </button>
                 </>
               ) : battleState.actionMode === 'fight' ? (
                 <>
+                  {/* Attack Button */}
                   <button 
-                    className="bg-red-600/80 hover:bg-red-500 border-2 border-red-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-16 h-16 md:w-20 md:h-20 bg-red-600/80 hover:bg-red-500 border-2 border-red-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     onClick={handleAttack}
                     disabled={attackMutation.isPending}
                     style={{ boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
                   >
-                    {attackMutation.isPending ? "⏳ ATTACKING..." : "💥 ATTACK"}
+                    {attackMutation.isPending ? (
+                      <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-white"></div>
+                    ) : (
+                      <Sword className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                    )}
                   </button>
+                  
+                  {/* Defend Button */}
                   <button 
-                    className="bg-yellow-600/80 hover:bg-yellow-500 border-2 border-yellow-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    className="w-16 h-16 md:w-20 md:h-20 bg-yellow-600/80 hover:bg-yellow-500 border-2 border-yellow-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                     onClick={() => {
                       setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }));
                       toast({ title: "Defense", description: "You brace for the enemy's attack!" });
                     }}
                     style={{ boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
                   >
-                    🛡️ DEFEND
+                    <Shield className="w-6 h-6 md:w-8 md:h-8 text-white" />
                   </button>
+                  
+                  {/* Back Button */}
                   <button 
-                    className="bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-lg px-6 py-3 text-base font-bold text-white tracking-wider uppercase transition-all duration-200 transform hover:scale-105"
+                    className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                     onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
                     style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
                   >
-                    ← BACK
+                    <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
                   </button>
                 </>
               ) : (
-                <div className="flex space-x-4">
+                <div className="flex items-center space-x-4">
                   <InlineItemMenu setBattleState={setBattleState} />
+                  <button 
+                    className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
+                    onClick={() => setBattleState((prev: any) => ({ ...prev, actionMode: 'main' }))}
+                    style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
+                  >
+                    <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                  </button>
                 </div>
               )}
             </div>
           ) : (
-            <div className="text-center text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50 mx-auto px-8">
+            <div className="text-center text-lg md:text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50">
               ⏳ ENEMY TURN
             </div>
           )}
