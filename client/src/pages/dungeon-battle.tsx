@@ -529,8 +529,7 @@ export default function DungeonBattlePage() {
               style={{ transform: 'translateY(10px)' }}
             />
             <div className="relative">
-              <Avatar2D 
-                playerStats={userStats}
+              <div 
                 className={`w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10 transition-all duration-300 ${
                   battleState.playerLunging ? 'translate-x-8 scale-110' : ''
                 } ${
@@ -539,7 +538,12 @@ export default function DungeonBattlePage() {
                 style={{
                   filter: battleState.playerFlashing ? 'brightness(1.5) hue-rotate(0deg) saturate(2) sepia(1) contrast(1.2) drop-shadow(0 0 10px rgba(255,0,0,0.8))' : undefined
                 }}
-              />
+              >
+                <Avatar2D 
+                  playerStats={userStats}
+                  className="[&>div]:!bg-transparent [&>div]:!shadow-none [&>div]:!border-none [&>div]:!rounded-none"
+                />
+              </div>
               {/* Monster Damage to Player */}
               {battleState.monsterDamage && (
                 <div 
