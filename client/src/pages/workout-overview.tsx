@@ -100,7 +100,7 @@ export default function WorkoutOverview() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-500">
-                  {exercises.reduce((total: number, ex: any) => total + (ex.sets?.length || 0), 0)}
+                  {workoutExercises.reduce((total: number, ex: any) => total + (ex.sets || 0), 0)}
                 </div>
                 <div className="text-sm text-muted-foreground">Total Sets</div>
               </div>
