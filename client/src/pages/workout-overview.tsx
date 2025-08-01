@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
-import { ArrowLeft, Play, Clock, Target, Dumbbell } from "lucide-react";
+import { ArrowLeft, Play, Clock, Target, Dumbbell, Edit3 } from "lucide-react";
 
 export default function WorkoutOverview() {
   const params = new URLSearchParams(window.location.search);
@@ -113,14 +113,24 @@ export default function WorkoutOverview() {
               </div>
             )}
 
-            <Button 
-              onClick={() => navigate(`/workout-session/${workoutId}`)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
-              size="lg"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Start Workout
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => navigate(`/workout-session/${workoutId}`)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
+                size="lg"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                Start Workout
+              </Button>
+              <Button 
+                onClick={() => navigate(`/workout-builder?edit=${workoutId}`)}
+                variant="outline"
+                size="lg"
+                className="py-3"
+              >
+                <Edit3 className="w-5 h-5" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
