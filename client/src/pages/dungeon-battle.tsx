@@ -337,11 +337,13 @@ export default function DungeonBattlePage() {
                     Lv. {battleState.monster.level}
                   </p>
                   <h3 
-                    className="text-xl md:text-2xl font-bold" 
                     style={{ 
-                      color: '#7f1d1d', 
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                      filter: 'none'
+                      color: '#7f1d1d !important', 
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.8) !important',
+                      fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
+                      fontWeight: 'bold',
+                      filter: 'none !important',
+                      WebkitTextFillColor: '#7f1d1d !important'
                     }}
                   >
                     {battleState.monster.name}
