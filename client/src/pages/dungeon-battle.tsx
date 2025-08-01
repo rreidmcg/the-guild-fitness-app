@@ -25,6 +25,7 @@ import {
 import swordIconImage from "@assets/IMG_3799_1754013496468.png";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { Avatar2D } from "@/components/ui/avatar-2d";
+import { BattleAccessGuard } from "@/components/ui/battle-access-guard";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
 // Import monster images
@@ -407,7 +408,8 @@ export default function DungeonBattlePage() {
   const progressPercent = ((battleState.currentMonsterIndex + (battleState.battleResult === 'victory' ? 1 : 0)) / battleState.zone.monsters.length) * 100;
 
   return (
-    <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+    <BattleAccessGuard>
+      <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
       {/* Forest Background */}
       <div 
         className="fixed inset-0 z-0"
@@ -653,8 +655,8 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-
-    </div>
+      </div>
+    </BattleAccessGuard>
   );
 }
 

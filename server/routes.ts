@@ -2957,20 +2957,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to check battle access
+  function hasBattleAccess(user: any): boolean {
+    return user?.username === 'Zero' || user?.currentTitle === '<G.M.>';
+  }
+
   // Battle system routes
   app.post("/api/battle/attack", async (req, res) => {
     try {
       const userId = requireAuth(req);
       const { monster, playerHp, playerMp } = req.body;
       
+      // Check battle access
+      const user = await storage.getUser(userId);
+      if (!user || !hasBattleAccess(user)) {
+        return res.status(403).json({ error: "You Do Not Have Access To This Feature" });
+      }
+      
       if (!monster) {
         return res.status(400).json({ error: "Monster data is required" });
-      }
-
-      // Get user stats for battle calculations
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
       }
 
       // Calculate player stats with equipment bonuses

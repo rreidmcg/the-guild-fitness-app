@@ -33,6 +33,7 @@ import goblinWarlordImage from "@assets/36CF820D-0CC0-4C99-A780-79B6D125B307_175
 import broodmotherImage from "@assets/CE5B8D2E-90AF-4DC0-A904-EDB98089C00A_1753845237897.png";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
+import { BattleAccessGuard } from "@/components/ui/battle-access-guard";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { queryClient } from "@/lib/queryClient";
 
@@ -220,8 +221,9 @@ export default function PvEDungeonsPage() {
   const userLevel = userStats.level || 1;
 
   return (
-    <ParallaxBackground showForestBackground={true}>
-      <div className="container mx-auto p-4 max-w-4xl">
+    <BattleAccessGuard>
+      <ParallaxBackground showForestBackground={true}>
+        <div className="container mx-auto p-4 max-w-4xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
@@ -419,5 +421,6 @@ export default function PvEDungeonsPage() {
       {/* Modal removed - dungeons now navigate directly to battle */}
       </div>
     </ParallaxBackground>
+    </BattleAccessGuard>
   );
 }
