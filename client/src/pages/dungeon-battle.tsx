@@ -41,6 +41,7 @@ import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_
 import sunsetForestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
 import battleArenaReference from "@assets/IMG_3695_1753992393781.png";
 import attackButtonIcon from "@assets/IMG_3799_1754013496468.png";
+import fleeButtonIcon from "@assets/IMG_3802_1754019197198.png";
 
 interface UserStats {
   level: number;
@@ -450,15 +451,19 @@ export default function DungeonBattlePage() {
               
               {/* Flee Button */}
               <button 
-                className="w-16 h-16 md:w-20 md:h-20 bg-gray-600/80 hover:bg-gray-500 border-2 border-gray-400/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
+                className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                 onClick={() => {
                   if (window.confirm("Are you sure you want to flee from battle?")) {
                     handleRetreat();
                   }
                 }}
-                style={{ boxShadow: '0 4px 12px rgba(75, 85, 99, 0.4), inset 0 2px 4px rgba(255,255,255,0.1)' }}
               >
-                <ArrowLeft className="w-6 h-6 md:w-8 md:h-8 text-white" />
+                <img 
+                  src={fleeButtonIcon} 
+                  alt="Flee" 
+                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                  style={{ imageRendering: 'pixelated' }}
+                />
               </button>
             </div>
           ) : (
