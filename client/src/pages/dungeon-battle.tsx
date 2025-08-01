@@ -170,6 +170,8 @@ interface BattleState {
   monsterLunging: boolean;
   playerDamage: number | null;
   monsterDamage: number | null;
+  playerFlashing: boolean;
+  monsterFlashing: boolean;
 }
 
 
@@ -195,7 +197,9 @@ export default function DungeonBattlePage() {
     playerLunging: false,
     monsterLunging: false,
     playerDamage: null,
-    monsterDamage: null
+    monsterDamage: null,
+    playerFlashing: false,
+    monsterFlashing: false
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -295,11 +299,12 @@ export default function DungeonBattlePage() {
     const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
     const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
 
-    // Start lunge animation
+    // Start player lunge and monster flash (taking damage)
     setBattleState(prev => ({
       ...prev,
       playerLunging: true,
-      playerDamage: playerDamage
+      playerDamage: playerDamage,
+      monsterFlashing: playerDamage !== null
     }));
 
     // After player lunge, show monster counter if applicable
@@ -316,19 +321,20 @@ export default function DungeonBattlePage() {
         playerLunging: false,
         monsterLunging: monsterDamage !== null,
         monsterDamage: monsterDamage,
-        playerDamage: null
+        playerDamage: null,
+        monsterFlashing: false,
+        playerFlashing: monsterDamage !== null
       }));
 
-      // Clear monster animation after delay
-      if (monsterDamage !== null) {
-        setTimeout(() => {
-          setBattleState(prev => ({
-            ...prev,
-            monsterLunging: false,
-            monsterDamage: null
-          }));
-        }, 800);
-      }
+      // Clear all animations after delay
+      setTimeout(() => {
+        setBattleState(prev => ({
+          ...prev,
+          monsterLunging: false,
+          monsterDamage: null,
+          playerFlashing: false
+        }));
+      }, 800);
     }, 800);
 
     if (data.battleResult === 'victory') {
@@ -504,8 +510,10 @@ export default function DungeonBattlePage() {
             <div className="relative">
               <Avatar2D 
                 playerStats={userStats}
-                className={`w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10 transition-transform duration-300 ${
+                className={`w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10 transition-all duration-300 ${
                   battleState.playerLunging ? 'translate-x-8 scale-110' : ''
+                } ${
+                  battleState.playerFlashing ? 'brightness-200 saturate-0' : ''
                 }`}
               />
               {/* Monster Damage to Player */}
@@ -535,8 +543,10 @@ export default function DungeonBattlePage() {
                 <img 
                   src={battleState.monster.image} 
                   alt={battleState.monster.name}
-                  className={`w-36 h-36 sm:w-48 sm:h-48 md:w-72 md:h-72 object-contain relative z-10 transition-transform duration-300 ${
+                  className={`w-36 h-36 sm:w-48 sm:h-48 md:w-72 md:h-72 object-contain relative z-10 transition-all duration-300 ${
                     battleState.monsterLunging ? '-translate-x-8 scale-110' : ''
+                  } ${
+                    battleState.monsterFlashing ? 'brightness-200 saturate-0' : ''
                   }`}
                   style={{ 
                     imageRendering: 'pixelated',
@@ -546,7 +556,7 @@ export default function DungeonBattlePage() {
                 {/* Player Damage to Monster */}
                 {battleState.playerDamage && (
                   <div 
-                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-orange-400 animate-bounce z-20"
+                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-white animate-bounce z-20"
                     style={{ 
                       textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
                       animation: 'float-up 1s ease-out forwards'
