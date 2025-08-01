@@ -508,16 +508,16 @@ export default function DungeonBattlePage() {
                   battleState.playerLunging ? 'translate-x-8 scale-110' : ''
                 }`}
               />
-              {/* Player Damage Number */}
-              {battleState.playerDamage && (
+              {/* Monster Damage to Player */}
+              {battleState.monsterDamage && (
                 <div 
-                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-orange-400 animate-bounce z-20"
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-red-400 animate-bounce z-20"
                   style={{ 
                     textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
                     animation: 'float-up 1s ease-out forwards'
                   }}
                 >
-                  -{battleState.playerDamage}
+                  -{battleState.monsterDamage}
                 </div>
               )}
             </div>
@@ -543,16 +543,16 @@ export default function DungeonBattlePage() {
                     filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
                   }}
                 />
-                {/* Monster Damage Number */}
-                {battleState.monsterDamage && (
+                {/* Player Damage to Monster */}
+                {battleState.playerDamage && (
                   <div 
-                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-red-400 animate-bounce z-20"
+                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-orange-400 animate-bounce z-20"
                     style={{ 
                       textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
                       animation: 'float-up 1s ease-out forwards'
                     }}
                   >
-                    -{battleState.monsterDamage}
+                    -{battleState.playerDamage}
                   </div>
                 )}
               </div>
