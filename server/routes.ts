@@ -3001,20 +3001,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if monster is defeated
       let battleResult = 'ongoing';
       let goldEarned = 0;
+      let experienceGained = 0;
       
       if (newMonsterHp <= 0) {
         battleResult = 'victory';
         goldEarned = monster.goldReward || 25;
+        experienceGained = monster.level * 15 + 35; // Base XP based on monster level
         
         battleLog.push(`${monster.name} is defeated!`);
-        battleLog.push(`You gained ${goldEarned} gold!`);
+        battleLog.push(`You gained ${goldEarned} gold and ${experienceGained} XP!`);
         
-        // Update user stats (only gold and battles won, no XP from battles)
+        // Update user stats
         const newGold = (user.gold || 0) + goldEarned;
+        const newExperience = (user.experience || 0) + experienceGained;
+        const newLevel = calculateLevel(newExperience);
         const newBattlesWon = (user.battlesWon || 0) + 1;
         
         await storage.updateUser(userId, {
           gold: newGold,
+          experience: newExperience,
+          level: newLevel,
           battlesWon: newBattlesWon
         });
         
@@ -3030,7 +3036,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           monster: { ...monster, currentHp: 0 },
           battleLog,
           battleResult,
-          goldEarned
+          goldEarned,
+          experienceGained
         });
       }
       
