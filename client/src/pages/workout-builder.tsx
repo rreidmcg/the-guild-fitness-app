@@ -84,19 +84,19 @@ export default function WorkoutBuilder() {
   const [isEditingExercise, setIsEditingExercise] = useState(false);
   const [editedExercise, setEditedExercise] = useState<any>(null);
 
-  const { data: exercises = [] } = useQuery({
+  const { data: exercises = [], isLoading: exercisesLoading } = useQuery({
     queryKey: ["/api/exercises"],
   });
 
   // Query for existing workout if in edit mode
-  const { data: existingWorkout } = useQuery({
+  const { data: existingWorkout, isLoading: workoutLoading } = useQuery({
     queryKey: ["/api/workouts", editWorkoutId],
     enabled: isEditMode && !!editWorkoutId,
   });
 
   // Load existing workout data when available
   useEffect(() => {
-    if (existingWorkout && isEditMode) {
+    if (existingWorkout && isEditMode && exercises && exercises.length > 0 && !exercisesLoading && !workoutLoading) {
       const workout = existingWorkout as any;
       setWorkoutName(workout.name || "");
       setWorkoutDescription(workout.description || "");
@@ -165,7 +165,7 @@ export default function WorkoutBuilder() {
         setSections(workoutSections);
       }
     }
-  }, [existingWorkout, isEditMode]);
+  }, [existingWorkout, isEditMode, exercises, exercisesLoading, workoutLoading]);
 
   const createWorkoutMutation = useMutation({
     mutationFn: async (workoutData: any) => {
