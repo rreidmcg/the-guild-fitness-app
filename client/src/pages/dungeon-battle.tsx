@@ -469,7 +469,8 @@ export default function DungeonBattlePage() {
                   <img 
                     src={swordIconImage} 
                     alt="Attack" 
-                    className="w-6 h-6 md:w-8 md:h-8 object-contain"
+                    className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                    style={{ imageRendering: 'pixelated' }}
                   />
                 )}
               </button>
