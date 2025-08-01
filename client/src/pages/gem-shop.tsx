@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { LoadingState } from "@/components/ui/loading-spinner";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -494,16 +495,10 @@ export default function GemShop() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="h-8 bg-muted animate-pulse rounded mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-80 bg-muted animate-pulse rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <LoadingState 
+        tipCategory="features" 
+        message="Loading gem shop..." 
+      />
     );
   }
 

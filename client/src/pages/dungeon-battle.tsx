@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BattleLoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Sword, 
@@ -294,11 +295,7 @@ export default function DungeonBattlePage() {
   };
 
   if (!userStats || !battleState.zone) {
-    return (
-      <div className="container mx-auto p-4 max-w-4xl">
-        <div className="text-center text-muted-foreground">Loading battle...</div>
-      </div>
-    );
+    return <BattleLoadingState message="Initializing battle..." />;
   }
 
   const progressPercent = ((battleState.currentMonsterIndex + (battleState.battleResult === 'victory' ? 1 : 0)) / battleState.zone.monsters.length) * 100;

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { LoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
@@ -140,18 +141,10 @@ export default function MailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background text-foreground pb-20">
-        <div className="pt-16 space-y-4 p-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-6 bg-muted rounded w-2/3 mb-2"></div>
-                <div className="h-4 bg-muted rounded w-full"></div>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <LoadingState 
+        tipCategory="features" 
+        message="Loading your mail..." 
+      />
     );
   }
 

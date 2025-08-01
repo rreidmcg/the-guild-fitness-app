@@ -3,6 +3,7 @@ import { useNavigate } from "@/hooks/use-navigate";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BattleLoadingState } from "@/components/ui/loading-spinner";
 import { 
   Sword, 
   Users,
@@ -54,11 +55,7 @@ export default function BattlePage() {
   });
 
   if (!userStats) {
-    return (
-      <div className="container mx-auto p-4 max-w-4xl">
-        <div className="text-center text-muted-foreground">Loading...</div>
-      </div>
-    );
+    return <BattleLoadingState />;
   }
 
   const userLevel = (userStats as UserStats)?.level || 1;

@@ -10,6 +10,7 @@ import { StatBar } from "@/components/ui/stat-bar";
 import { WardrobeModal } from "@/components/ui/wardrobe-modal";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { AtrophyWarning } from "@/components/ui/atrophy-warning";
+import { LoadingState } from "@/components/ui/loading-spinner";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { getTitleComponent } from "@/lib/title-rarity";
@@ -137,14 +138,10 @@ export default function Stats() {
 
   if (userStatsLoading || workoutSessionsLoading || personalRecordsLoading || inventoryLoading || achievementsLoading || userAchievementsLoading) {
     return (
-      <div className="min-h-screen bg-background text-foreground pb-20">
-        <div className="max-w-4xl mx-auto p-6 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading your stats...</p>
-          </div>
-        </div>
-      </div>
+      <LoadingState 
+        tipCategory="progression" 
+        message="Loading your character stats..." 
+      />
     );
   }
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LoadingState } from "@/components/ui/loading-spinner";
 import { CheckCircle, Coins, ArrowLeft, Home, XCircle } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 
@@ -46,12 +47,10 @@ export default function PaymentSuccess() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-          <p className="text-muted-foreground">Verifying your payment...</p>
-        </div>
-      </div>
+      <LoadingState 
+        tipCategory="features" 
+        message="Verifying your payment..." 
+      />
     );
   }
 

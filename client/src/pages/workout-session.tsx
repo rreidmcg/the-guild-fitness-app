@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
+import { WorkoutLoadingState } from "@/components/ui/loading-spinner";
 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -49,12 +50,12 @@ export default function WorkoutSession() {
     }
   }, [workout]);
 
-  // Page loading effect with gentle fade-in
+  // Page loading effect with minimum delay for tips
   useEffect(() => {
     const loadTimer = setTimeout(() => {
       setIsLoading(false);
       setTimeout(() => setPageLoaded(true), 100);
-    }, 800);
+    }, 2500); // Increased from 800ms to allow time to read tips
     return () => clearTimeout(loadTimer);
   }, []);
 
@@ -190,9 +191,9 @@ export default function WorkoutSession() {
 
   const progress = exerciseData.length > 0 ? (currentExerciseIndex / exerciseData.length) * 100 : 0;
 
-  // Show loading skeleton during initial load
+  // Show loading screen with tips during initial load
   if (isLoading || statsLoading || workoutLoading) {
-    return <LoadingSkeleton />;
+    return <WorkoutLoadingState message="Preparing your workout session..." />;
   }
 
   // Handle case where workout is not found

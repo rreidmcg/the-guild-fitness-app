@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { WorkoutCard } from "@/components/ui/workout-card";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
+import { WorkoutLoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 
 import { apiRequest } from "@/lib/queryClient";
@@ -83,7 +84,7 @@ export default function Workouts() {
       
       if (variables.completed) {
         // Quest completed - always earn 5 XP per quest (with potential streak bonus)
-        const hasStreakBonus = userStats && userStats.currentStreak >= 3;
+        const hasStreakBonus = userStats && userStats.currentStreak && userStats.currentStreak >= 3;
         const baseXp = hasStreakBonus ? Math.floor(5 * 1.5) : 5;
         
         let message = "Quest Completed!";
@@ -209,7 +210,7 @@ export default function Workouts() {
                     <span className="text-foreground">All 4: +5 Bonus XP</span>
                   </div>
                 </div>
-                {userStats && userStats.currentStreak >= 3 && (
+                {userStats && userStats.currentStreak && userStats.currentStreak >= 3 && (
                   <div className="flex items-center space-x-1 px-2 py-1 bg-purple-900/30 rounded border border-purple-600">
                     <TrendingUp className="w-4 h-4 text-purple-400" />
                     <span className="text-purple-300 text-xs font-semibold">
