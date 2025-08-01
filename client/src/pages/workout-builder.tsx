@@ -583,7 +583,7 @@ export default function WorkoutBuilder() {
                             onBlur={(e) => {
                               // Delay closing to allow for clicks on dropdown items
                               setTimeout(() => {
-                                if (!e.currentTarget.contains(document.activeElement)) {
+                                if (e.currentTarget && !e.currentTarget.contains(document.activeElement)) {
                                   setOpenExerciseCombobox(null);
                                 }
                               }, 150);
@@ -976,8 +976,30 @@ export default function WorkoutBuilder() {
           <div className="max-w-4xl mx-auto flex space-x-3">
             <Button 
               onClick={() => {
-                setSelectedSectionId(currentSection?.id || null);
-                setStep('exercise-selection');
+                // Add a blank exercise card to the current section
+                if (currentSection) {
+                  const newExercise: WorkoutExercise = {
+                    id: Date.now().toString(),
+                    exerciseId: 0, // No exercise selected yet
+                    exercise: undefined,
+                    sets: [{
+                      id: (Date.now() + 1).toString(),
+                      type: 'R' as const,
+                      reps: 10,
+                      weight: 0,
+                      rest: '01:00'
+                    }],
+                    notes: ''
+                  };
+                  
+                  const updatedExercises = [...currentSection.exercises, newExercise];
+                  setCurrentSection({...currentSection, exercises: updatedExercises});
+                  
+                  // Auto-focus on the new exercise name field
+                  setTimeout(() => {
+                    setOpenExerciseCombobox(newExercise.id);
+                  }, 100);
+                }
               }}
               variant="outline"
               className="flex-1"
