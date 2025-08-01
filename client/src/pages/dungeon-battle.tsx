@@ -374,14 +374,14 @@ export default function DungeonBattlePage() {
         </div>
 
         {/* Character Sprites - Battle Field with enhanced positioning */}
-        <div className="flex-1 flex items-end justify-between px-4 sm:px-8 md:px-16 lg:px-32 xl:px-48 pb-16 sm:pb-24 md:pb-32 lg:pb-16 relative mt-16 sm:mt-24 md:mt-32 max-w-7xl mx-auto" style={{ touchAction: 'none', userSelect: 'none' }}>
+        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
           {/* Player Character with HP/MP bars above (Invisible Card) */}
-          <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-10px) sm:translateY(-15px) md:translateY(-20px)' }}>
+          <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
             {/* Player HP/MP Bars above character - No visible card */}
-            <div className="mb-2 sm:mb-3 md:mb-4 space-y-1">
+            <div className="mb-4 space-y-1">
               {/* HP Bar */}
               <div className="relative">
-                <div className="bg-black/50 rounded-full h-2 sm:h-3 md:h-3 w-24 sm:w-28 md:w-32 lg:w-40 border border-green-500/50 overflow-hidden">
+                <div className="bg-black/50 rounded-full h-3 w-32 border border-green-500/50 overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-green-400 to-green-300 transition-all duration-500"
                     style={{ 
@@ -392,14 +392,14 @@ export default function DungeonBattlePage() {
                 </div>
                 {/* HP Ratio Text Inside Bar */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-white font-bold text-xs sm:text-xs md:text-sm drop-shadow-lg">
+                  <span className="text-white font-bold text-xs drop-shadow-lg">
                     {battleState.playerHp}/{battleState.playerMaxHp}
                   </span>
                 </div>
               </div>
               {/* MP Bar */}
               <div className="relative">
-                <div className="bg-black/50 rounded-full h-2 sm:h-3 md:h-3 w-20 sm:w-24 md:w-28 lg:w-36 border border-blue-500/50 overflow-hidden">
+                <div className="bg-black/50 rounded-full h-3 w-28 border border-blue-500/50 overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-blue-400 to-blue-300 transition-all duration-500"
                     style={{ 
@@ -410,7 +410,7 @@ export default function DungeonBattlePage() {
                 </div>
                 {/* MP Ratio Text Inside Bar */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-white font-bold text-xs sm:text-xs md:text-sm drop-shadow-lg">
+                  <span className="text-white font-bold text-xs drop-shadow-lg">
                     {battleState.playerMp}/{battleState.playerMaxMp}
                   </span>
                 </div>
@@ -419,27 +419,27 @@ export default function DungeonBattlePage() {
             
             {/* Character shadow */}
             <div 
-              className="absolute bottom-0 w-12 sm:w-16 md:w-20 lg:w-24 h-3 sm:h-4 md:h-5 lg:h-6 bg-black/30 rounded-full blur-sm"
-              style={{ transform: 'translateY(8px) sm:translateY(10px) md:translateY(12px)' }}
+              className="absolute bottom-0 w-16 h-4 bg-black/30 rounded-full blur-sm"
+              style={{ transform: 'translateY(10px)' }}
             />
             <Avatar2D 
               playerStats={userStats}
-              className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-80 lg:h-80 xl:w-96 xl:h-96 relative z-10"
+              className="w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10"
             />
           </div>
           
           {/* Monster Sprite with shadow and positioning */}
           {battleState.monster && battleState.monster.image && (
-            <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-10px) sm:translateY(-15px) md:translateY(-20px)' }}>
+            <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
               {/* Monster shadow */}
               <div 
-                className="absolute bottom-0 w-16 sm:w-20 md:w-24 lg:w-28 h-4 sm:h-5 md:h-6 lg:h-7 bg-black/30 rounded-full blur-sm"
-                style={{ transform: 'translateY(-3px) sm:translateY(-4px) md:translateY(-5px)' }}
+                className="absolute bottom-0 w-24 h-6 bg-black/30 rounded-full blur-sm"
+                style={{ transform: 'translateY(-5px)' }}
               />
               <img 
                 src={battleState.monster.image} 
                 alt={battleState.monster.name}
-                className="w-24 h-24 sm:w-36 sm:h-36 md:w-48 md:h-48 lg:w-60 lg:h-60 xl:w-72 xl:h-72 object-contain relative z-10"
+                className="w-36 h-36 sm:w-48 sm:h-48 md:w-72 md:h-72 object-contain relative z-10"
                 style={{ 
                   imageRendering: 'pixelated',
                   filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
@@ -450,45 +450,45 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Circular Icon Battle Interface - Adaptive */}
-      <div className="fixed bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-16 left-0 right-0 z-30">
+      {/* Circular Icon Battle Interface - Transparent */}
+      <div className="fixed bottom-16 left-0 right-0 z-30">
         {/* Mobile & Desktop Layout - Circular buttons */}
-        <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+        <div className="p-4 md:p-6">
           {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-            <div className="flex justify-center items-center space-x-6 sm:space-x-8 md:space-x-12 lg:space-x-16 relative">
-              {/* Attack Button - Responsive sizing and positioning */}
+            <div className="flex justify-center items-center space-x-8 md:space-x-12 relative">
+              {/* Attack Button - Larger and positioned */}
               <button 
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-24 h-24 md:w-30 md:h-30 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 onClick={handleAttack}
                 disabled={attackMutation.isPending}
-                style={{ transform: 'translate(30px, 30px) sm:translate(40px, 40px) md:translate(50px, 50px) lg:translate(60px, 40px) xl:translate(80px, 30px)' }}
+                style={{ transform: 'translate(50px, 50px)' }}
               >
                 {attackMutation.isPending ? (
-                  <div className="animate-spin rounded-full h-8 w-8 sm:h-9 sm:w-9 md:h-12 md:w-12 lg:h-14 lg:w-14 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-9 w-9 md:h-12 md:w-12 border-b-2 border-white"></div>
                 ) : (
                   <img 
                     src={swordIconImage} 
                     alt="Attack" 
-                    className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 object-contain"
+                    className="w-24 h-24 md:w-30 md:h-30 object-contain"
                     style={{ imageRendering: 'pixelated' }}
                   />
                 )}
               </button>
               
-              {/* Flee Button - Responsive sizing and positioning */}
+              {/* Flee Button - Same size, moved down and right */}
               <button 
-                className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
+                className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
                 onClick={() => {
                   if (window.confirm("Are you sure you want to flee from battle?")) {
                     handleRetreat();
                   }
                 }}
-                style={{ transform: 'translate(15px, 30px) sm:translate(20px, 40px) md:translate(20px, 50px) lg:translate(30px, 40px) xl:translate(40px, 30px)' }}
+                style={{ transform: 'translate(20px, 50px)' }}
               >
                 <img 
                   src={fleeButtonIcon} 
                   alt="Flee" 
-                  className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain"
+                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
                   style={{ imageRendering: 'pixelated' }}
                 />
               </button>
