@@ -16,13 +16,15 @@ export default function WorkoutOverview() {
     enabled: !!workoutId,
   });
 
+  // Fetch exercises data to get names
+  const { data: exercises } = useQuery<any[]>({
+    queryKey: ["/api/exercises"],
+  });
+
   if (isLoading) {
     return (
-      <div className="min-h-screen relative">
-        <ParallaxBackground>
-          <div></div>
-        </ParallaxBackground>
-        <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
           </div>
@@ -33,11 +35,8 @@ export default function WorkoutOverview() {
 
   if (!workout) {
     return (
-      <div className="min-h-screen relative">
-        <ParallaxBackground>
-          <div></div>
-        </ParallaxBackground>
-        <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
           <Card className="max-w-md mx-auto">
             <CardContent className="p-6 text-center">
               <h2 className="text-xl font-semibold mb-2">Workout Not Found</h2>
@@ -52,16 +51,22 @@ export default function WorkoutOverview() {
     );
   }
 
-  const exercises = workout.exercises || [];
-  const totalExercises = exercises.length;
+  const workoutExercises = workout.exercises || [];
+  const totalExercises = workoutExercises.length;
   const estimatedTime = totalExercises * 3; // Rough estimate: 3 minutes per exercise
 
+  console.log('Workout data:', workout);
+  console.log('Workout exercises:', workoutExercises);
+  
+  // Helper function to get exercise name by ID
+  const getExerciseName = (exerciseId: number) => {
+    const exercise = exercises?.find(ex => ex.id === exerciseId);
+    return exercise?.name || `Exercise ${exerciseId}`;
+  };
+
   return (
-    <div className="min-h-screen relative">
-      <ParallaxBackground>
-        <div></div>
-      </ParallaxBackground>
-      <div className="relative z-10 container mx-auto px-4 py-8 pb-24">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8 pb-24">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <Button
@@ -125,40 +130,52 @@ export default function WorkoutOverview() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {exercises.map((exercise: any, index: number) => (
-              <div key={index} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-foreground">{exercise.name}</h3>
-                  <Badge variant="outline">{exercise.sets?.length || 0} sets</Badge>
-                </div>
+            {workoutExercises.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Dumbbell className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No exercises found in this workout</p>
+                <p className="text-sm">The workout data may be structured differently or exercises may not be properly saved.</p>
+              </div>
+            ) : (
+              workoutExercises.map((exercise: any, index: number) => {
+                console.log('Exercise:', exercise);
+                // Handle different data structures based on actual console logs
+                const exerciseName = getExerciseName(exercise.exerciseId);
+                const setsCount = exercise.sets || 1; // Based on console logs, sets is a number, not array
+                const reps = exercise.reps || '';
+                const weight = exercise.weight || 0;
+                const restTime = exercise.restTime || 0;
                 
-                {exercise.sets && exercise.sets.length > 0 && (
-                  <div className="grid grid-cols-1 gap-2">
-                    {exercise.sets.map((set: any, setIndex: number) => (
-                      <div key={setIndex} className="flex items-center justify-between text-sm bg-muted/50 rounded p-2">
-                        <span className="font-medium">Set {setIndex + 1}</span>
+                return (
+                  <div key={index} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-semibold text-foreground">{exerciseName}</h3>
+                      <Badge variant="outline">{setsCount} sets</Badge>
+                    </div>
+                
+                    <div className="grid grid-cols-1 gap-2">
+                      <div className="flex items-center justify-between text-sm bg-muted/50 rounded p-2">
+                        <span className="font-medium">Set Configuration</span>
                         <div className="flex gap-4 text-muted-foreground">
-                          {set.reps && <span>{set.reps} reps</span>}
-                          {set.weight && <span>{set.weight} lbs</span>}
-                          {set.rir !== undefined && <span>RIR {set.rir}</span>}
-                          {set.rpe !== undefined && <span>RPE {set.rpe}</span>}
-                          {set.restTime && (
+                          {reps && <span>{reps} reps</span>}
+                          {weight > 0 && <span>{weight} lbs</span>}
+                          {restTime > 0 && (
                             <span className="flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              {set.restTime}s
+                              {restTime}s
                             </span>
                           )}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
 
-                {exercise.notes && (
-                  <p className="text-sm text-muted-foreground mt-2 italic">{exercise.notes}</p>
-                )}
-              </div>
-            ))}
+                    {exercise.notes && (
+                      <p className="text-sm text-muted-foreground mt-2 italic">{exercise.notes}</p>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </CardContent>
         </Card>
       </div>
