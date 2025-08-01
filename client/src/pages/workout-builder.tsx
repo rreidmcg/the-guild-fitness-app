@@ -354,53 +354,20 @@ export default function WorkoutBuilder() {
         ) : (
           <div className="space-y-4">
             {sections.map((section) => (
-              <Card key={section.id} className="bg-card border-border">
+              <Card 
+                key={section.id} 
+                className="bg-card border-border cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => {
+                  setCurrentSection(section);
+                  setIsEditingSection(true);
+                  setStep('section-form');
+                }}
+              >
                 <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 
-                      className="font-semibold text-foreground cursor-pointer hover:text-primary transition-colors"
-                      onClick={() => {
-                        setCurrentSection(section);
-                        setIsEditingSection(true);
-                        setStep('section-form');
-                      }}
-                    >
+                  <div className="mb-2">
+                    <h3 className="font-semibold text-foreground">
                       {section.name}
                     </h3>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-
-                        <DropdownMenuItem 
-                          onClick={() => {
-                            // Duplicate section
-                            const duplicatedSection = {
-                              ...section,
-                              id: Date.now().toString(),
-                              name: `${section.name} (Copy)`
-                            };
-                            setSections([...sections, duplicatedSection]);
-                          }}
-                        >
-                          <Copy className="w-4 h-4 mr-2" />
-                          Duplicate Section
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => {
-                            // Delete section
-                            setSections(sections.filter(s => s.id !== section.id));
-                          }}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Delete Section
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                   
                   <div className="flex items-center space-x-2 mb-3">
@@ -415,13 +382,7 @@ export default function WorkoutBuilder() {
                   <div className="space-y-2">
                     {section.exercises.map((exercise) => (
                       <div key={exercise.id} className="pl-4 border-l-2 border-muted">
-                        <p 
-                          className="text-sm font-medium text-foreground cursor-pointer hover:text-primary transition-colors"
-                          onClick={() => {
-                            setCurrentSection(section);
-                            setStep('section-form');
-                          }}
-                        >
+                        <p className="text-sm font-medium text-foreground">
                           {exercise.exercise?.name}
                         </p>
                       </div>
