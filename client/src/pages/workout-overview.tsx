@@ -206,23 +206,21 @@ export default function WorkoutOverview() {
                         </div>
                     
                         <div className="grid grid-cols-1 gap-2">
-                          <div className="flex items-center justify-between text-sm bg-muted/50 rounded p-2">
-                            <span className="font-medium">Set Configuration</span>
-                            <div className="flex gap-4 text-muted-foreground">
-                              {isTimeBasedExercise && displayDuration ? (
-                                <span>{displayDuration} minutes</span>
-                              ) : !isTimeBasedExercise && reps ? (
-                                <span>{reps} reps</span>
-                              ) : null}
-                              {weight > 0 && <span>{weight} lbs</span>}
-                              {restTime > 0 && !isTimeBasedExercise ? (
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {restTime}s rest
-                                </span>
-                              ) : isTimeBasedExercise && restTime === 0 ? (
-                                <span className="text-muted-foreground">No rest</span>
-                              ) : null}
+                          <div className="text-sm bg-muted/50 rounded p-2">
+                            <div className="font-medium mb-2">{setsCount} Sets</div>
+                            <div className="text-muted-foreground">
+                              {Array.from({length: setsCount}, (_, i) => (
+                                <div key={i} className="flex justify-between items-center py-1">
+                                  <span>Set {i + 1}:</span>
+                                  <span>
+                                    {isTimeBasedExercise && displayDuration ? (
+                                      `${displayDuration} minutes`
+                                    ) : (
+                                      `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`
+                                    )}
+                                  </span>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         </div>
@@ -268,18 +266,24 @@ export default function WorkoutOverview() {
                                   </span>
                                   <h4 className="font-medium text-foreground">{exerciseName}</h4>
                                 </div>
-                                <Badge variant="outline" size="sm">{setsCount} sets</Badge>
+                                <Badge variant="outline">{setsCount} sets</Badge>
                               </div>
                           
-                              <div className="flex items-center justify-between text-sm bg-muted/50 rounded p-2">
-                                <span className="font-medium">Configuration</span>
-                                <div className="flex gap-3 text-muted-foreground">
-                                  {isTimeBasedExercise && displayDuration ? (
-                                    <span>{displayDuration} min</span>
-                                  ) : !isTimeBasedExercise && reps ? (
-                                    <span>{reps} reps</span>
-                                  ) : null}
-                                  {weight > 0 && <span>{weight} lbs</span>}
+                              <div className="text-sm bg-muted/50 rounded p-2">
+                                <div className="font-medium mb-2">{setsCount} Sets</div>
+                                <div className="text-muted-foreground">
+                                  {Array.from({length: setsCount}, (_, i) => (
+                                    <div key={i} className="flex justify-between items-center py-1">
+                                      <span>Set {i + 1}:</span>
+                                      <span>
+                                        {isTimeBasedExercise && displayDuration ? (
+                                          `${displayDuration} minutes`
+                                        ) : (
+                                          `${reps} reps${weight > 0 ? ` @ ${weight} lbs` : ''}`
+                                        )}
+                                      </span>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
                             </div>
