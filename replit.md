@@ -12,6 +12,7 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **CRITICAL SYSTEM FIXES**: Resolved atrophy system running backwards due to date comparison logic errors - now properly reduces XP/stats for inactive users
 - **HP/MP REGENERATION**: Fixed regeneration mechanics with proper formulas (1% HP per minute minimum, MP based on agility stat)
 - **POTION SYSTEM**: Eliminated JSON double-stringification bug causing "cannot use potion" errors - potions now work correctly
+- **BATTLE UI OVERHAUL (v1.0.37)**: Complete battle interface redesign with custom sword icon, adaptive desktop/mobile layout, improved monster/player sizing, shadow positioning fixes, and responsive positioning for all screen sizes
 
 ## User Preferences
 
