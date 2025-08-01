@@ -482,7 +482,7 @@ export default function DungeonBattlePage() {
         {/* Character Sprites - Battle Field with enhanced positioning */}
         <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
           {/* Player Character with HP/MP bars above (Invisible Card) */}
-          <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
+          <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-40px)' }}>
             {/* Player HP/MP Bars above character - No visible card */}
             <div className="mb-4 space-y-1">
               {/* HP Bar */}
@@ -530,7 +530,7 @@ export default function DungeonBattlePage() {
             />
             <div className="relative">
               <div 
-                className={`w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96 relative z-10 transition-all duration-300 ${
+                className={`w-60 h-60 sm:w-80 sm:h-80 md:w-120 md:h-120 relative z-10 transition-all duration-300 ${
                   battleState.playerLunging ? 'translate-x-8 scale-110' : ''
                 } ${
                   battleState.playerFlashing ? 'brightness-150' : ''
