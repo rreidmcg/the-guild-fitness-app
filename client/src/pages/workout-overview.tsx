@@ -236,7 +236,7 @@ export default function WorkoutOverview() {
                     
                         <div className="text-sm bg-muted/50 rounded p-2">
                           <div className="text-muted-foreground">
-                            {setsCount}x {Array.from({length: setsCount}, (_, i) => {
+                            {setsCount} x {Array.from({length: setsCount}, (_, i) => {
                               const setDisplay = isTimeBasedExercise && displayDuration ? 
                                 `${displayDuration} min` : 
                                 `${reps} reps`;
@@ -288,7 +288,7 @@ export default function WorkoutOverview() {
                           
                               <div className="text-sm bg-muted/50 rounded p-2">
                                 <div className="text-muted-foreground">
-                                  {setsCount}x {Array.from({length: setsCount}, (_, i) => {
+                                  {setsCount} x {Array.from({length: setsCount}, (_, i) => {
                                     const setDisplay = isTimeBasedExercise && displayDuration ? 
                                       `${displayDuration} min` : 
                                       `${reps} reps`;
