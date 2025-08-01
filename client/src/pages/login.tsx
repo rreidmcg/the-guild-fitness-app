@@ -13,7 +13,7 @@ import { queryClient } from "@/lib/queryClient";
 import { Eye, EyeOff } from "lucide-react";
 import ForgotPasswordForm from "@/components/forgot-password-form";
 import { FloatingParticles } from "@/components/ui/floating-particles";
-import { AuthMusicBanner } from "@/components/ui/auth-music-banner";
+
 import logoImage from "@assets/24D3E703-7380-4E15-9893-55D6C971DD0C_1753833791530.png";
 import forestBg from "@assets/38F18B04-AA5B-42A3-9A39-BAB6798C8D7B_1753887273683.png";
 
@@ -92,7 +92,6 @@ export default function LoginPage() {
 
   return (
     <>
-      <AuthMusicBanner />
       <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden pt-16">
         {/* Fixed parallax background */}
         <div 

@@ -1,14 +1,12 @@
 import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
-import defaultMusicFile from '@assets/Pixelated Dreams ext v1.2_1753061935579.mp3';
-import battleMusicFile from '@assets/finale_1753453869533.mp3';
+import defaultMusicFile from '@assets/lute_1753990497210.mp3';
 
 interface BackgroundMusicContextType {
   isPlaying: boolean;
   isMuted: boolean;
   toggleMusic: () => void;
   startMusic: () => void;
-  setInCombat: (inCombat: boolean) => void;
 }
 
 const BackgroundMusicContext = createContext<BackgroundMusicContextType | undefined>(undefined);
@@ -21,41 +19,20 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true); // Default to muted/off
-  const [currentTrack, setCurrentTrack] = useState<string | null>(null);
-  const [inCombat, setInCombat] = useState(false);
   const [location] = useLocation();
   const wasPlayingBeforeHidden = useRef(false);
   const hasTriedAutoplay = useRef(false);
 
-  // Determine which music track to use based on combat state
-  const getMusicTrack = () => {
-    if (inCombat) {
-      return battleMusicFile;
-    }
-    return defaultMusicFile;
-  };
 
-  // Initialize or change audio track when combat state or location changes
+
+  // Initialize audio track (no need to change based on combat state)
   useEffect(() => {
-    const requiredTrack = getMusicTrack();
-    
-    if (currentTrack !== requiredTrack || !audioRef.current) {
-      const wasCurrentlyPlaying = isPlaying && !isMuted;
-      
-      // Clean up old audio
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-        audioRef.current = null;
-      }
-
-      // Create new audio element
-      const audio = new Audio(requiredTrack);
+    if (!audioRef.current) {
+      const audio = new Audio(defaultMusicFile);
       audio.loop = true;
       audio.volume = 0.3;
       audio.preload = 'auto';
       audioRef.current = audio;
-      setCurrentTrack(requiredTrack);
 
       // Set up event listeners
       const handlePlay = () => setIsPlaying(true);
@@ -70,17 +47,8 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
       audio.addEventListener('pause', handlePause);
       audio.addEventListener('ended', handleEnded);
       audio.addEventListener('error', handleError);
-
-      // Only resume music if it was playing before track change (no auto-start on first load)
-      if (wasCurrentlyPlaying) {
-        audio.play().catch(() => {
-          setIsPlaying(false);
-          setIsMuted(true);
-          console.warn('Background music autoplay blocked by browser');
-        });
-      }
     }
-  }, [inCombat, currentTrack]);
+  }, []);
 
   // Handle visibility changes
   useEffect(() => {
@@ -155,8 +123,7 @@ export function BackgroundMusicProvider({ children }: BackgroundMusicProviderPro
     isPlaying,
     isMuted,
     toggleMusic,
-    startMusic,
-    setInCombat
+    startMusic
   };
 
   return (

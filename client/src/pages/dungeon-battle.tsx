@@ -217,9 +217,7 @@ export default function DungeonBattlePage() {
       battleResult: 'ongoing',
       currentMonsterIndex: 0,
       totalGoldEarned: 0,
-      zone,
-      showActionModal: false,
-      actionMode: 'main'
+      zone
     });
   };
 
