@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown, Copy, Trash2, RefreshCw, Info, Edit3, Camera, Video } from "lucide-react";
+import { ArrowLeft, Plus, Save, X, MoreHorizontal, Check, Search, Filter, ChevronDown, Copy, Trash2, RefreshCw, Info, Edit3, Camera, Video, Link, Unlink } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -547,8 +547,43 @@ export default function WorkoutBuilder() {
         {/* Exercise List */}
         {currentSection?.exercises && currentSection.exercises.length > 0 && (
           <div className="space-y-4">
-            {currentSection.exercises.map((exercise) => (
-              <Card key={exercise.id} className="bg-background border-border">
+            {currentSection.exercises.map((exercise, exerciseIndex) => (
+              <div key={exercise.id}>
+                {/* Link/Unlink buttons between exercises */}
+                {exerciseIndex > 0 && (
+                  <div className="flex justify-center py-2">
+                    {(() => {
+                      const currentExercise = currentSection.exercises![exerciseIndex];
+                      const previousExercise = currentSection.exercises![exerciseIndex - 1];
+                      const areLinked = currentExercise.supersetGroup && 
+                                       currentExercise.supersetGroup === previousExercise.supersetGroup;
+                      
+                      return areLinked ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => unlinkExercise(exerciseIndex)}
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          <Unlink className="w-4 h-4 mr-2" />
+                          Unlink
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => linkExercises(exerciseIndex - 1)}
+                          className="text-muted-foreground hover:text-primary"
+                        >
+                          <Link className="w-4 h-4 mr-2" />
+                          Link to Superset
+                        </Button>
+                      );
+                    })()}
+                  </div>
+                )}
+
+              <Card className="bg-background border-border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
@@ -967,6 +1002,7 @@ export default function WorkoutBuilder() {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             ))}
           </div>
         )}
@@ -1166,6 +1202,56 @@ export default function WorkoutBuilder() {
     }) || [];
 
     setCurrentSection({ ...currentSection, exercises: updatedExercises });
+  };
+
+  // Helper functions for superset management
+  const getNextSupersetGroup = () => {
+    if (!currentSection?.exercises) return 'A';
+    const existingGroups = currentSection.exercises
+      .map(ex => ex.supersetGroup)
+      .filter(Boolean)
+      .map(group => group!.charCodeAt(0));
+    
+    if (existingGroups.length === 0) return 'A';
+    const maxGroup = Math.max(...existingGroups);
+    return String.fromCharCode(maxGroup + 1);
+  };
+
+  const linkExercises = (exerciseIndex: number) => {
+    if (!currentSection?.exercises || exerciseIndex >= currentSection.exercises.length - 1) return;
+    
+    const currentExercise = currentSection.exercises[exerciseIndex];
+    const nextExercise = currentSection.exercises[exerciseIndex + 1];
+    
+    let supersetGroup = currentExercise.supersetGroup || nextExercise.supersetGroup;
+    if (!supersetGroup) {
+      supersetGroup = getNextSupersetGroup();
+    }
+    
+    const updatedExercises = currentSection.exercises.map((ex, idx) => {
+      if (idx === exerciseIndex || idx === exerciseIndex + 1) {
+        return {...ex, supersetGroup};
+      }
+      return ex;
+    });
+    
+    setCurrentSection({...currentSection, exercises: updatedExercises});
+  };
+
+  const unlinkExercise = (exerciseIndex: number) => {
+    if (!currentSection?.exercises) return;
+    
+    const exercise = currentSection.exercises[exerciseIndex];
+    if (!exercise.supersetGroup) return;
+    
+    const updatedExercises = currentSection.exercises.map((ex, idx) => {
+      if (idx === exerciseIndex) {
+        return {...ex, supersetGroup: undefined};
+      }
+      return ex;
+    });
+    
+    setCurrentSection({...currentSection, exercises: updatedExercises});
   };
 
   // Exercise menu handlers
