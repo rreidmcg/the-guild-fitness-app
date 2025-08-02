@@ -485,28 +485,35 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUserExercisePreference(preference: InsertUserExercisePreferences): Promise<UserExercisePreferences> {
+    console.log('Storage: Upserting exercise preference:', preference);
     const existing = await this.getUserExercisePreference(preference.userId, preference.exerciseId);
+    console.log('Storage: Existing preference found:', existing);
     
     if (existing) {
       // Update existing preference
+      const updateData = {
+        ...preference,
+        updatedAt: new Date()
+      };
+      console.log('Storage: Updating preference with data:', updateData);
       const [updated] = await db
         .update(userExercisePreferences)
-        .set({
-          ...preference,
-          updatedAt: new Date()
-        })
+        .set(updateData)
         .where(and(
           eq(userExercisePreferences.userId, preference.userId),
           eq(userExercisePreferences.exerciseId, preference.exerciseId)
         ))
         .returning();
+      console.log('Storage: Updated preference result:', updated);
       return updated;
     } else {
       // Create new preference
+      console.log('Storage: Creating new preference with data:', preference);
       const [created] = await db
         .insert(userExercisePreferences)
         .values(preference)
         .returning();
+      console.log('Storage: Created preference result:', created);
       return created;
     }
   }

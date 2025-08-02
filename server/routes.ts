@@ -1245,12 +1245,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/exercise-preferences", async (req, res) => {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      console.log('Saving exercise preference - userId:', userId, 'body:', req.body);
       const preference = await storage.upsertUserExercisePreference({
         userId,
         ...req.body
       });
+      console.log('Exercise preference saved successfully:', preference);
       res.json(preference);
     } catch (error) {
+      console.error('Error saving exercise preference:', error);
       res.status(500).json({ error: "Failed to save exercise preference" });
     }
   });
