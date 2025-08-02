@@ -151,32 +151,32 @@ export default function MailPage() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4">
+      <div className="bg-card border-b border-border px-3 sm:px-4 py-4">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center space-x-2">
-                <Mail className="w-6 h-6 text-blue-500" />
-                <span>Mail</span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center space-x-2">
+                <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 flex-shrink-0" />
+                <span className="truncate">Mail</span>
                 {unreadCount > 0 && (
-                  <Badge className="bg-red-500 text-white text-xs">
+                  <Badge className="bg-red-500 text-white text-xs flex-shrink-0">
                     {unreadCount}
                   </Badge>
                 )}
               </h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">
+              <p className="text-muted-foreground mt-0.5 text-sm hidden sm:block">
                 News, rewards, and announcements from the developers
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={() => setShowAppRequestModal(true)}
                 className="bg-orange-600/20 border-orange-600/30 text-orange-600 hover:bg-orange-600/30"
               >
-                <AlertCircle className="w-4 h-4 mr-2" />
-                Feedback
+                <AlertCircle className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Feedback</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -184,8 +184,8 @@ export default function MailPage() {
                 onClick={() => refetch()}
                 disabled={isLoading}
               >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Refresh
+                <RotateCcw className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Refresh</span>
               </Button>
             </div>
           </div>
