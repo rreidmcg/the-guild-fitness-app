@@ -4,7 +4,12 @@
 
 The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, agility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
 
-## Recent Changes (August 1, 2025)
+## Recent Changes (August 2, 2025)
+- **PERSISTENT EXERCISE PREFERENCES**: Implemented complete user exercise preferences system with database storage, API endpoints, and automatic saving/loading of customized workout metrics (weight, reps, RPE, duration)
+- **WORKOUT SESSION ENHANCEMENT**: Updated workout session interface to auto-populate saved preferences as defaults and automatically save user modifications for future sessions
+- **PRIVACY CONFIRMATION**: Confirmed and documented that custom workouts are completely private to each user account with proper user ID filtering
+
+## Previous Changes (August 1, 2025)
 - **BATTLE SYSTEM REWARDS**: Battles now only award gold/currency, NOT experience points - XP comes exclusively from completing workouts to ensure level reflects real fitness consistency
 - **SIMPLIFIED BATTLE INTERFACE**: Streamlined to attack (sword icon) and flee (boot icon) only, removed items/buffs/consumables
 - **ATROPHY IMMUNITY**: Only Rob has permanent atrophy immunity, all other players subject to daily stat degradation when inactive
