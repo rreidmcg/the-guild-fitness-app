@@ -1220,6 +1220,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User exercise preferences routes
+  app.get("/api/exercise-preferences", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const preferences = await storage.getUserExercisePreferences(userId);
+      res.json(preferences);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch exercise preferences" });
+    }
+  });
+
+  app.get("/api/exercise-preferences/:exerciseId", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const exerciseId = parseInt(req.params.exerciseId);
+      const preference = await storage.getUserExercisePreference(userId, exerciseId);
+      res.json(preference || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch exercise preference" });
+    }
+  });
+
+  app.post("/api/exercise-preferences", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const preference = await storage.upsertUserExercisePreference({
+        userId,
+        ...req.body
+      });
+      res.json(preference);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save exercise preference" });
+    }
+  });
+
   // Wardrobe routes
   app.get("/api/wardrobe/items", async (req, res) => {
     try {

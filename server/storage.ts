@@ -1,9 +1,10 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, userExercisePreferences, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
   type PersonalRecord, type InsertPersonalRecord,
+  type UserExercisePreferences, type InsertUserExercisePreferences,
   type WorkoutProgram, type InsertWorkoutProgram,
   type ProgramWorkout, type InsertProgramWorkout,
   type WardrobeItem, type InsertWardrobeItem,
@@ -73,6 +74,11 @@ export interface IStorage {
   getUserPersonalRecords(userId: number): Promise<PersonalRecord[]>;
   createPersonalRecord(record: InsertPersonalRecord): Promise<PersonalRecord>;
   updatePersonalRecord(id: number, updates: Partial<PersonalRecord>): Promise<PersonalRecord>;
+
+  // User exercise preferences
+  getUserExercisePreferences(userId: number): Promise<UserExercisePreferences[]>;
+  getUserExercisePreference(userId: number, exerciseId: number): Promise<UserExercisePreferences | undefined>;
+  upsertUserExercisePreference(preference: InsertUserExercisePreferences): Promise<UserExercisePreferences>;
 
   // Workout programs
   getAllWorkoutPrograms(): Promise<WorkoutProgram[]>;
@@ -462,6 +468,47 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!record) throw new Error("Personal record not found");
     return record;
+  }
+
+  // User exercise preferences
+  async getUserExercisePreferences(userId: number): Promise<UserExercisePreferences[]> {
+    return await db.select().from(userExercisePreferences).where(eq(userExercisePreferences.userId, userId));
+  }
+
+  async getUserExercisePreference(userId: number, exerciseId: number): Promise<UserExercisePreferences | undefined> {
+    const [preference] = await db.select().from(userExercisePreferences)
+      .where(and(
+        eq(userExercisePreferences.userId, userId),
+        eq(userExercisePreferences.exerciseId, exerciseId)
+      ));
+    return preference || undefined;
+  }
+
+  async upsertUserExercisePreference(preference: InsertUserExercisePreferences): Promise<UserExercisePreferences> {
+    const existing = await this.getUserExercisePreference(preference.userId, preference.exerciseId);
+    
+    if (existing) {
+      // Update existing preference
+      const [updated] = await db
+        .update(userExercisePreferences)
+        .set({
+          ...preference,
+          updatedAt: new Date()
+        })
+        .where(and(
+          eq(userExercisePreferences.userId, preference.userId),
+          eq(userExercisePreferences.exerciseId, preference.exerciseId)
+        ))
+        .returning();
+      return updated;
+    } else {
+      // Create new preference
+      const [created] = await db
+        .insert(userExercisePreferences)
+        .values(preference)
+        .returning();
+      return created;
+    }
   }
 
   // Workout program operations

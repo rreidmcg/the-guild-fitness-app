@@ -56,6 +56,12 @@ export default function WorkoutSession() {
     queryKey: ["/api/exercises"],
   });
 
+  // Fetch user exercise preferences for default values
+  const { data: exercisePreferences } = useQuery({
+    queryKey: ["/api/exercise-preferences"],
+    enabled: !!userStats?.id,
+  });
+
   // Load workout data into exercise state with exercise names
   useEffect(() => {
     if (workout && (workout as any).exercises && exercises) {
@@ -71,6 +77,33 @@ export default function WorkoutSession() {
       setExerciseData(workoutExercises);
     }
   }, [workout, exercises]);
+
+  // Initialize set metrics with saved preferences or workout defaults
+  useEffect(() => {
+    if (exerciseData.length > 0 && exercisePreferences) {
+      const initialMetrics: Record<string, any> = {};
+      
+      exerciseData.forEach((exercise, exerciseIndex) => {
+        const savedPreference = (exercisePreferences as any[])?.find(
+          pref => pref.exerciseId === exercise.exerciseId
+        );
+        
+        exercise.sets?.forEach((_: any, setIndex: number) => {
+          const setKey = `${exerciseIndex}-${setIndex}`;
+          
+          // Use saved preferences as defaults, fallback to workout prescribed values
+          initialMetrics[setKey] = {
+            weight: savedPreference?.preferredWeight || exercise.weight || 0,
+            reps: savedPreference?.preferredReps || exercise.reps || 0,
+            rpe: savedPreference?.preferredRpe || exercise.rpe || 7,
+            duration: savedPreference?.preferredDuration || exercise.duration || undefined,
+          };
+        });
+      });
+      
+      setSetMetrics(initialMetrics);
+    }
+  }, [exerciseData, exercisePreferences]);
 
   // Page loading effect with minimum delay for tips
   useEffect(() => {
@@ -91,6 +124,18 @@ export default function WorkoutSession() {
     }
     return () => clearInterval(interval);
   }, [isActive, time]);
+
+  const saveExercisePreferenceMutation = useMutation({
+    mutationFn: async (preference: any) => {
+      return await apiRequest("/api/exercise-preferences", {
+        method: "POST",
+        body: preference,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/exercise-preferences"] });
+    },
+  });
 
   const completeWorkoutMutation = useMutation({
     mutationFn: async (sessionData: any) => {
@@ -180,6 +225,21 @@ export default function WorkoutSession() {
         [field]: value
       }
     }));
+
+    // Auto-save user preference for this exercise
+    const currentExercise = exerciseData[exerciseIndex];
+    if (currentExercise && userStats?.id) {
+      const currentMetrics = setMetrics[setKey] || {};
+      const newMetrics = { ...currentMetrics, [field]: value };
+      
+      saveExercisePreferenceMutation.mutate({
+        exerciseId: currentExercise.exerciseId,
+        preferredWeight: field === 'weight' ? value : newMetrics.weight,
+        preferredReps: field === 'reps' ? value : newMetrics.reps,
+        preferredRpe: field === 'rpe' ? value : newMetrics.rpe,
+        preferredDuration: field === 'duration' ? value : newMetrics.duration,
+      });
+    }
   };
 
   const getSetMetric = (exerciseIndex: number, setIndex: number, field: string): number | string => {

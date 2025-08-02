@@ -159,6 +159,28 @@ export const personalRecords = pgTable("personal_records", {
   achievedAt: timestamp("achieved_at").defaultNow(),
 });
 
+// User Exercise Preferences - stores personalized metrics for exercises
+export const userExercisePreferences = pgTable("user_exercise_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  exerciseId: integer("exercise_id").references(() => exercises.id),
+  preferredWeight: integer("preferred_weight"),
+  preferredReps: integer("preferred_reps"),
+  preferredDuration: integer("preferred_duration"),
+  preferredRpe: integer("preferred_rpe"), // Preferred RIR/RPE
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userExerciseIdx: uniqueIndex("user_exercise_idx").on(table.userId, table.exerciseId),
+}));
+
+export const insertUserExercisePreferencesSchema = createInsertSchema(userExercisePreferences).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export type UserExercisePreferences = typeof userExercisePreferences.$inferSelect;
+export type InsertUserExercisePreferences = z.infer<typeof insertUserExercisePreferencesSchema>;
+
 // Player inventory for consumable items
 export const playerInventory = pgTable("player_inventory", {
   id: serial("id").primaryKey(),
