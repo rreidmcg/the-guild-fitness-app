@@ -57,9 +57,9 @@ export default function WorkoutSession() {
   });
 
   // Fetch user exercise preferences for default values
-  const { data: exercisePreferences } = useQuery({
+  const { data: exercisePreferences, isLoading: preferencesLoading } = useQuery({
     queryKey: ["/api/exercise-preferences"],
-    enabled: !!userStats?.id,
+    enabled: !!userStats,
   });
 
   // Load workout data into exercise state with exercise names
@@ -80,7 +80,7 @@ export default function WorkoutSession() {
 
   // Initialize set metrics with saved preferences or workout defaults
   useEffect(() => {
-    if (exerciseData.length > 0 && exercisePreferences) {
+    if (exerciseData.length > 0) {
       const initialMetrics: Record<string, any> = {};
       
       exerciseData.forEach((exercise, exerciseIndex) => {
@@ -88,7 +88,7 @@ export default function WorkoutSession() {
           pref => pref.exerciseId === exercise.exerciseId
         );
         
-        exercise.sets?.forEach((_: any, setIndex: number) => {
+        exercise.sets?.forEach((set: any, setIndex: number) => {
           const setKey = `${exerciseIndex}-${setIndex}`;
           
           // Use saved preferences as defaults, fallback to workout prescribed values
