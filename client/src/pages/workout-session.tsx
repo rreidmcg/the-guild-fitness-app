@@ -298,11 +298,8 @@ export default function WorkoutSession() {
     const currentExercise = exerciseData[exerciseIndex];
     const metrics = setMetrics[setKey];
     
-    console.log('getSetMetric called:', { exerciseIndex, setIndex, field, metrics, currentExercise });
-    
     if (metrics && metrics[field as keyof typeof metrics] !== undefined) {
       const value = metrics[field as keyof typeof metrics] as number;
-      console.log('Returning saved metric:', value);
       return value;
     }
     
@@ -315,13 +312,12 @@ export default function WorkoutSession() {
       case 'duration': defaultValue = currentExercise?.duration || 0; break;
       default: defaultValue = 0;
     }
-    console.log('Returning default value:', defaultValue);
     return defaultValue;
   };
 
   const markAllSetsComplete = () => {
     const currentSets = getCurrentExerciseSets();
-    currentSets.forEach((_, setIndex) => {
+    currentSets.forEach((_: any, setIndex: number) => {
       const setKey = `${currentExerciseIndex}-${setIndex}`;
       setCompletedSets(prev => ({
         ...prev,
@@ -519,177 +515,140 @@ export default function WorkoutSession() {
 
             {/* Sets Table */}
             <div className="bg-card rounded-lg border border-border overflow-hidden">
-              {/* Table Header */}
-              <div className="grid grid-cols-5 gap-4 p-4 bg-muted/30 border-b border-border">
-                {(() => {
-                  const currentExercise = exerciseData[currentExerciseIndex];
-                  const defaultFields = getDefaultTrackingFields(currentExercise?.category || 'strength');
-                  const isTimeExercise = defaultFields.includes('time') || currentExercise?.duration > 0;
-                  const showWeight = defaultFields.includes('weight');
-                  const showReps = defaultFields.includes('reps');
-                  const showIntensity = defaultFields.includes('RIR') || defaultFields.includes('RPE');
-                  
-                  return (
-                    <>
+              {(() => {
+                const currentExercise = exerciseData[currentExerciseIndex];
+                const defaultFields = getDefaultTrackingFields(currentExercise?.category || 'strength');
+                const isTimeExercise = defaultFields.includes('time') || currentExercise?.duration > 0;
+                const showWeight = defaultFields.includes('weight');
+                const showReps = defaultFields.includes('reps');
+                const showIntensity = defaultFields.includes('RIR') || defaultFields.includes('RPE');
+                
+                // Count visible columns: SET + visible metrics + checkmark
+                let visibleColumns = 2; // SET + checkmark always visible
+                if (isTimeExercise || showWeight) visibleColumns++;
+                if (showReps) visibleColumns++;
+                if (showIntensity) visibleColumns++;
+                
+                const gridClass = `grid-cols-${visibleColumns}`;
+                
+                return (
+                  <>
+                    {/* Table Header */}
+                    <div className={`grid ${gridClass} gap-4 p-4 bg-muted/30 border-b border-border`}>
                       <div className="text-sm font-medium text-muted-foreground">SET</div>
-                      <div className="text-sm font-medium text-muted-foreground">
-                        {isTimeExercise ? 'SEC' : showWeight ? 'LB' : '—'}
-                      </div>
-                      <div className="text-sm font-medium text-muted-foreground">
-                        {showReps ? 'REPS' : '—'}
-                      </div>
-                      <div className="text-sm font-medium text-muted-foreground">
-                        {showIntensity ? 'RIR' : '—'}
-                      </div>
+                      {(isTimeExercise || showWeight) && (
+                        <div className="text-sm font-medium text-muted-foreground">
+                          {isTimeExercise ? 'SEC' : 'LB'}
+                        </div>
+                      )}
+                      {showReps && (
+                        <div className="text-sm font-medium text-muted-foreground">REPS</div>
+                      )}
+                      {showIntensity && (
+                        <div className="text-sm font-medium text-muted-foreground">RIR</div>
+                      )}
                       <div className="text-sm font-medium text-muted-foreground text-center">✓</div>
-                    </>
-                  );
-                })()}
-              </div>
-
-              {/* Sets Rows */}
-              <div className="divide-y divide-border">
-                {getCurrentExerciseSets().map((set: any, setIndex: number) => {
-                  const isCompleted = isSetCompleted(currentExerciseIndex, setIndex);
-                  const currentExercise = exerciseData[currentExerciseIndex];
-                  const isDurationBased = currentExercise?.duration > 0;
-                  
-                  return (
-                    <div key={setIndex} className="grid grid-cols-5 gap-4 p-4 items-center">
-                      {/* Set Number */}
-                      <div className="text-sm">
-                        {setIndex + 1}
-                      </div>
-                      
-                      {/* Weight/Duration */}
-                      <div>
-                        {(() => {
-                          const defaultFields = getDefaultTrackingFields(currentExercise.category || 'strength');
-                          console.log('Exercise:', currentExercise.name, 'Category:', currentExercise.category, 'Default fields:', defaultFields);
-                          const isTimeExercise = defaultFields.includes('time') || isDurationBased;
-                          const showWeight = defaultFields.includes('weight');
-                          
-                          if (isTimeExercise) {
-                            return (
-                              <Input
-                                type="number"
-                                value={getSetMetric(currentExerciseIndex, setIndex, 'duration')}
-                                onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'duration', parseInt(e.target.value) || 0)}
-                                className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                                min="0"
-                                placeholder={currentExercise.duration?.toString() || "0"}
-                              />
-                            );
-                          } else if (showWeight) {
-                            return (
-                              <Input
-                                type="number"
-                                value={getSetMetric(currentExerciseIndex, setIndex, 'weight') || ''}
-                                onChange={(e) => {
-                                  console.log('Weight input onChange fired:', e.target.value);
-                                  const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
-                                  updateSetMetric(currentExerciseIndex, setIndex, 'weight', newValue);
-                                }}
-                                onFocus={() => console.log('Weight input focused')}
-                                onInput={(e: any) => console.log('Weight input onInput fired:', e.target.value)}
-                                className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                                min="0"
-                                step="1"
-                                placeholder={currentExercise.weight?.toString() || "0"}
-                              />
-                            );
-                          } else {
-                            return (
-                              <div className="h-8 w-full text-center text-sm text-muted-foreground flex items-center justify-center">
-                                —
-                              </div>
-                            );
-                          }
-                        })()}
-                      </div>
-                      
-                      {/* Reps */}
-                      <div>
-                        {(() => {
-                          const defaultFields = getDefaultTrackingFields(currentExercise.category || 'strength');
-                          const showReps = defaultFields.includes('reps');
-                          
-                          if (showReps) {
-                            return (
-                              <Input
-                                type="number"
-                                value={getSetMetric(currentExerciseIndex, setIndex, 'reps') || ''}
-                                onChange={(e) => {
-                                  console.log('Reps input onChange fired:', e.target.value);
-                                  const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
-                                  updateSetMetric(currentExerciseIndex, setIndex, 'reps', newValue);
-                                }}
-                                onFocus={() => console.log('Reps input focused')}
-                                onInput={(e: any) => console.log('Reps input onInput fired:', e.target.value)}
-                                className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                                min="1"
-                                step="1"
-                                placeholder={currentExercise.reps?.toString() || "0"}
-                              />
-                            );
-                          } else {
-                            return (
-                              <div className="h-8 w-full text-center text-sm text-muted-foreground flex items-center justify-center">
-                                —
-                              </div>
-                            );
-                          }
-                        })()}
-                      </div>
-                      
-                      {/* RIR */}
-                      <div>
-                        {(() => {
-                          const defaultFields = getDefaultTrackingFields(currentExercise.category || 'strength');
-                          const showIntensity = defaultFields.includes('RIR') || defaultFields.includes('RPE');
-                          
-                          if (showIntensity) {
-                            return (
-                              <Input
-                                type="number"
-                                value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
-                                onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
-                                className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                                min="0"
-                                max="10"
-                                placeholder="3"
-                              />
-                            );
-                          } else {
-                            return (
-                              <div className="h-8 w-full text-center text-sm text-muted-foreground flex items-center justify-center">
-                                —
-                              </div>
-                            );
-                          }
-                        })()}
-                      </div>
-                      
-                      {/* Checkbox */}
-                      <div className="flex justify-center">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleSetCompletion(currentExerciseIndex, setIndex)}
-                          className={`w-8 h-8 p-0 rounded-full ${
-                            isCompleted 
-                              ? 'bg-green-500 hover:bg-green-600 text-white' 
-                              : 'bg-gray-200 hover:bg-gray-300 text-gray-500'
-                          }`}
-                        >
-                          {isCompleted && <Check className="w-4 h-4" />}
-                        </Button>
-                      </div>
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Sets Rows */}
+                    <div className="divide-y divide-border">
+                      {getCurrentExerciseSets().map((set: any, setIndex: number) => {
+                        const isCompleted = isSetCompleted(currentExerciseIndex, setIndex);
+                        
+                        return (
+                          <div key={setIndex} className={`grid ${gridClass} gap-4 p-4 items-center`}>
+                            {/* Set Number */}
+                            <div className="text-sm">
+                              {setIndex + 1}
+                            </div>
+                            
+                            {/* Weight/Duration - Only show if needed */}
+                            {(isTimeExercise || showWeight) && (
+                              <div>
+                                {isTimeExercise ? (
+                                  <Input
+                                    type="number"
+                                    value={getSetMetric(currentExerciseIndex, setIndex, 'duration')}
+                                    onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'duration', parseInt(e.target.value) || 0)}
+                                    className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                    min="0"
+                                    placeholder={currentExercise.duration?.toString() || "0"}
+                                  />
+                                ) : (
+                                  <Input
+                                    type="number"
+                                    value={getSetMetric(currentExerciseIndex, setIndex, 'weight') || ''}
+                                    onChange={(e) => {
+                                      const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                      updateSetMetric(currentExerciseIndex, setIndex, 'weight', newValue);
+                                    }}
+                                    className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                    min="0"
+                                    step="1"
+                                    placeholder={currentExercise.weight?.toString() || "0"}
+                                  />
+                                )}
+                              </div>
+                            )}
+                            
+                            {/* Reps - Only show if needed */}
+                            {showReps && (
+                              <div>
+                                <Input
+                                  type="number"
+                                  value={getSetMetric(currentExerciseIndex, setIndex, 'reps') || ''}
+                                  onChange={(e) => {
+                                    const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                    updateSetMetric(currentExerciseIndex, setIndex, 'reps', newValue);
+                                  }}
+                                  className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                  min="1"
+                                  step="1"
+                                  placeholder={currentExercise.reps?.toString() || "0"}
+                                />
+                              </div>
+                            )}
+                            
+                            {/* RIR - Only show if needed */}
+                            {showIntensity && (
+                              <div>
+                                <Input
+                                  type="number"
+                                  value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
+                                  onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
+                                  className="h-8 w-full text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                  min="0"
+                                  max="10"
+                                  placeholder="3"
+                                />
+                              </div>
+                            )}
+                            
+                            {/* Completion Checkbox */}
+                            <div className="flex justify-center">
+                              <Button
+                                variant={isCompleted ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => toggleSetCompletion(currentExerciseIndex, setIndex)}
+                                className={`w-8 h-8 p-0 ${
+                                  isCompleted 
+                                    ? "bg-green-600 hover:bg-green-700 border-green-600" 
+                                    : "border-border hover:bg-muted"
+                                }`}
+                              >
+                                {isCompleted && <Check className="h-4 w-4 text-white" />}
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
+
+
 
             {/* Action Buttons */}
             <div className="space-y-3 pt-4">
