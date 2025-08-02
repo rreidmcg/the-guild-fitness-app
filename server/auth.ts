@@ -1,24 +1,10 @@
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
+import { sendEmail } from './email-service';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const SALT_ROUNDS = 12;
-
-// Email configuration
-const createTransporter = () => {
-  // For development, use ethereal.email test account
-  // In production, configure with real SMTP settings
-  return nodemailer.createTransporter({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    auth: {
-      user: process.env.EMAIL_USER || 'ethereal.user@ethereal.email',
-      pass: process.env.EMAIL_PASS || 'ethereal.pass'
-    }
-  });
-};
 
 export const authUtils = {
   // Password hashing
@@ -50,29 +36,69 @@ export const authUtils = {
   // Email sending
   async sendVerificationEmail(email: string, username: string, token: string): Promise<boolean> {
     try {
-      const transporter = createTransporter();
       const verificationUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/verify-email?token=${token}`;
       
-      await transporter.sendMail({
-        from: '"Dumbbells & Dragons" <noreply@dumbellsanddragons.app>',
-        to: email,
-        subject: 'Verify Your Dumbbells & Dragons Account',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2563eb;">Welcome to Dumbbells & Dragons, ${username}!</h2>
-            <p>Thank you for joining our fitness RPG community. To complete your registration, please verify your email address.</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Verify Your Account - The Guild: Gamified Fitness</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #4f46e5; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+            .content { background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; }
+            .footer { background: #374151; color: white; padding: 15px; border-radius: 0 0 8px 8px; text-align: center; font-size: 12px; }
+            .button { display: inline-block; background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .button:hover { background-color: #3730a3; }
+            h2 { color: #4f46e5; margin-top: 0; }
+            .link { word-break: break-all; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🏋️ The Guild: Gamified Fitness</h1>
+            <p>Account Verification</p>
+          </div>
+          
+          <div class="content">
+            <h2>Welcome to The Guild, ${username}!</h2>
+            
+            <p>Thank you for joining our fitness RPG community! To complete your registration and start your adventure, please verify your email address.</p>
+            
+            <div style="text-align: center;">
+              <a href="${verificationUrl}" class="button">
                 Verify Email Address
               </a>
             </div>
+            
             <p>If the button doesn't work, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #6b7280;">${verificationUrl}</p>
-            <p style="color: #6b7280; font-size: 14px;">This link will expire in 24 hours.</p>
+            <p class="link">${verificationUrl}</p>
+            
+            <p><strong>This link will expire in 24 hours.</strong></p>
+            
+            <p>Once verified, you'll be able to:</p>
+            <ul>
+              <li>Create and track workouts</li>
+              <li>Level up your character with RPG stats</li>
+              <li>Battle monsters and earn rewards</li>
+              <li>Join the fitness adventure!</li>
+            </ul>
           </div>
-        `
+          
+          <div class="footer">
+            <p>This is an automated verification email from The Guild: Gamified Fitness.</p>
+            <p>© 2025 The Guild: Gamified Fitness. All rights reserved.</p>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      return await sendEmail({
+        to: email,
+        subject: '🏋️ Verify Your Guild Account - Start Your Fitness Adventure!',
+        html: emailHtml
       });
-      return true;
     } catch (error) {
       console.error('Failed to send verification email:', error);
       return false;
@@ -81,30 +107,65 @@ export const authUtils = {
 
   async sendPasswordResetEmail(email: string, username: string, token: string): Promise<boolean> {
     try {
-      const transporter = createTransporter();
       const resetUrl = `${process.env.BASE_URL || 'http://localhost:5000'}/reset-password?token=${token}`;
       
-      await transporter.sendMail({
-        from: '"Dumbbells & Dragons" <noreply@dumbellsanddragons.app>',
-        to: email,
-        subject: 'Reset Your Dumbbells & Dragons Password',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #dc2626;">Password Reset Request</h2>
-            <p>Hello ${username},</p>
-            <p>We received a request to reset your Dumbbells & Dragons account password. If you didn't make this request, you can ignore this email.</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetUrl}" style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
-                Reset Password
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Password Reset - The Guild: Gamified Fitness</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #dc2626; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
+            .content { background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; }
+            .footer { background: #374151; color: white; padding: 15px; border-radius: 0 0 8px 8px; text-align: center; font-size: 12px; }
+            .button { display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .button:hover { background-color: #b91c1c; }
+            h2 { color: #dc2626; margin-top: 0; }
+            .link { word-break: break-all; color: #6b7280; font-size: 14px; }
+            .warning { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 15px; border-radius: 6px; margin: 20px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🔐 The Guild: Gamified Fitness</h1>
+            <p>Password Reset Request</p>
+          </div>
+          
+          <div class="content">
+            <h2>Hello ${username},</h2>
+            
+            <p>We received a request to reset your Guild account password. If you didn't make this request, you can safely ignore this email.</p>
+            
+            <div style="text-align: center;">
+              <a href="${resetUrl}" class="button">
+                Reset Your Password
               </a>
             </div>
+            
             <p>If the button doesn't work, copy and paste this link into your browser:</p>
-            <p style="word-break: break-all; color: #6b7280;">${resetUrl}</p>
-            <p style="color: #6b7280; font-size: 14px;">This link will expire in 1 hour for security reasons.</p>
+            <p class="link">${resetUrl}</p>
+            
+            <div class="warning">
+              <strong>⚠️ Security Notice:</strong><br>
+              This link will expire in 1 hour for your account security. If you didn't request this reset, please ignore this email.
+            </div>
           </div>
-        `
+          
+          <div class="footer">
+            <p>This is an automated security email from The Guild: Gamified Fitness.</p>
+            <p>© 2025 The Guild: Gamified Fitness. All rights reserved.</p>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      return await sendEmail({
+        to: email,
+        subject: '🔐 Reset Your Guild Password - Security Request',
+        html: emailHtml
       });
-      return true;
     } catch (error) {
       console.error('Failed to send password reset email:', error);
       return false;
