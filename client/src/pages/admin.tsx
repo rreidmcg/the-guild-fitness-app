@@ -13,7 +13,7 @@ import { ApiError } from '@/components/ui/api-error';
 import { useApiQuery, useApiMutation } from '@/hooks/use-api';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
-import { NavBar } from '@/components/ui/nav-bar';
+import { CurrencyHeader } from '@/components/ui/currency-header';
 import { 
   Users, 
   Activity, 
@@ -97,9 +97,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <NavBar />
+      <CurrencyHeader />
       
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-6 pt-20">
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Administrative Control Panel</h1>
           <p className="text-muted-foreground">Comprehensive management suite for The Guild: Gamified Fitness platform</p>
