@@ -272,18 +272,25 @@ export default function WorkoutSession() {
     const currentExercise = exerciseData[exerciseIndex];
     const metrics = setMetrics[setKey];
     
+    console.log('getSetMetric called:', { exerciseIndex, setIndex, field, metrics, currentExercise });
+    
     if (metrics && metrics[field as keyof typeof metrics] !== undefined) {
-      return metrics[field as keyof typeof metrics] as number;
+      const value = metrics[field as keyof typeof metrics] as number;
+      console.log('Returning saved metric:', value);
+      return value;
     }
     
     // Return default from exercise data - use actual prescribed values
+    let defaultValue;
     switch (field) {
-      case 'weight': return currentExercise?.weight || '';
-      case 'reps': return currentExercise?.reps || '';
-      case 'rpe': return ''; // Let user fill in RIR
-      case 'duration': return currentExercise?.duration || '';
-      default: return '';
+      case 'weight': defaultValue = currentExercise?.weight || 0; break;
+      case 'reps': defaultValue = currentExercise?.reps || 0; break;
+      case 'rpe': defaultValue = 7; break; // Default RPE
+      case 'duration': defaultValue = currentExercise?.duration || 0; break;
+      default: defaultValue = 0;
     }
+    console.log('Returning default value:', defaultValue);
+    return defaultValue;
   };
 
   const markAllSetsComplete = () => {
