@@ -531,7 +531,10 @@ export default function WorkoutSession() {
                           <Input
                             type="number"
                             value={getSetMetric(currentExerciseIndex, setIndex, 'weight')}
-                            onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'weight', parseInt(e.target.value) || 0)}
+                            onChange={(e) => {
+                              console.log('Weight input onChange fired:', e.target.value);
+                              updateSetMetric(currentExerciseIndex, setIndex, 'weight', parseInt(e.target.value) || 0);
+                            }}
                             className="h-8 text-center border-none bg-transparent text-sm"
                             min="0"
                             placeholder={currentExercise.weight?.toString() || "0"}
@@ -544,7 +547,10 @@ export default function WorkoutSession() {
                         <Input
                           type="number"
                           value={getSetMetric(currentExerciseIndex, setIndex, 'reps')}
-                          onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'reps', parseInt(e.target.value) || 0)}
+                          onChange={(e) => {
+                            console.log('Reps input onChange fired:', e.target.value);
+                            updateSetMetric(currentExerciseIndex, setIndex, 'reps', parseInt(e.target.value) || 0);
+                          }}
                           className="h-8 text-center border-none bg-transparent text-sm"
                           min="1"
                           placeholder={currentExercise.reps?.toString() || "0"}
