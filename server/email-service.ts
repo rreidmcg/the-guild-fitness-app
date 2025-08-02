@@ -25,7 +25,7 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
       },
       body: JSON.stringify({
         from: {
-          email: "guildmasterreid@gmail.com",
+          email: "noreply@test-dnvo4d968wxg5r86.mlsender.net",
           name: "The Guild: Gamified Fitness"
         },
         to: [
@@ -43,19 +43,22 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`MailerSend API error (${response.status}):`, errorText);
-      
-      // API key needs activation - log details for manual processing
-      console.log('\n🔧 MAILERSEND SETUP REQUIRED:');
-      console.log('1. Go to https://app.mailersend.com/');
-      console.log('2. Verify your email address if prompted');
-      console.log('3. Check API Tokens section for key activation status');
-      console.log('4. No domain verification needed for Gmail sender\n');
-      
       logEmailNotification(params);
       return false;
     }
 
-    const result = await response.json();
+    // Check if response has content before trying to parse JSON
+    const responseText = await response.text();
+    let result = {};
+    if (responseText) {
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        // If no JSON response, that's often normal for successful email sends
+        console.log('MailerSend response (no JSON):', responseText);
+      }
+    }
+    
     console.log(`✅ Email sent successfully to ${params.to} via MailerSend`);
     return true;
     
