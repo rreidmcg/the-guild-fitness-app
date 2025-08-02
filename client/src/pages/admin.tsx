@@ -13,7 +13,7 @@ import { ApiError } from '@/components/ui/api-error';
 import { useApiQuery, useApiMutation } from '@/hooks/use-api';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
-import { ParallaxBackground } from '@/components/ui/parallax-background';
+import { NavBar } from '@/components/ui/nav-bar';
 import { 
   Users, 
   Activity, 
@@ -96,15 +96,17 @@ export default function AdminDashboard() {
   }
 
   return (
-    <ParallaxBackground>
-      <div className="admin-panel container mx-auto p-4 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white mb-2">Administrative Control Panel</h1>
-        <p className="text-gray-400">Comprehensive management suite for The Guild: Gamified Fitness platform</p>
-      </div>
+    <div className="min-h-screen bg-background text-foreground pb-20">
+      <NavBar />
+      
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">Administrative Control Panel</h1>
+          <p className="text-muted-foreground">Comprehensive management suite for The Guild: Gamified Fitness platform</p>
+        </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 bg-game-slate">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 bg-card border-border">
           <TabsTrigger value="analytics" className="flex items-center space-x-1 text-xs sm:text-sm">
             <BarChart3 className="w-4 h-4" />
             <span className="hidden sm:inline">Analytics Dashboard</span>
@@ -156,7 +158,7 @@ export default function AdminDashboard() {
         </TabsContent>
       </Tabs>
       </div>
-    </ParallaxBackground>
+    </div>
   );
 }
 
@@ -165,57 +167,57 @@ function AnalyticsOverview({ data }: { data: any }) {
     <div className="space-y-6">
       {/* User Engagement */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-blue-400" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-game-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{data.userEngagement.totalUsers}</div>
-            <p className="text-xs text-gray-400">Registered accounts</p>
+            <div className="text-2xl font-bold text-foreground">{data.userEngagement.totalUsers}</div>
+            <p className="text-xs text-muted-foreground">Registered accounts</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Active Users (24h)</CardTitle>
-            <Activity className="h-4 w-4 text-green-400" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Active Users (24h)</CardTitle>
+            <Activity className="h-4 w-4 text-game-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{data.userEngagement.activeUsers24h}</div>
-            <p className="text-xs text-gray-400">Daily active users</p>
+            <div className="text-2xl font-bold text-foreground">{data.userEngagement.activeUsers24h}</div>
+            <p className="text-xs text-muted-foreground">Daily active users</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Retention Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-yellow-400" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Retention Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-game-warning" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{data.userEngagement.retentionRate}%</div>
-            <p className="text-xs text-gray-400">30-day retention</p>
+            <div className="text-2xl font-bold text-foreground">{data.userEngagement.retentionRate}%</div>
+            <p className="text-xs text-muted-foreground">30-day retention</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border card-glow transition-all duration-300 hover:shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Total Workouts</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Workouts</CardTitle>
             <Activity className="h-4 w-4 text-purple-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{data.workoutStats.totalWorkouts}</div>
-            <p className="text-xs text-gray-400">Completed sessions</p>
+            <div className="text-2xl font-bold text-foreground">{data.workoutStats.totalWorkouts}</div>
+            <p className="text-xs text-muted-foreground">Completed sessions</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Detailed Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border card-glow">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Trophy className="w-5 h-5 text-yellow-400" />
+            <CardTitle className="flex items-center space-x-2 text-foreground">
+              <Trophy className="w-5 h-5 text-game-warning" />
               <span>Achievement Analytics</span>
             </CardTitle>
           </CardHeader>
@@ -223,10 +225,10 @@ function AnalyticsOverview({ data }: { data: any }) {
             <div className="space-y-3">
               {data.achievementStats.topAchievements.map((achievement: any, index: number) => (
                 <div key={index} className="flex justify-between items-center">
-                  <span className="text-gray-200">{achievement.name}</span>
+                  <span className="text-foreground">{achievement.name}</span>
                   <div className="text-right">
-                    <div className="text-white font-semibold">{achievement.unlocks} unlocks</div>
-                    <div className="text-xs text-gray-400">{achievement.percentage}% of users</div>
+                    <div className="text-foreground font-semibold">{achievement.unlocks} unlocks</div>
+                    <div className="text-xs text-muted-foreground">{achievement.percentage}% of users</div>
                   </div>
                 </div>
               ))}
@@ -234,9 +236,9 @@ function AnalyticsOverview({ data }: { data: any }) {
           </CardContent>
         </Card>
 
-        <Card className="bg-game-slate border-gray-700">
+        <Card className="bg-card border-border card-glow">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
+            <CardTitle className="flex items-center space-x-2 text-foreground">
               <Sword className="w-5 h-5 text-red-400" />
               <span>Combat Analytics</span>
             </CardTitle>
@@ -244,20 +246,20 @@ function AnalyticsOverview({ data }: { data: any }) {
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-gray-200">Total Battles</span>
-                <span className="text-white font-semibold">{data.battleStats.totalBattles}</span>
+                <span className="text-foreground">Total Battles</span>
+                <span className="text-foreground font-semibold">{data.battleStats.totalBattles}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-200">Avg per User</span>
-                <span className="text-white font-semibold">{data.battleStats.averageBattlesPerUser}</span>
+                <span className="text-foreground">Avg per User</span>
+                <span className="text-foreground font-semibold">{data.battleStats.averageBattlesPerUser}</span>
               </div>
               <div className="mt-4">
-                <h4 className="text-sm font-medium text-white mb-2">Most Defeated Monsters</h4>
+                <h4 className="text-sm font-medium text-foreground mb-2">Most Defeated Monsters</h4>
                 <div className="space-y-2">
                   {data.battleStats.topMonsters.slice(0, 3).map((monster: any, index: number) => (
                     <div key={index} className="flex justify-between text-sm">
-                      <span className="text-gray-200">{monster.name}</span>
-                      <span className="text-white">{monster.defeatedCount}</span>
+                      <span className="text-foreground">{monster.name}</span>
+                      <span className="text-foreground">{monster.defeatedCount}</span>
                     </div>
                   ))}
                 </div>
@@ -268,27 +270,27 @@ function AnalyticsOverview({ data }: { data: any }) {
       </div>
 
       {/* User Progression */}
-      <Card className="bg-game-slate border-gray-700">
+      <Card className="bg-card border-border card-glow">
         <CardHeader>
-          <CardTitle className="text-white">Character Progression Analytics</CardTitle>
+          <CardTitle className="text-foreground">Character Progression Analytics</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">{data.userProgression.averageLevel}</div>
-              <div className="text-sm text-gray-400">Average Level</div>
+              <div className="text-2xl font-bold text-foreground">{data.userProgression.averageLevel}</div>
+              <div className="text-sm text-muted-foreground">Average Level</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-red-400">{data.userProgression.averageStrength}</div>
-              <div className="text-sm text-gray-400">Average Strength</div>
+              <div className="text-sm text-muted-foreground">Average Strength</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-400">{data.userProgression.averageStamina}</div>
-              <div className="text-sm text-gray-400">Average Stamina</div>
+              <div className="text-sm text-muted-foreground">Average Stamina</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-400">{data.userProgression.averageAgility}</div>
-              <div className="text-sm text-gray-400">Average Agility</div>
+              <div className="text-sm text-muted-foreground">Average Agility</div>
             </div>
           </div>
         </CardContent>
@@ -420,12 +422,12 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Exercise Management */}
-        <Card className="bg-game-slate border-gray-700 shadow-lg">
+        <Card className="bg-card border-border card-glow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-lg font-semibold text-white">Exercise Library Management</CardTitle>
+            <CardTitle className="text-lg font-semibold text-foreground">Exercise Library Management</CardTitle>
             <Button 
               size="sm" 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg" 
+              className="bg-game-primary hover:bg-game-primary/90 text-primary-foreground" 
               onClick={() => setShowAddExercise(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -440,16 +442,16 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
             ) : (
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {exercises?.map((exercise: any) => (
-                  <div key={exercise.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-750 transition-colors duration-200">
+                  <div key={exercise.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border border-border hover:bg-muted/70 transition-colors duration-200">
                     <div className="flex-1">
-                      <div className="font-medium text-white">{exercise.name}</div>
-                      <div className="text-sm text-gray-400">{exercise.category}</div>
+                      <div className="font-medium text-foreground">{exercise.name}</div>
+                      <div className="text-sm text-muted-foreground">{exercise.category}</div>
                     </div>
                     <div className="flex space-x-2">
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200" 
+                        className="border-border text-muted-foreground hover:text-foreground" 
                         title="Edit Exercise Details"
                       >
                         <Edit className="w-4 h-4 sm:mr-1" />
@@ -458,7 +460,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="text-red-400 border-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200" 
+                        className="text-red-400 border-red-400 hover:bg-red-500/10 hover:text-red-300" 
                         title="Remove Exercise"
                       >
                         <Trash2 className="w-4 h-4 sm:mr-1" />
@@ -473,12 +475,12 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
         </Card>
 
         {/* Monster Management */}
-        <Card className="bg-game-slate border-gray-700 shadow-lg">
+        <Card className="bg-card border-border card-glow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-lg font-semibold text-white">Battle Monster Management</CardTitle>
+            <CardTitle className="text-lg font-semibold text-foreground">Battle Monster Management</CardTitle>
             <Button 
               size="sm" 
-              className="bg-red-600 hover:bg-red-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg" 
+              className="bg-red-600 hover:bg-red-700 text-white" 
               onClick={() => setShowAddMonster(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -493,16 +495,16 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
             ) : (
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {monsters?.map((monster: any) => (
-                  <div key={monster.id} className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-750 transition-colors duration-200">
+                  <div key={monster.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border border-border hover:bg-muted/70 transition-colors duration-200">
                     <div className="flex-1">
-                      <div className="font-medium text-white">{monster.name}</div>
-                      <div className="text-sm text-gray-400">Level {monster.level} • {monster.tier}-rank</div>
+                      <div className="font-medium text-foreground">{monster.name}</div>
+                      <div className="text-sm text-muted-foreground">Level {monster.level} • {monster.tier}-rank</div>
                     </div>
                     <div className="flex space-x-2">
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200" 
+                        className="border-border text-muted-foreground hover:text-foreground" 
                         title="Edit Monster Properties"
                       >
                         <Edit className="w-4 h-4 sm:mr-1" />
@@ -511,7 +513,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
                       <Button 
                         size="sm" 
                         variant="outline" 
-                        className="text-red-400 border-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200" 
+                        className="text-red-400 border-red-400 hover:bg-red-500/10 hover:text-red-300" 
                         title="Remove Monster"
                       >
                         <Trash2 className="w-4 h-4 sm:mr-1" />
@@ -528,25 +530,25 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
 
       {/* Add Exercise Dialog */}
       <Dialog open={showAddExercise} onOpenChange={setShowAddExercise}>
-        <DialogContent className="bg-game-slate border-gray-700 max-w-md">
+        <DialogContent className="bg-background border-border max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white">Create New Exercise</DialogTitle>
+            <DialogTitle className="text-foreground">Create New Exercise</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="exercise-name" className="text-white">Exercise Name</Label>
+              <Label htmlFor="exercise-name" className="text-foreground">Exercise Name</Label>
               <Input
                 id="exercise-name"
                 value={exerciseForm.name}
                 onChange={(e) => setExerciseForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Push-ups"
-                className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                className="bg-input border-border text-foreground"
               />
             </div>
             <div>
-              <Label htmlFor="exercise-category" className="text-white">Category</Label>
+              <Label htmlFor="exercise-category" className="text-foreground">Category</Label>
               <Select value={exerciseForm.category} onValueChange={(value) => setExerciseForm(prev => ({ ...prev, category: value }))}>
-                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                <SelectTrigger className="bg-input border-border text-foreground">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -559,58 +561,58 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
               </Select>
             </div>
             <div>
-              <Label htmlFor="muscle-groups" className="text-white">Muscle Groups (comma-separated)</Label>
+              <Label htmlFor="muscle-groups" className="text-foreground">Muscle Groups (comma-separated)</Label>
               <Input
                 id="muscle-groups"
                 value={exerciseForm.muscleGroups}
                 onChange={(e) => setExerciseForm(prev => ({ ...prev, muscleGroups: e.target.value }))}
                 placeholder="e.g., chest, triceps, shoulders"
-                className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                className="bg-input border-border text-foreground"
               />
             </div>
             <div>
-              <Label htmlFor="exercise-description" className="text-white">Description</Label>
+              <Label htmlFor="exercise-description" className="text-foreground">Description</Label>
               <Textarea
                 id="exercise-description"
                 value={exerciseForm.description}
                 onChange={(e) => setExerciseForm(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Exercise instructions and form cues..."
-                className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                className="bg-input border-border text-foreground"
                 rows={3}
               />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="strength-points" className="text-white">Strength Points</Label>
+                <Label htmlFor="strength-points" className="text-foreground">Strength Points</Label>
                 <Input
                   id="strength-points"
                   type="number"
                   min="0"
                   value={exerciseForm.strengthPoints}
                   onChange={(e) => setExerciseForm(prev => ({ ...prev, strengthPoints: parseInt(e.target.value) || 0 }))}
-                  className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                  className="bg-input border-border text-foreground"
                 />
               </div>
               <div>
-                <Label htmlFor="stamina-points" className="text-white">Stamina Points</Label>
+                <Label htmlFor="stamina-points" className="text-foreground">Stamina Points</Label>
                 <Input
                   id="stamina-points"
                   type="number"
                   min="0"
                   value={exerciseForm.staminaPoints}
                   onChange={(e) => setExerciseForm(prev => ({ ...prev, staminaPoints: parseInt(e.target.value) || 0 }))}
-                  className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                  className="bg-input border-border text-foreground"
                 />
               </div>
               <div>
-                <Label htmlFor="agility-points" className="text-white">Agility Points</Label>
+                <Label htmlFor="agility-points" className="text-foreground">Agility Points</Label>
                 <Input
                   id="agility-points"
                   type="number"
                   min="0"
                   value={exerciseForm.agilityPoints}
                   onChange={(e) => setExerciseForm(prev => ({ ...prev, agilityPoints: parseInt(e.target.value) || 0 }))}
-                  className="bg-gray-800 border-gray-600 text-white placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
+                  className="bg-input border-border text-foreground"
                 />
               </div>
             </div>
@@ -620,7 +622,7 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
             <Button 
               onClick={handleAddExercise} 
               disabled={addExerciseMutation.isPending || !exerciseForm.name || !exerciseForm.category}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-game-primary hover:bg-game-primary/90"
             >
               {addExerciseMutation.isPending ? "Creating..." : "Create Exercise"}
             </Button>
@@ -630,19 +632,19 @@ function ContentManagement({ exercises, monsters, exercisesLoading, monstersLoad
 
       {/* Add Monster Dialog */}
       <Dialog open={showAddMonster} onOpenChange={setShowAddMonster}>
-        <DialogContent className="bg-game-slate border-gray-700 max-w-md">
+        <DialogContent className="bg-background border-border max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white">Create New Monster</DialogTitle>
+            <DialogTitle className="text-foreground">Create New Monster</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="monster-name" className="text-white">Monster Name</Label>
+              <Label htmlFor="monster-name" className="text-foreground">Monster Name</Label>
               <Input
                 id="monster-name"
                 value={monsterForm.name}
                 onChange={(e) => setMonsterForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Shadow Wolf"
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-input border-border text-foreground"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
