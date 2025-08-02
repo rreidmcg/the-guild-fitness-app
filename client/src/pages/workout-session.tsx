@@ -521,13 +521,30 @@ export default function WorkoutSession() {
             <div className="bg-card rounded-lg border border-border overflow-hidden">
               {/* Table Header */}
               <div className="grid grid-cols-5 gap-4 p-4 bg-muted/30 border-b border-border">
-                <div className="text-sm font-medium text-muted-foreground">SET</div>
-                <div className="text-sm font-medium text-muted-foreground">
-                  {exerciseData[currentExerciseIndex]?.duration ? 'SEC' : 'LB'}
-                </div>
-                <div className="text-sm font-medium text-muted-foreground">REPS</div>
-                <div className="text-sm font-medium text-muted-foreground">RIR</div>
-                <div className="text-sm font-medium text-muted-foreground text-center">✓</div>
+                {(() => {
+                  const currentExercise = exerciseData[currentExerciseIndex];
+                  const defaultFields = getDefaultTrackingFields(currentExercise?.category || 'strength');
+                  const isTimeExercise = defaultFields.includes('time') || currentExercise?.duration > 0;
+                  const showWeight = defaultFields.includes('weight');
+                  const showReps = defaultFields.includes('reps');
+                  const showIntensity = defaultFields.includes('RIR') || defaultFields.includes('RPE');
+                  
+                  return (
+                    <>
+                      <div className="text-sm font-medium text-muted-foreground">SET</div>
+                      <div className="text-sm font-medium text-muted-foreground">
+                        {isTimeExercise ? 'SEC' : showWeight ? 'LB' : '—'}
+                      </div>
+                      <div className="text-sm font-medium text-muted-foreground">
+                        {showReps ? 'REPS' : '—'}
+                      </div>
+                      <div className="text-sm font-medium text-muted-foreground">
+                        {showIntensity ? 'RIR' : '—'}
+                      </div>
+                      <div className="text-sm font-medium text-muted-foreground text-center">✓</div>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Sets Rows */}
@@ -548,6 +565,7 @@ export default function WorkoutSession() {
                       <div>
                         {(() => {
                           const defaultFields = getDefaultTrackingFields(currentExercise.category || 'strength');
+                          console.log('Exercise:', currentExercise.name, 'Category:', currentExercise.category, 'Default fields:', defaultFields);
                           const isTimeExercise = defaultFields.includes('time') || isDurationBased;
                           const showWeight = defaultFields.includes('weight');
                           
