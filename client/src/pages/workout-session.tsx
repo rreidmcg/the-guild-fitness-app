@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { ArrowLeft, Play, Pause, Square, Check, Target, ChevronRight, ChevronLeft, CheckCircle2 } from "lucide-react";
 import type { User } from "@shared/schema";
+import { getDefaultTrackingFields, isTimeBased } from "@shared/exercise-defaults";
 
 export default function WorkoutSession() {
   const { id } = useParams();
@@ -545,80 +546,110 @@ export default function WorkoutSession() {
                       
                       {/* Weight/Duration */}
                       <div>
-                        {currentExercise?.fields?.includes('time') || isDurationBased ? (
-                          <Input
-                            type="number"
-                            value={getSetMetric(currentExerciseIndex, setIndex, 'duration')}
-                            onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'duration', parseInt(e.target.value) || 0)}
-                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                            min="0"
-                            placeholder={currentExercise.duration?.toString() || "0"}
-                          />
-                        ) : currentExercise?.fields?.includes('weight') ? (
-                          <Input
-                            type="number"
-                            value={getSetMetric(currentExerciseIndex, setIndex, 'weight') || ''}
-                            onChange={(e) => {
-                              console.log('Weight input onChange fired:', e.target.value);
-                              const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
-                              updateSetMetric(currentExerciseIndex, setIndex, 'weight', newValue);
-                            }}
-                            onFocus={() => console.log('Weight input focused')}
-                            onInput={(e: any) => console.log('Weight input onInput fired:', e.target.value)}
-                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                            min="0"
-                            step="1"
-                            placeholder={currentExercise.weight?.toString() || "0"}
-                          />
-                        ) : (
-                          <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
-                            —
-                          </div>
-                        )}
+                        {(() => {
+                          const defaultFields = getDefaultTrackingFields(currentExercise.category || 'strength');
+                          const isTimeExercise = defaultFields.includes('time') || isDurationBased;
+                          const showWeight = defaultFields.includes('weight');
+                          
+                          if (isTimeExercise) {
+                            return (
+                              <Input
+                                type="number"
+                                value={getSetMetric(currentExerciseIndex, setIndex, 'duration')}
+                                onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'duration', parseInt(e.target.value) || 0)}
+                                className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                min="0"
+                                placeholder={currentExercise.duration?.toString() || "0"}
+                              />
+                            );
+                          } else if (showWeight) {
+                            return (
+                              <Input
+                                type="number"
+                                value={getSetMetric(currentExerciseIndex, setIndex, 'weight') || ''}
+                                onChange={(e) => {
+                                  console.log('Weight input onChange fired:', e.target.value);
+                                  const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                  updateSetMetric(currentExerciseIndex, setIndex, 'weight', newValue);
+                                }}
+                                onFocus={() => console.log('Weight input focused')}
+                                onInput={(e: any) => console.log('Weight input onInput fired:', e.target.value)}
+                                className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                min="0"
+                                step="1"
+                                placeholder={currentExercise.weight?.toString() || "0"}
+                              />
+                            );
+                          } else {
+                            return (
+                              <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
+                                —
+                              </div>
+                            );
+                          }
+                        })()}
                       </div>
                       
                       {/* Reps */}
                       <div>
-                        {currentExercise?.fields?.includes('reps') ? (
-                          <Input
-                            type="number"
-                            value={getSetMetric(currentExerciseIndex, setIndex, 'reps') || ''}
-                            onChange={(e) => {
-                              console.log('Reps input onChange fired:', e.target.value);
-                              const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
-                              updateSetMetric(currentExerciseIndex, setIndex, 'reps', newValue);
-                            }}
-                            onFocus={() => console.log('Reps input focused')}
-                            onInput={(e: any) => console.log('Reps input onInput fired:', e.target.value)}
-                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                            min="1"
-                            step="1"
-                            placeholder={currentExercise.reps?.toString() || "0"}
-                          />
-                        ) : (
-                          <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
-                            —
-                          </div>
-                        )}
+                        {(() => {
+                          const defaultFields = getDefaultTrackingFields(currentExercise.category || 'strength');
+                          const showReps = defaultFields.includes('reps');
+                          
+                          if (showReps) {
+                            return (
+                              <Input
+                                type="number"
+                                value={getSetMetric(currentExerciseIndex, setIndex, 'reps') || ''}
+                                onChange={(e) => {
+                                  console.log('Reps input onChange fired:', e.target.value);
+                                  const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                  updateSetMetric(currentExerciseIndex, setIndex, 'reps', newValue);
+                                }}
+                                onFocus={() => console.log('Reps input focused')}
+                                onInput={(e: any) => console.log('Reps input onInput fired:', e.target.value)}
+                                className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                min="1"
+                                step="1"
+                                placeholder={currentExercise.reps?.toString() || "0"}
+                              />
+                            );
+                          } else {
+                            return (
+                              <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
+                                —
+                              </div>
+                            );
+                          }
+                        })()}
                       </div>
                       
                       {/* RIR */}
                       <div>
-                        {currentExercise?.fields?.includes('RIR') || currentExercise?.fields?.includes('RPE') ? (
-                          <Input
-                            type="number"
-                            value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
-                            onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
-                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                            min="0"
-                            max="10"
-                            placeholder="3"
-                          />
-                        ) : (
-                          <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
-                            —
-                          </div>
-                        )}
+                        {(() => {
+                          const defaultFields = getDefaultTrackingFields(currentExercise.category || 'strength');
+                          const showIntensity = defaultFields.includes('RIR') || defaultFields.includes('RPE');
+                          
+                          if (showIntensity) {
+                            return (
+                              <Input
+                                type="number"
+                                value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
+                                onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
+                                className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                                min="0"
+                                max="10"
+                                placeholder="3"
+                              />
+                            );
+                          } else {
+                            return (
+                              <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
+                                —
+                              </div>
+                            );
+                          }
+                        })()}
                       </div>
                       
                       {/* Checkbox */}

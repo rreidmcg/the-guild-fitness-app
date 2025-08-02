@@ -5,13 +5,12 @@
 The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, agility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
 
 ## Recent Changes (August 2, 2025)
+- **SMART EXERCISE DEFAULTS**: Replaced complex manual field configuration with intelligent defaults based on exercise category - strength exercises show weight/reps/RIR, bodyweight shows reps/RIR, cardio shows time/RPE, etc.
+- **SIMPLIFIED WORKOUT BUILDER**: Removed manual tracking field selection UI in favor of automatic smart defaults, significantly improving user experience
+- **EXERCISE CATEGORIZATION**: Created comprehensive exercise default system that automatically determines appropriate tracking fields based on exercise type (strength, bodyweight, cardio, plyometric, etc.)
 - **ADMIN PANEL STYLING ALIGNMENT**: Successfully brought admin panel in line with app's design system by replacing ParallaxBackground with standard layout, using proper theme variables instead of hardcoded colors, and replacing NavBar with CurrencyHeader for consistency
 - **MOBILE MAIL HEADER FIX**: Fixed cramped mail page header on mobile devices with responsive layout adjustments - header now stacks vertically on small screens, hides subtitle text, shows icon-only buttons, and uses proper text sizing
-- **PERSISTENT EXERCISE PREFERENCES**: Implemented complete user exercise preferences system with database storage, API endpoints, and automatic saving/loading of customized workout metrics (weight, reps, RPE, duration)
-- **WORKOUT SESSION ENHANCEMENT**: Updated workout session interface to auto-populate saved preferences as defaults and automatically save user modifications for future sessions
-- **PRIVACY CONFIRMATION**: Confirmed and documented that custom workouts are completely private to each user account with proper user ID filtering
 - **WORKOUT SESSION ERROR FIX**: Fixed workout session crash caused by sets being stored as numbers instead of arrays - now properly converts template data to session format
-- **EXERCISE PREFERENCES DEBUGGING**: Working on persistent exercise preferences - added error handling and debugging logs to track saving issues
 
 ## Previous Changes (August 1, 2025)
 - **BATTLE SYSTEM REWARDS**: Battles now only award gold/currency, NOT experience points - XP comes exclusively from completing workouts to ensure level reflects real fitness consistency

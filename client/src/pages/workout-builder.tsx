@@ -774,31 +774,8 @@ export default function WorkoutBuilder() {
                     </div>
                     
                     {/* Tracking Fields Display */}
-                    <div className="flex flex-wrap gap-2">
-                      {((exercise as any)?.trackingFields || ['reps', 'weight', 'RIR']).map((field: string) => (
-                        <div key={field} className="flex items-center bg-muted rounded px-2 py-1">
-                          <span className="text-xs font-medium uppercase">{field}</span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-4 w-4 p-0 ml-1 hover:bg-destructive hover:text-destructive-foreground"
-                            onClick={() => {
-                              if (currentSection && currentSection.exercises) {
-                                const currentFields = (exercise as any)?.trackingFields || ['reps', 'weight', 'RIR'];
-                                const updatedFields = currentFields.filter((f: string) => f !== field);
-                                const updatedExercises = currentSection.exercises.map(ex => 
-                                  ex.id === exercise.id 
-                                    ? {...ex, trackingFields: updatedFields}
-                                    : ex
-                                );
-                                setCurrentSection({...currentSection, exercises: updatedExercises});
-                              }
-                            }}
-                          >
-                            <X className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      ))}
+                    <div className="text-xs text-muted-foreground">
+                      Smart tracking fields based on exercise type
                     </div>
                   </div>
 
@@ -1381,7 +1358,7 @@ export default function WorkoutBuilder() {
           restTime: ex.restTime || 60, // Use configured value or default
           section: section.name, // Include section name
           order: exerciseIndex, // Order within section
-          fields: ex.fields || [], // Include tracking fields configuration
+          // No fields array needed - using smart defaults based on exercise category
         }))
       ),
     };
