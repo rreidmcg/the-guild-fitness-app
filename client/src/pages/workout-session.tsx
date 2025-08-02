@@ -67,11 +67,22 @@ export default function WorkoutSession() {
     if (workout && (workout as any).exercises && exercises) {
       const workoutExercises = (workout as any).exercises.map((workoutEx: any) => {
         const exerciseDetails = exercises.find(ex => ex.id === workoutEx.exerciseId);
+        
+        // Convert sets from number to array for session tracking
+        const setsArray = Array.from({ length: workoutEx.sets || 0 }, (_, index) => ({
+          id: index,
+          reps: workoutEx.reps || 0,
+          weight: workoutEx.weight || 0,
+          duration: workoutEx.duration || undefined,
+          completed: false
+        }));
+        
         return {
           ...workoutEx,
           name: exerciseDetails?.name || `Exercise ${workoutEx.exerciseId}`,
           category: exerciseDetails?.category || 'strength',
           muscleGroups: exerciseDetails?.muscleGroups || [],
+          sets: setsArray // Replace the number with an array
         };
       });
       setExerciseData(workoutExercises);
