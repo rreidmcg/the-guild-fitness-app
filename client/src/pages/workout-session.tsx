@@ -237,7 +237,9 @@ export default function WorkoutSession() {
   };
 
   const updateSetMetric = (exerciseIndex: number, setIndex: number, field: string, value: number) => {
+    console.log('=== updateSetMetric START ===');
     console.log('updateSetMetric called:', { exerciseIndex, setIndex, field, value });
+    
     const setKey = `${exerciseIndex}-${setIndex}`;
     setSetMetrics(prev => ({
       ...prev,
@@ -249,7 +251,12 @@ export default function WorkoutSession() {
 
     // Auto-save user preference for this exercise
     const currentExercise = exerciseData[exerciseIndex];
+    console.log('Current exercise from exerciseData:', currentExercise);
+    console.log('User stats:', userStats);
+    console.log('saveExercisePreferenceMutation object:', saveExercisePreferenceMutation);
+    
     if (currentExercise && userStats?.id) {
+      console.log('CONDITIONS MET - proceeding with preference save');
       const currentMetrics = setMetrics[setKey] || {};
       const newMetrics = { ...currentMetrics, [field]: value };
       
@@ -262,8 +269,14 @@ export default function WorkoutSession() {
         preferredDuration: field === 'duration' ? value : (Number(newMetrics.duration) || null),
       };
       
-      console.log('Saving exercise preference:', preferenceData);
-      saveExercisePreferenceMutation.mutate(preferenceData);
+      console.log('About to call saveExercisePreferenceMutation.mutate with:', preferenceData);
+      
+      try {
+        saveExercisePreferenceMutation.mutate(preferenceData);
+        console.log('saveExercisePreferenceMutation.mutate called successfully');
+      } catch (error) {
+        console.error('ERROR calling saveExercisePreferenceMutation.mutate:', error);
+      }
       
       // Show immediate feedback
       toast({
@@ -271,7 +284,12 @@ export default function WorkoutSession() {
         description: `${field} updated to ${value}`,
         duration: 1000,
       });
+    } else {
+      console.log('CONDITIONS NOT MET:');
+      console.log('- currentExercise exists:', !!currentExercise);
+      console.log('- userStats?.id exists:', !!userStats?.id);
     }
+    console.log('=== updateSetMetric END ===');
   };
 
   const getSetMetric = (exerciseIndex: number, setIndex: number, field: string): number | string => {
@@ -498,9 +516,16 @@ export default function WorkoutSession() {
               <Button 
                 onClick={() => {
                   const currentExercise = exerciseData[currentExerciseIndex];
+                  console.log('MANUAL TEST BUTTON CLICKED');
+                  console.log('Current exercise:', currentExercise);
+                  console.log('User stats:', userStats);
+                  console.log('SaveExercisePreferenceMutation:', saveExercisePreferenceMutation);
+                  
                   if (currentExercise) {
                     console.log('MANUAL TEST: Triggering preference save');
                     updateSetMetric(currentExerciseIndex, 0, 'weight', 99);
+                  } else {
+                    console.log('NO CURRENT EXERCISE FOUND');
                   }
                 }}
                 variant="outline"
