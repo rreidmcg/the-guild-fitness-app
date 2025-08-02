@@ -530,15 +530,17 @@ export default function WorkoutSession() {
                         ) : (
                           <Input
                             type="number"
-                            value={getSetMetric(currentExerciseIndex, setIndex, 'weight')}
+                            value={getSetMetric(currentExerciseIndex, setIndex, 'weight') || ''}
                             onChange={(e) => {
                               console.log('Weight input onChange fired:', e.target.value);
-                              updateSetMetric(currentExerciseIndex, setIndex, 'weight', parseInt(e.target.value) || 0);
+                              const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
+                              updateSetMetric(currentExerciseIndex, setIndex, 'weight', newValue);
                             }}
                             onFocus={() => console.log('Weight input focused')}
                             onInput={(e: any) => console.log('Weight input onInput fired:', e.target.value)}
                             className="h-8 text-center border-none bg-transparent text-sm"
                             min="0"
+                            step="1"
                             placeholder={currentExercise.weight?.toString() || "0"}
                           />
                         )}
@@ -548,13 +550,17 @@ export default function WorkoutSession() {
                       <div>
                         <Input
                           type="number"
-                          value={getSetMetric(currentExerciseIndex, setIndex, 'reps')}
+                          value={getSetMetric(currentExerciseIndex, setIndex, 'reps') || ''}
                           onChange={(e) => {
                             console.log('Reps input onChange fired:', e.target.value);
-                            updateSetMetric(currentExerciseIndex, setIndex, 'reps', parseInt(e.target.value) || 0);
+                            const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
+                            updateSetMetric(currentExerciseIndex, setIndex, 'reps', newValue);
                           }}
+                          onFocus={() => console.log('Reps input focused')}
+                          onInput={(e: any) => console.log('Reps input onInput fired:', e.target.value)}
                           className="h-8 text-center border-none bg-transparent text-sm"
                           min="1"
+                          step="1"
                           placeholder={currentExercise.reps?.toString() || "0"}
                         />
                       </div>
