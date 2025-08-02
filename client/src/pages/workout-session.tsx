@@ -512,28 +512,42 @@ export default function WorkoutSession() {
                   Rest: {exerciseData[currentExerciseIndex].restTime}s between sets
                 </p>
               )}
-              {/* DEBUG: Test preference saving */}
-              <Button 
-                onClick={() => {
-                  const currentExercise = exerciseData[currentExerciseIndex];
-                  console.log('MANUAL TEST BUTTON CLICKED');
-                  console.log('Current exercise:', currentExercise);
-                  console.log('User stats:', userStats);
-                  console.log('SaveExercisePreferenceMutation:', saveExercisePreferenceMutation);
-                  
-                  if (currentExercise) {
-                    console.log('MANUAL TEST: Triggering preference save');
-                    updateSetMetric(currentExerciseIndex, 0, 'weight', 99);
-                  } else {
-                    console.log('NO CURRENT EXERCISE FOUND');
-                  }
-                }}
-                variant="outline"
-                size="sm"
-                className="text-xs"
-              >
-                TEST: Save Weight=99
-              </Button>
+              
+              {/* DEBUG: Force-trigger preference save */}
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => {
+                    console.log('🔥 FORCE TEST BUTTON CLICKED 🔥');
+                    // Direct call to mutation
+                    if (saveExercisePreferenceMutation && userStats?.id && exerciseData[currentExerciseIndex]) {
+                      const preferenceData = {
+                        exerciseId: exerciseData[currentExerciseIndex].exerciseId,
+                        preferredWeight: 999,
+                        preferredReps: 15,
+                        preferredRpe: 8,
+                        preferredDuration: null,
+                      };
+                      console.log('🚀 DIRECTLY calling mutation with:', preferenceData);
+                      saveExercisePreferenceMutation.mutate(preferenceData);
+                    } else {
+                      console.log('❌ Missing requirements:', {
+                        mutation: !!saveExercisePreferenceMutation,
+                        userId: userStats?.id,
+                        exercise: !!exerciseData[currentExerciseIndex]
+                      });
+                    }
+                  }}
+                  variant="destructive"
+                  size="sm"
+                  className="text-xs"
+                >
+                  🔥 FORCE SAVE TEST
+                </Button>
+                
+                <p className="text-xs text-muted-foreground">
+                  Exercise ID: {exerciseData[currentExerciseIndex]?.exerciseId} | User ID: {userStats?.id}
+                </p>
+              </div>
             </div>
 
             {/* Sets Table */}
