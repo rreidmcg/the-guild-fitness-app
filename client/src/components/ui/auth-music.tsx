@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import heroMusicFile from '@assets/guillotine_1754099888859.mp3';
+import heroMusicFile from '@assets/lute_1753990497210.mp3';
 
 interface AuthMusicProps {
   shouldPlay?: boolean;
