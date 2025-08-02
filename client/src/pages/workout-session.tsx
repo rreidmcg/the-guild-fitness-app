@@ -535,6 +535,8 @@ export default function WorkoutSession() {
                               console.log('Weight input onChange fired:', e.target.value);
                               updateSetMetric(currentExerciseIndex, setIndex, 'weight', parseInt(e.target.value) || 0);
                             }}
+                            onFocus={() => console.log('Weight input focused')}
+                            onInput={(e: any) => console.log('Weight input onInput fired:', e.target.value)}
                             className="h-8 text-center border-none bg-transparent text-sm"
                             min="0"
                             placeholder={currentExercise.weight?.toString() || "0"}
