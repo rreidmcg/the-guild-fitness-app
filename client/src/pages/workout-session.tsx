@@ -182,7 +182,7 @@ export default function WorkoutSession() {
     }));
   };
 
-  const getSetMetric = (exerciseIndex: number, setIndex: number, field: string): number => {
+  const getSetMetric = (exerciseIndex: number, setIndex: number, field: string): number | string => {
     const setKey = `${exerciseIndex}-${setIndex}`;
     const currentExercise = exerciseData[exerciseIndex];
     const metrics = setMetrics[setKey];
@@ -191,13 +191,13 @@ export default function WorkoutSession() {
       return metrics[field as keyof typeof metrics] as number;
     }
     
-    // Return default from exercise data
+    // Return default from exercise data - use actual prescribed values
     switch (field) {
-      case 'weight': return currentExercise?.weight || 0;
-      case 'reps': return currentExercise?.reps || 10;
-      case 'rpe': return 7; // Default RPE
-      case 'duration': return currentExercise?.duration || 0;
-      default: return 0;
+      case 'weight': return currentExercise?.weight || '';
+      case 'reps': return currentExercise?.reps || '';
+      case 'rpe': return ''; // Let user fill in RIR
+      case 'duration': return currentExercise?.duration || '';
+      default: return '';
     }
   };
 
@@ -390,9 +390,11 @@ export default function WorkoutSession() {
               <h3 className="text-2xl font-bold text-foreground">
                 {exerciseData[currentExerciseIndex]?.name}
               </h3>
-              <p className="text-sm text-muted-foreground">
-                Tempo: 3-0-0-1
-              </p>
+              {exerciseData[currentExerciseIndex]?.restTime && (
+                <p className="text-sm text-muted-foreground">
+                  Rest: {exerciseData[currentExerciseIndex].restTime}s between sets
+                </p>
+              )}
             </div>
 
             {/* Sets Table */}
@@ -400,7 +402,9 @@ export default function WorkoutSession() {
               {/* Table Header */}
               <div className="grid grid-cols-5 gap-4 p-4 bg-muted/30 border-b border-border">
                 <div className="text-sm font-medium text-muted-foreground">SET</div>
-                <div className="text-sm font-medium text-muted-foreground">LB</div>
+                <div className="text-sm font-medium text-muted-foreground">
+                  {exerciseData[currentExerciseIndex]?.duration ? 'SEC' : 'LB'}
+                </div>
                 <div className="text-sm font-medium text-muted-foreground">REPS</div>
                 <div className="text-sm font-medium text-muted-foreground">RIR</div>
                 <div className="text-sm font-medium text-muted-foreground text-center">✓</div>
@@ -410,19 +414,27 @@ export default function WorkoutSession() {
               <div className="divide-y divide-border">
                 {getCurrentExerciseSets().map((set: any, setIndex: number) => {
                   const isCompleted = isSetCompleted(currentExerciseIndex, setIndex);
-                  const isWarmup = setIndex < 2; // First 2 sets are warmup in the image
+                  const currentExercise = exerciseData[currentExerciseIndex];
+                  const isDurationBased = currentExercise?.duration > 0;
                   
                   return (
                     <div key={setIndex} className="grid grid-cols-5 gap-4 p-4 items-center">
                       {/* Set Number */}
                       <div className="text-sm">
-                        {isWarmup ? 'W' : setIndex - 1}
+                        {setIndex + 1}
                       </div>
                       
-                      {/* Weight */}
+                      {/* Weight/Duration */}
                       <div>
-                        {isWarmup ? (
-                          <span className="text-sm text-muted-foreground">-</span>
+                        {isDurationBased ? (
+                          <Input
+                            type="number"
+                            value={getSetMetric(currentExerciseIndex, setIndex, 'duration')}
+                            onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'duration', parseInt(e.target.value) || 0)}
+                            className="h-8 text-center border-none bg-transparent text-sm"
+                            min="0"
+                            placeholder={currentExercise.duration?.toString() || "0"}
+                          />
                         ) : (
                           <Input
                             type="number"
@@ -430,6 +442,7 @@ export default function WorkoutSession() {
                             onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'weight', parseInt(e.target.value) || 0)}
                             className="h-8 text-center border-none bg-transparent text-sm"
                             min="0"
+                            placeholder={currentExercise.weight?.toString() || "0"}
                           />
                         )}
                       </div>
@@ -442,23 +455,21 @@ export default function WorkoutSession() {
                           onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'reps', parseInt(e.target.value) || 0)}
                           className="h-8 text-center border-none bg-transparent text-sm"
                           min="1"
+                          placeholder={currentExercise.reps?.toString() || "0"}
                         />
                       </div>
                       
                       {/* RIR */}
                       <div>
-                        {isWarmup ? (
-                          <span className="text-sm text-muted-foreground">-</span>
-                        ) : (
-                          <Input
-                            type="number"
-                            value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
-                            onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
-                            className="h-8 text-center border-none bg-transparent text-sm"
-                            min="0"
-                            max="10"
-                          />
-                        )}
+                        <Input
+                          type="number"
+                          value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
+                          onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
+                          className="h-8 text-center border-none bg-transparent text-sm"
+                          min="0"
+                          max="10"
+                          placeholder="3"
+                        />
                       </div>
                       
                       {/* Checkbox */}
