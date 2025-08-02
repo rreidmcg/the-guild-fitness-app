@@ -523,7 +523,7 @@ export default function WorkoutSession() {
                             type="number"
                             value={getSetMetric(currentExerciseIndex, setIndex, 'duration')}
                             onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'duration', parseInt(e.target.value) || 0)}
-                            className="h-8 text-center border-none bg-transparent text-sm"
+                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
                             min="0"
                             placeholder={currentExercise.duration?.toString() || "0"}
                           />
@@ -538,7 +538,7 @@ export default function WorkoutSession() {
                             }}
                             onFocus={() => console.log('Weight input focused')}
                             onInput={(e: any) => console.log('Weight input onInput fired:', e.target.value)}
-                            className="h-8 text-center border-none bg-transparent text-sm"
+                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
                             min="0"
                             step="1"
                             placeholder={currentExercise.weight?.toString() || "0"}
@@ -558,7 +558,7 @@ export default function WorkoutSession() {
                           }}
                           onFocus={() => console.log('Reps input focused')}
                           onInput={(e: any) => console.log('Reps input onInput fired:', e.target.value)}
-                          className="h-8 text-center border-none bg-transparent text-sm"
+                          className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
                           min="1"
                           step="1"
                           placeholder={currentExercise.reps?.toString() || "0"}
@@ -571,7 +571,7 @@ export default function WorkoutSession() {
                           type="number"
                           value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
                           onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
-                          className="h-8 text-center border-none bg-transparent text-sm"
+                          className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
                           min="0"
                           max="10"
                           placeholder="3"
