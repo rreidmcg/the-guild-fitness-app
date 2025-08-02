@@ -1371,13 +1371,17 @@ export default function WorkoutBuilder() {
     const workoutData = {
       name: workoutName,
       description: workoutDescription,
-      exercises: sections.flatMap(section => 
-        section.exercises.map(ex => ({
+      exercises: sections.flatMap((section, sectionIndex) => 
+        section.exercises.map((ex, exerciseIndex) => ({
           exerciseId: ex.exerciseId,
           sets: ex.sets.length,
-          reps: 10, // Default
-          weight: 0, // Default
-          restTime: 60 // Default
+          reps: ex.reps || 10, // Use configured value or default
+          weight: ex.weight || 0, // Use configured value or default
+          duration: ex.duration || undefined, // Include duration if set
+          restTime: ex.restTime || 60, // Use configured value or default
+          section: section.name, // Include section name
+          order: exerciseIndex, // Order within section
+          fields: ex.fields || [], // Include tracking fields configuration
         }))
       ),
     };

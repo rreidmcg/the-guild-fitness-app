@@ -513,41 +513,7 @@ export default function WorkoutSession() {
                 </p>
               )}
               
-              {/* DEBUG: Force-trigger preference save */}
-              <div className="space-y-2">
-                <Button 
-                  onClick={() => {
-                    console.log('🔥 FORCE TEST BUTTON CLICKED 🔥');
-                    // Direct call to mutation
-                    if (saveExercisePreferenceMutation && userStats?.id && exerciseData[currentExerciseIndex]) {
-                      const preferenceData = {
-                        exerciseId: exerciseData[currentExerciseIndex].exerciseId,
-                        preferredWeight: 999,
-                        preferredReps: 15,
-                        preferredRpe: 8,
-                        preferredDuration: null,
-                      };
-                      console.log('🚀 DIRECTLY calling mutation with:', preferenceData);
-                      saveExercisePreferenceMutation.mutate(preferenceData);
-                    } else {
-                      console.log('❌ Missing requirements:', {
-                        mutation: !!saveExercisePreferenceMutation,
-                        userId: userStats?.id,
-                        exercise: !!exerciseData[currentExerciseIndex]
-                      });
-                    }
-                  }}
-                  variant="destructive"
-                  size="sm"
-                  className="text-xs"
-                >
-                  🔥 FORCE SAVE TEST
-                </Button>
-                
-                <p className="text-xs text-muted-foreground">
-                  Exercise ID: {exerciseData[currentExerciseIndex]?.exerciseId} | User ID: {userStats?.id}
-                </p>
-              </div>
+
             </div>
 
             {/* Sets Table */}
@@ -579,7 +545,7 @@ export default function WorkoutSession() {
                       
                       {/* Weight/Duration */}
                       <div>
-                        {isDurationBased ? (
+                        {currentExercise?.fields?.includes('time') || isDurationBased ? (
                           <Input
                             type="number"
                             value={getSetMetric(currentExerciseIndex, setIndex, 'duration')}
@@ -588,7 +554,7 @@ export default function WorkoutSession() {
                             min="0"
                             placeholder={currentExercise.duration?.toString() || "0"}
                           />
-                        ) : (
+                        ) : currentExercise?.fields?.includes('weight') ? (
                           <Input
                             type="number"
                             value={getSetMetric(currentExerciseIndex, setIndex, 'weight') || ''}
@@ -604,39 +570,55 @@ export default function WorkoutSession() {
                             step="1"
                             placeholder={currentExercise.weight?.toString() || "0"}
                           />
+                        ) : (
+                          <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
+                            —
+                          </div>
                         )}
                       </div>
                       
                       {/* Reps */}
                       <div>
-                        <Input
-                          type="number"
-                          value={getSetMetric(currentExerciseIndex, setIndex, 'reps') || ''}
-                          onChange={(e) => {
-                            console.log('Reps input onChange fired:', e.target.value);
-                            const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
-                            updateSetMetric(currentExerciseIndex, setIndex, 'reps', newValue);
-                          }}
-                          onFocus={() => console.log('Reps input focused')}
-                          onInput={(e: any) => console.log('Reps input onInput fired:', e.target.value)}
-                          className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                          min="1"
-                          step="1"
-                          placeholder={currentExercise.reps?.toString() || "0"}
-                        />
+                        {currentExercise?.fields?.includes('reps') ? (
+                          <Input
+                            type="number"
+                            value={getSetMetric(currentExerciseIndex, setIndex, 'reps') || ''}
+                            onChange={(e) => {
+                              console.log('Reps input onChange fired:', e.target.value);
+                              const newValue = e.target.value === '' ? 0 : parseInt(e.target.value);
+                              updateSetMetric(currentExerciseIndex, setIndex, 'reps', newValue);
+                            }}
+                            onFocus={() => console.log('Reps input focused')}
+                            onInput={(e: any) => console.log('Reps input onInput fired:', e.target.value)}
+                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                            min="1"
+                            step="1"
+                            placeholder={currentExercise.reps?.toString() || "0"}
+                          />
+                        ) : (
+                          <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
+                            —
+                          </div>
+                        )}
                       </div>
                       
                       {/* RIR */}
                       <div>
-                        <Input
-                          type="number"
-                          value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
-                          onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
-                          className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
-                          min="0"
-                          max="10"
-                          placeholder="3"
-                        />
+                        {currentExercise?.fields?.includes('RIR') || currentExercise?.fields?.includes('RPE') ? (
+                          <Input
+                            type="number"
+                            value={getSetMetric(currentExerciseIndex, setIndex, 'rpe')}
+                            onChange={(e) => updateSetMetric(currentExerciseIndex, setIndex, 'rpe', parseInt(e.target.value) || 0)}
+                            className="h-8 text-center border border-input bg-background text-sm focus:ring-2 focus:ring-ring"
+                            min="0"
+                            max="10"
+                            placeholder="3"
+                          />
+                        ) : (
+                          <div className="h-8 text-center text-sm text-muted-foreground flex items-center justify-center">
+                            —
+                          </div>
+                        )}
                       </div>
                       
                       {/* Checkbox */}

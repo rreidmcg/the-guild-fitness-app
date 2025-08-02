@@ -114,6 +114,7 @@ export const workouts = pgTable("workouts", {
     section?: string; // section name (e.g., "Warm-up", "Main", "Cool-down")
     supersetGroup?: string; // identifier for superset grouping
     order?: number; // order within section
+    fields?: string[]; // tracking fields like ['weight', 'RIR', 'RPE', 'reps'] etc.
   }>>().notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
