@@ -97,7 +97,7 @@ export default function AdminDashboard() {
 
   return (
     <ParallaxBackground>
-      <div className="container mx-auto p-4 max-w-7xl">
+      <div className="admin-panel container mx-auto p-4 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-white mb-2">Administrative Control Panel</h1>
         <p className="text-gray-400">Comprehensive management suite for The Guild: Gamified Fitness platform</p>

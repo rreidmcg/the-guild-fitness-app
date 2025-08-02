@@ -364,3 +364,83 @@
     box-shadow: 0 0 30px rgba(107, 185, 230, 0.4);
   }
 }
+
+/* Admin Panel Scoped Styles */
+.admin-panel {
+  /* Fix card backgrounds specifically for admin panel */
+  .card,
+  [data-radix-collection-item],
+  [role="tabpanel"],
+  .bg-card {
+    background-color: hsl(215, 25%, 12%) !important;
+    border-color: hsl(215, 20%, 20%) !important;
+    color: hsl(197, 100%, 90%) !important;
+  }
+  
+  /* Fix text colors in admin panel */
+  .text-foreground {
+    color: hsl(197, 100%, 90%) !important;
+  }
+  
+  .text-muted-foreground {
+    color: hsl(197, 80%, 75%) !important;
+  }
+  
+  /* Fix secondary backgrounds */
+  .bg-secondary {
+    background-color: hsl(215, 20%, 16%) !important;
+    color: hsl(197, 100%, 85%) !important;
+  }
+  
+  /* Fix muted backgrounds */
+  .bg-muted {
+    background-color: hsl(215, 20%, 12%) !important;
+    color: hsl(197, 80%, 75%) !important;
+  }
+  
+  /* Fix background elements */
+  .bg-background {
+    background-color: hsl(215, 28%, 8%) !important;
+    color: hsl(197, 100%, 90%) !important;
+  }
+  
+  /* Fix input styling in admin */
+  input,
+  textarea,
+  select {
+    background-color: hsl(215, 20%, 15%) !important;
+    color: hsl(197, 100%, 90%) !important;
+    border-color: hsl(215, 20%, 20%) !important;
+  }
+  
+  /* Fix table styling in admin */
+  table {
+    background-color: hsl(215, 25%, 12%) !important;
+    color: hsl(197, 100%, 90%) !important;
+  }
+  
+  tr {
+    border-color: hsl(215, 20%, 20%) !important;
+  }
+  
+  th,
+  td {
+    color: hsl(197, 100%, 90%) !important;
+  }
+  
+  /* Fix badge colors in admin */
+  .badge {
+    color: hsl(215, 28%, 8%) !important;
+  }
+  
+  /* Fix button text in admin */
+  button {
+    color: inherit !important;
+  }
+  
+  /* Fix tabs styling */
+  [data-state="active"] {
+    background-color: hsl(215, 20%, 16%) !important;
+    color: hsl(197, 100%, 90%) !important;
+  }
+}
