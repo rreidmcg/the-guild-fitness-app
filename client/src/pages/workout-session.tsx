@@ -237,6 +237,7 @@ export default function WorkoutSession() {
   };
 
   const updateSetMetric = (exerciseIndex: number, setIndex: number, field: string, value: number) => {
+    console.log('updateSetMetric called:', { exerciseIndex, setIndex, field, value });
     const setKey = `${exerciseIndex}-${setIndex}`;
     setSetMetrics(prev => ({
       ...prev,
