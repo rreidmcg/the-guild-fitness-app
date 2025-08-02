@@ -264,6 +264,13 @@ export default function WorkoutSession() {
       
       console.log('Saving exercise preference:', preferenceData);
       saveExercisePreferenceMutation.mutate(preferenceData);
+      
+      // Show immediate feedback
+      toast({
+        title: "Preference Saved",
+        description: `${field} updated to ${value}`,
+        duration: 1000,
+      });
     }
   };
 
@@ -487,6 +494,21 @@ export default function WorkoutSession() {
                   Rest: {exerciseData[currentExerciseIndex].restTime}s between sets
                 </p>
               )}
+              {/* DEBUG: Test preference saving */}
+              <Button 
+                onClick={() => {
+                  const currentExercise = exerciseData[currentExerciseIndex];
+                  if (currentExercise) {
+                    console.log('MANUAL TEST: Triggering preference save');
+                    updateSetMetric(currentExerciseIndex, 0, 'weight', 99);
+                  }
+                }}
+                variant="outline"
+                size="sm"
+                className="text-xs"
+              >
+                TEST: Save Weight=99
+              </Button>
             </div>
 
             {/* Sets Table */}
