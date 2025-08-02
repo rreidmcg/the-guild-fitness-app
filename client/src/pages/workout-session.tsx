@@ -143,8 +143,17 @@ export default function WorkoutSession() {
         body: preference,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Exercise preference saved successfully:', data);
       queryClient.invalidateQueries({ queryKey: ["/api/exercise-preferences"] });
+    },
+    onError: (error) => {
+      console.error('Failed to save exercise preference:', error);
+      toast({
+        title: "Warning",
+        description: "Failed to save exercise preference",
+        variant: "destructive",
+      });
     },
   });
 
@@ -243,13 +252,17 @@ export default function WorkoutSession() {
       const currentMetrics = setMetrics[setKey] || {};
       const newMetrics = { ...currentMetrics, [field]: value };
       
-      saveExercisePreferenceMutation.mutate({
+      // Ensure all values are proper numbers or null
+      const preferenceData = {
         exerciseId: currentExercise.exerciseId,
-        preferredWeight: field === 'weight' ? value : newMetrics.weight,
-        preferredReps: field === 'reps' ? value : newMetrics.reps,
-        preferredRpe: field === 'rpe' ? value : newMetrics.rpe,
-        preferredDuration: field === 'duration' ? value : newMetrics.duration,
-      });
+        preferredWeight: field === 'weight' ? value : (Number(newMetrics.weight) || null),
+        preferredReps: field === 'reps' ? value : (Number(newMetrics.reps) || null),
+        preferredRpe: field === 'rpe' ? value : (Number(newMetrics.rpe) || null),
+        preferredDuration: field === 'duration' ? value : (Number(newMetrics.duration) || null),
+      };
+      
+      console.log('Saving exercise preference:', preferenceData);
+      saveExercisePreferenceMutation.mutate(preferenceData);
     }
   };
 
