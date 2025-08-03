@@ -4,6 +4,11 @@
 
 The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, agility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
 
+## Recent Changes (August 3, 2025)
+- **BATTLE ACCESS CONTROL FIX**: Implemented comprehensive battle access restrictions to prevent unauthorized users from accessing PvE dungeons - only Zero and users with G.M. title can now access battles, while restricted users see professional "Access Restricted" message with lock icon
+- **EMAIL VERIFICATION MANUAL PROCESS**: Successfully verified user "Doorz" account manually due to MailerSend trial limitations - system can send verification emails to admin for forwarding to users
+- **SECURITY LAYER IMPLEMENTATION**: Added frontend battle access checks in addition to existing backend API protections - battle page now validates permissions before allowing navigation to PvE dungeons
+
 ## Recent Changes (August 2, 2025)
 - **EMAIL VERIFICATION SYSTEM FIX**: Fixed email verification not working by migrating from broken Nodemailer/Ethereal setup to production MailerSend API - new users now receive proper verification emails with professional styling
 - **DYNAMIC COLUMN HIDING**: Implemented smart column hiding for workout sessions - bodyweight exercises (like jumping jacks) now only show relevant columns (SET, REPS, RIR) instead of wasting space with weight columns
