@@ -42,8 +42,9 @@ export default function WorkoutSession() {
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentTransform, setCurrentTransform] = useState({ x: 0, rotation: 0 });
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
     queryKey: ["/api/user/stats"],
@@ -334,29 +335,76 @@ export default function WorkoutSession() {
     return currentExercise?.section || currentExercise?.category || "Workout";
   };
 
-  // Swipe handling functions
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(0);
-    setTouchStart(e.targetTouches[0].clientX);
+  // Enhanced swipe handling functions with visual feedback
+  const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    setStartX(clientX);
+    setIsDragging(true);
+    setCurrentTransform({ x: 0, rotation: 0 });
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+  const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const deltaX = clientX - startX;
+    const rotation = deltaX * 0.05; // Subtle rotation effect
+    
+    setCurrentTransform({ x: deltaX, rotation });
+    
+    if (cardRef.current) {
+      cardRef.current.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+      cardRef.current.style.transition = 'none';
+    }
   };
 
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-
-    if (isLeftSwipe && currentExerciseIndex < exerciseData.length - 1) {
-      goToNextExercise();
+  const handleDragEnd = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isDragging) return;
+    
+    const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
+    const deltaX = clientX - startX;
+    const threshold = 100;
+    
+    setIsDragging(false);
+    
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'transform 0.3s ease-out';
+      
+      if (Math.abs(deltaX) > threshold) {
+        // Swipe detected
+        if (deltaX > 0 && currentExerciseIndex > 0) {
+          // Right swipe - go to previous
+          goToPreviousExercise();
+        } else if (deltaX < 0 && currentExerciseIndex < exerciseData.length - 1) {
+          // Left swipe - go to next
+          goToNextExercise();
+        }
+      }
+      
+      // Reset position
+      cardRef.current.style.transform = 'translateX(0px) rotate(0deg)';
     }
-    if (isRightSwipe && currentExerciseIndex > 0) {
-      goToPreviousExercise();
-    }
+    
+    setCurrentTransform({ x: 0, rotation: 0 });
+  };
+
+  // Mouse event handlers for desktop
+  const handleMouseStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleDragStart(e);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      handleDragMove(e as any);
+    };
+    
+    const handleMouseUp = (e: MouseEvent) => {
+      handleDragEnd(e as any);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   // Loading skeleton component
@@ -544,7 +592,7 @@ export default function WorkoutSession() {
                   {currentExerciseIndex + 1} of {exerciseData.length}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 opacity-60">
-                  ← Swipe to navigate →
+                  {isDragging ? 'Release to navigate' : '← Swipe or drag →'}
                 </div>
               </div>
               
@@ -571,13 +619,22 @@ export default function WorkoutSession() {
               )}
             </div>
 
-            {/* Sets Table - With Swipe Support */}
+            {/* Sets Table - With Enhanced Swipe Support */}
             <div 
               ref={cardRef}
-              className="bg-card rounded-lg border border-border overflow-hidden"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
+              className={`bg-card rounded-lg border border-border overflow-hidden select-none transition-all duration-200 ${
+                isDragging 
+                  ? 'cursor-grabbing shadow-xl scale-105' 
+                  : 'cursor-grab hover:shadow-lg'
+              }`}
+              onTouchStart={handleDragStart}
+              onTouchMove={handleDragMove}
+              onTouchEnd={handleDragEnd}
+              onMouseDown={handleMouseStart}
+              style={{
+                transform: `translateX(${currentTransform.x}px) rotate(${currentTransform.rotation}deg)`,
+                transition: isDragging ? 'none' : 'transform 0.3s ease-out, box-shadow 0.2s ease-out, scale 0.2s ease-out'
+              }}
             >
               {(() => {
                 const currentExercise = exerciseData[currentExerciseIndex];
