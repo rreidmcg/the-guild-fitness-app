@@ -64,6 +64,7 @@ export interface IStorage {
   getUserWorkoutSessions(userId: number): Promise<WorkoutSession[]>;
   getAllWorkoutSessions(): Promise<WorkoutSession[]>;
   getWorkoutSession(id: number): Promise<WorkoutSession | undefined>;
+  getWorkoutSessionById(sessionId: number, userId: number): Promise<WorkoutSession & { exercises: any[] } | undefined>;
   createWorkoutSession(session: InsertWorkoutSession): Promise<WorkoutSession>;
 
   // Exercise performance operations
@@ -411,6 +412,31 @@ export class DatabaseStorage implements IStorage {
       .values(insertSession as any)
       .returning();
     return session;
+  }
+
+  async getWorkoutSessionById(sessionId: number, userId: number): Promise<WorkoutSession & { exercises: any[] } | undefined> {
+    await this.ensureInitialized();
+    
+    // Get the workout session
+    const [session] = await db.select()
+      .from(workoutSessions)
+      .where(and(
+        eq(workoutSessions.id, sessionId),
+        eq(workoutSessions.userId, userId)
+      ));
+    
+    if (!session) {
+      return undefined;
+    }
+
+    // Get exercises data from the session
+    // The exercises are stored in the session data when it's created
+    const exercises = (session as any).exercises || [];
+
+    return {
+      ...session,
+      exercises
+    };
   }
 
   async getAllWorkoutSessions(): Promise<WorkoutSession[]> {

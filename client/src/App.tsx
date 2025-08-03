@@ -45,6 +45,7 @@ import ProgramOverview from "@/pages/program-overview";
 import ProgramDay from "@/pages/program-day";
 import ProgramWorkout from "@/pages/program-workout";
 import WorkoutOverview from "@/pages/workout-overview";
+import WorkoutSessionResults from "@/pages/workout-session-results";
 
 function Router() {
   return (
@@ -105,6 +106,11 @@ function Router() {
       <Route path="/workout-session/:id">
         <AuthGuard>
           <WorkoutSession />
+        </AuthGuard>
+      </Route>
+      <Route path="/workout-session-results/:sessionId">
+        <AuthGuard>
+          <WorkoutSessionResults />
         </AuthGuard>
       </Route>
       <Route path="/battle">

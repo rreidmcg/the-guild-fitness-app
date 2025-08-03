@@ -1097,6 +1097,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get individual workout session with exercise details
+  app.get("/api/workout-sessions/:sessionId", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const sessionId = parseInt(req.params.sessionId);
+      
+      if (isNaN(sessionId)) {
+        return res.status(400).json({ error: "Invalid session ID" });
+      }
+      
+      const session = await storage.getWorkoutSessionById(sessionId, userId);
+      
+      if (!session) {
+        return res.status(404).json({ error: "Workout session not found" });
+      }
+      
+      res.json(session);
+    } catch (error) {
+      console.error("Error fetching workout session:", error);
+      res.status(500).json({ error: "Failed to fetch workout session" });
+    }
+  });
+
   app.post("/api/workout-sessions", async (req, res) => {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); } // Use the current logged-in user
