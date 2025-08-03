@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { CurrencyHeader } from "@/components/ui/currency-header";
+import { BottomNav } from "@/components/ui/bottom-nav";
 import { Trophy, TrendingUp, Clock, Target, Star, ChevronRight, ArrowLeft, X } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -48,7 +50,11 @@ export function WorkoutSummary({
   const totalStatsGained = (statsGained.strength || 0) + (statsGained.stamina || 0) + (statsGained.agility || 0);
 
   return (
-    <div className="workout-summary min-h-screen bg-background p-4 pb-24 overflow-y-auto">
+    <div className="workout-summary min-h-screen bg-background overflow-y-auto">
+      {/* Currency Header */}
+      <CurrencyHeader />
+      
+      <div className="p-4 pb-24">
       {/* Header with close button */}
       <div className="max-w-2xl mx-auto mb-4">
         <div className="flex items-center justify-between">
@@ -207,6 +213,10 @@ export function WorkoutSummary({
             Back to Workouts
           </Button>
         </div>
+      </div>
+      
+      {/* Bottom Navigation */}
+      <BottomNav />
       </div>
     </div>
   );
