@@ -60,6 +60,10 @@ export default function BattlePage() {
   }
 
   const userLevel = (userStats as UserStats)?.level || 1;
+  const stats = userStats as UserStats;
+  
+  // Check if user has battle access (Zero or G.M. title)
+  const hasBattleAccess = stats.username === 'Zero' || stats.currentTitle === '<G.M.>';
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -114,8 +118,11 @@ export default function BattlePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* PvE Card */}
         <Card 
-          className="cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
-          onClick={() => navigate("/pve-dungeons")}
+          className={hasBattleAccess 
+            ? "cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
+            : "border-2 border-gray-500/50 bg-gradient-to-br from-gray-900/20 to-gray-800/20 opacity-60"
+          }
+          onClick={hasBattleAccess ? () => navigate("/pve-dungeons") : undefined}
         >
           <CardHeader className="text-center -mt-20 pb-6">
             <CardTitle className="text-2xl text-green-400 flex items-center justify-center">
@@ -132,34 +139,53 @@ export default function BattlePage() {
           </CardHeader>
           <CardContent className="text-center -mt-24">
             <div className="space-y-4">
-              <div className="bg-green-500/10 p-4 rounded-lg">
-                <h4 className="font-semibold text-green-400 mb-2">E-Rank Available</h4>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex justify-between">
-                    <span>Slime Caverns</span>
-                    <span className="text-green-400">Levels 1-6</span>
+              {hasBattleAccess ? (
+                <>
+                  <div className="bg-green-500/10 p-4 rounded-lg">
+                    <h4 className="font-semibold text-green-400 mb-2">E-Rank Available</h4>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex justify-between">
+                        <span>Slime Caverns</span>
+                        <span className="text-green-400">Levels 1-6</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Rat Warrens</span>
+                        <span className="text-green-400">Levels 2-7</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Goblin Outpost</span>
+                        <span className="text-green-400">Levels 4-8</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Spider's Nest</span>
+                        <span className="text-green-400">Levels 6-10</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Rat Warrens</span>
-                    <span className="text-green-400">Levels 2-7</span>
+                  
+                  <div className="flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-sm text-muted-foreground">Your Level</div>
+                      <div className="text-xl font-bold text-green-400">{userLevel}</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Goblin Outpost</span>
-                    <span className="text-green-400">Levels 4-8</span>
+                </>
+              ) : (
+                <div className="bg-red-500/10 p-4 rounded-lg">
+                  <div className="flex items-center justify-center mb-3">
+                    <Lock className="h-8 w-8 text-red-400 mr-2" />
+                    <h4 className="font-semibold text-red-400">Access Restricted</h4>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Spider's Nest</span>
-                    <span className="text-green-400">Levels 6-10</span>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    PvE Dungeons are currently in private beta testing.
+                  </p>
+                  <div className="space-y-2 text-xs text-muted-foreground">
+                    <div>• Limited to beta testers only</div>
+                    <div>• Full release coming soon</div>
+                    <div>• Focus on workouts to level up!</div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-sm text-muted-foreground">Your Level</div>
-                  <div className="text-xl font-bold text-green-400">{userLevel}</div>
-                </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
