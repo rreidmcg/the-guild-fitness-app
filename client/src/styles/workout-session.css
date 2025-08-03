@@ -1,0 +1,61 @@
+/* WORKOUT SESSION COMPONENT STYLES - Isolated to prevent conflicts */
+
+/* BEM naming convention for workout session swipe component */
+.workout-session__exercise-card {
+  /* Base styles applied via Tailwind classes */
+}
+
+.workout-session__exercise-card--idle {
+  /* Idle state styles */
+  will-change: transform, box-shadow;
+}
+
+.workout-session__exercise-card--dragging {
+  /* Dragging state styles */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  pointer-events: none; /* Prevent text selection during drag */
+}
+
+/* Prevent accidental text selection during swipe interactions */
+.workout-session__exercise-card * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Re-enable text selection for input fields */
+.workout-session__exercise-card input,
+.workout-session__exercise-card textarea {
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  pointer-events: auto;
+}
+
+/* Smooth transform performance optimization */
+.workout-session__exercise-card {
+  transform: translateZ(0); /* Force hardware acceleration */
+  backface-visibility: hidden;
+}
+
+/* Touch action optimization for mobile devices */
+.workout-session__exercise-card {
+  touch-action: pan-x; /* Only allow horizontal panning */
+}
+
+/* Enhanced visual feedback during drag */
+.workout-session__exercise-card--dragging {
+  filter: brightness(1.02);
+  border-color: rgb(59 130 246 / 0.3); /* Subtle blue border hint */
+}
+
+/* Component-specific constants as CSS custom properties */
+.workout-session__exercise-card {
+  --workout-swipe-threshold: 120px;
+  --workout-drag-transition: transform 0.3s ease-out;
+}

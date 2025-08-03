@@ -18,6 +18,9 @@ import { ArrowLeft, Play, Pause, Square, Check, Target, ChevronRight, ChevronLef
 import type { User } from "@shared/schema";
 import { getDefaultTrackingFields, isTimeBased } from "@shared/exercise-defaults";
 
+// Import component-specific styles to prevent conflicts
+import "../styles/workout-session.css";
+
 export default function WorkoutSession() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -41,10 +44,13 @@ export default function WorkoutSession() {
   const [showRPESelection, setShowRPESelection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [currentTransform, setCurrentTransform] = useState({ x: 0 });
+  // Workout Session Swipe Component - Isolated state and refs
+  const workoutCardRef = useRef<HTMLDivElement>(null);
+  const [workoutSwipeState, setWorkoutSwipeState] = useState({
+    isDragging: false,
+    startX: 0,
+    currentTransformX: 0
+  });
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
     queryKey: ["/api/user/stats"],
@@ -335,78 +341,88 @@ export default function WorkoutSession() {
     return currentExercise?.section || currentExercise?.category || "Workout";
   };
 
-  // Enhanced swipe handling functions with clean horizontal movement
-  const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+  // WORKOUT SESSION SWIPE COMPONENT - Isolated handlers to prevent conflicts
+  const workoutSwipe_handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    setStartX(clientX);
-    setIsDragging(true);
-    setCurrentTransform({ x: 0 });
+    setWorkoutSwipeState(prev => ({
+      ...prev,
+      startX: clientX,
+      isDragging: true,
+      currentTransformX: 0
+    }));
     
-    if (cardRef.current) {
-      cardRef.current.style.transition = 'none';
+    // Only target workout session card element
+    if (workoutCardRef.current) {
+      workoutCardRef.current.style.transition = 'none';
     }
   };
 
-  const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDragging) return;
+  const workoutSwipe_handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!workoutSwipeState.isDragging) return;
     
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const deltaX = clientX - startX;
+    const deltaX = clientX - workoutSwipeState.startX;
     
-    setCurrentTransform({ x: deltaX });
+    setWorkoutSwipeState(prev => ({
+      ...prev,
+      currentTransformX: deltaX
+    }));
     
-    if (cardRef.current) {
-      cardRef.current.style.transform = `translateX(${deltaX}px)`;
+    // Scoped to workout session card only
+    if (workoutCardRef.current) {
+      workoutCardRef.current.style.transform = `translateX(${deltaX}px)`;
     }
   };
 
-  const handleDragEnd = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDragging) return;
+  const workoutSwipe_handleDragEnd = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!workoutSwipeState.isDragging) return;
     
     const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
-    const deltaX = clientX - startX;
-    const threshold = 120; // Increased threshold for more deliberate swipes
+    const deltaX = clientX - workoutSwipeState.startX;
+    const WORKOUT_SWIPE_THRESHOLD = 120; // Component-specific constant
     
-    setIsDragging(false);
+    setWorkoutSwipeState(prev => ({
+      ...prev,
+      isDragging: false,
+      currentTransformX: 0
+    }));
     
-    if (cardRef.current) {
-      cardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+    // Only manipulate workout session card element
+    if (workoutCardRef.current) {
+      workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
       
-      if (Math.abs(deltaX) > threshold) {
-        // Swipe detected - navigate and briefly animate
+      if (Math.abs(deltaX) > WORKOUT_SWIPE_THRESHOLD) {
+        // Swipe navigation - only affects workout session state
         if (deltaX > 0 && currentExerciseIndex > 0) {
-          // Right swipe - go to previous
-          goToPreviousExercise();
+          goToPreviousExercise(); // Component-specific navigation
         } else if (deltaX < 0 && currentExerciseIndex < exerciseData.length - 1) {
-          // Left swipe - go to next
-          goToNextExercise();
+          goToNextExercise(); // Component-specific navigation
         }
       }
       
-      // Reset position smoothly
-      cardRef.current.style.transform = 'translateX(0px)';
+      // Reset position - scoped to this component's element
+      workoutCardRef.current.style.transform = 'translateX(0px)';
     }
-    
-    setCurrentTransform({ x: 0 });
   };
 
-  // Mouse event handlers for desktop
-  const handleMouseStart = (e: React.MouseEvent) => {
+  // Desktop mouse handlers - namespaced for workout session
+  const workoutSwipe_handleMouseStart = (e: React.MouseEvent) => {
     e.preventDefault();
-    handleDragStart(e);
+    workoutSwipe_handleDragStart(e);
     
-    const handleMouseMove = (e: MouseEvent) => {
-      handleDragMove(e as any);
+    // Create unique event handlers to avoid conflicts
+    const workoutMouseMove = (e: MouseEvent) => {
+      workoutSwipe_handleDragMove(e as any);
     };
     
-    const handleMouseUp = (e: MouseEvent) => {
-      handleDragEnd(e as any);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+    const workoutMouseUp = (e: MouseEvent) => {
+      workoutSwipe_handleDragEnd(e as any);
+      document.removeEventListener('mousemove', workoutMouseMove);
+      document.removeEventListener('mouseup', workoutMouseUp);
     };
     
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', workoutMouseMove);
+    document.addEventListener('mouseup', workoutMouseUp);
   };
 
   // Loading skeleton component
@@ -594,7 +610,7 @@ export default function WorkoutSession() {
                   {currentExerciseIndex + 1} of {exerciseData.length}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 opacity-60">
-                  {isDragging ? 'Release to navigate' : '← Swipe or drag →'}
+                  {workoutSwipeState.isDragging ? 'Release to navigate' : '← Swipe or drag →'}
                 </div>
               </div>
               
@@ -621,21 +637,21 @@ export default function WorkoutSession() {
               )}
             </div>
 
-            {/* Sets Table - With Enhanced Swipe Support */}
+            {/* WORKOUT SESSION EXERCISE CARD - Isolated swipe component */}
             <div 
-              ref={cardRef}
-              className={`bg-card rounded-lg border border-border overflow-hidden select-none transition-all duration-200 ${
-                isDragging 
-                  ? 'cursor-grabbing shadow-xl scale-105' 
-                  : 'cursor-grab hover:shadow-lg'
+              ref={workoutCardRef}
+              className={`workout-session__exercise-card bg-card rounded-lg border border-border overflow-hidden select-none transition-all duration-200 ${
+                workoutSwipeState.isDragging 
+                  ? 'workout-session__exercise-card--dragging cursor-grabbing shadow-xl scale-105' 
+                  : 'workout-session__exercise-card--idle cursor-grab hover:shadow-lg'
               }`}
-              onTouchStart={handleDragStart}
-              onTouchMove={handleDragMove}
-              onTouchEnd={handleDragEnd}
-              onMouseDown={handleMouseStart}
+              onTouchStart={workoutSwipe_handleDragStart}
+              onTouchMove={workoutSwipe_handleDragMove}
+              onTouchEnd={workoutSwipe_handleDragEnd}
+              onMouseDown={workoutSwipe_handleMouseStart}
               style={{
-                transform: `translateX(${currentTransform.x}px)`,
-                transition: isDragging ? 'none' : 'transform 0.3s ease-out, box-shadow 0.2s ease-out, scale 0.2s ease-out'
+                transform: `translateX(${workoutSwipeState.currentTransformX}px)`,
+                transition: workoutSwipeState.isDragging ? 'none' : 'transform 0.3s ease-out, box-shadow 0.2s ease-out, scale 0.2s ease-out'
               }}
             >
               {(() => {
