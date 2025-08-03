@@ -42,6 +42,7 @@ export default function WorkoutSession() {
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [completedSession, setCompletedSession] = useState<any>(null);
   const [showSummary, setShowSummary] = useState(false);
+  const [showFinishConfirmation, setShowFinishConfirmation] = useState(false);
   const [perceivedEffort, setPerceivedEffort] = useState(7); // RPE scale 1-10
   const [showRPESelection, setShowRPESelection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -760,6 +761,20 @@ export default function WorkoutSession() {
               </Button>
             </div>
             
+            {/* Finish Workout Button - Show on last exercise */}
+            {currentExerciseIndex === exerciseData.length - 1 && (
+              <div className="pt-6">
+                <Button
+                  onClick={() => setShowFinishConfirmation(true)}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg font-semibold"
+                  size="lg"
+                >
+                  <Check className="w-6 h-6 mr-2" />
+                  Finish Workout
+                </Button>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="space-y-3 pt-2">
               <Button
@@ -889,6 +904,47 @@ export default function WorkoutSession() {
             >
               Complete Workout
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Finish Workout Confirmation Modal */}
+      <Dialog open={showFinishConfirmation} onOpenChange={setShowFinishConfirmation}>
+        <DialogContent className="sm:max-w-md bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="text-center flex items-center justify-center gap-2">
+              <Check className="w-5 h-5 text-green-600" />
+              Finish Workout?
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-4 space-y-6">
+            <div className="text-center text-foreground">
+              <p className="mb-2">Are you ready to complete this workout?</p>
+              <p className="text-sm text-muted-foreground">
+                You'll earn XP and level up your character stats!
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowFinishConfirmation(false)}
+                className="flex-1"
+              >
+                Continue Training
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowFinishConfirmation(false);
+                  handleCompleteWorkout();
+                }}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                disabled={completeWorkoutMutation.isPending}
+              >
+                <Check className="w-4 h-4 mr-2" />
+                {completeWorkoutMutation.isPending ? 'Finishing...' : 'Finish & Get XP'}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
