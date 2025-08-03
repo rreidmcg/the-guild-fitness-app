@@ -575,7 +575,17 @@ export default function Workouts() {
                 <Card 
                   key={session.id} 
                   className="bg-gradient-to-r from-blue-500/5 to-purple-500/5 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/workout-results/${session.id}`)}
+                  onClick={() => {
+                    if (session.workoutId) {
+                      navigate(`/workout-session/${session.workoutId}`);
+                    } else {
+                      toast({
+                        title: "Cannot replay workout",
+                        description: "This workout session cannot be replayed.",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">

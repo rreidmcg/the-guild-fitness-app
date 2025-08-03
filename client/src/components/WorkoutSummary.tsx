@@ -100,7 +100,6 @@ export function WorkoutSummary({
             <div className="space-y-2">
               <TrendingUp className="w-8 h-8 text-blue-500 mx-auto" />
               <h3 className="text-2xl font-bold text-foreground">+{xpGained} XP</h3>
-              <p className="text-muted-foreground">Experience Gained</p>
             </div>
           </CardContent>
         </Card>
