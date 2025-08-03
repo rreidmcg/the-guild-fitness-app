@@ -44,7 +44,7 @@ export default function WorkoutSession() {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
-  const [currentTransform, setCurrentTransform] = useState({ x: 0, rotation: 0 });
+  const [currentTransform, setCurrentTransform] = useState({ x: 0 });
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
     queryKey: ["/api/user/stats"],
@@ -335,12 +335,16 @@ export default function WorkoutSession() {
     return currentExercise?.section || currentExercise?.category || "Workout";
   };
 
-  // Enhanced swipe handling functions with visual feedback
+  // Enhanced swipe handling functions with clean horizontal movement
   const handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     setStartX(clientX);
     setIsDragging(true);
-    setCurrentTransform({ x: 0, rotation: 0 });
+    setCurrentTransform({ x: 0 });
+    
+    if (cardRef.current) {
+      cardRef.current.style.transition = 'none';
+    }
   };
 
   const handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
@@ -348,13 +352,11 @@ export default function WorkoutSession() {
     
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const deltaX = clientX - startX;
-    const rotation = deltaX * 0.05; // Subtle rotation effect
     
-    setCurrentTransform({ x: deltaX, rotation });
+    setCurrentTransform({ x: deltaX });
     
     if (cardRef.current) {
-      cardRef.current.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
-      cardRef.current.style.transition = 'none';
+      cardRef.current.style.transform = `translateX(${deltaX}px)`;
     }
   };
 
@@ -363,15 +365,15 @@ export default function WorkoutSession() {
     
     const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
     const deltaX = clientX - startX;
-    const threshold = 100;
+    const threshold = 120; // Increased threshold for more deliberate swipes
     
     setIsDragging(false);
     
     if (cardRef.current) {
-      cardRef.current.style.transition = 'transform 0.3s ease-out';
+      cardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
       
       if (Math.abs(deltaX) > threshold) {
-        // Swipe detected
+        // Swipe detected - navigate and briefly animate
         if (deltaX > 0 && currentExerciseIndex > 0) {
           // Right swipe - go to previous
           goToPreviousExercise();
@@ -381,11 +383,11 @@ export default function WorkoutSession() {
         }
       }
       
-      // Reset position
-      cardRef.current.style.transform = 'translateX(0px) rotate(0deg)';
+      // Reset position smoothly
+      cardRef.current.style.transform = 'translateX(0px)';
     }
     
-    setCurrentTransform({ x: 0, rotation: 0 });
+    setCurrentTransform({ x: 0 });
   };
 
   // Mouse event handlers for desktop
@@ -632,7 +634,7 @@ export default function WorkoutSession() {
               onTouchEnd={handleDragEnd}
               onMouseDown={handleMouseStart}
               style={{
-                transform: `translateX(${currentTransform.x}px) rotate(${currentTransform.rotation}deg)`,
+                transform: `translateX(${currentTransform.x}px)`,
                 transition: isDragging ? 'none' : 'transform 0.3s ease-out, box-shadow 0.2s ease-out, scale 0.2s ease-out'
               }}
             >
