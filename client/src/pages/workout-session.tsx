@@ -44,14 +44,15 @@ export default function WorkoutSession() {
   const [showRPESelection, setShowRPESelection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
-  // Workout Session Swipe Deck Component - Enhanced with card-like navigation
+  // Workout Session Swipe Deck Component - Complete deck rendering approach
+  const workoutDeckRef = useRef<HTMLDivElement>(null);
   const workoutCardRef = useRef<HTMLDivElement>(null);
+  const workoutNextCardRef = useRef<HTMLDivElement>(null);
   const [workoutSwipeState, setWorkoutSwipeState] = useState({
     isDragging: false,
     startX: 0,
     currentTransformX: 0,
-    isTransitioning: false,
-    cardDirection: 'idle' as 'idle' | 'forward' | 'backward'
+    isTransitioning: false
   });
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
@@ -343,10 +344,10 @@ export default function WorkoutSession() {
     return currentExercise?.section || currentExercise?.category || "Workout";
   };
 
-  // WORKOUT SESSION SWIPE DECK - Enhanced card-like navigation with smooth transitions
+  // WORKOUT SESSION SWIPE DECK - Complete deck approach with proper card management
   const workoutSwipe_handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
-    if (workoutSwipeState.isTransitioning) return; // Prevent interaction during transitions
+    if (workoutSwipeState.isTransitioning || !workoutCardRef.current) return;
     
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     
@@ -354,107 +355,88 @@ export default function WorkoutSession() {
       ...prev,
       isDragging: true,
       startX: clientX,
-      currentTransformX: 0,
-      cardDirection: 'idle'
+      currentTransformX: 0
     }));
     
-    // Enhanced card interaction - disable transitions for smooth dragging
-    if (workoutCardRef.current) {
-      workoutCardRef.current.style.transition = 'none';
-      workoutCardRef.current.classList.add('workout-session__exercise-card--dragging');
-    }
+    // Disable transition for smooth dragging
+    workoutCardRef.current.style.transition = 'none';
   };
 
   const workoutSwipe_handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!workoutSwipeState.isDragging || workoutSwipeState.isTransitioning) return;
+    if (!workoutSwipeState.isDragging || !workoutCardRef.current) return;
     
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const deltaX = clientX - workoutSwipeState.startX;
     
     setWorkoutSwipeState(prev => ({
       ...prev,
-      currentTransformX: deltaX,
-      cardDirection: deltaX > 50 ? 'backward' : deltaX < -50 ? 'forward' : 'idle'
+      currentTransformX: deltaX
     }));
     
-    // Enhanced visual feedback with opacity based on drag distance
-    if (workoutCardRef.current) {
-      const opacity = Math.max(0.7, 1 - Math.abs(deltaX) / 400);
-      workoutCardRef.current.style.transform = `translateX(${deltaX}px)`;
-      workoutCardRef.current.style.opacity = opacity.toString();
-    }
+    // Simple transform during drag
+    workoutCardRef.current.style.transform = `translateX(${deltaX}px)`;
   };
 
   const workoutSwipe_handleDragEnd = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!workoutSwipeState.isDragging) return;
+    if (!workoutSwipeState.isDragging || !workoutCardRef.current) return;
     
     const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
     const deltaX = clientX - workoutSwipeState.startX;
-    const WORKOUT_SWIPE_THRESHOLD = 100; // Reduced threshold for better responsiveness
+    const WORKOUT_SWIPE_THRESHOLD = 100;
     
     setWorkoutSwipeState(prev => ({
       ...prev,
       isDragging: false,
-      currentTransformX: 0,
       isTransitioning: true
     }));
     
-    if (workoutCardRef.current) {
-      workoutCardRef.current.classList.remove('workout-session__exercise-card--dragging');
-      workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+    workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+    
+    if (deltaX < -WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex < exerciseData.length - 1) {
+      // Swipe left → go forward
+      workoutCardRef.current.style.transform = 'translateX(-1000px)';
+      workoutCardRef.current.style.opacity = '0';
       
-      // Card-like swipe navigation with smooth animations
-      if (deltaX < -WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex < exerciseData.length - 1) {
-        // Swipe left → slide current card out to the left, load new card from right
-        workoutSwipe_slideToNext();
-      } else if (deltaX > WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex > 0) {
-        // Swipe right → slide current card out to the right, load previous card from left
-        workoutSwipe_slideToPrevious();
-      } else {
-        // Snap back to center
-        workoutCardRef.current.style.transform = 'translateX(0)';
-        workoutCardRef.current.style.opacity = '1';
-        setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
+      setTimeout(() => {
+        setCurrentExerciseIndex(prev => prev + 1);
+        workoutSwipe_renderDeck();
+      }, 300);
+    } else if (deltaX > WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex > 0) {
+      // Swipe right → go back
+      const newIndex = currentExerciseIndex - 1;
+      setCurrentExerciseIndex(newIndex);
+      
+      // Create new card from left
+      if (workoutCardRef.current) {
+        workoutCardRef.current.style.transform = 'translateX(-1000px)';
+        
+        requestAnimationFrame(() => {
+          if (workoutCardRef.current) {
+            workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+            workoutCardRef.current.style.transform = 'translateX(0)';
+            workoutCardRef.current.style.opacity = '1';
+            
+            setTimeout(() => {
+              setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
+            }, 300);
+          }
+        });
       }
+    } else {
+      // Snap back
+      workoutCardRef.current.style.transform = 'translateX(0)';
+      setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
     }
   };
   
-  // Card-like transition animations inspired by the provided swipe deck
-  const workoutSwipe_slideToNext = () => {
+  // Render deck similar to provided example
+  const workoutSwipe_renderDeck = () => {
     if (!workoutCardRef.current) return;
     
-    // Slide current card out to the left
-    workoutCardRef.current.style.transform = 'translateX(-1000px)';
-    workoutCardRef.current.style.opacity = '0';
-    
-    setTimeout(() => {
-      setCurrentExerciseIndex(prev => prev + 1);
-      workoutSwipe_loadNewCard('from-right');
-    }, 300);
-  };
-  
-  const workoutSwipe_slideToPrevious = () => {
-    if (!workoutCardRef.current) return;
-    
-    // Slide current card out to the right
+    // Reset card for new exercise
     workoutCardRef.current.style.transform = 'translateX(1000px)';
     workoutCardRef.current.style.opacity = '0';
     
-    setTimeout(() => {
-      setCurrentExerciseIndex(prev => prev - 1);
-      workoutSwipe_loadNewCard('from-left');
-    }, 300);
-  };
-  
-  const workoutSwipe_loadNewCard = (direction: 'from-left' | 'from-right') => {
-    if (!workoutCardRef.current) return;
-    
-    // Position new card off-screen based on direction
-    const startPosition = direction === 'from-right' ? '1000px' : '-1000px';
-    workoutCardRef.current.style.transform = `translateX(${startPosition})`;
-    workoutCardRef.current.style.opacity = '0';
-    
-    // Animate card into position
     requestAnimationFrame(() => {
       if (workoutCardRef.current) {
         workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
@@ -673,13 +655,7 @@ export default function WorkoutSession() {
                   {currentExerciseIndex + 1} of {exerciseData.length}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 opacity-60">
-                  {workoutSwipeState.isDragging 
-                    ? (workoutSwipeState.cardDirection === 'forward' 
-                        ? '← Release to go forward' 
-                        : workoutSwipeState.cardDirection === 'backward'
-                          ? 'Release to go back →'
-                          : 'Release to stay')
-                    : '← Swipe or drag →'}
+                  {workoutSwipeState.isDragging ? 'Release to navigate' : '← Swipe or drag →'}
                 </div>
               </div>
               
@@ -706,75 +682,77 @@ export default function WorkoutSession() {
               )}
             </div>
 
-            {/* WORKOUT SESSION EXERCISE CARD - Enhanced swipe deck with visual feedback */}
+            {/* WORKOUT SESSION SWIPE DECK - Complete deck with proper card management */}
             <div 
-              ref={workoutCardRef}
-              className={`workout-session__exercise-card bg-card rounded-lg border border-border overflow-hidden select-none transition-all duration-200 ${
-                workoutSwipeState.isDragging 
-                  ? 'workout-session__exercise-card--dragging cursor-grabbing shadow-xl scale-105' 
-                  : 'workout-session__exercise-card--idle cursor-grab hover:shadow-lg'
-              }`}
-              data-direction={workoutSwipeState.cardDirection}
-              onTouchStart={workoutSwipe_handleDragStart}
-              onTouchMove={workoutSwipe_handleDragMove}
-              onTouchEnd={workoutSwipe_handleDragEnd}
-              onMouseDown={workoutSwipe_handleMouseStart}
-              style={{
-                transform: `translateX(${workoutSwipeState.currentTransformX}px)`,
-                opacity: workoutSwipeState.isDragging 
-                  ? Math.max(0.7, 1 - Math.abs(workoutSwipeState.currentTransformX) / 400)
-                  : 1,
-                transition: workoutSwipeState.isDragging 
-                  ? 'none' 
-                  : 'transform 0.3s ease-out, opacity 0.3s ease-out, box-shadow 0.2s ease-out, scale 0.2s ease-out'
-              }}
+              ref={workoutDeckRef}
+              className="workout-session__deck relative"
+              style={{ perspective: '1000px' }}
             >
-              {(() => {
-                const currentExercise = exerciseData[currentExerciseIndex];
-                const defaultFields = getDefaultTrackingFields(currentExercise?.category || 'strength');
-                const isTimeExercise = defaultFields.includes('time') || currentExercise?.duration > 0;
-                const showWeight = defaultFields.includes('weight');
-                const showReps = defaultFields.includes('reps');
-                const showIntensity = defaultFields.includes('RIR') || defaultFields.includes('RPE');
-                
-                // Count visible columns: SET + visible metrics + checkmark
-                let visibleColumns = 2; // SET + checkmark always visible
-                if (isTimeExercise || showWeight) visibleColumns++;
-                if (showReps) visibleColumns++;
-                if (showIntensity) visibleColumns++;
-                
-                const gridClass = `grid-cols-${visibleColumns}`;
-                
-                return (
-                  <>
-                    {/* Table Header */}
-                    <div className={`grid ${gridClass} gap-4 p-4 bg-muted/30 border-b border-border`}>
-                      <div className="text-sm font-medium text-muted-foreground">SET</div>
-                      {(isTimeExercise || showWeight) && (
-                        <div className="text-sm font-medium text-muted-foreground">
-                          {isTimeExercise ? 'SEC' : 'LB'}
-                        </div>
-                      )}
-                      {showReps && (
-                        <div className="text-sm font-medium text-muted-foreground">REPS</div>
-                      )}
-                      {showIntensity && (
-                        <div className="text-sm font-medium text-muted-foreground">RIR</div>
-                      )}
-                      <div className="text-sm font-medium text-muted-foreground text-center">✓</div>
-                    </div>
+              {/* Current Exercise Card */}
+              <div 
+                ref={workoutCardRef}
+                className={`workout-session__exercise-card bg-card rounded-lg border border-border overflow-hidden select-none ${
+                  workoutSwipeState.isDragging 
+                    ? 'cursor-grabbing' 
+                    : 'cursor-grab'
+                }`}
+                style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+                  transition: workoutSwipeState.isDragging ? 'none' : 'transform 0.3s ease-out, opacity 0.3s ease-out'
+                }}
+                onTouchStart={workoutSwipe_handleDragStart}
+                onTouchMove={workoutSwipe_handleDragMove}
+                onTouchEnd={workoutSwipe_handleDragEnd}
+                onMouseDown={workoutSwipe_handleMouseStart}
+              >
+                {(() => {
+                  const currentExercise = exerciseData[currentExerciseIndex];
+                  const defaultFields = getDefaultTrackingFields(currentExercise?.category || 'strength');
+                  const isTimeExercise = defaultFields.includes('time') || currentExercise?.duration > 0;
+                  const showWeight = defaultFields.includes('weight');
+                  const showReps = defaultFields.includes('reps');
+                  const showIntensity = defaultFields.includes('RIR') || defaultFields.includes('RPE');
+                  
+                  // Count visible columns: SET + visible metrics + checkmark
+                  let visibleColumns = 2; // SET + checkmark always visible
+                  if (isTimeExercise || showWeight) visibleColumns++;
+                  if (showReps) visibleColumns++;
+                  if (showIntensity) visibleColumns++;
+                  
+                  const gridClass = `grid-cols-${visibleColumns}`;
+                  
+                  return (
+                    <>
+                      {/* Table Header */}
+                      <div className={`grid ${gridClass} gap-4 p-4 bg-muted/30 border-b border-border`}>
+                        <div className="text-sm font-medium text-muted-foreground">SET</div>
+                        {(isTimeExercise || showWeight) && (
+                          <div className="text-sm font-medium text-muted-foreground">
+                            {isTimeExercise ? 'SEC' : 'LB'}
+                          </div>
+                        )}
+                        {showReps && (
+                          <div className="text-sm font-medium text-muted-foreground">REPS</div>
+                        )}
+                        {showIntensity && (
+                          <div className="text-sm font-medium text-muted-foreground">RIR</div>
+                        )}
+                        <div className="text-sm font-medium text-muted-foreground text-center">✓</div>
+                      </div>
 
-                    {/* Sets Rows */}
-                    <div className="divide-y divide-border">
-                      {getCurrentExerciseSets().map((set: any, setIndex: number) => {
-                        const isCompleted = isSetCompleted(currentExerciseIndex, setIndex);
-                        
-                        return (
-                          <div key={setIndex} className={`grid ${gridClass} gap-4 p-4 items-center`}>
-                            {/* Set Number */}
-                            <div className="text-sm">
-                              {setIndex + 1}
-                            </div>
+                      {/* Sets Rows */}
+                      <div className="divide-y divide-border">
+                        {getCurrentExerciseSets().map((set: any, setIndex: number) => {
+                          const isCompleted = isSetCompleted(currentExerciseIndex, setIndex);
+                          
+                          return (
+                            <div key={setIndex} className={`grid ${gridClass} gap-4 p-4 items-center`}>
+                              {/* Set Number */}
+                              <div className="text-sm">
+                                {setIndex + 1}
+                              </div>
                             
                             {/* Weight/Duration - Only show if needed */}
                             {(isTimeExercise || showWeight) && (
@@ -860,6 +838,7 @@ export default function WorkoutSession() {
                   </>
                 );
               })()}
+              </div>
             </div>
 
 
