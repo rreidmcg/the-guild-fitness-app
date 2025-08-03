@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, TrendingUp, Clock, Target, Star, ChevronRight } from "lucide-react";
+import { Trophy, TrendingUp, Clock, Target, Star, ChevronRight, ArrowLeft, X } from "lucide-react";
 import { useLocation } from "wouter";
 
 interface WorkoutSummaryProps {
@@ -49,6 +49,29 @@ export function WorkoutSummary({
 
   return (
     <div className="workout-summary min-h-screen bg-background p-4">
+      {/* Header with close button */}
+      <div className="max-w-2xl mx-auto mb-4">
+        <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/workouts")}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation("/workouts")}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -168,21 +191,21 @@ export function WorkoutSummary({
         {/* Action Buttons */}
         <div className="space-y-3 pt-6">
           <Button
-            onClick={() => setLocation("/workouts")}
+            onClick={() => setLocation("/stats")}
             className="w-full bg-game-primary hover:bg-game-primary/90 text-white py-3"
             size="lg"
           >
-            Back to Workouts
+            View Stats
             <ChevronRight className="w-5 h-5 ml-2" />
           </Button>
           
           <Button
-            onClick={() => setLocation("/stats")}
+            onClick={() => setLocation("/workouts")}
             variant="outline"
             className="w-full py-3"
             size="lg"
           >
-            View Stats
+            Back to Workouts
           </Button>
         </div>
       </div>
