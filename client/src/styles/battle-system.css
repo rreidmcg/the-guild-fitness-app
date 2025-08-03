@@ -1,0 +1,217 @@
+/* BATTLE SYSTEM COMPONENTS - Defensive CSS to prevent conflicts */
+
+/* BEM naming convention for battle system components */
+
+/* BATTLE PAGE COMPONENT */
+.battle-page {
+  /* Base battle page container */
+  isolation: isolate; /* Create new stacking context */
+}
+
+.battle-page__parallax-container {
+  /* Parallax background container - scoped to battle page only */
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.battle-page__content-wrapper {
+  /* Main content wrapper with backdrop */
+  backdrop-filter: blur(1px);
+}
+
+.battle-page__mode-card {
+  /* Battle mode selection cards */
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.battle-page__mode-card--accessible {
+  /* Card with battle access granted */
+  cursor: pointer;
+}
+
+.battle-page__mode-card--restricted {
+  /* Card with restricted access */
+  cursor: not-allowed;
+  user-select: none;
+}
+
+.battle-page__mode-card:hover.battle-page__mode-card--accessible {
+  transform: scale(1.05);
+}
+
+/* PVE DUNGEONS COMPONENT */
+.pve-dungeons {
+  /* Base PvE dungeons container */
+  isolation: isolate;
+}
+
+.pve-dungeons__zone-card {
+  /* Individual dungeon zone cards */
+  transition: all 0.3s ease;
+  will-change: transform, box-shadow;
+}
+
+.pve-dungeons__zone-card--available {
+  /* Available dungeon zone */
+  cursor: pointer;
+}
+
+.pve-dungeons__zone-card--locked {
+  /* Locked dungeon zone */
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pve-dungeons__monster-list {
+  /* Monster list within dungeon zones */
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.pve-dungeons__monster-item {
+  /* Individual monster items */
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.pve-dungeons__monster-item:hover {
+  transform: translateX(4px);
+}
+
+/* DUNGEON BATTLE COMPONENT */
+.dungeon-battle {
+  /* Base dungeon battle container */
+  isolation: isolate;
+  user-select: none; /* Prevent text selection during battle */
+}
+
+.dungeon-battle__combat-area {
+  /* Main combat area */
+  min-height: 400px;
+  position: relative;
+}
+
+.dungeon-battle__player-stats {
+  /* Player statistics display */
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dungeon-battle__monster-display {
+  /* Monster image and stats display */
+  position: relative;
+  will-change: transform;
+}
+
+.dungeon-battle__health-bar {
+  /* Health bar component */
+  transition: width 0.5s ease-out;
+  will-change: width;
+}
+
+.dungeon-battle__mana-bar {
+  /* Mana bar component */
+  transition: width 0.3s ease-out;
+  will-change: width;
+}
+
+.dungeon-battle__action-button {
+  /* Battle action buttons (attack, flee) */
+  transition: all 0.2s ease;
+  user-select: none;
+  touch-action: manipulation; /* Optimize for touch devices */
+}
+
+.dungeon-battle__action-button:active {
+  transform: scale(0.95);
+}
+
+.dungeon-battle__action-button--attack {
+  /* Attack button specific styles */
+  --button-color: rgb(239 68 68); /* Red theme */
+}
+
+.dungeon-battle__action-button--flee {
+  /* Flee button specific styles */
+  --button-color: rgb(107 114 128); /* Gray theme */
+}
+
+.dungeon-battle__battle-log {
+  /* Battle log/combat messages area */
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
+
+.dungeon-battle__battle-log-entry {
+  /* Individual battle log entries */
+  animation: battle-log-entry-appear 0.3s ease-out;
+}
+
+@keyframes battle-log-entry-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dungeon-battle__victory-modal {
+  /* Victory modal overlay */
+  backdrop-filter: blur(12px);
+}
+
+.dungeon-battle__defeat-modal {
+  /* Defeat modal overlay */
+  backdrop-filter: blur(12px);
+}
+
+/* BATTLE ACCESS GUARD COMPONENT */
+.battle-access-guard {
+  /* Access guard wrapper */
+  isolation: isolate;
+}
+
+.battle-access-guard__restriction-message {
+  /* Restriction message display */
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Performance optimizations for battle system */
+.battle-page__parallax-container *,
+.pve-dungeons__zone-card *,
+.dungeon-battle__combat-area * {
+  /* Prevent layout thrashing during animations */
+  will-change: auto;
+}
+
+/* Responsive optimizations */
+@media (max-width: 768px) {
+  .battle-page__mode-card {
+    /* Reduce hover effects on mobile */
+    transition: border-color 0.3s ease;
+  }
+  
+  .battle-page__mode-card:hover.battle-page__mode-card--accessible {
+    transform: none; /* Disable scale on mobile */
+  }
+  
+  .dungeon-battle__combat-area {
+    min-height: 300px; /* Reduce height on mobile */
+  }
+}
+
+/* Component-specific constants */
+:root {
+  --battle-transition-duration: 0.3s;
+  --battle-hover-scale: 1.05;
+  --battle-active-scale: 0.95;
+  --battle-border-radius: 0.75rem;
+}

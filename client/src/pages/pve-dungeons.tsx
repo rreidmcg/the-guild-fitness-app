@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BattleLoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
+
+// Import battle system defensive styles
+import "../styles/battle-system.css";
 import { 
   Sword, 
   Shield, 

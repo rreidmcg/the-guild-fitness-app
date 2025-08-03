@@ -8,6 +8,9 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BattleLoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
+
+// Import battle system defensive styles
+import "../styles/battle-system.css";
 import { 
   Shield, 
   Heart, 

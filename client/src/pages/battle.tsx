@@ -16,6 +16,9 @@ import {
 import dungeonsTitle from "@assets/9DCDA11D-2AD4-4DF9-AC4D-62C0709560C2_1753842591713.png";
 import arenaTitle from "@assets/68542DD6-45F1-4C55-B33F-CC59C71FE8FA_1754018912124.png";
 
+// Import battle system defensive styles
+import "../styles/battle-system.css";
+
 // User stats type to match the API response
 interface UserStats {
   level: number;
@@ -43,12 +46,24 @@ interface UserStats {
 
 export default function BattlePage() {
   const navigate = useNavigate();
-  const [scrollY, setScrollY] = useState(0);
+  
+  // BATTLE PAGE COMPONENT - Isolated state management
+  const [battlePageState, setBattlePageState] = useState({
+    scrollY: 0,
+    isLoading: false
+  });
 
+  // Battle page scroll handler - namespaced to prevent conflicts
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const battlePage_handleScroll = () => {
+      setBattlePageState(prev => ({
+        ...prev,
+        scrollY: window.scrollY
+      }));
+    };
+    
+    window.addEventListener('scroll', battlePage_handleScroll);
+    return () => window.removeEventListener('scroll', battlePage_handleScroll);
   }, []);
 
   const { data: userStats } = useQuery({
@@ -66,14 +81,14 @@ export default function BattlePage() {
   const hasBattleAccess = stats.username === 'Zero' || stats.currentTitle === '<G.M.>';
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Parallax Background Layers */}
-      <div className="fixed inset-0 z-0">
+    <div className="battle-page relative min-h-screen overflow-hidden">
+      {/* BATTLE PAGE PARALLAX BACKGROUNDS - Isolated to prevent conflicts */}
+      <div className="battle-page__parallax-container fixed inset-0 z-0">
         {/* Far Background Layer - Slowest */}
         <div 
           className="absolute inset-0 opacity-20"
           style={{
-            transform: `translateY(${scrollY * 0.1}px)`,
+            transform: `translateY(${battlePageState.scrollY * 0.1}px)`,
             background: 'radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(168, 85, 247, 0.3) 0%, transparent 50%)'
           }}
         />
@@ -82,7 +97,7 @@ export default function BattlePage() {
         <div 
           className="absolute inset-0 opacity-30"
           style={{
-            transform: `translateY(${scrollY * 0.2}px)`,
+            transform: `translateY(${battlePageState.scrollY * 0.2}px)`,
             background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, transparent 40%, rgba(239, 68, 68, 0.1) 100%)'
           }}
         />
@@ -91,14 +106,14 @@ export default function BattlePage() {
         <div 
           className="absolute inset-0 opacity-40"
           style={{
-            transform: `translateY(${scrollY * 0.3}px)`,
+            transform: `translateY(${battlePageState.scrollY * 0.3}px)`,
             background: 'conic-gradient(from 45deg at 50% 50%, rgba(168, 85, 247, 0.05) 0deg, rgba(59, 130, 246, 0.05) 120deg, rgba(34, 197, 94, 0.05) 240deg, rgba(168, 85, 247, 0.05) 360deg)'
           }}
         />
       </div>
 
-      {/* Main Content with Backdrop */}
-      <div className="relative z-10 min-h-screen bg-background text-foreground pb-20">
+      {/* BATTLE PAGE MAIN CONTENT - Component isolation */}
+      <div className="battle-page__content-wrapper relative z-10 min-h-screen bg-background text-foreground pb-20">
         {/* Header */}
         <div className="bg-card border-b border-border px-4 py-4">
           <div className="max-w-4xl mx-auto">
@@ -116,12 +131,13 @@ export default function BattlePage() {
 
         {/* Battle Mode Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* PvE Card */}
+        {/* BATTLE MODE: PVE DUNGEONS - Defensive component structure */}
         <Card 
-          className={hasBattleAccess 
-            ? "cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
-            : "border-2 border-gray-500/50 bg-gradient-to-br from-gray-900/20 to-gray-800/20 opacity-60"
-          }
+          className={`battle-page__mode-card ${
+            hasBattleAccess 
+              ? "battle-page__mode-card--accessible cursor-pointer transition-all duration-300 hover:scale-105 border-2 border-green-500/50 bg-gradient-to-br from-green-900/20 to-emerald-900/20 hover:border-green-400"
+              : "battle-page__mode-card--restricted border-2 border-gray-500/50 bg-gradient-to-br from-gray-900/20 to-gray-800/20 opacity-60"
+          }`}
           onClick={hasBattleAccess ? () => navigate("/pve-dungeons") : undefined}
         >
           <CardHeader className="text-center -mt-20 pb-6">
@@ -190,8 +206,8 @@ export default function BattlePage() {
           </CardContent>
         </Card>
 
-        {/* PvP Card */}
-        <Card className="border-2 border-purple-500/50 bg-gradient-to-br from-purple-900/20 to-pink-900/20 opacity-60">
+        {/* BATTLE MODE: PVP ARENA - Defensive component structure */}
+        <Card className="battle-page__mode-card battle-page__mode-card--restricted border-2 border-purple-500/50 bg-gradient-to-br from-purple-900/20 to-pink-900/20 opacity-60">
           <CardHeader className="text-center -mt-10 -mb-12">
             <CardTitle className="text-2xl text-purple-400 flex items-center justify-center">
               <img 
