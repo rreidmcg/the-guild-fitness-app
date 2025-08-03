@@ -53,15 +53,51 @@ export function calculateStatXpGains(sessionData: any): {
   staminaXp: number;
   agilityXp: number;
 } {
-  // Base XP calculation based on workout effort and duration
-  const baseDuration = sessionData.duration || 30; // minutes
-  const baseVolume = sessionData.totalVolume || 1000; // total weight lifted
+  // Use already calculated XP from completed sets
+  const baseXp = sessionData.xpEarned || 50;
   
-  // Calculate base XP from workout effort (stat squish: smaller numbers, same progression)
-  // Duration: 0.6 XP per minute, Volume: 0.004 XP per pound lifted
-  const durationXp = baseDuration * 0.6; // 0.6 XP per minute (18 XP for 30 min workout)
-  const volumeXp = Math.floor(baseVolume * 0.004); // 4 XP for 1000 lbs total volume
-  const baseXp = durationXp + volumeXp;
+  // If we have exercises data, calculate more precise stat distribution
+  if (sessionData.exercises && Array.isArray(sessionData.exercises)) {
+    let strengthSets = 0, staminaSets = 0, agilitySets = 0;
+    let totalCompletedSets = 0;
+    
+    sessionData.exercises.forEach((exercise: any) => {
+      const category = exercise.category || 'strength';
+      if (exercise.sets && Array.isArray(exercise.sets)) {
+        exercise.sets.forEach((set: any) => {
+          if (set.completed) {
+            totalCompletedSets++;
+            // Distribute sets based on exercise category
+            if (category === 'strength' || category === 'powerlifting') {
+              strengthSets++;
+            } else if (category === 'cardio' || category === 'endurance') {
+              staminaSets++;
+            } else if (category === 'plyometric' || category === 'agility') {
+              agilitySets++;
+            } else {
+              // Default mixed distribution for other categories
+              strengthSets += 0.5;
+              staminaSets += 0.3;
+              agilitySets += 0.2;
+            }
+          }
+        });
+      }
+    });
+    
+    if (totalCompletedSets > 0) {
+      // Distribute XP based on actual exercise composition
+      const strengthXp = Math.floor(baseXp * (strengthSets / totalCompletedSets));
+      const staminaXp = Math.floor(baseXp * (staminaSets / totalCompletedSets));
+      const agilityXp = Math.floor(baseXp * (agilitySets / totalCompletedSets));
+      
+      return { strengthXp, staminaXp, agilityXp };
+    }
+  }
+  
+  // Fallback to original logic if no exercises data
+  const baseDuration = sessionData.duration || 30;
+  const baseVolume = sessionData.totalVolume || 0;
   
   // Distribute XP based on workout type with realistic athletic focus
   // Detect workout type based on volume vs duration ratio

@@ -1101,15 +1101,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); } // Use the current logged-in user
       
+      // Calculate XP based on actual completed sets
+      const exercises = req.body.exercises || [];
+      
+      // Count total completed sets across all exercises
+      let totalCompletedSets = 0;
+      let totalPossibleSets = 0;
+      let totalVolume = 0;
+      
+      exercises.forEach((exercise: any) => {
+        if (exercise.sets && Array.isArray(exercise.sets)) {
+          exercise.sets.forEach((set: any) => {
+            totalPossibleSets++;
+            if (set.completed) {
+              totalCompletedSets++;
+              // Calculate volume for completed sets only
+              const weight = set.weight || 0;
+              const reps = set.reps || 0;
+              totalVolume += weight * reps;
+            }
+          });
+        }
+      });
+      
+      // Calculate completion percentage
+      const completionPercentage = totalPossibleSets > 0 ? totalCompletedSets / totalPossibleSets : 0;
+      
+      // Base XP calculation (50 XP for full completion)
+      const baseXP = Math.floor(50 * completionPercentage);
+      
       // Create a simplified session data object that matches the schema
       const sessionData = {
         userId,
         workoutId: req.body.workoutId || null,
         name: req.body.name || "Workout Session",
         duration: req.body.duration || 30,
-        totalVolume: req.body.totalVolume || 0,
-        xpEarned: req.body.xpEarned || 50,
-        statsEarned: req.body.statsEarned || { strength: 15, stamina: 20, agility: 15 }
+        totalVolume: totalVolume,
+        xpEarned: baseXP,
+        statsEarned: req.body.statsEarned || { strength: 15, stamina: 20, agility: 15 },
+        exercises: exercises
       };
       
       // Get user data for stat updates

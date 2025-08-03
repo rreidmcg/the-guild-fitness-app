@@ -48,7 +48,7 @@ export function WorkoutSummary({
   const totalStatsGained = (statsGained.strength || 0) + (statsGained.stamina || 0) + (statsGained.agility || 0);
 
   return (
-    <div className="workout-summary min-h-screen bg-background p-4">
+    <div className="workout-summary min-h-screen bg-background p-4 pb-24 overflow-y-auto">
       {/* Header with close button */}
       <div className="max-w-2xl mx-auto mb-4">
         <div className="flex items-center justify-between">
