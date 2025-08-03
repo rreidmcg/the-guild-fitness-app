@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Workout Swipe Deck</title>
+  <style>
+    body {
+      margin: 0; display: flex;
+      height: 100vh; align-items: center; justify-content: center;
+      background: #f4f4f4; font-family: sans-serif;
+      overflow: hidden;
+    }
+    #deck {
+      position: relative; width: 320px; height: 460px;
+      overflow: hidden;
+    }
+    .card {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: white; border-radius: 16px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2em; user-select: none;
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    }
+  </style>
+</head>
+<body>
+
+<div id="deck"></div>
+
+<script>
+  const exercises = ['Push‑ups', 'Squats', 'Plank', 'Lunges', 'Burpees'];
+  let currentIndex = 0;
+
+  const deck = document.getElementById('deck');
+  let topCard = createCard(exercises[currentIndex]);
+  deck.appendChild(topCard);
+
+  function createCard(text) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.textContent = text;
+    return card;
+  }
+
+  let startX = 0, dragging = false;
+
+  deck.addEventListener('touchstart', startDrag, { passive: false });
+  deck.addEventListener('touchmove', onDrag, { passive: false });
+  deck.addEventListener('touchend', endDrag);
+  deck.addEventListener('mousedown', startDrag);
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup', endDrag);
+
+  function startDrag(e) {
+    e.preventDefault();
+    if (!topCard) return;
+    dragging = true;
+    startX = (e.touches ? e.touches[0] : e).clientX;
+    topCard.style.transition = 'none';
+  }
+
+  function onDrag(e) {
+    if (!dragging || !topCard) return;
+    const x = (e.touches ? e.touches[0] : e).clientX;
+    const dx = x - startX;
+    topCard.style.transform = `translateX(${dx}px)`;
+  }
+
+  function endDrag(e) {
+    if (!dragging || !topCard) return;
+    dragging = false;
+    const x = (e.changedTouches ? e.changedTouches[0] : e).clientX;
+    const dx = x - startX;
+    const threshold = 100;
+    topCard.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+
+    if (dx < -threshold && currentIndex < exercises.length - 1) {
+      // Swipe left → go forward
+      topCard.style.transform = 'translateX(-1000px)';
+      topCard.style.opacity = '0';
+      currentIndex++;
+      setTimeout(loadNewCard, 300);
+    } else if (dx > threshold && currentIndex > 0) {
+      // Swipe right → go backward
+      const prev = currentIndex - 1;
+      const prevCard = createCard(exercises[prev]);
+      prevCard.style.transform = 'translateX(-1000px)';
+      prevCard.style.opacity = '0';
+      deck.appendChild(prevCard);
+
+      requestAnimationFrame(() => {
+        prevCard.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+        prevCard.style.transform = 'translateX(0)';
+        prevCard.style.opacity = '1';
+      });
+
+      topCard.remove();
+      currentIndex = prev;
+      topCard = prevCard;
+    } else {
+      // Snap back
+      topCard.style.transform = 'translateX(0)';
+    }
+  }
+
+  function loadNewCard() {
+    topCard.remove();
+    const card = createCard(exercises[currentIndex]);
+    card.style.transform = 'translateX(1000px)';
+    card.style.opacity = '0';
+    deck.appendChild(card);
+
+    requestAnimationFrame(() => {
+      card.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+      card.style.transform = 'translateX(0)';
+      card.style.opacity = '1';
+    });
+
+    topCard = card;
+  }
+</script>
+
+</body>
+</html>

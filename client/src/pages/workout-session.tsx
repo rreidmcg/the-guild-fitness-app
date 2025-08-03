@@ -44,12 +44,14 @@ export default function WorkoutSession() {
   const [showRPESelection, setShowRPESelection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
-  // Workout Session Swipe Component - Isolated state and refs
+  // Workout Session Swipe Deck Component - Enhanced with card-like navigation
   const workoutCardRef = useRef<HTMLDivElement>(null);
   const [workoutSwipeState, setWorkoutSwipeState] = useState({
     isDragging: false,
     startX: 0,
-    currentTransformX: 0
+    currentTransformX: 0,
+    isTransitioning: false,
+    cardDirection: 'idle' as 'idle' | 'forward' | 'backward'
   });
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
@@ -341,36 +343,45 @@ export default function WorkoutSession() {
     return currentExercise?.section || currentExercise?.category || "Workout";
   };
 
-  // WORKOUT SESSION SWIPE COMPONENT - Isolated handlers to prevent conflicts
+  // WORKOUT SESSION SWIPE DECK - Enhanced card-like navigation with smooth transitions
   const workoutSwipe_handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
+    if (workoutSwipeState.isTransitioning) return; // Prevent interaction during transitions
+    
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    
     setWorkoutSwipeState(prev => ({
       ...prev,
-      startX: clientX,
       isDragging: true,
-      currentTransformX: 0
+      startX: clientX,
+      currentTransformX: 0,
+      cardDirection: 'idle'
     }));
     
-    // Only target workout session card element
+    // Enhanced card interaction - disable transitions for smooth dragging
     if (workoutCardRef.current) {
       workoutCardRef.current.style.transition = 'none';
+      workoutCardRef.current.classList.add('workout-session__exercise-card--dragging');
     }
   };
 
   const workoutSwipe_handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!workoutSwipeState.isDragging) return;
+    if (!workoutSwipeState.isDragging || workoutSwipeState.isTransitioning) return;
     
     const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
     const deltaX = clientX - workoutSwipeState.startX;
     
     setWorkoutSwipeState(prev => ({
       ...prev,
-      currentTransformX: deltaX
+      currentTransformX: deltaX,
+      cardDirection: deltaX > 50 ? 'backward' : deltaX < -50 ? 'forward' : 'idle'
     }));
     
-    // Scoped to workout session card only
+    // Enhanced visual feedback with opacity based on drag distance
     if (workoutCardRef.current) {
+      const opacity = Math.max(0.7, 1 - Math.abs(deltaX) / 400);
       workoutCardRef.current.style.transform = `translateX(${deltaX}px)`;
+      workoutCardRef.current.style.opacity = opacity.toString();
     }
   };
 
@@ -379,30 +390,82 @@ export default function WorkoutSession() {
     
     const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
     const deltaX = clientX - workoutSwipeState.startX;
-    const WORKOUT_SWIPE_THRESHOLD = 120; // Component-specific constant
+    const WORKOUT_SWIPE_THRESHOLD = 100; // Reduced threshold for better responsiveness
     
     setWorkoutSwipeState(prev => ({
       ...prev,
       isDragging: false,
-      currentTransformX: 0
+      currentTransformX: 0,
+      isTransitioning: true
     }));
     
-    // Only manipulate workout session card element
     if (workoutCardRef.current) {
+      workoutCardRef.current.classList.remove('workout-session__exercise-card--dragging');
       workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
       
-      if (Math.abs(deltaX) > WORKOUT_SWIPE_THRESHOLD) {
-        // Swipe navigation - only affects workout session state
-        if (deltaX > 0 && currentExerciseIndex > 0) {
-          goToPreviousExercise(); // Component-specific navigation
-        } else if (deltaX < 0 && currentExerciseIndex < exerciseData.length - 1) {
-          goToNextExercise(); // Component-specific navigation
-        }
+      // Card-like swipe navigation with smooth animations
+      if (deltaX < -WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex < exerciseData.length - 1) {
+        // Swipe left → slide current card out to the left, load new card from right
+        workoutSwipe_slideToNext();
+      } else if (deltaX > WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex > 0) {
+        // Swipe right → slide current card out to the right, load previous card from left
+        workoutSwipe_slideToPrevious();
+      } else {
+        // Snap back to center
+        workoutCardRef.current.style.transform = 'translateX(0)';
+        workoutCardRef.current.style.opacity = '1';
+        setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
       }
-      
-      // Reset position - scoped to this component's element
-      workoutCardRef.current.style.transform = 'translateX(0px)';
     }
+  };
+  
+  // Card-like transition animations inspired by the provided swipe deck
+  const workoutSwipe_slideToNext = () => {
+    if (!workoutCardRef.current) return;
+    
+    // Slide current card out to the left
+    workoutCardRef.current.style.transform = 'translateX(-1000px)';
+    workoutCardRef.current.style.opacity = '0';
+    
+    setTimeout(() => {
+      setCurrentExerciseIndex(prev => prev + 1);
+      workoutSwipe_loadNewCard('from-right');
+    }, 300);
+  };
+  
+  const workoutSwipe_slideToPrevious = () => {
+    if (!workoutCardRef.current) return;
+    
+    // Slide current card out to the right
+    workoutCardRef.current.style.transform = 'translateX(1000px)';
+    workoutCardRef.current.style.opacity = '0';
+    
+    setTimeout(() => {
+      setCurrentExerciseIndex(prev => prev - 1);
+      workoutSwipe_loadNewCard('from-left');
+    }, 300);
+  };
+  
+  const workoutSwipe_loadNewCard = (direction: 'from-left' | 'from-right') => {
+    if (!workoutCardRef.current) return;
+    
+    // Position new card off-screen based on direction
+    const startPosition = direction === 'from-right' ? '1000px' : '-1000px';
+    workoutCardRef.current.style.transform = `translateX(${startPosition})`;
+    workoutCardRef.current.style.opacity = '0';
+    
+    // Animate card into position
+    requestAnimationFrame(() => {
+      if (workoutCardRef.current) {
+        workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+        workoutCardRef.current.style.transform = 'translateX(0)';
+        workoutCardRef.current.style.opacity = '1';
+        
+        setTimeout(() => {
+          setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
+        }, 300);
+      }
+    });
   };
 
   // Desktop mouse handlers - namespaced for workout session
@@ -610,7 +673,13 @@ export default function WorkoutSession() {
                   {currentExerciseIndex + 1} of {exerciseData.length}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1 opacity-60">
-                  {workoutSwipeState.isDragging ? 'Release to navigate' : '← Swipe or drag →'}
+                  {workoutSwipeState.isDragging 
+                    ? (workoutSwipeState.cardDirection === 'forward' 
+                        ? '← Release to go forward' 
+                        : workoutSwipeState.cardDirection === 'backward'
+                          ? 'Release to go back →'
+                          : 'Release to stay')
+                    : '← Swipe or drag →'}
                 </div>
               </div>
               
@@ -637,7 +706,7 @@ export default function WorkoutSession() {
               )}
             </div>
 
-            {/* WORKOUT SESSION EXERCISE CARD - Isolated swipe component */}
+            {/* WORKOUT SESSION EXERCISE CARD - Enhanced swipe deck with visual feedback */}
             <div 
               ref={workoutCardRef}
               className={`workout-session__exercise-card bg-card rounded-lg border border-border overflow-hidden select-none transition-all duration-200 ${
@@ -645,13 +714,19 @@ export default function WorkoutSession() {
                   ? 'workout-session__exercise-card--dragging cursor-grabbing shadow-xl scale-105' 
                   : 'workout-session__exercise-card--idle cursor-grab hover:shadow-lg'
               }`}
+              data-direction={workoutSwipeState.cardDirection}
               onTouchStart={workoutSwipe_handleDragStart}
               onTouchMove={workoutSwipe_handleDragMove}
               onTouchEnd={workoutSwipe_handleDragEnd}
               onMouseDown={workoutSwipe_handleMouseStart}
               style={{
                 transform: `translateX(${workoutSwipeState.currentTransformX}px)`,
-                transition: workoutSwipeState.isDragging ? 'none' : 'transform 0.3s ease-out, box-shadow 0.2s ease-out, scale 0.2s ease-out'
+                opacity: workoutSwipeState.isDragging 
+                  ? Math.max(0.7, 1 - Math.abs(workoutSwipeState.currentTransformX) / 400)
+                  : 1,
+                transition: workoutSwipeState.isDragging 
+                  ? 'none' 
+                  : 'transform 0.3s ease-out, opacity 0.3s ease-out, box-shadow 0.2s ease-out, scale 0.2s ease-out'
               }}
             >
               {(() => {

@@ -1,22 +1,31 @@
-/* WORKOUT SESSION COMPONENT STYLES - Isolated to prevent conflicts */
+/* WORKOUT SESSION COMPONENT STYLES - Enhanced Swipe Deck Implementation */
 
-/* BEM naming convention for workout session swipe component */
+/* BEM naming convention for workout session swipe deck component */
 .workout-session__exercise-card {
-  /* Base styles applied via Tailwind classes */
+  /* Enhanced card-like appearance inspired by provided swipe deck */
+  position: relative;
+  overflow: hidden;
+  will-change: transform, opacity;
+  transform: translateZ(0); /* Force hardware acceleration */
+  backface-visibility: hidden;
+  transition: none; /* Controlled via JavaScript for smooth animations */
 }
 
 .workout-session__exercise-card--idle {
-  /* Idle state styles */
-  will-change: transform, box-shadow;
+  /* Idle state with subtle shadow enhancement */
+  will-change: transform, box-shadow, opacity;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.1); /* Inspired by provided deck styling */
 }
 
 .workout-session__exercise-card--dragging {
-  /* Dragging state styles */
+  /* Enhanced dragging state with improved visual feedback */
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  pointer-events: none; /* Prevent text selection during drag */
+  cursor: grabbing;
+  filter: brightness(1.02);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15); /* Enhanced shadow during drag */
 }
 
 /* Prevent accidental text selection during swipe interactions */
@@ -43,19 +52,35 @@
   backface-visibility: hidden;
 }
 
-/* Touch action optimization for mobile devices */
+/* Touch action optimization for enhanced mobile deck interaction */
 .workout-session__exercise-card {
-  touch-action: pan-x; /* Only allow horizontal panning */
+  touch-action: pan-x; /* Only allow horizontal panning for deck behavior */
+  cursor: grab; /* Visual affordance for draggable cards */
 }
 
-/* Enhanced visual feedback during drag */
+/* Enhanced visual feedback with card-like transitions */
 .workout-session__exercise-card--dragging {
-  filter: brightness(1.02);
-  border-color: rgb(59 130 246 / 0.3); /* Subtle blue border hint */
+  border-color: rgb(59 130 246 / 0.2); /* Subtle blue hint during interaction */
 }
 
-/* Component-specific constants as CSS custom properties */
+/* Card direction visual indicators */
+.workout-session__exercise-card[data-direction="forward"] {
+  border-left: 3px solid rgb(34 197 94); /* Green hint for forward navigation */
+}
+
+.workout-session__exercise-card[data-direction="backward"] {
+  border-right: 3px solid rgb(249 115 22); /* Orange hint for backward navigation */
+}
+
+/* Component-specific constants enhanced for card deck behavior */
 .workout-session__exercise-card {
-  --workout-swipe-threshold: 120px;
-  --workout-drag-transition: transform 0.3s ease-out;
+  --workout-swipe-threshold: 100px; /* Reduced for better responsiveness */
+  --workout-card-transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  --workout-slide-distance: 1000px; /* Distance for card slide animations */
+}
+
+/* Smooth card loading animations */
+.workout-session__exercise-card--loading {
+  transform: translateX(var(--workout-slide-distance));
+  opacity: 0;
 }
