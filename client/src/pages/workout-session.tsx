@@ -30,6 +30,7 @@ export default function WorkoutSession() {
 
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
+  const [startTime, setStartTime] = useState<Date | null>(null);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [exerciseData, setExerciseData] = useState<any[]>([]);
   const [completedSets, setCompletedSets] = useState<Record<string, boolean>>({});
@@ -134,16 +135,20 @@ export default function WorkoutSession() {
     return () => clearTimeout(loadTimer);
   }, []);
 
-  // Timer effect
+  // Timer effect and start tracking
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isActive) {
+      // Set start time when workout begins
+      if (!startTime) {
+        setStartTime(new Date());
+      }
       interval = setInterval(() => {
         setTime(time + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isActive, time]);
+  }, [isActive, time, startTime]);
 
   const saveExercisePreferenceMutation = useMutation({
     mutationFn: async (preference: any) => {
@@ -443,10 +448,16 @@ export default function WorkoutSession() {
       };
     });
 
+    // Calculate actual workout duration from start time to now
+    const endTime = new Date();
+    const actualDuration = startTime 
+      ? Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60)) // Minutes
+      : Math.floor(time / 60); // Fallback to timer if no start time
+
     const sessionData = {
       workoutId: parseInt(id || "0"),
       name: (workout as any)?.name || "Workout Session",
-      duration: Math.floor(time / 60), // Convert to minutes
+      duration: actualDuration,
       totalVolume: 0, // Will be calculated from exercises
       xpEarned: 0, // Will be calculated server-side
       statsEarned: {},

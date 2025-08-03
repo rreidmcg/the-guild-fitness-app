@@ -40,6 +40,29 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 
+// Calculate estimated workout duration based on exercises
+function calculateEstimatedDuration(exercises: any[]): number {
+  if (!exercises || exercises.length === 0) return 30;
+  
+  let totalTime = 0;
+  
+  exercises.forEach((exercise) => {
+    const sets = exercise.sets || 3;
+    const restTime = exercise.restTime || 60; // seconds
+    
+    // Estimate 45 seconds per set + rest time between sets
+    const setTime = 45; // seconds per set
+    const exerciseTime = (sets * setTime) + ((sets - 1) * restTime);
+    totalTime += exerciseTime;
+  });
+  
+  // Add 5 minutes for general warm-up/transition time
+  totalTime += 300;
+  
+  // Convert to minutes and round
+  return Math.round(totalTime / 60);
+}
+
 export default function Workouts() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -456,7 +479,7 @@ export default function Workouts() {
                           {workout.exercises?.length || 0} exercises
                         </span>
                         <span className="text-muted-foreground font-medium">
-                          ~{workout.estimatedDuration || 30} min
+                          ~{calculateEstimatedDuration(workout.exercises || [])} min
                         </span>
                       </div>
                     </CardContent>

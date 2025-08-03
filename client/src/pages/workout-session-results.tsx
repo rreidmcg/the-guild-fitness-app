@@ -96,7 +96,7 @@ export default function WorkoutSessionResults() {
             <Card className="bg-card border-border">
               <CardContent className="p-4 text-center">
                 <Clock className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-foreground">{session.duration}</div>
+                <div className="text-2xl font-bold text-foreground">{session.duration || 0}</div>
                 <p className="text-xs text-muted-foreground">Minutes</p>
               </CardContent>
             </Card>

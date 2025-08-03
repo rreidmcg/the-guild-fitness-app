@@ -128,6 +128,19 @@ export const workoutSessions = pgTable("workout_sessions", {
   duration: integer("duration"), // in minutes
   totalVolume: integer("total_volume"), // total weight lifted
   xpEarned: integer("xp_earned").default(0),
+  perceivedEffort: integer("perceived_effort"), // RPE scale 1-10
+  exercises: json("exercises").$type<Array<{
+    exerciseId: number;
+    name: string;
+    category?: string;
+    sets: Array<{
+      reps?: number;
+      weight?: number;
+      duration?: number;
+      rpe?: number;
+      completed: boolean;
+    }>;
+  }>>(), // Store exercise performance data
   statsEarned: json("stats_earned").$type<{
     strength?: number;
     stamina?: number;

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Workout Time Tracker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .workout-info {
+      background: #34495e;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #1abc9c;
+      color: white;
+    }
+
+    #timeModal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: none;
+      background: rgba(0, 0, 0, 0.6);
+      align-items: center;
+      justify-content: center;
+    }
+
+    #timeModal .modal-content {
+      background: white;
+      color: black;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+    }
+
+    #timeModal input {
+      width: 100%;
+      padding: 10px;
+      font-size: 18px;
+      margin: 15px 0;
+    }
+
+    #timeModal button {
+      background: #2980b9;
+    }
+  </style>
+</head>
+<body>
+
+<div class="workout-info" id="workoutCard">
+  <h2>Upper Body Workout</h2>
+  <p>Estimated Time: <strong id="estimate">15</strong> minutes</p>
+  <button onclick="startWorkout()">Start Workout</button>
+  <button onclick="endWorkout()">Finish Workout</button>
+</div>
+
+<div id="timeModal">
+  <div class="modal-content">
+    <p id="modalText">Your workout time seems off. Adjust it if needed:</p>
+    <input type="number" id="manualTime" min="1" />
+    <button onclick="confirmTime()">Confirm</button>
+  </div>
+</div>
+
+<script>
+  const estimatedTime = 15;
+  let startTime = null;
+  let endTime = null;
+
+  function startWorkout() {
+    startTime = new Date();
+    alert('Workout started!');
+  }
+
+  function endWorkout() {
+    if (!startTime) {
+      alert('Start the workout first!');
+      return;
+    }
+    endTime = new Date();
+    const elapsedMs = endTime - startTime;
+    const actualMin = elapsedMs / 60000;
+    const low = estimatedTime * 0.5;
+    const high = estimatedTime * 1.5;
+
+    if (actualMin < low || actualMin > high) {
+      showModal(Math.round(actualMin));
+    } else {
+      saveWorkout(Math.round(actualMin));
+    }
+  }
+
+  function showModal(actual) {
+    document.getElementById('timeModal').style.display = 'flex';
+    document.getElementById('manualTime').value = actual;
+  }
+
+  function confirmTime() {
+    const time = parseInt(document.getElementById('manualTime').value);
+    if (!isNaN(time)) {
+      saveWorkout(time);
+      document.getElementById('timeModal').style.display = 'none';
+    }
+  }
+
+  function saveWorkout(time) {
+    console.log(`Workout saved with time: ${time} mins`);
+    alert(`Workout saved with time: ${time} mins`);
+    // You can now push this to localStorage, DB, or analytics system
+  }
+</script>
+
+</body>
+</html>
