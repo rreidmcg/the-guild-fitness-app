@@ -1,0 +1,245 @@
+/* DEFENSIVE CODING STANDARDS - Global Component Guidelines */
+
+/* 
+  BEM NAMING CONVENTION REFERENCE:
+  
+  Block: Component name (e.g., "stats-page", "shop-component")
+  Element: Part of component (e.g., "stats-page__currency-display") 
+  Modifier: Variation (e.g., "stats-page__currency-display--premium")
+  
+  Pattern: .component-name__element-name--modifier-name
+*/
+
+/* GLOBAL DEFENSIVE RULES */
+
+/* Isolation - Every major component creates its own stacking context */
+.stats-page,
+.shop-component,
+.leaderboard-page,
+.mail-component,
+.admin-panel,
+.auth-forms,
+.workout-builder {
+  isolation: isolate;
+  contain: layout style;
+}
+
+/* Performance - Hardware acceleration for animated components */
+.stats-page__avatar-container,
+.shop-component__item-grid,
+.leaderboard-page__player-list,
+.workout-builder__exercise-list {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Touch optimization for mobile interactions */
+.stats-page__stat-button,
+.shop-component__purchase-button,
+.leaderboard-page__player-card,
+.mail-component__message-item {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Text selection control - Prevent accidental selection in UI components */
+.stats-page__navigation,
+.shop-component__category-tabs,
+.leaderboard-page__rankings,
+.battle-system {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Re-enable text selection for content areas */
+.mail-component__message-content,
+.admin-panel__text-areas,
+.workout-builder__exercise-description {
+  user-select: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+}
+
+/* TRANSITION STANDARDS */
+:root {
+  /* Consistent timing for all components */
+  --defensive-transition-fast: 0.15s ease-out;
+  --defensive-transition-normal: 0.3s ease-out;
+  --defensive-transition-slow: 0.5s ease-out;
+  
+  /* Consistent scaling for hover effects */
+  --defensive-scale-subtle: 1.02;
+  --defensive-scale-normal: 1.05;
+  --defensive-scale-active: 0.95;
+  
+  /* Consistent border radius */
+  --defensive-radius-small: 0.375rem;
+  --defensive-radius-normal: 0.75rem;
+  --defensive-radius-large: 1rem;
+}
+
+/* COMPONENT STATE STANDARDS */
+
+/* Loading states */
+.component--loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.component--loading * {
+  cursor: wait !important;
+}
+
+/* Error states */
+.component--error {
+  border: 1px solid rgb(239 68 68 / 0.5);
+  background: rgb(239 68 68 / 0.05);
+}
+
+/* Success states */
+.component--success {
+  border: 1px solid rgb(34 197 94 / 0.5);
+  background: rgb(34 197 94 / 0.05);
+}
+
+/* Disabled states */
+.component--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE BREAKPOINT STANDARDS */
+
+/* Mobile-first approach with consistent breakpoints */
+@media (max-width: 640px) {
+  /* Mobile: Reduce animations and hover effects */
+  .stats-page__stat-card:hover,
+  .shop-component__item-card:hover,
+  .leaderboard-page__player-card:hover {
+    transform: none;
+  }
+  
+  /* Mobile: Larger touch targets */
+  .stats-page__stat-button,
+  .shop-component__purchase-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Tablet and up: Enable hover effects */
+  .stats-page__stat-card:hover {
+    transform: scale(var(--defensive-scale-subtle));
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop: Full interaction effects */
+  .shop-component__item-card:hover {
+    transform: scale(var(--defensive-scale-normal));
+  }
+}
+
+/* ACCESSIBILITY STANDARDS */
+
+/* Focus management */
+.stats-page__stat-button:focus,
+.shop-component__purchase-button:focus,
+.leaderboard-page__filter-button:focus {
+  outline: 2px solid rgb(59 130 246);
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .stats-page__avatar-container,
+  .shop-component__item-grid,
+  .leaderboard-page__player-list,
+  .workout-builder__exercise-list {
+    will-change: auto;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+  .component--error {
+    border-width: 2px;
+  }
+  
+  .component--success {
+    border-width: 2px;
+  }
+}
+
+/* SCROLL BEHAVIOR STANDARDS */
+
+/* Smooth scrolling for component navigation */
+.stats-page__scroll-container,
+.shop-component__category-scroll,
+.leaderboard-page__rankings-scroll {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+
+/* Custom scrollbar styling */
+.stats-page__scroll-container::-webkit-scrollbar,
+.shop-component__category-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.stats-page__scroll-container::-webkit-scrollbar-track,
+.shop-component__category-scroll::-webkit-scrollbar-track {
+  background: rgb(31 41 55);
+}
+
+.stats-page__scroll-container::-webkit-scrollbar-thumb,
+.shop-component__category-scroll::-webkit-scrollbar-thumb {
+  background: rgb(75 85 99);
+  border-radius: 4px;
+}
+
+/* ANIMATION PERFORMANCE */
+
+/* Only animate transform and opacity for best performance */
+.stats-page__currency-counter,
+.shop-component__price-display,
+.leaderboard-page__rank-indicator {
+  transition: transform var(--defensive-transition-normal),
+              opacity var(--defensive-transition-normal);
+}
+
+/* Prevent layout thrashing */
+.stats-page__dynamic-content,
+.shop-component__dynamic-grid {
+  contain: layout;
+}
+
+/* COMPONENT BOUNDARIES - Clear visual separation */
+.stats-page {
+  border-top: 1px solid transparent; /* Invisible boundary marker */
+}
+
+.shop-component {
+  border-top: 1px solid transparent;
+}
+
+.leaderboard-page {
+  border-top: 1px solid transparent;
+}
+
+/* DEBUG MODE - Uncomment to visualize component boundaries */
+/*
+.stats-page { border: 2px solid red !important; }
+.shop-component { border: 2px solid blue !important; }
+.leaderboard-page { border: 2px solid green !important; }
+.workout-builder { border: 2px solid purple !important; }
+.battle-system { border: 2px solid orange !important; }
+*/

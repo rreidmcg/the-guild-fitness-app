@@ -6,6 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LoadingState } from "@/components/ui/loading-spinner";
+
+// Import defensive coding standards
+import "../styles/defensive-coding-standards.css";
 import { 
   ShoppingCart, 
   Coins, 
@@ -107,10 +110,14 @@ export default function Shop() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("consumables");
-
-  const [selectedConsumableCategory, setSelectedConsumableCategory] = useState("all");
-  const [showGoldPurchase, setShowGoldPurchase] = useState(false);
+  
+  // SHOP COMPONENT - Isolated state management
+  const [shopComponentState, setShopComponentState] = useState({
+    activeTab: "consumables",
+    selectedConsumableCategory: "all",
+    showGoldPurchase: false,
+    isProcessing: false
+  });
 
   const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],
@@ -549,7 +556,7 @@ export default function Shop() {
 
   return (
     <ParallaxBackground>
-      <div className="min-h-screen bg-background text-foreground pb-20">
+      <div className="shop-component min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
@@ -564,8 +571,8 @@ export default function Shop() {
       </div>
 
       <div className="max-w-4xl mx-auto p-6">
-        <Tabs value={activeTab} onValueChange={(value) => {
-          setActiveTab(value);
+        <Tabs value={shopComponentState.activeTab} onValueChange={(value) => {
+          setShopComponentState(prev => ({ ...prev, activeTab: value }));
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }} className="w-full">
           <TabsList className="grid w-full grid-cols-3">

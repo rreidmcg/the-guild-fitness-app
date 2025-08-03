@@ -26,6 +26,9 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { formatDistanceToNow } from "date-fns";
 import { AppRequestModal } from "@/components/app-request-modal";
 
+// Import defensive coding standards
+import "../styles/defensive-coding-standards.css";
+
 interface PlayerMail {
   id: number;
   userId: number;
@@ -50,8 +53,12 @@ interface PlayerMail {
 }
 
 export default function MailPage() {
-  const [selectedMail, setSelectedMail] = useState<PlayerMail | null>(null);
-  const [showAppRequestModal, setShowAppRequestModal] = useState(false);
+  // MAIL COMPONENT - Isolated state management
+  const [mailComponentState, setMailComponentState] = useState({
+    selectedMail: null as PlayerMail | null,
+    showAppRequestModal: false,
+    isProcessing: false
+  });
   const { toast } = useToast();
 
   const { data: mail = [], isLoading, refetch } = useQuery<PlayerMail[]>({
@@ -126,8 +133,8 @@ export default function MailPage() {
     return variants[mailType] || "bg-gray-500/10 text-gray-600 border-gray-500/20";
   };
 
-  const handleOpenMail = (mailItem: PlayerMail) => {
-    setSelectedMail(mailItem);
+  const mailComponent_handleOpenMail = (mailItem: PlayerMail) => {
+    setMailComponentState(prev => ({ ...prev, selectedMail: mailItem }));
     if (!mailItem.isRead) {
       markAsReadMutation.mutate(mailItem.id);
     }
@@ -149,7 +156,7 @@ export default function MailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <div className="mail-component min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-3 sm:px-4 py-4">
         <div className="max-w-4xl mx-auto">
@@ -172,7 +179,7 @@ export default function MailPage() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={() => setShowAppRequestModal(true)}
+                onClick={() => setMailComponentState(prev => ({ ...prev, showAppRequestModal: true }))}
                 className="bg-orange-600/20 border-orange-600/30 text-orange-600 hover:bg-orange-600/30"
               >
                 <AlertCircle className="w-4 h-4 sm:mr-2" />
@@ -193,7 +200,7 @@ export default function MailPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {selectedMail ? (
+        {mailComponentState.selectedMail ? (
           // Mail Detail View
           <Card className="max-w-3xl mx-auto">
             <CardHeader>
@@ -248,10 +255,10 @@ export default function MailPage() {
                           <span>Rewards Attached</span>
                         </h4>
                         <div className="space-y-1 text-sm">
-                          {selectedMail.rewards.gold && (
+                          {mailComponentState.selectedMail.rewards.gold && (
                             <div className="flex items-center space-x-2">
                               <Coins className="w-4 h-4 text-yellow-500" />
-                              <span>{selectedMail.rewards.gold} Gold</span>
+                              <span>{mailComponentState.selectedMail.rewards.gold} Gold</span>
                             </div>
                           )}
                           {selectedMail.rewards.xp && (
@@ -309,7 +316,7 @@ export default function MailPage() {
                   className={`cursor-pointer hover:bg-accent/50 transition-colors ${
                     !mailItem.isRead ? 'border-l-4 border-l-blue-500 bg-accent/20' : ''
                   }`}
-                  onClick={() => handleOpenMail(mailItem)}
+                  onClick={() => mailComponent_handleOpenMail(mailItem)}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
@@ -361,8 +368,8 @@ export default function MailPage() {
 
       {/* App Request Modal */}
       <AppRequestModal 
-        isOpen={showAppRequestModal}
-        onClose={() => setShowAppRequestModal(false)}
+        isOpen={mailComponentState.showAppRequestModal}
+        onClose={() => setMailComponentState(prev => ({ ...prev, showAppRequestModal: false }))}
       />
     </div>
   );

@@ -14,6 +14,9 @@ import { LoadingState } from "@/components/ui/loading-spinner";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { getTitleComponent } from "@/lib/title-rarity";
+
+// Import defensive coding standards
+import "../styles/defensive-coding-standards.css";
 import { 
   Dumbbell, 
   Trophy, 
@@ -38,7 +41,12 @@ export default function Stats() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [showWardrobe, setShowWardrobe] = useState(false);
+  // STATS PAGE COMPONENT - Isolated state management
+  const [statsPageState, setStatsPageState] = useState({
+    showWardrobe: false,
+    isLoading: false,
+    selectedTab: 'overview'
+  });
   
   // Calculator functions removed - no longer needed for wardrobe system
   
@@ -147,7 +155,7 @@ export default function Stats() {
 
   return (
     <ParallaxBackground>
-      <div className="min-h-screen bg-background text-foreground pb-20">
+      <div className="stats-page min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
       <div className="bg-card border-b border-border px-4 py-4">
         <div className="max-w-4xl mx-auto">
@@ -171,7 +179,7 @@ export default function Stats() {
           {/* Wardrobe Button in Corner */}
           <Button
             size="sm"
-            onClick={() => setShowWardrobe(true)}
+            onClick={() => setStatsPageState(prev => ({ ...prev, showWardrobe: true }))}
             className="absolute top-4 right-4 bg-purple-600 text-white hover:bg-purple-700 p-2 z-10"
             title="Open Wardrobe"
           >
@@ -447,8 +455,8 @@ export default function Stats() {
 
       {/* Wardrobe Modal */}
       <WardrobeModal 
-        isOpen={showWardrobe}
-        onClose={() => setShowWardrobe(false)}
+        isOpen={statsPageState.showWardrobe}
+        onClose={() => setStatsPageState(prev => ({ ...prev, showWardrobe: false }))}
         user={safeUserStats}
       />
       </div>

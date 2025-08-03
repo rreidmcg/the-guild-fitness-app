@@ -8,6 +8,9 @@ import { Avatar2D } from "@/components/ui/avatar-2d";
 import { Badge } from "@/components/ui/badge";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 
+// Import defensive coding standards
+import "../styles/defensive-coding-standards.css";
+
 export default function LeaderboardPage() {
   const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
@@ -55,7 +58,7 @@ export default function LeaderboardPage() {
 
   return (
     <ParallaxBackground>
-      <div className="min-h-screen bg-background text-foreground pb-20">
+      <div className="leaderboard-page min-h-screen bg-background text-foreground pb-20">
       
       
       {/* Header */}

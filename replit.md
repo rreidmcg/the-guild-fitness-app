@@ -5,7 +5,9 @@
 The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, agility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
 
 ## Recent Changes (August 3, 2025)
+- **UNIVERSAL DEFENSIVE CODING STANDARD**: Established comprehensive defensive coding practices as mandatory app-wide standard - created defensive-coding-standards.css with BEM naming conventions, component isolation, performance optimizations, and accessibility guidelines for all future development
 - **BATTLE SYSTEM DEFENSIVE CODING**: Applied comprehensive defensive coding practices to entire battle system (battle.tsx, pve-dungeons.tsx, dungeon-battle.tsx) - created isolated battle-system.css with BEM naming, namespaced state management, and component-specific class prefixes to prevent conflicts and ensure stability
+- **CORE PAGES FORTIFICATION**: Applied defensive coding to all major pages (stats.tsx, shop.tsx, leaderboard.tsx, mail.tsx) with isolated state management, BEM class naming, and component boundaries to prevent "butterfly effect" issues
 - **WORKOUT TRACKER ENHANCEMENTS**: Implemented smooth swipe navigation between exercises with visual feedback, fixed completion button accessibility issue preventing XP rewards, added arrow navigation controls with progress indicators
 - **DEFENSIVE CODING IMPLEMENTATION**: Applied comprehensive defensive coding practices to workout session component - namespaced classes (BEM convention), isolated component state, scoped selectors, and dedicated CSS file to prevent conflicts
 - **SWIPE INTERACTION REFINEMENT**: Enhanced swipe functionality with clean horizontal-only movement, 120px threshold, proper touch/mouse event handling, and performance optimizations (hardware acceleration, touch-action)
@@ -35,6 +37,12 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+**Development Standards (Established August 3, 2025):**
+- **Defensive Coding Mandatory**: All new components must follow BEM naming convention (block__element--modifier) and use component-isolated state management
+- **Component Boundaries**: Every major component must have clear CSS class prefixes and isolated styling to prevent conflicts
+- **Performance First**: Hardware acceleration, touch optimization, and accessibility features required for all interactive elements
+- **Future-Proof Architecture**: All changes must consider scalability and maintainability to prevent "butterfly effect" issues during feature expansion
 
 ## System Architecture
 
