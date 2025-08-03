@@ -890,22 +890,22 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
   return (
     <>
-      <Card className="bg-game-slate border-gray-700 shadow-lg">
+      <Card className="bg-card border-border shadow-lg">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 pb-4">
-          <CardTitle className="text-lg font-semibold text-white">User Account Management</CardTitle>
+          <CardTitle className="text-lg font-semibold text-foreground">User Account Management</CardTitle>
           <div className="flex items-center space-x-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:flex-none">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full sm:w-64 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+                className="pl-10 w-full sm:w-64 bg-background border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
             <Button 
               size="sm" 
-              className="bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors duration-200 shadow-md hover:shadow-lg whitespace-nowrap"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Administrator
@@ -916,60 +916,60 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
           <div className="space-y-4">
             {/* User Statistics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <Users className="w-5 h-5 text-blue-400" />
                     </div>
                     <div>
-                      <div className="text-xl font-bold text-white">{users?.length || 0}</div>
-                      <div className="text-sm text-gray-400">Total Users</div>
+                      <div className="text-xl font-bold text-foreground">{users?.length || 0}</div>
+                      <div className="text-sm text-muted-foreground">Total Users</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-green-500/10 rounded-lg">
                       <Shield className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
-                      <div className="text-xl font-bold text-white">
+                      <div className="text-xl font-bold text-foreground">
                         {users?.filter((u: any) => !u.isBanned && !u.isDeleted).length || 0}
                       </div>
-                      <div className="text-sm text-gray-400">Active Users</div>
+                      <div className="text-sm text-muted-foreground">Active Users</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-red-500/10 rounded-lg">
                       <Ban className="w-5 h-5 text-red-400" />
                     </div>
                     <div>
-                      <div className="text-xl font-bold text-white">
+                      <div className="text-xl font-bold text-foreground">
                         {users?.filter((u: any) => u.isBanned).length || 0}
                       </div>
-                      <div className="text-sm text-gray-400">Banned Users</div>
+                      <div className="text-sm text-muted-foreground">Banned Users</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-gray-500/10 rounded-lg">
                       <UserX className="w-5 h-5 text-gray-400" />
                     </div>
                     <div>
-                      <div className="text-xl font-bold text-white">
+                      <div className="text-xl font-bold text-foreground">
                         {users?.filter((u: any) => u.isDeleted).length || 0}
                       </div>
-                      <div className="text-sm text-gray-400">Deleted Users</div>
+                      <div className="text-sm text-muted-foreground">Deleted Users</div>
                     </div>
                   </div>
                 </CardContent>
@@ -979,10 +979,10 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
             {/* User List */}
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {filteredUsers.map((user: any) => (
-                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:bg-gray-750 transition-colors duration-200 space-y-3 sm:space-y-0">
+                <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-card rounded-lg border border-border hover:bg-muted/50 transition-colors duration-200 space-y-3 sm:space-y-0">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="font-medium text-white truncate">{user.username}</span>
+                      <span className="font-medium text-foreground truncate">{user.username}</span>
                       {getUserStatusBadge(user)}
                       {user.currentTitle && (
                         <Badge variant="outline" className="text-xs">
@@ -990,7 +990,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                         </Badge>
                       )}
                     </div>
-                    <div className="text-sm text-gray-400 break-words">
+                    <div className="text-sm text-muted-foreground break-words">
                       {user.email} • Level {user.level} • Joined {new Date(user.createdAt).toLocaleDateString()}
                     </div>
                     {user.isBanned && (
@@ -1006,7 +1006,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+                      className="border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
                       title="View User Details"
                     >
                       <Eye className="w-4 h-4" />
@@ -1047,7 +1047,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                         </Button>
                       </>
                     ) : (
-                      <Badge variant="outline" className="text-gray-500">
+                      <Badge variant="outline" className="text-muted-foreground">
                         Deleted
                       </Badge>
                     )}
@@ -1061,9 +1061,9 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="bg-game-slate border-gray-700">
+        <DialogContent className="bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2 text-white">
+            <DialogTitle className="flex items-center space-x-2 text-foreground">
               {actionType === 'ban' ? (
                 <>
                   <Ban className="w-5 h-5 text-yellow-400" />
@@ -1079,16 +1079,16 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="p-4 bg-game-slate rounded-lg border border-gray-700">
-              <div className="font-medium text-white">Target User: {selectedUser?.username}</div>
-              <div className="text-sm text-gray-400">Email: {selectedUser?.email}</div>
-              <div className="text-sm text-gray-400">Level: {selectedUser?.level}</div>
+            <div className="p-4 bg-muted rounded-lg border border-border">
+              <div className="font-medium text-foreground">Target User: {selectedUser?.username}</div>
+              <div className="text-sm text-muted-foreground">Email: {selectedUser?.email}</div>
+              <div className="text-sm text-muted-foreground">Level: {selectedUser?.level}</div>
             </div>
 
             {actionType === 'ban' && (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="banDuration">Ban Duration</Label>
+                  <Label htmlFor="banDuration" className="text-foreground">Ban Duration</Label>
                   <Select value={banDuration} onValueChange={setBanDuration}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select ban duration" />
@@ -1105,13 +1105,13 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="banReason" className="text-white">Reason for Ban *</Label>
+                  <Label htmlFor="banReason" className="text-foreground">Reason for Ban *</Label>
                   <Textarea
                     id="banReason"
                     value={banReason}
                     onChange={(e) => setBanReason(e.target.value)}
                     placeholder="Provide a detailed reason for banning this user..."
-                    className="min-h-20 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
+                    className="min-h-20 bg-background border-border text-foreground placeholder:text-muted-foreground placeholder:transition-opacity focus:placeholder:opacity-0"
                   />
                 </div>
               </>
@@ -1119,13 +1119,13 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
 
             {actionType === 'remove' && (
               <div className="space-y-2">
-                <Label htmlFor="removeReason" className="text-white">Reason for Removal *</Label>
+                <Label htmlFor="removeReason" className="text-foreground">Reason for Removal *</Label>
                 <Textarea
                   id="removeReason"
                   value={removeReason}
                   onChange={(e) => setRemoveReason(e.target.value)}
                   placeholder="Provide a detailed reason for permanently removing this user account..."
-                  className="min-h-20 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
+                  className="min-h-20 bg-background border-border text-foreground placeholder:text-muted-foreground placeholder:transition-opacity focus:placeholder:opacity-0"
                 />
                 <div className="p-3 bg-red-900/20 border border-red-500 rounded-lg">
                   <div className="flex items-center space-x-2 text-red-400">
@@ -1144,7 +1144,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
             <Button 
               variant="outline" 
               onClick={closeDialog}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              className="border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
             >
               Cancel
             </Button>
@@ -1156,7 +1156,7 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
                 banUserMutation.isPending ||
                 removeUserMutation.isPending
               }
-              className={`${actionType === 'ban' ? "bg-yellow-600 hover:bg-yellow-700" : "bg-red-600 hover:bg-red-700"} text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`${actionType === 'ban' ? "bg-yellow-600 hover:bg-yellow-700" : "bg-destructive hover:bg-destructive/90"} text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {banUserMutation.isPending || removeUserMutation.isPending ? (
                 <>Processing...</>
