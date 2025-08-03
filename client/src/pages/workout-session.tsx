@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
+import { WorkoutSummary } from "../components/WorkoutSummary";
 import { WorkoutLoadingState } from "@/components/ui/loading-spinner";
 
 import { useToast } from "@/hooks/use-toast";
@@ -40,20 +41,13 @@ export default function WorkoutSession() {
   }>>({});
   const [showVictoryModal, setShowVictoryModal] = useState(false);
   const [completedSession, setCompletedSession] = useState<any>(null);
+  const [showSummary, setShowSummary] = useState(false);
   const [perceivedEffort, setPerceivedEffort] = useState(7); // RPE scale 1-10
   const [showRPESelection, setShowRPESelection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
-  // Workout Session Swipe Deck Component - Complete deck rendering approach
-  const workoutDeckRef = useRef<HTMLDivElement>(null);
-  const workoutCardRef = useRef<HTMLDivElement>(null);
-  const workoutNextCardRef = useRef<HTMLDivElement>(null);
-  const [workoutSwipeState, setWorkoutSwipeState] = useState({
-    isDragging: false,
-    startX: 0,
-    currentTransformX: 0,
-    isTransitioning: false
-  });
+  // Simple navigation state for arrow controls
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
     queryKey: ["/api/user/stats"],
@@ -344,130 +338,21 @@ export default function WorkoutSession() {
     return currentExercise?.section || currentExercise?.category || "Workout";
   };
 
-  // WORKOUT SESSION SWIPE DECK - Complete deck approach with proper card management
-  const workoutSwipe_handleDragStart = (e: React.TouchEvent | React.MouseEvent) => {
-    e.preventDefault();
-    if (workoutSwipeState.isTransitioning || !workoutCardRef.current) return;
-    
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    
-    setWorkoutSwipeState(prev => ({
-      ...prev,
-      isDragging: true,
-      startX: clientX,
-      currentTransformX: 0
-    }));
-    
-    // Disable transition for smooth dragging
-    workoutCardRef.current.style.transition = 'none';
-  };
-
-  const workoutSwipe_handleDragMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!workoutSwipeState.isDragging || !workoutCardRef.current) return;
-    
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const deltaX = clientX - workoutSwipeState.startX;
-    
-    setWorkoutSwipeState(prev => ({
-      ...prev,
-      currentTransformX: deltaX
-    }));
-    
-    // Simple transform during drag
-    workoutCardRef.current.style.transform = `translateX(${deltaX}px)`;
-  };
-
-  const workoutSwipe_handleDragEnd = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!workoutSwipeState.isDragging || !workoutCardRef.current) return;
-    
-    const clientX = 'changedTouches' in e ? e.changedTouches[0].clientX : e.clientX;
-    const deltaX = clientX - workoutSwipeState.startX;
-    const WORKOUT_SWIPE_THRESHOLD = 100;
-    
-    setWorkoutSwipeState(prev => ({
-      ...prev,
-      isDragging: false,
-      isTransitioning: true
-    }));
-    
-    workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-    
-    if (deltaX < -WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex < exerciseData.length - 1) {
-      // Swipe left → go forward
-      workoutCardRef.current.style.transform = 'translateX(-1000px)';
-      workoutCardRef.current.style.opacity = '0';
-      
-      setTimeout(() => {
-        setCurrentExerciseIndex(prev => prev + 1);
-        workoutSwipe_renderDeck();
-      }, 300);
-    } else if (deltaX > WORKOUT_SWIPE_THRESHOLD && currentExerciseIndex > 0) {
-      // Swipe right → go back
-      const newIndex = currentExerciseIndex - 1;
-      setCurrentExerciseIndex(newIndex);
-      
-      // Create new card from left
-      if (workoutCardRef.current) {
-        workoutCardRef.current.style.transform = 'translateX(-1000px)';
-        
-        requestAnimationFrame(() => {
-          if (workoutCardRef.current) {
-            workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-            workoutCardRef.current.style.transform = 'translateX(0)';
-            workoutCardRef.current.style.opacity = '1';
-            
-            setTimeout(() => {
-              setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
-            }, 300);
-          }
-        });
-      }
-    } else {
-      // Snap back
-      workoutCardRef.current.style.transform = 'translateX(0)';
-      setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
+  // Simple arrow navigation handlers
+  const handlePreviousExercise = () => {
+    if (currentExerciseIndex > 0 && !isNavigating) {
+      setIsNavigating(true);
+      setCurrentExerciseIndex(prev => prev - 1);
+      setTimeout(() => setIsNavigating(false), 200);
     }
   };
-  
-  // Render deck similar to provided example
-  const workoutSwipe_renderDeck = () => {
-    if (!workoutCardRef.current) return;
-    
-    // Reset card for new exercise
-    workoutCardRef.current.style.transform = 'translateX(1000px)';
-    workoutCardRef.current.style.opacity = '0';
-    
-    requestAnimationFrame(() => {
-      if (workoutCardRef.current) {
-        workoutCardRef.current.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-        workoutCardRef.current.style.transform = 'translateX(0)';
-        workoutCardRef.current.style.opacity = '1';
-        
-        setTimeout(() => {
-          setWorkoutSwipeState(prev => ({ ...prev, isTransitioning: false }));
-        }, 300);
-      }
-    });
-  };
 
-  // Desktop mouse handlers - namespaced for workout session
-  const workoutSwipe_handleMouseStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    workoutSwipe_handleDragStart(e);
-    
-    // Create unique event handlers to avoid conflicts
-    const workoutMouseMove = (e: MouseEvent) => {
-      workoutSwipe_handleDragMove(e as any);
-    };
-    
-    const workoutMouseUp = (e: MouseEvent) => {
-      workoutSwipe_handleDragEnd(e as any);
-      document.removeEventListener('mousemove', workoutMouseMove);
-      document.removeEventListener('mouseup', workoutMouseUp);
-    };
-    
-    document.addEventListener('mousemove', workoutMouseMove);
-    document.addEventListener('mouseup', workoutMouseUp);
+  const handleNextExercise = () => {
+    if (currentExerciseIndex < exerciseData.length - 1 && !isNavigating) {
+      setIsNavigating(true);
+      setCurrentExerciseIndex(prev => prev + 1);
+      setTimeout(() => setIsNavigating(false), 200);
+    }
   };
 
   // Loading skeleton component
@@ -601,6 +486,33 @@ export default function WorkoutSession() {
     );
   }
 
+  // Show workout summary if completed
+  if (showSummary && completedSession && userStats) {
+    const leveledUp = completedSession.newLevel && completedSession.newLevel > userStats.level;
+    
+    // Calculate XP to next level
+    const currentLevel = leveledUp ? completedSession.newLevel : userStats.level;
+    const currentXP = leveledUp ? (userStats.experience + completedSession.xpEarned) : userStats.experience;
+    const xpForNextLevel = Math.floor(100 * Math.pow(1.5, currentLevel));
+    const xpToNextLevel = xpForNextLevel - currentXP;
+    
+    return (
+      <WorkoutSummary
+        workoutName={workout?.name || "Workout"}
+        xpGained={completedSession.xpEarned || 0}
+        currentLevel={currentLevel}
+        currentXP={currentXP}
+        xpToNextLevel={xpToNextLevel}
+        totalXPForNextLevel={xpForNextLevel}
+        statsGained={completedSession.statsEarned || {}}
+        duration={completedSession.duration || 0}
+        totalVolume={completedSession.totalVolume}
+        leveledUp={leveledUp}
+        newLevel={completedSession.newLevel}
+      />
+    );
+  }
+
   return (
     <div className={`min-h-screen bg-game-dark text-foreground pb-20 transition-opacity duration-500 ${pageLoaded ? 'opacity-100' : 'opacity-0'}`}>
       
@@ -654,9 +566,6 @@ export default function WorkoutSession() {
                 <div className="text-sm text-muted-foreground">
                   {currentExerciseIndex + 1} of {exerciseData.length}
                 </div>
-                <div className="text-xs text-muted-foreground mt-1 opacity-60">
-                  {workoutSwipeState.isDragging ? 'Release to navigate' : '← Swipe or drag →'}
-                </div>
               </div>
               
               <Button
@@ -682,31 +591,8 @@ export default function WorkoutSession() {
               )}
             </div>
 
-            {/* WORKOUT SESSION SWIPE DECK - Complete deck with proper card management */}
-            <div 
-              ref={workoutDeckRef}
-              className="workout-session__deck relative"
-              style={{ perspective: '1000px' }}
-            >
-              {/* Current Exercise Card */}
-              <div 
-                ref={workoutCardRef}
-                className={`workout-session__exercise-card bg-card rounded-lg border border-border overflow-hidden select-none ${
-                  workoutSwipeState.isDragging 
-                    ? 'cursor-grabbing' 
-                    : 'cursor-grab'
-                }`}
-                style={{
-                  position: 'relative',
-                  zIndex: 2,
-                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-                  transition: workoutSwipeState.isDragging ? 'none' : 'transform 0.3s ease-out, opacity 0.3s ease-out'
-                }}
-                onTouchStart={workoutSwipe_handleDragStart}
-                onTouchMove={workoutSwipe_handleDragMove}
-                onTouchEnd={workoutSwipe_handleDragEnd}
-                onMouseDown={workoutSwipe_handleMouseStart}
-              >
+            {/* WORKOUT SESSION EXERCISE CARD - Simple card with navigation arrows */}
+            <div className="workout-session__exercise-card bg-card rounded-lg border border-border overflow-hidden">
                 {(() => {
                   const currentExercise = exerciseData[currentExerciseIndex];
                   const defaultFields = getDefaultTrackingFields(currentExercise?.category || 'strength');
@@ -838,36 +724,44 @@ export default function WorkoutSession() {
                   </>
                 );
               })()}
-              </div>
             </div>
 
 
 
-            {/* Action Buttons */}
-            <div className="space-y-3 pt-4">
-              {currentExerciseIndex < exerciseData.length - 1 ? (
-                <Button
-                  onClick={goToNextExercise}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
-                  size="lg"
-                >
-                  Next Exercise
-                  <ChevronRight className="w-5 h-5 ml-2" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => {
-                    // Last exercise - allow finishing this exercise
-                    goToNextExercise();
-                  }}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-full"
-                  size="lg"
-                >
-                  Finish Exercise
-                  <Check className="w-5 h-5 ml-2" />
-                </Button>
-              )}
+            {/* Navigation Arrows */}
+            <div className="flex items-center justify-center gap-6 pt-4 pb-2">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handlePreviousExercise}
+                disabled={currentExerciseIndex === 0 || isNavigating}
+                className="h-12 w-12 rounded-full p-0 border-2"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </Button>
               
+              <div className="text-center min-w-[100px]">
+                <div className="text-lg font-semibold">
+                  {currentExerciseIndex + 1} / {exerciseData.length}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Exercise
+                </div>
+              </div>
+              
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={handleNextExercise}
+                disabled={currentExerciseIndex === exerciseData.length - 1 || isNavigating}
+                className="h-12 w-12 rounded-full p-0 border-2"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </Button>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-2">
               <Button
                 variant="ghost"
                 onClick={markAllSetsComplete}
