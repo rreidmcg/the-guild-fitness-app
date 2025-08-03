@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "wouter";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@/hooks/use-navigate";
@@ -41,6 +41,9 @@ export default function WorkoutSession() {
   const [showRPESelection, setShowRPESelection] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoaded, setPageLoaded] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
     queryKey: ["/api/user/stats"],
@@ -331,6 +334,31 @@ export default function WorkoutSession() {
     return currentExercise?.section || currentExercise?.category || "Workout";
   };
 
+  // Swipe handling functions
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(0);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentExerciseIndex < exerciseData.length - 1) {
+      goToNextExercise();
+    }
+    if (isRightSwipe && currentExerciseIndex > 0) {
+      goToPreviousExercise();
+    }
+  };
+
   // Loading skeleton component
   const LoadingSkeleton = () => (
     <div className="animate-pulse">
@@ -499,6 +527,38 @@ export default function WorkoutSession() {
               </h2>
             </div>
 
+            {/* Exercise Navigation */}
+            <div className="flex items-center justify-between mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToPreviousExercise}
+                disabled={currentExerciseIndex === 0}
+                className="text-muted-foreground hover:text-foreground transition-all duration-200"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">
+                  {currentExerciseIndex + 1} of {exerciseData.length}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 opacity-60">
+                  ← Swipe to navigate →
+                </div>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={goToNextExercise}
+                disabled={currentExerciseIndex >= exerciseData.length - 1}
+                className="text-muted-foreground hover:text-foreground transition-all duration-200"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
+
             {/* Exercise Name */}
             <div className="text-center space-y-2">
               <h3 className="text-2xl font-bold text-foreground">
@@ -509,12 +569,16 @@ export default function WorkoutSession() {
                   Rest: {exerciseData[currentExerciseIndex].restTime}s between sets
                 </p>
               )}
-              
-
             </div>
 
-            {/* Sets Table */}
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
+            {/* Sets Table - With Swipe Support */}
+            <div 
+              ref={cardRef}
+              className="bg-card rounded-lg border border-border overflow-hidden"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               {(() => {
                 const currentExercise = exerciseData[currentExerciseIndex];
                 const defaultFields = getDefaultTrackingFields(currentExercise?.category || 'strength');
@@ -652,21 +716,35 @@ export default function WorkoutSession() {
 
             {/* Action Buttons */}
             <div className="space-y-3 pt-4">
-              <Button
-                onClick={goToNextExercise}
-                disabled={currentExerciseIndex >= exerciseData.length - 1}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
-                size="lg"
-              >
-                Done
-              </Button>
+              {currentExerciseIndex < exerciseData.length - 1 ? (
+                <Button
+                  onClick={goToNextExercise}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
+                  size="lg"
+                >
+                  Next Exercise
+                  <ChevronRight className="w-5 h-5 ml-2" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    // Last exercise - allow finishing this exercise
+                    goToNextExercise();
+                  }}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-full"
+                  size="lg"
+                >
+                  Finish Exercise
+                  <Check className="w-5 h-5 ml-2" />
+                </Button>
+              )}
               
               <Button
                 variant="ghost"
                 onClick={markAllSetsComplete}
                 className="w-full text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
               >
-                Mark All
+                Mark All Sets Complete
               </Button>
             </div>
           </div>
@@ -679,26 +757,44 @@ export default function WorkoutSession() {
             <p className="text-muted-foreground">Press start to begin tracking your session</p>
           </div>
         ) : (
-          <div className="text-center py-12">
-            <h3 className="text-2xl font-bold mb-2 text-foreground">Workout Complete!</h3>
-            <p className="text-muted-foreground">All exercises have been completed</p>
+          <div className="text-center py-12 space-y-6">
+            <div className="w-24 h-24 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-12 h-12 text-white" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold mb-2 text-foreground">All Exercises Complete!</h3>
+              <p className="text-muted-foreground mb-6">You've finished all exercises in this workout</p>
+            </div>
+            
+            {/* Show Complete Workout Button prominently when all exercises are done */}
+            <Button 
+              size="lg"
+              onClick={handleCompleteWorkout}
+              disabled={completeWorkoutMutation.isPending}
+              className="bg-game-success hover:bg-green-600 text-white py-4 px-8 rounded-full text-lg"
+            >
+              <Check className={`w-6 h-6 mr-2 text-white ${completeWorkoutMutation.isPending ? 'animate-spin' : ''}`} />
+              {completeWorkoutMutation.isPending ? 'Completing...' : 'Complete Workout & Get XP'}
+            </Button>
           </div>
         )}
 
-        {/* Complete Workout Button */}
-        <div className="fixed bottom-6 right-6 animate-in fade-in slide-in-from-bottom-6 delay-1000">
-          <Button 
-            size="lg"
-            onClick={handleCompleteWorkout}
-            disabled={completeWorkoutMutation.isPending}
-            className="bg-game-success hover:bg-green-600 text-white transform transition-all duration-300 hover:scale-110 hover:shadow-lg"
-          >
-            <Check className={`w-6 h-6 mr-2 text-white transition-all duration-300 ${completeWorkoutMutation.isPending ? 'animate-spin' : 'hover:scale-125'}`} />
-            <span className="transition-all duration-200">
-              {completeWorkoutMutation.isPending ? 'Completing...' : 'Complete Workout'}
-            </span>
-          </Button>
-        </div>
+        {/* Complete Workout Button - Only show during exercises, not after completion */}
+        {currentExerciseIndex < exerciseData.length && (
+          <div className="fixed bottom-6 right-6 animate-in fade-in slide-in-from-bottom-6 delay-1000">
+            <Button 
+              size="lg"
+              onClick={handleCompleteWorkout}
+              disabled={completeWorkoutMutation.isPending}
+              className="bg-game-success hover:bg-green-600 text-white transform transition-all duration-300 hover:scale-110 hover:shadow-lg"
+            >
+              <Check className={`w-6 h-6 mr-2 text-white transition-all duration-300 ${completeWorkoutMutation.isPending ? 'animate-spin' : 'hover:scale-125'}`} />
+              <span className="transition-all duration-200">
+                {completeWorkoutMutation.isPending ? 'Completing...' : 'Complete Workout'}
+              </span>
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Victory Modal */}
