@@ -178,6 +178,8 @@ interface BattleState {
   playerFlashing: boolean;
   monsterFlashing: boolean;
   enhancedMode: boolean;
+  showActionModal: boolean;
+  actionMode: 'main' | 'items' | 'skills';
 }
 
 
@@ -206,7 +208,9 @@ export default function DungeonBattlePage() {
     monsterDamage: null,
     playerFlashing: false,
     monsterFlashing: false,
-    enhancedMode: false
+    enhancedMode: false,
+    showActionModal: false,
+    actionMode: 'main'
   });
 
   // Battle events for Phaser integration
@@ -273,6 +277,13 @@ export default function DungeonBattlePage() {
       currentMonsterIndex: 0,
       totalGoldEarned: 0,
       zone,
+      playerLunging: false,
+      monsterLunging: false,
+      playerDamage: null,
+      monsterDamage: null,
+      playerFlashing: false,
+      monsterFlashing: false,
+      enhancedMode: false,
       showActionModal: false,
       actionMode: 'main'
     });
