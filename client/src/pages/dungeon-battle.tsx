@@ -472,13 +472,18 @@ export default function DungeonBattlePage() {
               currentMp: battleState.playerMp,
               maxMp: battleState.playerMaxMp,
               strength: userStats.strength,
-              agility: userStats.agility
+              agility: userStats.agility,
+              username: userStats.username,
+              skinColor: userStats.skinColor,
+              hairColor: userStats.hairColor,
+              gender: userStats.gender
             }}
             monster={{
               name: battleState.monster.name,
               currentHp: battleState.monster.currentHp,
               maxHp: battleState.monster.maxHp,
-              image: battleState.monster.image
+              image: battleState.monster.image,
+              level: battleState.monster.level
             }}
             onBattleAction={(action) => {
               if (action === 'attack') handleAttack();
@@ -489,6 +494,7 @@ export default function DungeonBattlePage() {
               }
             }}
             battleEvents={battleEvents}
+            battleBackground={battleState.zone?.background}
           />
         </div>
       ) : null}
