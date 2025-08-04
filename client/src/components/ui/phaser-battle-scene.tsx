@@ -70,7 +70,18 @@ export function PhaserBattleScene({
     gameRef.current = new Phaser.Game(config);
 
     function preload(this: Phaser.Scene) {
-      // Create ultra-realistic player avatar using advanced canvas techniques
+      // Try to load custom sprites first, fall back to generated sprites
+      const customPlayerSprite = '/sprites/player.png';
+      const customMonsterSprite = `/sprites/monster-${monster.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+      
+      // Check if custom sprites exist and load them
+      let useCustomSprites = false;
+      
+      // Load custom player sprite if available
+      this.load.image('custom-player', customPlayerSprite);
+      this.load.image('custom-monster', customMonsterSprite);
+      
+      // Fallback: Create ultra-realistic generated sprites
       const canvas = document.createElement('canvas');
       canvas.width = 120;
       canvas.height = 160;
@@ -864,9 +875,21 @@ export function PhaserBattleScene({
         quantity: 1
       });
       
-      // Create player sprite (left side) with idle animation using realistic texture
-      const playerSprite = this.add.image(200, 300, 'player-sprite-realistic')
-        .setDisplaySize(120, 160) // Match the realistic sprite dimensions
+      // Try to use custom sprites first, fallback to generated ones
+      let playerSpriteKey = 'player-sprite-realistic';
+      let monsterSpriteKey = 'monster-sprite-realistic';
+      
+      // Check if custom sprites loaded successfully
+      if (this.textures.exists('custom-player')) {
+        playerSpriteKey = 'custom-player';
+      }
+      if (this.textures.exists('custom-monster')) {
+        monsterSpriteKey = 'custom-monster';
+      }
+      
+      // Create player sprite (left side) with idle animation
+      const playerSprite = this.add.image(200, 300, playerSpriteKey)
+        .setDisplaySize(120, 160) // Consistent dimensions
         .setData('type', 'player')
         .setData('originalX', 200)
         .setData('originalY', 300);
@@ -881,8 +904,8 @@ export function PhaserBattleScene({
         ease: 'Sine.easeInOut'
       });
       
-      // Create monster sprite (right side) with menacing presence using realistic texture
-      const monsterSprite = this.add.image(600, 300, 'monster-sprite-realistic')
+      // Create monster sprite (right side) with menacing presence
+      const monsterSprite = this.add.image(600, 300, monsterSpriteKey)
         .setDisplaySize(140, 140) // Match the realistic monster dimensions
         .setData('type', 'monster')
         .setData('originalX', 600)
