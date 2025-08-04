@@ -137,7 +137,9 @@ export function PhaserBattleScene({
       if (playerHpBar) {
         const playerHpPercent = playerStats.currentHp / playerStats.maxHp;
         playerHpBar.setScale(playerHpPercent, 1);
-        playerHpBar.setTint(playerHpPercent > 0.5 ? 0x00ff00 : 0xffaa00);
+        // Change color based on HP percentage using fillColor for rectangles
+        const healthColor = playerHpPercent > 0.5 ? 0x00ff00 : (playerHpPercent > 0.25 ? 0xffaa00 : 0xff0000);
+        playerHpBar.setFillStyle(healthColor);
       }
       
       if (monsterHpBar) {
@@ -181,7 +183,10 @@ export function PhaserBattleScene({
           tint: 0xff0000,
           duration: 100,
           yoyo: true,
-          repeat: 2
+          repeat: 2,
+          onComplete: () => {
+            monsterSprite.clearTint();
+          }
         });
         
         // Damage number
@@ -210,7 +215,10 @@ export function PhaserBattleScene({
           tint: 0xff0000,
           duration: 100,
           yoyo: true,
-          repeat: 2
+          repeat: 2,
+          onComplete: () => {
+            playerSprite.clearTint();
+          }
         });
         
         // Damage number
