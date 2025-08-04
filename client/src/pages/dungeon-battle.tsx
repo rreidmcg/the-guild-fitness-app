@@ -29,6 +29,7 @@ import swordIconImage from "@assets/IMG_3799_1754013496468.png";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { BattleAccessGuard } from "@/components/ui/battle-access-guard";
+import { PhaserBattleScene } from "@/components/ui/phaser-battle-scene";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
 // Import monster images
@@ -176,6 +177,7 @@ interface BattleState {
   monsterDamage: number | null;
   playerFlashing: boolean;
   monsterFlashing: boolean;
+  enhancedMode: boolean;
 }
 
 
@@ -203,8 +205,12 @@ export default function DungeonBattlePage() {
     playerDamage: null,
     monsterDamage: null,
     playerFlashing: false,
-    monsterFlashing: false
+    monsterFlashing: false,
+    enhancedMode: false
   });
+
+  // Battle events for Phaser integration
+  const [battleEvents, setBattleEvents] = useState<any>(null);
 
   const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],
@@ -302,6 +308,22 @@ export default function DungeonBattlePage() {
     
     const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
     const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
+
+    // Trigger Phaser battle events if in enhanced mode
+    if (battleState.enhancedMode) {
+      setBattleEvents({
+        playerAttack: playerDamage ? { 
+          damage: playerDamage, 
+          critical: data.battleLog[0]?.includes('Critical') 
+        } : null,
+        monsterAttack: monsterDamage ? { damage: monsterDamage } : null,
+        victory: data.battleResult === 'victory',
+        defeat: data.battleResult === 'defeat'
+      });
+      
+      // Clear events after animations
+      setTimeout(() => setBattleEvents(null), 2000);
+    }
 
     // Start player lunge and monster flash (taking damage)
     setBattleState(prev => ({
@@ -413,6 +435,53 @@ export default function DungeonBattlePage() {
   return (
     <BattleAccessGuard>
       <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+      
+      {/* Enhanced Mode Toggle */}
+      <div className="fixed top-20 right-4 z-50">
+        <button
+          onClick={() => setBattleState(prev => ({ ...prev, enhancedMode: !prev.enhancedMode }))}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+            battleState.enhancedMode 
+              ? 'bg-purple-600 text-white' 
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          {battleState.enhancedMode ? '🎮 Enhanced' : '⚡ Basic'}
+        </button>
+      </div>
+
+      {/* Phaser Battle Scene - Only show when enhanced mode is active */}
+      {battleState.enhancedMode && battleState.monster && userStats ? (
+        <div className="fixed inset-0 z-30 bg-black">
+          <PhaserBattleScene
+            isActive={battleState.enhancedMode}
+            playerStats={{
+              currentHp: battleState.playerHp,
+              maxHp: battleState.playerMaxHp,
+              currentMp: battleState.playerMp,
+              maxMp: battleState.playerMaxMp,
+              strength: userStats.strength,
+              agility: userStats.agility
+            }}
+            monster={{
+              name: battleState.monster.name,
+              currentHp: battleState.monster.currentHp,
+              maxHp: battleState.monster.maxHp,
+              image: battleState.monster.image
+            }}
+            onBattleAction={(action) => {
+              if (action === 'attack') handleAttack();
+              if (action === 'flee') {
+                if (window.confirm("Are you sure you want to flee from battle?")) {
+                  handleRetreat();
+                }
+              }
+            }}
+            battleEvents={battleEvents}
+          />
+        </div>
+      ) : null}
+      
       {/* Forest Background */}
       <div 
         className="fixed inset-0 z-0"
