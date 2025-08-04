@@ -6,7 +6,7 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 
 ## Recent Changes (August 4, 2025)
 - **WORKOUT SESSION PERSISTENCE IMPLEMENTED**: Fixed critical mobile workout logging issue where users lost progress when locking phone between sets - added comprehensive localStorage auto-save system that preserves all workout state (exercise progress, timer, set completion, metrics) and automatically restores session when returning to app
-- **MOBILE WORKOUT UX ENHANCED**: Added phone lock detection via page visibility API, session restoration notifications, and before-unload warnings to prevent accidental data loss during active workouts
+- **MOBILE WORKOUT UX ENHANCED**: Added phone lock detection via page visibility API, seamless session restoration, and before-unload warnings to prevent accidental data loss during active workouts
 - **WORKOUT LOGGING ERROR HANDLING IMPROVED**: Enhanced both frontend and backend error handling with detailed validation messages, proper data type conversion, and comprehensive exercise data validation to prevent submission failures
 - **SESSION TIMEOUT PROTECTION**: Workout sessions now persist for 24 hours in localStorage with automatic cleanup, ensuring users can resume workouts even after extended breaks or phone restarts
 - **AUTOMATIC ATROPHY PROCESSING IMPLEMENTED**: Added scheduled atrophy system that runs daily on server startup and every 24 hours thereafter - ensures consistent stat degradation for inactive users without manual intervention

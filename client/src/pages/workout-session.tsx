@@ -145,12 +145,6 @@ export default function WorkoutSession() {
         setTime(savedState.time || 0);
         setStartTime(savedState.startTime ? new Date(savedState.startTime) : null);
         setPerceivedEffort(savedState.perceivedEffort || 7);
-        
-        toast({
-          title: "Session Restored",
-          description: "Your workout progress has been restored from where you left off.",
-          duration: 3000,
-        });
       } else {
         // Initialize new workout session
         const workoutExercises = (workout as any).exercises.map((workoutEx: any) => {
