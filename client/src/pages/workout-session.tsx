@@ -173,12 +173,14 @@ export default function WorkoutSession() {
 
   const completeWorkoutMutation = useMutation({
     mutationFn: async (sessionData: any) => {
+      console.log("Submitting workout session data:", sessionData);
       return await apiRequest("/api/workout-sessions", {
         method: "POST",
         body: sessionData,
       });
     },
     onSuccess: (result) => {
+      console.log("Workout session completed successfully:", result);
       queryClient.invalidateQueries({ queryKey: ["/api/workout-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       
@@ -186,10 +188,14 @@ export default function WorkoutSession() {
       setCompletedSession(result);
       setShowVictoryModal(true);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Workout completion error:", error);
+      const errorMessage = error?.response?.data?.error || error?.message || "Failed to complete workout";
+      const errorDetails = error?.response?.data?.details;
+      
       toast({
-        title: "Error",
-        description: "Failed to complete workout",
+        title: "Workout Logging Error",
+        description: errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage,
         variant: "destructive",
       });
     },
@@ -431,17 +437,20 @@ export default function WorkoutSession() {
         const metrics = setMetrics[setKey] || {};
         
         return {
-          reps: metrics.reps || exercise.reps || 10,
-          weight: metrics.weight || exercise.weight || 0,
-          duration: metrics.duration || exercise.duration || 0,
-          rpe: metrics.rpe || 7,
+          reps: Number(metrics.reps || exercise.reps || 10) || 10,
+          weight: Number(metrics.weight || exercise.weight || 0) || 0,
+          duration: Number(metrics.duration || exercise.duration || 0) || 0,
+          rpe: Number(metrics.rpe || 7) || 7,
           completed: isCompleted
         };
       });
 
+      // Ensure exerciseId is valid
+      const exerciseId = Number(exercise.exerciseId || exercise.id) || 1;
+      
       return {
-        exerciseId: exercise.exerciseId || exercise.id || 0,
-        name: exercise.name,
+        exerciseId: exerciseId,
+        name: exercise.name || `Exercise ${exerciseId}`,
         category: exercise.category || "strength",
         statTypes: exercise.statTypes || { strength: 1 },
         sets: completedSetsData
@@ -454,14 +463,25 @@ export default function WorkoutSession() {
       ? Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60)) // Minutes
       : Math.floor(time / 60); // Fallback to timer if no start time
 
+    // Calculate total volume for completed sets
+    let totalVolume = 0;
+    completedExercises.forEach(exercise => {
+      exercise.sets.forEach(set => {
+        if (set.completed) {
+          totalVolume += (set.weight || 0) * (set.reps || 0);
+        }
+      });
+    });
+
     const sessionData = {
-      workoutId: parseInt(id || "0"),
-      name: (workout as any)?.name || "Workout Session",
-      duration: actualDuration,
-      totalVolume: 0, // Will be calculated from exercises
+      userId: userStats?.id, // Explicitly include userId
+      workoutId: parseInt(id || "0") || null, // Allow null if no workout ID
+      name: String((workout as any)?.name || "Workout Session"),
+      duration: Math.max(1, actualDuration), // Ensure minimum 1 minute
+      totalVolume: totalVolume,
       xpEarned: 0, // Will be calculated server-side
-      statsEarned: {},
-      perceivedEffort,
+      statsEarned: { strength: 0, stamina: 0, agility: 0 },
+      perceivedEffort: Math.max(1, Math.min(10, perceivedEffort)), // Clamp RPE between 1-10
       exercises: completedExercises,
     };
     
