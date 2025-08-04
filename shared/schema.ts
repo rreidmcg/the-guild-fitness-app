@@ -571,7 +571,7 @@ export const playerMail = pgTable("player_mail", {
   senderName: text("sender_name").notNull(), // "Developer Team", "System", etc.
   subject: text("subject").notNull(),
   content: text("content").notNull(),
-  mailType: text("mail_type").notNull(), // "news", "reward", "announcement", "event"
+  mailType: text("mail_type", { enum: ["news", "reward", "announcement", "event"] }).notNull(),
   isRead: boolean("is_read").default(false),
   rewards: json("rewards").$type<{
     gold?: number;
