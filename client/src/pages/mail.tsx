@@ -331,7 +331,6 @@ export default function MailPage() {
                           <span className="text-lg font-bold text-foreground">
                             {mailItem.senderName}
                           </span>
-                          {getMailTypeIcon(mailItem.mailType)}
                           <Badge className={getMailTypeBadge(mailItem.mailType)}>
                             {mailItem.mailType}
                           </Badge>
