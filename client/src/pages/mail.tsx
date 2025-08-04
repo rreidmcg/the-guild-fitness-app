@@ -326,12 +326,9 @@ export default function MailPage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
+                        {/* Sender name at the top */}
                         <div className="flex items-center space-x-2 mb-1">
-                          {getMailTypeIcon(mailItem.mailType)}
-                          <Badge className={getMailTypeBadge(mailItem.mailType)}>
-                            {mailItem.mailType}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-sm text-muted-foreground font-medium">
                             {mailItem.senderName}
                           </span>
                           {!mailItem.isRead && (
@@ -340,12 +337,23 @@ export default function MailPage() {
                             </Badge>
                           )}
                         </div>
-                        <CardTitle className="text-base font-semibold">
+                        
+                        {/* Mail type and subject */}
+                        <div className="flex items-center space-x-2 mb-2">
+                          {getMailTypeIcon(mailItem.mailType)}
+                          <Badge className={getMailTypeBadge(mailItem.mailType)}>
+                            {mailItem.mailType}
+                          </Badge>
+                        </div>
+                        
+                        <CardTitle className="text-base font-semibold mb-2">
                           {mailItem.subject}
                         </CardTitle>
-                        <CardDescription className="line-clamp-2 text-sm">
+                        
+                        {/* Content preview - not bolded */}
+                        <p className="line-clamp-2 text-sm text-muted-foreground">
                           {mailItem.content}
-                        </CardDescription>
+                        </p>
                       </div>
                       <div className="text-right flex flex-col items-end space-y-1">
                         <span className="text-xs text-muted-foreground">
