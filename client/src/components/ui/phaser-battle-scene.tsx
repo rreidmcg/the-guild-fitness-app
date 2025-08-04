@@ -70,94 +70,448 @@ export function PhaserBattleScene({
     gameRef.current = new Phaser.Game(config);
 
     function preload(this: Phaser.Scene) {
-      // Create advanced player avatar based on stats
+      // Create highly detailed player avatar based on stats and uploaded character style
       const playerGraphics = this.add.graphics();
       
-      // Create player avatar with body, head, and equipment
-      playerGraphics.fillStyle(0x8B4513); // Brown skin tone
-      playerGraphics.fillCircle(40, 20, 12); // Head
-      playerGraphics.fillRect(32, 32, 16, 24); // Body
-      playerGraphics.fillRect(28, 40, 8, 16); // Left arm
-      playerGraphics.fillRect(44, 40, 8, 16); // Right arm
-      playerGraphics.fillRect(34, 56, 6, 20); // Left leg
-      playerGraphics.fillRect(40, 56, 6, 20); // Right leg
+      // Determine skin color
+      const skinColor = playerStats.skinColor === 'light' ? 0xFFDBB5 : 
+                       playerStats.skinColor === 'medium' ? 0xD4A574 :
+                       playerStats.skinColor === 'dark' ? 0x8B6914 : 0xFFDBB5;
       
-      // Add equipment based on level/stats
-      if (playerStats.strength > 2) {
-        playerGraphics.fillStyle(0x666666); // Sword
-        playerGraphics.fillRect(50, 35, 3, 15);
-        playerGraphics.fillStyle(0x8B4513); // Handle
-        playerGraphics.fillRect(49, 50, 5, 6);
-      }
+      // HEAD - More detailed with shading
+      playerGraphics.fillStyle(skinColor);
+      playerGraphics.fillEllipse(40, 22, 24, 22); // Main head shape
       
-      // Hair color
+      // Head shading for depth
+      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
+        Phaser.Display.Color.IntegerToRGB(skinColor).r * 0.8,
+        Phaser.Display.Color.IntegerToRGB(skinColor).g * 0.8,
+        Phaser.Display.Color.IntegerToRGB(skinColor).b * 0.8,
+        255
+      ));
+      playerGraphics.fillEllipse(45, 25, 8, 6); // Right side shadow
+      
+      // FACIAL FEATURES
+      playerGraphics.fillStyle(0x000000);
+      playerGraphics.fillCircle(35, 20, 2); // Left eye
+      playerGraphics.fillCircle(45, 20, 2); // Right eye
+      playerGraphics.fillStyle(0xFFFFFF);
+      playerGraphics.fillCircle(36, 19, 1); // Left eye highlight
+      playerGraphics.fillCircle(46, 19, 1); // Right eye highlight
+      
+      // Nose and mouth
+      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
+        Phaser.Display.Color.IntegerToRGB(skinColor).r * 0.9,
+        Phaser.Display.Color.IntegerToRGB(skinColor).g * 0.9,
+        Phaser.Display.Color.IntegerToRGB(skinColor).b * 0.9,
+        255
+      ));
+      playerGraphics.fillCircle(40, 24, 1.5); // Nose
+      playerGraphics.fillStyle(0x8B0000);
+      playerGraphics.fillEllipse(40, 27, 4, 2); // Mouth
+      
+      // HAIR - More detailed and styled
       const hairColor = playerStats.hairColor === 'blonde' ? 0xFFD700 : 
                        playerStats.hairColor === 'brown' ? 0x8B4513 :
-                       playerStats.hairColor === 'black' ? 0x000000 : 0x8B4513;
+                       playerStats.hairColor === 'black' ? 0x2C1810 : 
+                       playerStats.hairColor === 'red' ? 0xB22222 : 0x8B4513;
+      
       playerGraphics.fillStyle(hairColor);
-      playerGraphics.fillRect(32, 8, 16, 8); // Hair
+      // Multiple hair layers for volume and detail
+      playerGraphics.fillEllipse(40, 12, 28, 16); // Main hair mass
+      playerGraphics.fillEllipse(35, 10, 12, 8); // Left hair tuft
+      playerGraphics.fillEllipse(45, 10, 12, 8); // Right hair tuft
+      playerGraphics.fillEllipse(40, 8, 16, 6); // Top hair
       
-      playerGraphics.generateTexture('player-sprite', 80, 80);
-      playerGraphics.destroy();
+      // Hair highlights
+      const hairHighlight = Phaser.Display.Color.GetColor32(
+        Math.min(255, Phaser.Display.Color.IntegerToRGB(hairColor).r * 1.3),
+        Math.min(255, Phaser.Display.Color.IntegerToRGB(hairColor).g * 1.3),
+        Math.min(255, Phaser.Display.Color.IntegerToRGB(hairColor).b * 1.3),
+        255
+      );
+      playerGraphics.fillStyle(hairHighlight);
+      playerGraphics.fillEllipse(38, 10, 8, 4); // Hair highlight
+      playerGraphics.fillEllipse(42, 12, 6, 3); // Secondary highlight
       
-      // Create dynamic monster sprite
-      const monsterGraphics = this.add.graphics();
+      // NECK
+      playerGraphics.fillStyle(skinColor);
+      playerGraphics.fillRect(36, 32, 8, 6);
       
-      // Different monster appearances based on name
-      if (monster.name.toLowerCase().includes('slime')) {
-        // Slime appearance
-        monsterGraphics.fillStyle(0x00ff00);
-        monsterGraphics.fillEllipse(50, 40, 60, 40);
-        monsterGraphics.fillStyle(0x008800);
-        monsterGraphics.fillEllipse(35, 25, 8, 8); // Left eye
-        monsterGraphics.fillEllipse(65, 25, 8, 8); // Right eye
-      } else if (monster.name.toLowerCase().includes('rat')) {
-        // Rat appearance
-        monsterGraphics.fillStyle(0x8B4513);
-        monsterGraphics.fillEllipse(50, 45, 50, 25); // Body
-        monsterGraphics.fillEllipse(30, 35, 20, 15); // Head
-        monsterGraphics.fillStyle(0x000000);
-        monsterGraphics.fillCircle(25, 30, 2); // Eye
-        monsterGraphics.fillCircle(25, 40, 1); // Nose
-        // Tail
-        monsterGraphics.fillStyle(0x8B4513);
-        monsterGraphics.fillRect(75, 45, 15, 3);
-      } else if (monster.name.toLowerCase().includes('spider')) {
-        // Spider appearance
-        monsterGraphics.fillStyle(0x333333);
-        monsterGraphics.fillEllipse(50, 40, 40, 30); // Body
-        // Legs
-        for (let i = 0; i < 4; i++) {
-          const angle = (i / 4) * Math.PI * 2;
-          const legX = 50 + Math.cos(angle) * 25;
-          const legY = 40 + Math.sin(angle) * 20;
-          monsterGraphics.fillRect(legX, legY, 2, 15);
-        }
-        monsterGraphics.fillStyle(0xff0000);
-        monsterGraphics.fillCircle(45, 35, 2); // Eyes
-        monsterGraphics.fillCircle(55, 35, 2);
-      } else if (monster.name.toLowerCase().includes('goblin')) {
-        // Goblin appearance
-        monsterGraphics.fillStyle(0x228B22); // Green skin
-        monsterGraphics.fillCircle(50, 25, 12); // Head
-        monsterGraphics.fillRect(42, 37, 16, 24); // Body
-        monsterGraphics.fillRect(38, 45, 8, 16); // Arms
-        monsterGraphics.fillRect(54, 45, 8, 16);
-        monsterGraphics.fillRect(44, 61, 6, 20); // Legs
-        monsterGraphics.fillRect(50, 61, 6, 20);
-        // Weapon
-        monsterGraphics.fillStyle(0x666666);
-        monsterGraphics.fillRect(65, 40, 3, 12);
-      } else {
-        // Generic monster
-        monsterGraphics.fillStyle(0xff4a4a);
-        monsterGraphics.fillRect(25, 25, 50, 50);
-        monsterGraphics.fillStyle(0xffffff);
-        monsterGraphics.fillCircle(40, 40, 3); // Eyes
-        monsterGraphics.fillCircle(60, 40, 3);
+      // TORSO - Detailed with clothing
+      // Base shirt/tunic
+      const shirtColor = playerStats.strength > 2 ? 0x4169E1 : 0x8B4513; // Blue for warriors, brown for beginners
+      playerGraphics.fillStyle(shirtColor);
+      playerGraphics.fillRect(28, 38, 24, 28); // Main torso
+      
+      // Shirt details and shading
+      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
+        Phaser.Display.Color.IntegerToRGB(shirtColor).r * 0.7,
+        Phaser.Display.Color.IntegerToRGB(shirtColor).g * 0.7,
+        Phaser.Display.Color.IntegerToRGB(shirtColor).b * 0.7,
+        255
+      ));
+      playerGraphics.fillRect(46, 40, 6, 24); // Right side shadow
+      playerGraphics.fillRect(30, 60, 20, 4); // Belt area
+      
+      // Belt
+      playerGraphics.fillStyle(0x654321);
+      playerGraphics.fillRect(30, 62, 20, 3);
+      playerGraphics.fillStyle(0xFFD700);
+      playerGraphics.fillRect(38, 61, 4, 5); // Belt buckle
+      
+      // ARMS - More anatomically correct
+      playerGraphics.fillStyle(skinColor);
+      // Left arm
+      playerGraphics.fillEllipse(24, 45, 8, 16); // Upper arm
+      playerGraphics.fillEllipse(22, 58, 6, 14); // Forearm
+      playerGraphics.fillEllipse(20, 68, 8, 6); // Hand
+      
+      // Right arm  
+      playerGraphics.fillEllipse(56, 45, 8, 16); // Upper arm
+      playerGraphics.fillEllipse(58, 58, 6, 14); // Forearm
+      playerGraphics.fillEllipse(60, 68, 8, 6); // Hand
+      
+      // Arm shading
+      const armShadow = Phaser.Display.Color.GetColor32(
+        Phaser.Display.Color.IntegerToRGB(skinColor).r * 0.8,
+        Phaser.Display.Color.IntegerToRGB(skinColor).g * 0.8,
+        Phaser.Display.Color.IntegerToRGB(skinColor).b * 0.8,
+        255
+      );
+      playerGraphics.fillStyle(armShadow);
+      playerGraphics.fillEllipse(26, 47, 4, 8); // Left arm shadow
+      playerGraphics.fillEllipse(58, 47, 4, 8); // Right arm shadow
+      
+      // LEGS - Detailed with pants/leggings
+      const pantsColor = 0x2F4F4F; // Dark slate gray
+      playerGraphics.fillStyle(pantsColor);
+      playerGraphics.fillRect(32, 66, 8, 22); // Left leg
+      playerGraphics.fillRect(40, 66, 8, 22); // Right leg
+      
+      // Leg shading
+      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
+        Phaser.Display.Color.IntegerToRGB(pantsColor).r * 0.7,
+        Phaser.Display.Color.IntegerToRGB(pantsColor).g * 0.7,
+        Phaser.Display.Color.IntegerToRGB(pantsColor).b * 0.7,
+        255
+      ));
+      playerGraphics.fillRect(44, 68, 4, 18); // Right leg shadow
+      
+      // BOOTS
+      playerGraphics.fillStyle(0x8B4513);
+      playerGraphics.fillEllipse(36, 90, 12, 8); // Left boot
+      playerGraphics.fillEllipse(44, 90, 12, 8); // Right boot
+      
+      // Boot details
+      playerGraphics.fillStyle(0x654321);
+      playerGraphics.fillRect(32, 88, 8, 2); // Left boot top
+      playerGraphics.fillRect(40, 88, 8, 2); // Right boot top
+      
+      // EQUIPMENT based on stats
+      if (playerStats.strength > 2) {
+        // Detailed sword
+        playerGraphics.fillStyle(0xC0C0C0); // Silver blade
+        playerGraphics.fillRect(62, 35, 4, 20); // Blade
+        playerGraphics.fillRect(63, 32, 2, 6); // Blade tip
+        
+        // Blade highlights
+        playerGraphics.fillStyle(0xFFFFFF);
+        playerGraphics.fillRect(62, 36, 1, 18); // Blade edge highlight
+        
+        // Crossguard
+        playerGraphics.fillStyle(0x8B4513);
+        playerGraphics.fillRect(60, 54, 8, 3);
+        
+        // Handle
+        playerGraphics.fillStyle(0x654321);
+        playerGraphics.fillRect(63, 56, 2, 8);
+        
+        // Pommel
+        playerGraphics.fillStyle(0xFFD700);
+        playerGraphics.fillCircle(64, 66, 3);
       }
       
-      monsterGraphics.generateTexture('monster-sprite', 100, 80);
+      if (playerStats.agility > 2) {
+        // Add a cape for agile characters
+        playerGraphics.fillStyle(0x8B0000); // Dark red cape
+        playerGraphics.fillEllipse(40, 42, 20, 24);
+        
+        // Cape shading
+        playerGraphics.fillStyle(0x660000);
+        playerGraphics.fillEllipse(45, 45, 12, 18);
+      }
+      
+      playerGraphics.generateTexture('player-sprite', 80, 100);
+      playerGraphics.destroy();
+      
+      // Create highly detailed dynamic monster sprite
+      const monsterGraphics = this.add.graphics();
+      
+      // Different monster appearances based on name with enhanced detail
+      if (monster.name.toLowerCase().includes('slime')) {
+        // Enhanced Slime appearance
+        const slimeColor = 0x32CD32; // Lime green
+        const slimeShadow = 0x228B22; // Forest green
+        
+        // Main slime body with gradient effect
+        monsterGraphics.fillStyle(slimeColor);
+        monsterGraphics.fillEllipse(50, 45, 70, 50); // Main body
+        
+        // Slime shading and highlights
+        monsterGraphics.fillStyle(slimeShadow);
+        monsterGraphics.fillEllipse(60, 50, 40, 30); // Bottom shadow
+        monsterGraphics.fillEllipse(55, 35, 20, 15); // Top shadow
+        
+        // Slime highlights
+        monsterGraphics.fillStyle(0x90EE90); // Light green
+        monsterGraphics.fillEllipse(40, 35, 25, 18); // Main highlight
+        monsterGraphics.fillEllipse(35, 30, 12, 8); // Secondary highlight
+        
+        // Detailed eyes
+        monsterGraphics.fillStyle(0x000000);
+        monsterGraphics.fillEllipse(40, 30, 10, 12); // Left eye
+        monsterGraphics.fillEllipse(60, 30, 10, 12); // Right eye
+        
+        // Eye highlights
+        monsterGraphics.fillStyle(0xFFFFFF);
+        monsterGraphics.fillCircle(42, 28, 3); // Left eye highlight
+        monsterGraphics.fillCircle(62, 28, 3); // Right eye highlight
+        
+        // Mouth
+        monsterGraphics.fillStyle(0x000000);
+        monsterGraphics.fillEllipse(50, 42, 12, 6); // Mouth
+        
+        // Slime drips
+        monsterGraphics.fillStyle(slimeColor);
+        monsterGraphics.fillCircle(30, 65, 4); // Left drip
+        monsterGraphics.fillCircle(70, 68, 3); // Right drip
+        monsterGraphics.fillCircle(50, 70, 5); // Center drip
+        
+      } else if (monster.name.toLowerCase().includes('rat')) {
+        // Enhanced Rat appearance
+        const ratColor = 0x8B4513; // Saddle brown
+        const ratShadow = 0x654321; // Dark brown
+        
+        // Main body
+        monsterGraphics.fillStyle(ratColor);
+        monsterGraphics.fillEllipse(55, 50, 60, 30); // Body
+        monsterGraphics.fillEllipse(25, 40, 25, 20); // Head
+        
+        // Body shading
+        monsterGraphics.fillStyle(ratShadow);
+        monsterGraphics.fillEllipse(65, 55, 35, 18); // Body shadow
+        monsterGraphics.fillEllipse(30, 45, 15, 12); // Head shadow
+        
+        // Detailed features
+        monsterGraphics.fillStyle(0x000000);
+        monsterGraphics.fillCircle(20, 35, 3); // Eye
+        monsterGraphics.fillCircle(22, 45, 2); // Nose
+        
+        // Eye highlight
+        monsterGraphics.fillStyle(0xFFFFFF);
+        monsterGraphics.fillCircle(21, 34, 1); // Eye highlight
+        
+        // Ears
+        monsterGraphics.fillStyle(ratColor);
+        monsterGraphics.fillEllipse(15, 30, 8, 12); // Left ear
+        monsterGraphics.fillEllipse(25, 28, 8, 12); // Right ear
+        
+        // Ear shadows
+        monsterGraphics.fillStyle(ratShadow);
+        monsterGraphics.fillEllipse(16, 32, 4, 6); // Left ear shadow
+        monsterGraphics.fillEllipse(26, 30, 4, 6); // Right ear shadow
+        
+        // Detailed tail with segments
+        monsterGraphics.fillStyle(ratColor);
+        monsterGraphics.fillEllipse(85, 50, 15, 5); // Tail base
+        monsterGraphics.fillEllipse(95, 48, 12, 4); // Tail middle
+        monsterGraphics.fillEllipse(103, 46, 10, 3); // Tail tip
+        
+        // Whiskers
+        monsterGraphics.lineStyle(1, 0x000000);
+        monsterGraphics.beginPath();
+        monsterGraphics.moveTo(15, 42);
+        monsterGraphics.lineTo(5, 40);
+        monsterGraphics.moveTo(15, 45);
+        monsterGraphics.lineTo(5, 45);
+        monsterGraphics.strokePath();
+        
+      } else if (monster.name.toLowerCase().includes('spider')) {
+        // Enhanced Spider appearance
+        const spiderColor = 0x2F2F2F; // Dark gray
+        const spiderHighlight = 0x4F4F4F; // Light gray
+        
+        // Main body segments
+        monsterGraphics.fillStyle(spiderColor);
+        monsterGraphics.fillEllipse(50, 45, 45, 35); // Abdomen
+        monsterGraphics.fillEllipse(50, 30, 30, 25); // Cephalothorax
+        
+        // Body shading and details
+        monsterGraphics.fillStyle(spiderHighlight);
+        monsterGraphics.fillEllipse(45, 35, 15, 12); // Cephalothorax highlight
+        monsterGraphics.fillEllipse(40, 50, 20, 15); // Abdomen highlight
+        
+        // Detailed legs (8 legs)
+        monsterGraphics.lineStyle(3, spiderColor);
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 4) * Math.PI;
+          const side = i < 4 ? -1 : 1;
+          const legLength = 25 + (i % 2) * 5;
+          const startX = 50 + side * 15;
+          const startY = 35 + (i % 4) * 3;
+          const endX = startX + Math.cos(angle) * legLength * side;
+          const endY = startY + Math.sin(angle) * legLength;
+          
+          // Leg segments
+          monsterGraphics.beginPath();
+          monsterGraphics.moveTo(startX, startY);
+          monsterGraphics.lineTo(startX + Math.cos(angle) * (legLength * 0.6) * side, startY + Math.sin(angle) * (legLength * 0.6));
+          monsterGraphics.lineTo(endX, endY);
+          monsterGraphics.strokePath();
+        }
+        
+        // Multiple eyes
+        monsterGraphics.fillStyle(0xFF0000); // Red eyes
+        monsterGraphics.fillCircle(45, 25, 3); // Main left eye
+        monsterGraphics.fillCircle(55, 25, 3); // Main right eye
+        monsterGraphics.fillCircle(42, 28, 2); // Secondary left eye
+        monsterGraphics.fillCircle(58, 28, 2); // Secondary right eye
+        
+        // Eye highlights
+        monsterGraphics.fillStyle(0xFFFFFF);
+        monsterGraphics.fillCircle(46, 24, 1);
+        monsterGraphics.fillCircle(56, 24, 1);
+        
+        // Fangs
+        monsterGraphics.fillStyle(0xFFFFFF);
+        monsterGraphics.fillTriangle(48, 32, 46, 38, 50, 38); // Left fang
+        monsterGraphics.fillTriangle(52, 32, 50, 38, 54, 38); // Right fang
+        
+      } else if (monster.name.toLowerCase().includes('goblin')) {
+        // Enhanced Goblin appearance
+        const goblinSkin = 0x228B22; // Forest green
+        const goblinShadow = 0x006400; // Dark green
+        
+        // Head with proper shading
+        monsterGraphics.fillStyle(goblinSkin);
+        monsterGraphics.fillEllipse(50, 25, 20, 18); // Head
+        
+        // Head shading
+        monsterGraphics.fillStyle(goblinShadow);
+        monsterGraphics.fillEllipse(55, 28, 8, 6); // Head shadow
+        
+        // Large pointed ears
+        monsterGraphics.fillStyle(goblinSkin);
+        monsterGraphics.fillTriangle(35, 20, 30, 15, 35, 25); // Left ear
+        monsterGraphics.fillTriangle(65, 20, 70, 15, 65, 25); // Right ear
+        
+        // Detailed torso
+        monsterGraphics.fillStyle(0x8B4513); // Brown tunic
+        monsterGraphics.fillRect(40, 35, 20, 30); // Torso
+        
+        // Torso shading
+        monsterGraphics.fillStyle(0x654321);
+        monsterGraphics.fillRect(55, 37, 5, 26); // Right side shadow
+        
+        // Arms with muscle definition
+        monsterGraphics.fillStyle(goblinSkin);
+        monsterGraphics.fillEllipse(32, 45, 12, 20); // Left arm
+        monsterGraphics.fillEllipse(68, 45, 12, 20); // Right arm
+        
+        // Arm shading
+        monsterGraphics.fillStyle(goblinShadow);
+        monsterGraphics.fillEllipse(35, 48, 6, 12); // Left arm shadow
+        monsterGraphics.fillEllipse(71, 48, 6, 12); // Right arm shadow
+        
+        // Legs
+        monsterGraphics.fillStyle(0x2F4F4F); // Dark pants
+        monsterGraphics.fillRect(42, 65, 7, 25); // Left leg
+        monsterGraphics.fillRect(51, 65, 7, 25); // Right leg
+        
+        // Facial features
+        monsterGraphics.fillStyle(0xFF0000); // Red eyes
+        monsterGraphics.fillCircle(45, 22, 2); // Left eye
+        monsterGraphics.fillCircle(55, 22, 2); // Right eye
+        
+        // Ugly goblin nose
+        monsterGraphics.fillStyle(goblinShadow);
+        monsterGraphics.fillTriangle(50, 25, 48, 30, 52, 30); // Nose
+        
+        // Nasty grin
+        monsterGraphics.fillStyle(0x000000);
+        monsterGraphics.fillEllipse(50, 32, 8, 3); // Mouth
+        
+        // Sharp teeth
+        monsterGraphics.fillStyle(0xFFFFFF);
+        monsterGraphics.fillTriangle(47, 32, 46, 35, 48, 35); // Left tooth
+        monsterGraphics.fillTriangle(53, 32, 52, 35, 54, 35); // Right tooth
+        
+        // Detailed weapon (crude club)
+        monsterGraphics.fillStyle(0x8B4513);
+        monsterGraphics.fillRect(75, 40, 5, 25); // Handle
+        monsterGraphics.fillEllipse(77, 35, 12, 10); // Club head
+        
+        // Weapon details
+        monsterGraphics.fillStyle(0x654321);
+        monsterGraphics.fillEllipse(79, 37, 6, 4); // Club shadow
+        
+      } else {
+        // Enhanced Generic Monster (Orc-like creature)
+        const monsterColor = 0xB22222; // Fire brick red
+        const monsterShadow = 0x8B0000; // Dark red
+        
+        // Main body with muscle definition
+        monsterGraphics.fillStyle(monsterColor);
+        monsterGraphics.fillRect(35, 35, 30, 40); // Torso
+        monsterGraphics.fillEllipse(50, 25, 25, 20); // Head
+        
+        // Body shading
+        monsterGraphics.fillStyle(monsterShadow);
+        monsterGraphics.fillRect(55, 37, 10, 36); // Torso shadow
+        monsterGraphics.fillEllipse(57, 28, 8, 6); // Head shadow
+        
+        // Muscular arms
+        monsterGraphics.fillStyle(monsterColor);
+        monsterGraphics.fillEllipse(25, 45, 15, 25); // Left arm
+        monsterGraphics.fillEllipse(75, 45, 15, 25); // Right arm
+        
+        // Arm shading
+        monsterGraphics.fillStyle(monsterShadow);
+        monsterGraphics.fillEllipse(28, 48, 8, 15); // Left arm shadow
+        monsterGraphics.fillEllipse(78, 48, 8, 15); // Right arm shadow
+        
+        // Legs
+        monsterGraphics.fillStyle(0x2F4F4F); // Dark pants
+        monsterGraphics.fillRect(40, 75, 8, 25); // Left leg
+        monsterGraphics.fillRect(52, 75, 8, 25); // Right leg
+        
+        // Fierce eyes
+        monsterGraphics.fillStyle(0xFFFF00); // Glowing yellow eyes
+        monsterGraphics.fillCircle(43, 22, 4); // Left eye
+        monsterGraphics.fillCircle(57, 22, 4); // Right eye
+        
+        // Pupil
+        monsterGraphics.fillStyle(0x000000);
+        monsterGraphics.fillCircle(43, 22, 2); // Left pupil
+        monsterGraphics.fillCircle(57, 22, 2); // Right pupil
+        
+        // Snarling mouth
+        monsterGraphics.fillStyle(0x000000);
+        monsterGraphics.fillEllipse(50, 32, 12, 6); // Mouth
+        
+        // Sharp fangs
+        monsterGraphics.fillStyle(0xFFFFFF);
+        monsterGraphics.fillTriangle(46, 32, 44, 38, 48, 38); // Left fang
+        monsterGraphics.fillTriangle(54, 32, 52, 38, 56, 38); // Right fang
+        
+        // Horns
+        monsterGraphics.fillStyle(0x654321);
+        monsterGraphics.fillTriangle(42, 15, 40, 5, 44, 15); // Left horn
+        monsterGraphics.fillTriangle(58, 15, 56, 5, 60, 15); // Right horn
+      }
+      
+      monsterGraphics.generateTexture('monster-sprite', 120, 100);
       monsterGraphics.destroy();
       
       // Create particle textures
@@ -218,28 +572,28 @@ export function PhaserBattleScene({
       });
       
       // Create player sprite (left side) with idle animation
-      const playerSprite = this.add.image(200, 280, 'player-sprite')
-        .setDisplaySize(80, 80)
+      const playerSprite = this.add.image(200, 300, 'player-sprite')
+        .setDisplaySize(100, 120) // Larger and properly proportioned
         .setData('type', 'player')
         .setData('originalX', 200)
-        .setData('originalY', 280);
+        .setData('originalY', 300);
       
       // Add subtle idle animation to player
       this.tweens.add({
         targets: playerSprite,
-        y: playerSprite.y - 5,
-        duration: 1500,
+        y: playerSprite.y - 8,
+        duration: 1800,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut'
       });
       
       // Create monster sprite (right side) with menacing presence
-      const monsterSprite = this.add.image(600, 280, 'monster-sprite')
-        .setDisplaySize(100, 80)
+      const monsterSprite = this.add.image(600, 300, 'monster-sprite')
+        .setDisplaySize(130, 110) // Larger and more imposing
         .setData('type', 'monster')
         .setData('originalX', 600)
-        .setData('originalY', 280);
+        .setData('originalY', 300);
       
       // Add menacing idle animation to monster
       this.tweens.add({
@@ -252,18 +606,18 @@ export function PhaserBattleScene({
         ease: 'Power2'
       });
       
-      // Enhanced HP bars with borders and gradients
-      const playerHpBg = this.add.rectangle(200, 340, 140, 16, 0x333333).setStrokeStyle(2, 0x666666);
-      const playerHpBar = this.add.rectangle(200, 340, 136, 12, 0x00ff00);
-      const playerMpBg = this.add.rectangle(200, 360, 140, 12, 0x333333).setStrokeStyle(2, 0x666666);
-      const playerMpBar = this.add.rectangle(200, 360, 136, 8, 0x0066ff);
+      // Enhanced HP bars with borders and gradients (repositioned for new sprite layout)
+      const playerHpBg = this.add.rectangle(200, 380, 140, 16, 0x333333).setStrokeStyle(2, 0x666666);
+      const playerHpBar = this.add.rectangle(200, 380, 136, 12, 0x00ff00);
+      const playerMpBg = this.add.rectangle(200, 395, 140, 12, 0x333333).setStrokeStyle(2, 0x666666);
+      const playerMpBar = this.add.rectangle(200, 395, 136, 8, 0x0066ff);
       
-      // Monster HP bar
-      const monsterHpBg = this.add.rectangle(600, 180, 140, 16, 0x333333).setStrokeStyle(2, 0x666666);
-      const monsterHpBar = this.add.rectangle(600, 180, 136, 12, 0xff0000);
+      // Monster HP bar (positioned above monster)
+      const monsterHpBg = this.add.rectangle(600, 200, 140, 16, 0x333333).setStrokeStyle(2, 0x666666);
+      const monsterHpBar = this.add.rectangle(600, 200, 136, 12, 0xff0000);
       
-      // Enhanced labels with styling
-      this.add.text(200, 380, `${playerStats.username || 'Hero'} (Lv.${Math.floor(playerStats.strength + playerStats.agility)})`, { 
+      // Enhanced labels with styling (repositioned)
+      this.add.text(200, 410, `${playerStats.username || 'Hero'} (Lv.${Math.floor(playerStats.strength + playerStats.agility)})`, { 
         fontSize: '12px', 
         color: '#ffffff',
         fontFamily: 'monospace',
@@ -271,7 +625,7 @@ export function PhaserBattleScene({
         strokeThickness: 2
       }).setOrigin(0.5);
       
-      this.add.text(600, 160, `${monster.name} (Lv.${monster.level || 1})`, { 
+      this.add.text(600, 180, `${monster.name} (Lv.${monster.level || 1})`, { 
         fontSize: '12px', 
         color: '#ffaaaa',
         fontFamily: 'monospace',
@@ -279,20 +633,20 @@ export function PhaserBattleScene({
         strokeThickness: 2
       }).setOrigin(0.5);
       
-      // HP/MP text overlays
-      const playerHpText = this.add.text(200, 340, `${playerStats.currentHp}/${playerStats.maxHp}`, {
+      // HP/MP text overlays (repositioned)
+      const playerHpText = this.add.text(200, 380, `${playerStats.currentHp}/${playerStats.maxHp}`, {
         fontSize: '10px',
         color: '#ffffff',
         fontFamily: 'monospace'
       }).setOrigin(0.5);
       
-      const playerMpText = this.add.text(200, 360, `${playerStats.currentMp}/${playerStats.maxMp}`, {
+      const playerMpText = this.add.text(200, 395, `${playerStats.currentMp}/${playerStats.maxMp}`, {
         fontSize: '8px',
         color: '#aaaaff',
         fontFamily: 'monospace'
       }).setOrigin(0.5);
       
-      const monsterHpText = this.add.text(600, 180, `${monster.currentHp}/${monster.maxHp}`, {
+      const monsterHpText = this.add.text(600, 200, `${monster.currentHp}/${monster.maxHp}`, {
         fontSize: '10px',
         color: '#ffffff',
         fontFamily: 'monospace'
