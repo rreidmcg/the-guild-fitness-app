@@ -1216,15 +1216,15 @@ function AdminMailbox() {
 
   return (
     <>
-      <Card className="bg-game-slate border-gray-700 shadow-lg">
+      <Card className="bg-card border-border shadow-lg">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 pb-4">
-          <CardTitle className="flex items-center space-x-2 text-lg font-semibold text-white">
+          <CardTitle className="flex items-center space-x-2 text-lg font-semibold text-foreground">
             <Mail className="w-5 h-5 text-blue-400" />
             <span>Admin Notification Center</span>
           </CardTitle>
           <Button 
             onClick={() => setShowComposeDialog(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg w-full sm:w-auto"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors duration-200 shadow-md hover:shadow-lg w-full sm:w-auto"
           >
             <Send className="w-4 h-4 mr-2" />
             Compose Global Notification
@@ -1234,57 +1234,57 @@ function AdminMailbox() {
           <div className="space-y-6">
             {/* Quick Actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-all duration-200 hover:bg-muted/50 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-500/10 rounded-lg">
                       <Newspaper className="w-5 h-5 text-blue-400" />
                     </div>
                     <div>
-                      <div className="font-medium text-white">News Update</div>
-                      <div className="text-sm text-gray-400">Platform announcements</div>
+                      <div className="font-medium text-foreground">News Update</div>
+                      <div className="text-sm text-muted-foreground">Platform announcements</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-all duration-200 hover:bg-muted/50 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-purple-500/10 rounded-lg">
                       <Gift className="w-5 h-5 text-purple-400" />
                     </div>
                     <div>
-                      <div className="font-medium text-white">Reward Mail</div>
-                      <div className="text-sm text-gray-400">Send gifts to users</div>
+                      <div className="font-medium text-foreground">Reward Mail</div>
+                      <div className="text-sm text-muted-foreground">Send gifts to users</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-all duration-200 hover:bg-muted/50 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-yellow-500/10 rounded-lg">
                       <Crown className="w-5 h-5 text-yellow-400" />
                     </div>
                     <div>
-                      <div className="font-medium text-white">Announcement</div>
-                      <div className="text-sm text-gray-400">Important notices</div>
+                      <div className="font-medium text-foreground">Announcement</div>
+                      <div className="text-sm text-muted-foreground">Important notices</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-game-slate border-gray-700 shadow-md hover:shadow-lg transition-all duration-200 hover:bg-gray-750 cursor-pointer">
+              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-all duration-200 hover:bg-muted/50 cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-green-500/10 rounded-lg">
                       <Star className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
-                      <div className="font-medium text-white">Event Notice</div>
-                      <div className="text-sm text-gray-400">Special events</div>
+                      <div className="font-medium text-foreground">Event Notice</div>
+                      <div className="text-sm text-muted-foreground">Special events</div>
                     </div>
                   </div>
                 </CardContent>
@@ -1292,17 +1292,17 @@ function AdminMailbox() {
             </div>
             
             {/* Information Panel */}
-            <div className="p-6 bg-game-slate/50 border border-gray-700 rounded-lg">
-              <h3 className="font-semibold text-white mb-3 flex items-center space-x-2">
+            <div className="p-6 bg-muted/30 border border-border rounded-lg">
+              <h3 className="font-semibold text-foreground mb-3 flex items-center space-x-2">
                 <Send className="w-5 h-5 text-blue-400" />
                 <span>Global Notification System</span>
               </h3>
-              <div className="text-gray-200 space-y-2">
+              <div className="text-foreground/90 space-y-2">
                 <p>Send notifications to all active users in the platform. You can include various types of rewards and set expiry dates for time-sensitive content.</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-sm">
                   <div>
-                    <h4 className="font-medium text-white mb-2">Notification Types:</h4>
-                    <ul className="space-y-1 text-gray-300">
+                    <h4 className="font-medium text-foreground mb-2">Notification Types:</h4>
+                    <ul className="space-y-1 text-muted-foreground">
                       <li>• <span className="text-blue-400">News:</span> Platform updates and announcements</li>
                       <li>• <span className="text-purple-400">Rewards:</span> Send gold, XP, or items to users</li>
                       <li>• <span className="text-yellow-400">Announcements:</span> Important system notices</li>
@@ -1310,8 +1310,8 @@ function AdminMailbox() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium text-white mb-2">Available Rewards:</h4>
-                    <ul className="space-y-1 text-gray-300">
+                    <h4 className="font-medium text-foreground mb-2">Available Rewards:</h4>
+                    <ul className="space-y-1 text-muted-foreground">
                       <li>• <span className="text-yellow-400">Gold Coins:</span> In-game currency</li>
                       <li>• <span className="text-blue-400">Experience Points:</span> Character progression</li>
                       <li>• <span className="text-purple-400">Streak Freezes:</span> Protect daily streaks</li>
@@ -1327,9 +1327,9 @@ function AdminMailbox() {
 
       {/* Compose Mail Dialog */}
       <Dialog open={showComposeDialog} onOpenChange={setShowComposeDialog}>
-        <DialogContent className="bg-game-slate border-gray-700 max-w-2xl">
+        <DialogContent className="bg-card border-border max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2 text-white">
+            <DialogTitle className="flex items-center space-x-2 text-foreground">
               <Send className="w-5 h-5 text-blue-400" />
               <span>Compose Global Notification</span>
             </DialogTitle>
@@ -1338,9 +1338,9 @@ function AdminMailbox() {
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {/* Mail Type */}
             <div className="space-y-2">
-              <Label htmlFor="mailType" className="text-white">Notification Type</Label>
+              <Label htmlFor="mailType" className="text-foreground">Notification Type</Label>
               <Select value={mailType} onValueChange={setMailType}>
-                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                <SelectTrigger className="bg-background border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1374,25 +1374,25 @@ function AdminMailbox() {
 
             {/* Subject */}
             <div className="space-y-2">
-              <Label htmlFor="subject" className="text-white">Subject *</Label>
+              <Label htmlFor="subject" className="text-foreground">Subject *</Label>
               <Input
                 id="subject"
                 value={mailSubject}
                 onChange={(e) => setMailSubject(e.target.value)}
                 placeholder="Enter notification subject..."
-                className="w-full bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
+                className="w-full bg-background border-border text-foreground placeholder:text-muted-foreground placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
 
             {/* Content */}
             <div className="space-y-2">
-              <Label htmlFor="content" className="text-white">Message Content *</Label>
+              <Label htmlFor="content" className="text-foreground">Message Content *</Label>
               <Textarea
                 id="content"
                 value={mailContent}
                 onChange={(e) => setMailContent(e.target.value)}
                 placeholder="Enter your message content here..."
-                className="min-h-24 resize-none bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 placeholder:transition-opacity focus:placeholder:opacity-0"
+                className="min-h-24 resize-none bg-background border-border text-foreground placeholder:text-muted-foreground placeholder:transition-opacity focus:placeholder:opacity-0"
               />
             </div>
 
@@ -1405,7 +1405,7 @@ function AdminMailbox() {
                 onChange={(e) => setIncludeRewards(e.target.checked)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded"
               />
-              <Label htmlFor="includeRewards" className="flex items-center space-x-2">
+              <Label htmlFor="includeRewards" className="flex items-center space-x-2 text-foreground">
                 <Gift className="w-4 h-4 text-purple-400" />
                 <span>Include Rewards & Attachments</span>
               </Label>
@@ -1413,15 +1413,15 @@ function AdminMailbox() {
 
             {/* Rewards Section */}
             {includeRewards && (
-              <div className="space-y-4 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-                <h4 className="font-medium text-white flex items-center space-x-2">
+              <div className="space-y-4 p-4 bg-muted/30 border border-border rounded-lg">
+                <h4 className="font-medium text-foreground flex items-center space-x-2">
                   <Coins className="w-4 h-4 text-yellow-400" />
                   <span>Reward Attachments</span>
                 </h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="goldReward">Gold Coins</Label>
+                    <Label htmlFor="goldReward" className="text-foreground">Gold Coins</Label>
                     <Input
                       id="goldReward"
                       type="number"
@@ -1434,7 +1434,7 @@ function AdminMailbox() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="xpReward">Experience Points</Label>
+                    <Label htmlFor="xpReward" className="text-foreground">Experience Points</Label>
                     <Input
                       id="xpReward"
                       type="number"
@@ -1447,7 +1447,7 @@ function AdminMailbox() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="streakFreezeReward">Streak Freezes</Label>
+                    <Label htmlFor="streakFreezeReward" className="text-foreground">Streak Freezes</Label>
                     <Input
                       id="streakFreezeReward"
                       type="number"
@@ -1461,7 +1461,7 @@ function AdminMailbox() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="potionReward">Health Potions</Label>
+                    <Label htmlFor="potionReward" className="text-foreground">Health Potions</Label>
                     <Input
                       id="potionReward"
                       type="number"
@@ -1479,7 +1479,7 @@ function AdminMailbox() {
 
             {/* Expiry Date */}
             <div className="space-y-2">
-              <Label htmlFor="expiryDate">Expiry Date (Optional)</Label>
+              <Label htmlFor="expiryDate" className="text-foreground">Expiry Date (Optional)</Label>
               <Input
                 id="expiryDate"
                 type="datetime-local"
@@ -1487,7 +1487,7 @@ function AdminMailbox() {
                 onChange={(e) => setExpiryDate(e.target.value)}
                 className="w-full"
               />
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 Leave empty for permanent notifications
               </p>
             </div>
@@ -1497,14 +1497,14 @@ function AdminMailbox() {
             <Button 
               variant="outline" 
               onClick={closeComposeDialog}
-              className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200"
+              className="border-border text-muted-foreground hover:bg-muted hover:text-foreground transition-all duration-200"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSendMail}
               disabled={!mailSubject.trim() || !mailContent.trim() || sendMailMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sendMailMutation.isPending ? (
                 <>Sending...</>
