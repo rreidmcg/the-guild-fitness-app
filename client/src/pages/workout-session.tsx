@@ -591,7 +591,7 @@ export default function WorkoutSession() {
     // Calculate total volume for completed sets
     let totalVolume = 0;
     completedExercises.forEach(exercise => {
-      exercise.sets.forEach(set => {
+      exercise.sets.forEach((set: any) => {
         if (set.completed) {
           totalVolume += (set.weight || 0) * (set.reps || 0);
         }
@@ -645,7 +645,7 @@ export default function WorkoutSession() {
 
   // Show workout summary if completed
   if (showSummary && completedSession && userStats) {
-    const leveledUp = completedSession.newLevel && completedSession.newLevel > userStats.level;
+    const leveledUp = completedSession.newLevel && completedSession.newLevel > (userStats.level || 1);
     
     // Calculate XP to next level
     const currentLevel = leveledUp ? completedSession.newLevel : userStats.level;
@@ -655,7 +655,7 @@ export default function WorkoutSession() {
     
     return (
       <WorkoutSummary
-        workoutName={workout?.name || "Workout"}
+        workoutName={(workout as any)?.name || "Workout"}
         xpGained={completedSession.xpEarned || 0}
         currentLevel={currentLevel}
         currentXP={currentXP}
