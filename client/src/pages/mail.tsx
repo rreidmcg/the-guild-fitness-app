@@ -133,6 +133,11 @@ export default function MailPage() {
     return variants[mailType] || "bg-gray-500/10 text-gray-600 border-gray-500/20";
   };
 
+  const formatTimeAgoCompact = (date: Date) => {
+    const formatted = formatDistanceToNow(date, { addSuffix: true });
+    return formatted.replace("less than a minute ago", "< 1 min ago");
+  };
+
   const mailComponent_handleOpenMail = (mailItem: PlayerMail) => {
     setMailComponentState(prev => ({ ...prev, selectedMail: mailItem }));
     if (!mailItem.isRead) {
@@ -207,24 +212,24 @@ export default function MailPage() {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
-                    {getMailTypeIcon(selectedMail.mailType)}
-                    <Badge className={getMailTypeBadge(selectedMail.mailType)}>
-                      {selectedMail.mailType}
+                    {getMailTypeIcon(mailComponentState.selectedMail.mailType)}
+                    <Badge className={getMailTypeBadge(mailComponentState.selectedMail.mailType)}>
+                      {mailComponentState.selectedMail.mailType}
                     </Badge>
                     <span className="text-sm text-muted-foreground">
-                      from {selectedMail.senderName}
+                      from {mailComponentState.selectedMail.senderName}
                     </span>
                   </div>
-                  <CardTitle className="text-xl">{selectedMail.subject}</CardTitle>
+                  <CardTitle className="text-xl">{mailComponentState.selectedMail.subject}</CardTitle>
                   <CardDescription className="flex items-center space-x-2 mt-1">
                     <Clock className="w-4 h-4" />
-                    <span>{formatDistanceToNow(new Date(selectedMail.createdAt), { addSuffix: true })}</span>
-                    {selectedMail.expiresAt && (
+                    <span>{formatTimeAgoCompact(new Date(mailComponentState.selectedMail.createdAt))}</span>
+                    {mailComponentState.selectedMail.expiresAt && (
                       <>
                         <span>•</span>
                         <Calendar className="w-4 h-4 text-orange-500" />
                         <span className="text-orange-500">
-                          Expires {formatDistanceToNow(new Date(selectedMail.expiresAt), { addSuffix: true })}
+                          Expires {formatTimeAgoCompact(new Date(mailComponentState.selectedMail.expiresAt))}
                         </span>
                       </>
                     )}
@@ -233,7 +238,7 @@ export default function MailPage() {
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => setSelectedMail(null)}
+                  onClick={() => setMailComponentState(prev => ({ ...prev, selectedMail: null }))}
                 >
                   ← Back
                 </Button>
@@ -241,10 +246,10 @@ export default function MailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                <p className="whitespace-pre-wrap">{selectedMail.content}</p>
+                <p className="whitespace-pre-wrap">{mailComponentState.selectedMail.content}</p>
               </div>
 
-              {selectedMail.rewards && (
+              {mailComponentState.selectedMail.rewards && (
                 <>
                   <Separator />
                   <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg p-4 border border-purple-500/20">
@@ -261,13 +266,13 @@ export default function MailPage() {
                               <span>{mailComponentState.selectedMail.rewards.gold} Gold</span>
                             </div>
                           )}
-                          {selectedMail.rewards.xp && (
+                          {mailComponentState.selectedMail.rewards.xp && (
                             <div className="flex items-center space-x-2">
                               <Sparkles className="w-4 h-4 text-blue-500" />
-                              <span>{selectedMail.rewards.xp} XP</span>
+                              <span>{mailComponentState.selectedMail.rewards.xp} XP</span>
                             </div>
                           )}
-                          {selectedMail.rewards.items && selectedMail.rewards.items.map((item, index) => (
+                          {mailComponentState.selectedMail.rewards.items && mailComponentState.selectedMail.rewards.items.map((item, index) => (
                             <div key={index} className="flex items-center space-x-2">
                               <Trophy className="w-4 h-4 text-green-500" />
                               <span>{item.quantity}x {item.itemName}</span>
@@ -275,9 +280,9 @@ export default function MailPage() {
                           ))}
                         </div>
                       </div>
-                      {!selectedMail.rewardsClaimed ? (
+                      {!mailComponentState.selectedMail.rewardsClaimed ? (
                         <Button 
-                          onClick={() => handleClaimRewards(selectedMail.id)}
+                          onClick={() => handleClaimRewards(mailComponentState.selectedMail.id)}
                           disabled={claimRewardsMutation.isPending}
                           className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                         >
@@ -344,7 +349,7 @@ export default function MailPage() {
                       </div>
                       <div className="text-right flex flex-col items-end space-y-1">
                         <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(mailItem.createdAt), { addSuffix: true })}
+                          {formatTimeAgoCompact(new Date(mailItem.createdAt))}
                         </span>
                         {mailItem.rewards && (
                           <div className="flex items-center space-x-1">
