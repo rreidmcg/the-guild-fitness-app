@@ -2589,7 +2589,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('Send admin mail error:', error);
-      res.status(500).json({ error: "Failed to send mail" });
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      res.status(500).json({ error: error.message || "Failed to send mail" });
     }
   });
 
