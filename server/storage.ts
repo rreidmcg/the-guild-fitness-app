@@ -1141,8 +1141,6 @@ export class DatabaseStorage implements IStorage {
   async sendBulkMail(mail: Omit<InsertPlayerMail, 'userId'>, targetUserIds?: number[]): Promise<number> {
     await this.ensureInitialized();
     
-    console.log('sendBulkMail called with mail:', mail);
-    
     let userIds: number[];
     
     if (targetUserIds && targetUserIds.length > 0) {
@@ -1153,24 +1151,13 @@ export class DatabaseStorage implements IStorage {
       userIds = allUsers.map(u => u.id);
     }
 
-    console.log('Sending mail to users:', userIds);
-
     // Create mail for each user
     const mailEntries = userIds.map(userId => ({
       ...mail,
       userId
     }));
 
-    console.log('Mail entries to insert:', mailEntries);
-
-    try {
-      await db.insert(playerMail).values(mailEntries as any);
-      console.log('Mail insertion successful');
-    } catch (insertError: any) {
-      console.error('Database insert error:', insertError);
-      console.error('Insert error message:', insertError.message);
-      throw insertError;
-    }
+    await db.insert(playerMail).values(mailEntries as any);
     
     return mailEntries.length;
   }
