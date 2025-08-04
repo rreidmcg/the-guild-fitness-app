@@ -31,7 +31,6 @@ import {
   Search,
   Calendar,
   Clock,
-  UserX,
   Eye,
   Mail,
   Send,
@@ -914,68 +913,6 @@ function UserManagement({ users, usersLoading, usersError, refetchUsers }: any) 
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* User Statistics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-blue-500/10 rounded-lg">
-                      <Users className="w-5 h-5 text-blue-400" />
-                    </div>
-                    <div>
-                      <div className="text-xl font-bold text-foreground">{users?.length || 0}</div>
-                      <div className="text-sm text-muted-foreground">Total Users</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-green-500/10 rounded-lg">
-                      <Shield className="w-5 h-5 text-green-400" />
-                    </div>
-                    <div>
-                      <div className="text-xl font-bold text-foreground">
-                        {users?.filter((u: any) => !u.isBanned && !u.isDeleted).length || 0}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Active Users</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-red-500/10 rounded-lg">
-                      <Ban className="w-5 h-5 text-red-400" />
-                    </div>
-                    <div>
-                      <div className="text-xl font-bold text-foreground">
-                        {users?.filter((u: any) => u.isBanned).length || 0}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Banned Users</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-card border-border shadow-md hover:shadow-lg transition-shadow duration-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-gray-500/10 rounded-lg">
-                      <UserX className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <div>
-                      <div className="text-xl font-bold text-foreground">
-                        {users?.filter((u: any) => u.isDeleted).length || 0}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Deleted Users</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* User List */}
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {filteredUsers.map((user: any) => (
