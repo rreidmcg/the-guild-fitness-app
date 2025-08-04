@@ -70,180 +70,473 @@ export function PhaserBattleScene({
     gameRef.current = new Phaser.Game(config);
 
     function preload(this: Phaser.Scene) {
-      // Create highly detailed player avatar based on stats and uploaded character style
-      const playerGraphics = this.add.graphics();
+      // Create ultra-realistic player avatar using advanced canvas techniques
+      const canvas = document.createElement('canvas');
+      canvas.width = 120;
+      canvas.height = 160;
+      const ctx = canvas.getContext('2d')!;
       
-      // Determine skin color
-      const skinColor = playerStats.skinColor === 'light' ? 0xFFDBB5 : 
-                       playerStats.skinColor === 'medium' ? 0xD4A574 :
-                       playerStats.skinColor === 'dark' ? 0x8B6914 : 0xFFDBB5;
+      // Advanced anti-aliasing
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       
-      // HEAD - More detailed with shading
-      playerGraphics.fillStyle(skinColor);
-      playerGraphics.fillEllipse(40, 22, 24, 22); // Main head shape
+      // Determine realistic skin color values
+      const skinTones = {
+        light: { base: '#FFDBAC', shadow: '#E8C4A0', highlight: '#FFF2E8' },
+        medium: { base: '#D4A574', shadow: '#C8956B', highlight: '#E8BF94' },
+        dark: { base: '#8B6914', shadow: '#704E0A', highlight: '#A67C1A' }
+      };
+      const skin = skinTones[playerStats.skinColor as keyof typeof skinTones] || skinTones.light;
       
-      // Head shading for depth
-      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
-        Phaser.Display.Color.IntegerToRGB(skinColor).r * 0.8,
-        Phaser.Display.Color.IntegerToRGB(skinColor).g * 0.8,
-        Phaser.Display.Color.IntegerToRGB(skinColor).b * 0.8,
-        255
-      ));
-      playerGraphics.fillEllipse(45, 25, 8, 6); // Right side shadow
+      // REALISTIC HEAD with proper proportions and gradients
+      const headGradient = ctx.createRadialGradient(60, 30, 5, 60, 30, 18);
+      headGradient.addColorStop(0, skin.highlight);
+      headGradient.addColorStop(0.7, skin.base);
+      headGradient.addColorStop(1, skin.shadow);
       
-      // FACIAL FEATURES
-      playerGraphics.fillStyle(0x000000);
-      playerGraphics.fillCircle(35, 20, 2); // Left eye
-      playerGraphics.fillCircle(45, 20, 2); // Right eye
-      playerGraphics.fillStyle(0xFFFFFF);
-      playerGraphics.fillCircle(36, 19, 1); // Left eye highlight
-      playerGraphics.fillCircle(46, 19, 1); // Right eye highlight
+      ctx.fillStyle = headGradient;
+      ctx.beginPath();
+      ctx.ellipse(60, 30, 18, 16, 0, 0, Math.PI * 2);
+      ctx.fill();
       
-      // Nose and mouth
-      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
-        Phaser.Display.Color.IntegerToRGB(skinColor).r * 0.9,
-        Phaser.Display.Color.IntegerToRGB(skinColor).g * 0.9,
-        Phaser.Display.Color.IntegerToRGB(skinColor).b * 0.9,
-        255
-      ));
-      playerGraphics.fillCircle(40, 24, 1.5); // Nose
-      playerGraphics.fillStyle(0x8B0000);
-      playerGraphics.fillEllipse(40, 27, 4, 2); // Mouth
+      // Jaw line definition
+      ctx.fillStyle = skin.shadow;
+      ctx.beginPath();
+      ctx.ellipse(60, 38, 12, 6, 0, 0, Math.PI);
+      ctx.fill();
       
-      // HAIR - More detailed and styled
-      const hairColor = playerStats.hairColor === 'blonde' ? 0xFFD700 : 
-                       playerStats.hairColor === 'brown' ? 0x8B4513 :
-                       playerStats.hairColor === 'black' ? 0x2C1810 : 
-                       playerStats.hairColor === 'red' ? 0xB22222 : 0x8B4513;
+      // REALISTIC FACIAL FEATURES
+      // Eyes with depth and detail
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.ellipse(54, 26, 4, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(66, 26, 4, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
       
-      playerGraphics.fillStyle(hairColor);
-      // Multiple hair layers for volume and detail
-      playerGraphics.fillEllipse(40, 12, 28, 16); // Main hair mass
-      playerGraphics.fillEllipse(35, 10, 12, 8); // Left hair tuft
-      playerGraphics.fillEllipse(45, 10, 12, 8); // Right hair tuft
-      playerGraphics.fillEllipse(40, 8, 16, 6); // Top hair
+      // Iris and pupils (default to brown if not specified)
+      const eyeColor = '#8B4513'; // Brown eyes as default
       
-      // Hair highlights
-      const hairHighlight = Phaser.Display.Color.GetColor32(
-        Math.min(255, Phaser.Display.Color.IntegerToRGB(hairColor).r * 1.3),
-        Math.min(255, Phaser.Display.Color.IntegerToRGB(hairColor).g * 1.3),
-        Math.min(255, Phaser.Display.Color.IntegerToRGB(hairColor).b * 1.3),
-        255
-      );
-      playerGraphics.fillStyle(hairHighlight);
-      playerGraphics.fillEllipse(38, 10, 8, 4); // Hair highlight
-      playerGraphics.fillEllipse(42, 12, 6, 3); // Secondary highlight
+      ctx.fillStyle = eyeColor;
+      ctx.beginPath();
+      ctx.ellipse(54, 26, 2.5, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(66, 26, 2.5, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
       
-      // NECK
-      playerGraphics.fillStyle(skinColor);
-      playerGraphics.fillRect(36, 32, 8, 6);
+      // Pupils
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.ellipse(54, 26, 1.2, 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(66, 26, 1.2, 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
       
-      // TORSO - Detailed with clothing
-      // Base shirt/tunic
-      const shirtColor = playerStats.strength > 2 ? 0x4169E1 : 0x8B4513; // Blue for warriors, brown for beginners
-      playerGraphics.fillStyle(shirtColor);
-      playerGraphics.fillRect(28, 38, 24, 28); // Main torso
+      // Eye highlights for realism
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.ellipse(55, 25, 0.8, 0.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(67, 25, 0.8, 0.8, 0, 0, Math.PI * 2);
+      ctx.fill();
       
-      // Shirt details and shading
-      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
-        Phaser.Display.Color.IntegerToRGB(shirtColor).r * 0.7,
-        Phaser.Display.Color.IntegerToRGB(shirtColor).g * 0.7,
-        Phaser.Display.Color.IntegerToRGB(shirtColor).b * 0.7,
-        255
-      ));
-      playerGraphics.fillRect(46, 40, 6, 24); // Right side shadow
-      playerGraphics.fillRect(30, 60, 20, 4); // Belt area
+      // Eyebrows with individual hair strokes
+      ctx.strokeStyle = playerStats.hairColor === 'blonde' ? '#D4AF37' : 
+                       playerStats.hairColor === 'brown' ? '#654321' :
+                       playerStats.hairColor === 'black' ? '#1C1C1C' : 
+                       playerStats.hairColor === 'red' ? '#B22222' : '#654321';
+      ctx.lineWidth = 0.8;
       
-      // Belt
-      playerGraphics.fillStyle(0x654321);
-      playerGraphics.fillRect(30, 62, 20, 3);
-      playerGraphics.fillStyle(0xFFD700);
-      playerGraphics.fillRect(38, 61, 4, 5); // Belt buckle
+      for (let i = 0; i < 8; i++) {
+        ctx.beginPath();
+        ctx.moveTo(48 + i * 1.5, 20 - Math.sin(i * 0.3) * 0.5);
+        ctx.lineTo(49 + i * 1.5, 18 - Math.sin(i * 0.3) * 0.5);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(62 + i * 1.5, 20 - Math.sin(i * 0.3) * 0.5);
+        ctx.lineTo(63 + i * 1.5, 18 - Math.sin(i * 0.3) * 0.5);
+        ctx.stroke();
+      }
       
-      // ARMS - More anatomically correct
-      playerGraphics.fillStyle(skinColor);
+      // Realistic nose with shading
+      const noseGradient = ctx.createLinearGradient(58, 30, 62, 34);
+      noseGradient.addColorStop(0, skin.highlight);
+      noseGradient.addColorStop(1, skin.shadow);
+      
+      ctx.fillStyle = noseGradient;
+      ctx.beginPath();
+      ctx.moveTo(60, 30);
+      ctx.lineTo(58, 34);
+      ctx.lineTo(60, 36);
+      ctx.lineTo(62, 34);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Nostrils
+      ctx.fillStyle = skin.shadow;
+      ctx.beginPath();
+      ctx.ellipse(58.5, 35, 0.8, 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(61.5, 35, 0.8, 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Realistic mouth with lips
+      const lipGradient = ctx.createLinearGradient(60, 40, 60, 44);
+      lipGradient.addColorStop(0, '#E8A5A5');
+      lipGradient.addColorStop(1, '#D48888');
+      
+      ctx.fillStyle = lipGradient;
+      ctx.beginPath();
+      ctx.ellipse(60, 42, 5, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Lip highlight
+      ctx.fillStyle = '#F5C2C2';
+      ctx.beginPath();
+      ctx.ellipse(60, 41, 3, 1, 0, 0, Math.PI);
+      ctx.fill();
+      
+      // REALISTIC HAIR with texture and volume
+      const hairColor = playerStats.hairColor === 'blonde' ? '#FFD700' : 
+                       playerStats.hairColor === 'brown' ? '#8B4513' :
+                       playerStats.hairColor === 'black' ? '#2C1810' : 
+                       playerStats.hairColor === 'red' ? '#B22222' : '#8B4513';
+      
+      // Helper function to darken color
+      const darkenColor = (color: string, factor: number) => {
+        const hex = color.replace('#', '');
+        const r = Math.floor(parseInt(hex.substr(0, 2), 16) * factor);
+        const g = Math.floor(parseInt(hex.substr(2, 2), 16) * factor);
+        const b = Math.floor(parseInt(hex.substr(4, 2), 16) * factor);
+        return `rgb(${r}, ${g}, ${b})`;
+      };
+
+      const hairGradient = ctx.createRadialGradient(60, 15, 5, 60, 15, 25);
+      hairGradient.addColorStop(0, hairColor);
+      hairGradient.addColorStop(1, darkenColor(hairColor, 0.7));
+      
+      ctx.fillStyle = hairGradient;
+      ctx.beginPath();
+      ctx.ellipse(60, 15, 22, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Hair strands for texture
+      ctx.strokeStyle = hairColor;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 30; i++) {
+        const angle = (i / 30) * Math.PI * 2;
+        const startX = 60 + Math.cos(angle) * 15;
+        const startY = 15 + Math.sin(angle) * 8;
+        const endX = 60 + Math.cos(angle) * 22;
+        const endY = 15 + Math.sin(angle) * 12;
+        
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      }
+      
+      // REALISTIC NECK AND SHOULDERS
+      const neckGradient = ctx.createLinearGradient(55, 46, 65, 46);
+      neckGradient.addColorStop(0, skin.shadow);
+      neckGradient.addColorStop(0.5, skin.base);
+      neckGradient.addColorStop(1, skin.shadow);
+      
+      ctx.fillStyle = neckGradient;
+      ctx.fillRect(55, 46, 10, 12);
+      
+      // REALISTIC TORSO with clothing texture
+      const shirtColor = playerStats.strength > 2 ? '#4169E1' : '#8B4513';
+      const torsoGradient = ctx.createLinearGradient(40, 58, 80, 58);
+      torsoGradient.addColorStop(0, shirtColor);
+      torsoGradient.addColorStop(1, darkenColor(shirtColor, 0.6));
+      
+      ctx.fillStyle = torsoGradient;
+      ctx.fillRect(40, 58, 40, 35);
+      
+      // Clothing wrinkles and details
+      ctx.strokeStyle = darkenColor(shirtColor, 0.4);
+      ctx.lineWidth = 1;
+      
+      // Vertical wrinkles
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(45 + i * 10, 60);
+        ctx.quadraticCurveTo(46 + i * 10, 75, 45 + i * 10, 90);
+        ctx.stroke();
+      }
+      
+      // REALISTIC ARMS with muscle definition
+      const armGradient = ctx.createRadialGradient(30, 70, 3, 30, 70, 8);
+      armGradient.addColorStop(0, skin.highlight);
+      armGradient.addColorStop(1, skin.shadow);
+      
+      ctx.fillStyle = armGradient;
       // Left arm
-      playerGraphics.fillEllipse(24, 45, 8, 16); // Upper arm
-      playerGraphics.fillEllipse(22, 58, 6, 14); // Forearm
-      playerGraphics.fillEllipse(20, 68, 8, 6); // Hand
+      ctx.beginPath();
+      ctx.ellipse(30, 70, 6, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(28, 85, 4, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
       
-      // Right arm  
-      playerGraphics.fillEllipse(56, 45, 8, 16); // Upper arm
-      playerGraphics.fillEllipse(58, 58, 6, 14); // Forearm
-      playerGraphics.fillEllipse(60, 68, 8, 6); // Hand
+      // Right arm
+      ctx.beginPath();
+      ctx.ellipse(90, 70, 6, 12, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(92, 85, 4, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
       
-      // Arm shading
-      const armShadow = Phaser.Display.Color.GetColor32(
-        Phaser.Display.Color.IntegerToRGB(skinColor).r * 0.8,
-        Phaser.Display.Color.IntegerToRGB(skinColor).g * 0.8,
-        Phaser.Display.Color.IntegerToRGB(skinColor).b * 0.8,
-        255
-      );
-      playerGraphics.fillStyle(armShadow);
-      playerGraphics.fillEllipse(26, 47, 4, 8); // Left arm shadow
-      playerGraphics.fillEllipse(58, 47, 4, 8); // Right arm shadow
+      // REALISTIC LEGS with proper proportions
+      const legGradient = ctx.createLinearGradient(50, 93, 70, 93);
+      legGradient.addColorStop(0, '#2F4F4F');
+      legGradient.addColorStop(1, '#1C3333');
       
-      // LEGS - Detailed with pants/leggings
-      const pantsColor = 0x2F4F4F; // Dark slate gray
-      playerGraphics.fillStyle(pantsColor);
-      playerGraphics.fillRect(32, 66, 8, 22); // Left leg
-      playerGraphics.fillRect(40, 66, 8, 22); // Right leg
+      ctx.fillStyle = legGradient;
+      ctx.fillRect(50, 93, 8, 30);
+      ctx.fillRect(62, 93, 8, 30);
       
-      // Leg shading
-      playerGraphics.fillStyle(Phaser.Display.Color.GetColor32(
-        Phaser.Display.Color.IntegerToRGB(pantsColor).r * 0.7,
-        Phaser.Display.Color.IntegerToRGB(pantsColor).g * 0.7,
-        Phaser.Display.Color.IntegerToRGB(pantsColor).b * 0.7,
-        255
-      ));
-      playerGraphics.fillRect(44, 68, 4, 18); // Right leg shadow
-      
-      // BOOTS
-      playerGraphics.fillStyle(0x8B4513);
-      playerGraphics.fillEllipse(36, 90, 12, 8); // Left boot
-      playerGraphics.fillEllipse(44, 90, 12, 8); // Right boot
-      
-      // Boot details
-      playerGraphics.fillStyle(0x654321);
-      playerGraphics.fillRect(32, 88, 8, 2); // Left boot top
-      playerGraphics.fillRect(40, 88, 8, 2); // Right boot top
-      
-      // EQUIPMENT based on stats
-      if (playerStats.strength > 2) {
-        // Detailed sword
-        playerGraphics.fillStyle(0xC0C0C0); // Silver blade
-        playerGraphics.fillRect(62, 35, 4, 20); // Blade
-        playerGraphics.fillRect(63, 32, 2, 6); // Blade tip
-        
-        // Blade highlights
-        playerGraphics.fillStyle(0xFFFFFF);
-        playerGraphics.fillRect(62, 36, 1, 18); // Blade edge highlight
-        
-        // Crossguard
-        playerGraphics.fillStyle(0x8B4513);
-        playerGraphics.fillRect(60, 54, 8, 3);
-        
-        // Handle
-        playerGraphics.fillStyle(0x654321);
-        playerGraphics.fillRect(63, 56, 2, 8);
-        
-        // Pommel
-        playerGraphics.fillStyle(0xFFD700);
-        playerGraphics.fillCircle(64, 66, 3);
+      // Generate texture from canvas
+      const texture = this.textures.createCanvas('player-sprite-realistic', canvas.width, canvas.height);
+      const canvasTexture = texture?.getSourceImage() as HTMLCanvasElement;
+      if (canvasTexture) {
+        const canvasCtx = canvasTexture.getContext('2d')!;
+        canvasCtx.drawImage(canvas, 0, 0);
+        texture?.refresh();
       }
       
-      if (playerStats.agility > 2) {
-        // Add a cape for agile characters
-        playerGraphics.fillStyle(0x8B0000); // Dark red cape
-        playerGraphics.fillEllipse(40, 42, 20, 24);
+      // Create ultra-realistic monster sprite using same advanced techniques
+      const monsterCanvas = document.createElement('canvas');
+      monsterCanvas.width = 140;
+      monsterCanvas.height = 140;
+      const mCtx = monsterCanvas.getContext('2d')!;
+      
+      mCtx.imageSmoothingEnabled = true;
+      mCtx.imageSmoothingQuality = 'high';
+      
+      // Generate different realistic monsters based on type
+      if (monster.name.toLowerCase().includes('slime')) {
+        // Ultra-realistic slime with translucent effects
+        const slimeGradient = mCtx.createRadialGradient(70, 70, 10, 70, 70, 50);
+        slimeGradient.addColorStop(0, 'rgba(50, 205, 50, 0.9)');
+        slimeGradient.addColorStop(0.7, 'rgba(34, 139, 34, 0.8)');
+        slimeGradient.addColorStop(1, 'rgba(0, 100, 0, 0.6)');
         
-        // Cape shading
-        playerGraphics.fillStyle(0x660000);
-        playerGraphics.fillEllipse(45, 45, 12, 18);
+        mCtx.fillStyle = slimeGradient;
+        mCtx.beginPath();
+        mCtx.ellipse(70, 80, 45, 35, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Slime highlights and bubbles
+        mCtx.fillStyle = 'rgba(144, 238, 144, 0.7)';
+        mCtx.beginPath();
+        mCtx.ellipse(55, 65, 15, 12, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Multiple bubbles for texture
+        for (let i = 0; i < 8; i++) {
+          const x = 40 + Math.random() * 60;
+          const y = 50 + Math.random() * 50;
+          const size = 2 + Math.random() * 4;
+          mCtx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+          mCtx.beginPath();
+          mCtx.ellipse(x, y, size, size, 0, 0, Math.PI * 2);
+          mCtx.fill();
+        }
+        
+        // Realistic eyes with depth
+        mCtx.fillStyle = '#000000';
+        mCtx.beginPath();
+        mCtx.ellipse(60, 60, 6, 8, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.ellipse(80, 60, 6, 8, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        mCtx.fillStyle = '#FFFFFF';
+        mCtx.beginPath();
+        mCtx.ellipse(62, 58, 2, 2, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.ellipse(82, 58, 2, 2, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+      } else if (monster.name.toLowerCase().includes('goblin')) {
+        // Ultra-realistic goblin with detailed features
+        const goblinSkin = '#228B22';
+        
+        // Head with proper shading
+        const headGradient = mCtx.createRadialGradient(70, 40, 5, 70, 40, 15);
+        headGradient.addColorStop(0, '#32CD32');
+        headGradient.addColorStop(0.7, goblinSkin);
+        headGradient.addColorStop(1, '#006400');
+        
+        mCtx.fillStyle = headGradient;
+        mCtx.beginPath();
+        mCtx.ellipse(70, 40, 15, 13, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Large pointed ears
+        mCtx.fillStyle = goblinSkin;
+        mCtx.beginPath();
+        mCtx.moveTo(50, 35);
+        mCtx.lineTo(45, 25);
+        mCtx.lineTo(55, 40);
+        mCtx.closePath();
+        mCtx.fill();
+        
+        mCtx.beginPath();
+        mCtx.moveTo(90, 35);
+        mCtx.lineTo(95, 25);
+        mCtx.lineTo(85, 40);
+        mCtx.closePath();
+        mCtx.fill();
+        
+        // Body with muscular definition
+        const bodyGradient = mCtx.createLinearGradient(60, 55, 80, 55);
+        bodyGradient.addColorStop(0, '#8B4513');
+        bodyGradient.addColorStop(1, '#654321');
+        
+        mCtx.fillStyle = bodyGradient;
+        mCtx.fillRect(60, 55, 20, 25);
+        
+        // Arms
+        mCtx.fillStyle = goblinSkin;
+        mCtx.beginPath();
+        mCtx.ellipse(50, 65, 6, 12, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.ellipse(90, 65, 6, 12, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Legs
+        mCtx.fillStyle = '#2F4F4F';
+        mCtx.fillRect(62, 80, 6, 18);
+        mCtx.fillRect(72, 80, 6, 18);
+        
+        // Fierce red eyes
+        mCtx.fillStyle = '#FF0000';
+        mCtx.beginPath();
+        mCtx.ellipse(65, 36, 3, 3, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.ellipse(75, 36, 3, 3, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Nasty grin with teeth
+        mCtx.fillStyle = '#000000';
+        mCtx.beginPath();
+        mCtx.ellipse(70, 45, 6, 2, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        mCtx.fillStyle = '#FFFFFF';
+        mCtx.beginPath();
+        mCtx.moveTo(67, 44);
+        mCtx.lineTo(65, 47);
+        mCtx.lineTo(69, 47);
+        mCtx.closePath();
+        mCtx.fill();
+        
+        mCtx.beginPath();
+        mCtx.moveTo(73, 44);
+        mCtx.lineTo(71, 47);
+        mCtx.lineTo(75, 47);
+        mCtx.closePath();
+        mCtx.fill();
+        
+      } else {
+        // Ultra-realistic generic monster (demon-like)
+        const demonRed = '#B22222';
+        
+        // Muscular body with proper anatomy
+        const bodyGradient = mCtx.createRadialGradient(70, 70, 10, 70, 70, 30);
+        bodyGradient.addColorStop(0, '#DC143C');
+        bodyGradient.addColorStop(0.7, demonRed);
+        bodyGradient.addColorStop(1, '#8B0000');
+        
+        mCtx.fillStyle = bodyGradient;
+        mCtx.fillRect(55, 50, 30, 40);
+        
+        // Head
+        mCtx.beginPath();
+        mCtx.ellipse(70, 35, 18, 15, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Horns
+        mCtx.fillStyle = '#654321';
+        mCtx.beginPath();
+        mCtx.moveTo(60, 25);
+        mCtx.lineTo(58, 15);
+        mCtx.lineTo(62, 25);
+        mCtx.closePath();
+        mCtx.fill();
+        
+        mCtx.beginPath();
+        mCtx.moveTo(80, 25);
+        mCtx.lineTo(82, 15);
+        mCtx.lineTo(78, 25);
+        mCtx.closePath();
+        mCtx.fill();
+        
+        // Muscular arms
+        mCtx.fillStyle = bodyGradient;
+        mCtx.beginPath();
+        mCtx.ellipse(45, 60, 8, 15, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.ellipse(95, 60, 8, 15, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Glowing yellow eyes
+        mCtx.fillStyle = '#FFFF00';
+        mCtx.beginPath();
+        mCtx.ellipse(65, 30, 4, 4, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.ellipse(75, 30, 4, 4, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Black pupils
+        mCtx.fillStyle = '#000000';
+        mCtx.beginPath();
+        mCtx.ellipse(65, 30, 2, 2, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.beginPath();
+        mCtx.ellipse(75, 30, 2, 2, 0, 0, Math.PI * 2);
+        mCtx.fill();
+        
+        // Fangs
+        mCtx.fillStyle = '#FFFFFF';
+        mCtx.beginPath();
+        mCtx.moveTo(67, 40);
+        mCtx.lineTo(65, 45);
+        mCtx.lineTo(69, 45);
+        mCtx.closePath();
+        mCtx.fill();
+        
+        mCtx.beginPath();
+        mCtx.moveTo(73, 40);
+        mCtx.lineTo(71, 45);
+        mCtx.lineTo(75, 45);
+        mCtx.closePath();
+        mCtx.fill();
       }
       
-      playerGraphics.generateTexture('player-sprite', 80, 100);
-      playerGraphics.destroy();
+      // Generate monster texture from canvas
+      const monsterTexture = this.textures.createCanvas('monster-sprite-realistic', monsterCanvas.width, monsterCanvas.height);
+      const monsterCanvasTexture = monsterTexture?.getSourceImage() as HTMLCanvasElement;
+      if (monsterCanvasTexture) {
+        const monsterCanvasCtx = monsterCanvasTexture.getContext('2d')!;
+        monsterCanvasCtx.drawImage(monsterCanvas, 0, 0);
+        monsterTexture?.refresh();
+      }
       
       // Create highly detailed dynamic monster sprite
       const monsterGraphics = this.add.graphics();
@@ -571,9 +864,9 @@ export function PhaserBattleScene({
         quantity: 1
       });
       
-      // Create player sprite (left side) with idle animation
-      const playerSprite = this.add.image(200, 300, 'player-sprite')
-        .setDisplaySize(100, 120) // Larger and properly proportioned
+      // Create player sprite (left side) with idle animation using realistic texture
+      const playerSprite = this.add.image(200, 300, 'player-sprite-realistic')
+        .setDisplaySize(120, 160) // Match the realistic sprite dimensions
         .setData('type', 'player')
         .setData('originalX', 200)
         .setData('originalY', 300);
@@ -588,9 +881,9 @@ export function PhaserBattleScene({
         ease: 'Sine.easeInOut'
       });
       
-      // Create monster sprite (right side) with menacing presence
-      const monsterSprite = this.add.image(600, 300, 'monster-sprite')
-        .setDisplaySize(130, 110) // Larger and more imposing
+      // Create monster sprite (right side) with menacing presence using realistic texture
+      const monsterSprite = this.add.image(600, 300, 'monster-sprite-realistic')
+        .setDisplaySize(140, 140) // Match the realistic monster dimensions
         .setData('type', 'monster')
         .setData('originalX', 600)
         .setData('originalY', 300);
