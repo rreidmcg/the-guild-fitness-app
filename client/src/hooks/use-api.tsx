@@ -63,14 +63,12 @@ export function useApiMutation<TData = any, TVariables = any>({
 
   return useMutation({
     mutationFn: async (variables: TVariables) => {
-      const response = await apiRequest(method, endpoint, variables);
+      const response = await apiRequest(endpoint, {
+        method,
+        body: variables
+      });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `${method} request failed`);
-      }
-      
-      return response.json();
+      return response;
     },
     onSuccess: (data, variables) => {
       // Invalidate specified queries
