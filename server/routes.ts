@@ -2556,6 +2556,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin mail routes (only for G.M. users)
   app.post('/api/admin/send-mail', async (req, res) => {
     try {
+      console.log('Admin send mail request received:', req.body);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
       const user = await storage.getUser(userId);
       
@@ -2565,6 +2566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { subject, content, mailType, rewards, targetUserIds, expiresAt } = req.body;
+      console.log('Mail data parsed:', { subject, content, mailType, rewards, targetUserIds, expiresAt });
 
       if (!subject || !content || !mailType) {
         return res.status(400).json({ error: "Subject, content, and mail type are required" });
@@ -2580,7 +2582,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expiresAt: expiresAt ? new Date(expiresAt) : null
       };
 
+      console.log('Calling sendBulkMail with:', mailData);
       const sentCount = await storage.sendBulkMail(mailData, targetUserIds);
+      console.log('Mail sent successfully to', sentCount, 'users');
       
       res.json({ 
         success: true, 
