@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { AtrophySystem } from "./atrophy-system";
 
 const app = express();
 app.use(express.json());
@@ -69,6 +70,13 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
+  // Setup daily atrophy processing
+  // Run once at startup, then every 24 hours
+  AtrophySystem.processAtrophy().catch(console.error);
+  setInterval(() => {
+    AtrophySystem.processAtrophy().catch(console.error);
+  }, 24 * 60 * 60 * 1000); // 24 hours
+  
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.

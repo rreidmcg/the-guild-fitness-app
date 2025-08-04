@@ -5,6 +5,11 @@
 The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, agility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
 
 ## Recent Changes (August 4, 2025)
+- **AUTOMATIC ATROPHY PROCESSING IMPLEMENTED**: Added scheduled atrophy system that runs daily on server startup and every 24 hours thereafter - ensures consistent stat degradation for inactive users without manual intervention
+- **STREAK AND ATROPHY SYSTEMS VERIFIED**: Comprehensive analysis confirmed both systems work correctly - streaks reset to 0 when minimum activity requirements (2/4 daily quests OR 1 workout) aren't met, atrophy subtracts 1% XP and recalculates stats accurately for users inactive >24 hours
+- **ZERO'S STATS RESET COMPLETE**: Reset Zero to Level 1 with all stats at 1, 0 XP, 0 gold, and cleared workout history for fresh character progression testing
+- **MONSTER ANALYTICS CLEARED**: Deleted all monster battle data (3 instances) to reset combat tracking and encounter system
+- **MAILBOX TIMESTAMP OPTIMIZATION**: Updated mail timestamps from "less than a minute ago" to "< 1 min ago" for improved space efficiency in mobile interface
 - **ADMIN MAIL SYSTEM FULLY RESTORED**: Fixed critical API request formatting issue in useApiMutation hook that was preventing global mail composition - admin panel can now successfully send notifications to all users with proper authentication and data validation
 - **API AUTHENTICATION RESOLVED**: Corrected useApiMutation to use proper apiRequest format with credentials, resolving "string did not match" errors that were actually authentication failures
 - **MAIL VALIDATION ENHANCED**: Added enum validation to mailType field in database schema to ensure only valid mail types (news, reward, announcement, event) are accepted
