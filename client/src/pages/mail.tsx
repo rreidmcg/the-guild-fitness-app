@@ -326,11 +326,15 @@ export default function MailPage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        {/* Sender name at the top */}
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="text-sm text-muted-foreground font-medium">
+                        {/* Sender name and mail type in same row */}
+                        <div className="flex items-center space-x-2 mb-2">
+                          <span className="text-lg font-bold text-foreground">
                             {mailItem.senderName}
                           </span>
+                          {getMailTypeIcon(mailItem.mailType)}
+                          <Badge className={getMailTypeBadge(mailItem.mailType)}>
+                            {mailItem.mailType}
+                          </Badge>
                           {!mailItem.isRead && (
                             <Badge variant="secondary" className="bg-blue-500 text-white text-xs">
                               New
@@ -338,15 +342,7 @@ export default function MailPage() {
                           )}
                         </div>
                         
-                        {/* Mail type and subject */}
-                        <div className="flex items-center space-x-2 mb-2">
-                          {getMailTypeIcon(mailItem.mailType)}
-                          <Badge className={getMailTypeBadge(mailItem.mailType)}>
-                            {mailItem.mailType}
-                          </Badge>
-                        </div>
-                        
-                        <CardTitle className="text-base font-semibold mb-2">
+                        <CardTitle className="text-sm font-semibold mb-2">
                           {mailItem.subject}
                         </CardTitle>
                         
