@@ -295,10 +295,42 @@ export default function WorkoutSession() {
   const completeWorkoutMutation = useMutation({
     mutationFn: async (sessionData: any) => {
       console.log("Submitting workout session data:", sessionData);
-      return await apiRequest("/api/workout-sessions", {
-        method: "POST",
-        body: sessionData,
-      });
+      
+      // Pre-validate data before sending
+      if (!sessionData.name || sessionData.name.trim() === '') {
+        throw new Error('Workout name is required');
+      }
+      if (!sessionData.duration || sessionData.duration < 1) {
+        throw new Error('Valid workout duration is required');
+      }
+      if (!sessionData.exercises || sessionData.exercises.length === 0) {
+        throw new Error('At least one exercise is required');
+      }
+      
+      // Store the data locally before sending (in case of failure)
+      const { WorkoutBackupManager } = await import("@/utils/workout-backup");
+      const backupKey = WorkoutBackupManager.saveBackup(sessionData);
+      
+      try {
+        const result = await apiRequest("/api/workout-sessions", {
+          method: "POST",
+          body: sessionData,
+        });
+        
+        // Remove backup on success
+        if (backupKey) {
+          WorkoutBackupManager.removeBackup(backupKey);
+        }
+        return result;
+      } catch (error: any) {
+        console.error("Workout submission failed:", error);
+        
+        // Keep backup for potential retry
+        if (backupKey) {
+          console.log("Workout data backed up, can retry");
+        }
+        throw error;
+      }
     },
     onSuccess: (result) => {
       console.log("Workout session completed successfully:", result);
@@ -314,16 +346,74 @@ export default function WorkoutSession() {
       setShowVictoryModal(true);
     },
     onError: (error: any) => {
-      console.error("Workout completion error:", error);
-      const errorMessage = error?.response?.data?.error || error?.message || "Failed to complete workout";
-      const errorDetails = error?.response?.data?.details;
+      console.error("Failed to complete workout:", error);
+      
+      // Parse server error response for user-friendly messages
+      let errorMessage = "Failed to save workout session. Please try again.";
+      let shouldShowRetryButton = false;
+      
+      if (error?.response?.status === 401) {
+        errorMessage = "Your session has expired. Please log in again to save your workout.";
+        shouldShowRetryButton = false;
+      } else if (error?.response?.status === 400) {
+        const serverError = error?.response?.data;
+        if (serverError?.userFriendly) {
+          errorMessage = serverError.details || serverError.error;
+        } else {
+          errorMessage = "Some workout data is invalid. Please check your entries and try again.";
+        }
+        shouldShowRetryButton = true;
+      } else if (error?.response?.status === 503) {
+        errorMessage = "Connection issue detected. Your workout is saved locally and will retry automatically.";
+        shouldShowRetryButton = true;
+      } else if (error?.response?.data?.userFriendly) {
+        errorMessage = error.response.data.details || error.response.data.error;
+        shouldShowRetryButton = error.response.data.shouldRetry;
+      }
       
       toast({
-        title: "Workout Logging Error",
-        description: errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage,
+        title: shouldShowRetryButton ? "Workout Save Failed" : "Error",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      // Show retry button in a separate toast for retryable errors
+      if (shouldShowRetryButton) {
+        setTimeout(() => {
+          toast({
+            title: "Retry Available",
+            description: "Tap here to retry saving your workout",
+            variant: "default",
+            action: (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  const { WorkoutBackupManager } = await import("@/utils/workout-backup");
+                  const mostRecentBackup = WorkoutBackupManager.getMostRecentBackup();
+                  if (mostRecentBackup) {
+                    completeWorkoutMutation.mutate(mostRecentBackup.sessionData);
+                  }
+                }}
+              >
+                Retry
+              </Button>
+            ),
+          });
+        }, 2000);
+      }
+      
+      // Don't navigate away on error - keep user in workout
+      setShowRPESelection(false);
     },
+    retry: (failureCount, error: any) => {
+      // Only retry on network errors or 5xx server errors
+      if (error?.response?.status >= 500 || !error?.response) {
+        return failureCount < 3;
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 
   const formatTime = (seconds: number) => {
