@@ -922,7 +922,7 @@ export function PhaserBattleScene({
         this.anims.create({
           key: 'player-attack',
           frames: this.anims.generateFrameNumbers('player-attack-animation', { start: 0, end: 20 }),
-          frameRate: 15, // 15 FPS for smooth but visible animation
+          frameRate: 8, // Slower frame rate for visible individual frames
           repeat: 0 // Play once
         });
       }
@@ -934,23 +934,13 @@ export function PhaserBattleScene({
         .setData('originalX', 200)
         .setData('originalY', 300);
       
-      // Enhanced idle animation - gentle floating with breathing scale
+      // Subtle idle animation - very gentle floating
       this.tweens.add({
         targets: playerSprite,
-        y: playerSprite.y - 8,
-        scaleX: 1.03,
-        scaleY: 1.03,
-        duration: 1800,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut'
-      });
-      
-      // Subtle rotation sway for more life-like movement
-      this.tweens.add({
-        targets: playerSprite,
-        rotation: 0.08,
-        duration: 2500,
+        y: playerSprite.y - 3,
+        scaleX: 1.01,
+        scaleY: 1.01,
+        duration: 3000,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut'
@@ -1017,15 +1007,15 @@ export function PhaserBattleScene({
         .setData('originalX', 600)
         .setData('originalY', 300);
       
-      // Add menacing idle animation to monster
+      // Subtle monster idle animation
       this.tweens.add({
         targets: monsterSprite,
-        scaleX: 1.1,
-        scaleY: 1.1,
-        duration: 2000,
+        scaleX: 1.02,
+        scaleY: 1.02,
+        duration: 2500,
         yoyo: true,
         repeat: -1,
-        ease: 'Power2'
+        ease: 'Sine.easeInOut'
       });
       
       // Enhanced HP bars with borders and gradients (repositioned for new sprite layout)
@@ -1169,22 +1159,18 @@ export function PhaserBattleScene({
         // Camera shake for impact
         scene.cameras.main.shake(200, 0.01);
         
-        // Enhanced player attack with sprite switching and Effekseer-style effects
+        // Enhanced player attack with sprite sheet animation and Effekseer-style effects
         const originalX = playerSprite.getData('originalX');
-        const switchSprite = scene.data.get('switchPlayerSprite');
         const effekseer = scene.data.get('effekseerSystem');
-        
-        // Step 1: Charge phase - switch to charge sprite + spell casting effect
-        switchSprite('custom-player-charge', 200);
         
         // Professional spell casting effect during charge
         const spellEffect = effekseer.createSpellCast(playerSprite.x + 20, playerSprite.y - 20, 0x00FFFF);
         
-        // Step 2: Attack phase - play sprite sheet animation and add explosion
-        scene.time.delayedCall(150, () => {
-          // Check if player sprite is an animated sprite or can be converted
-          if (playerSprite.anims && scene.anims.exists('player-attack')) {
-            // Convert to animated sprite if needed and play attack animation
+        // Play sprite sheet attack animation immediately
+        scene.time.delayedCall(100, () => {
+          // Check if animation exists and create animated sprite
+          if (scene.anims.exists('player-attack')) {
+            // Create animated sprite to replace static one
             const animatedSprite = scene.add.sprite(playerSprite.x, playerSprite.y, 'player-attack-animation')
               .setDisplaySize(120, 160)
               .setData('type', 'player')
@@ -1198,21 +1184,18 @@ export function PhaserBattleScene({
             // Play attack animation
             animatedSprite.play('player-attack');
             
+            // Create explosion effect when animation is halfway through
+            scene.time.delayedCall(1300, () => { // About halfway through 21-frame animation at 8fps
+              const explosionEffect = effekseer.createExplosion(monsterSprite.x, monsterSprite.y - 20, 0.8);
+            });
+            
             // When animation completes, switch back to idle sprite
             animatedSprite.on('animationcomplete', () => {
               playerSprite.setVisible(true);
               animatedSprite.destroy();
               scene.data.set('playerSprite', playerSprite);
             });
-          } else {
-            // Fallback to simple sprite switching if animation fails
-            switchSprite('custom-player-attack', 400);
           }
-          
-          // Create explosion effect at monster position when attack hits
-          scene.time.delayedCall(200, () => {
-            const explosionEffect = effekseer.createExplosion(monsterSprite.x, monsterSprite.y - 20, 0.8);
-          });
         });
         
         scene.tweens.add({
