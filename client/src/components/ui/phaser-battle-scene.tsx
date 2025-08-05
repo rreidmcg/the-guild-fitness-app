@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
+import { EffekseerSystem } from './effekseer-effects';
 
 interface PhaserBattleSceneProps {
   isActive: boolean;
@@ -823,10 +824,13 @@ export function PhaserBattleScene({
       monsterGraphics.generateTexture('monster-sprite', 120, 100);
       monsterGraphics.destroy();
       
-      // Create particle textures
+      // Create particle textures for Effekseer-style effects
       this.add.graphics().fillStyle(0xffd700).fillCircle(5, 5, 5).generateTexture('gold-particle', 10, 10);
       this.add.graphics().fillStyle(0xff0000).fillCircle(3, 3, 3).generateTexture('blood-particle', 6, 6);
       this.add.graphics().fillStyle(0x00ffff).fillCircle(4, 4, 4).generateTexture('magic-particle', 8, 8);
+      this.add.graphics().fillStyle(0xff4400).fillCircle(4, 4, 4).generateTexture('fire-particle', 8, 8);
+      this.add.graphics().fillStyle(0x88ff88).fillCircle(3, 3, 3).generateTexture('light-particle', 6, 6);
+      this.add.graphics().fillStyle(0xccccff).fillCircle(2, 2, 2).generateTexture('electric-particle', 4, 4);
       
       // Create background elements
       const bgGraphics = this.add.graphics();
@@ -865,6 +869,10 @@ export function PhaserBattleScene({
 
     function create(this: Phaser.Scene) {
       sceneRef.current = this;
+      
+      // Initialize Effekseer-style visual effects system
+      const effekseerSystem = new EffekseerSystem(this);
+      this.data.set('effekseerSystem', effekseerSystem);
       
       // Create battle arena background
       const bg = this.add.image(400, 200, 'battle-bg');
@@ -1111,6 +1119,14 @@ export function PhaserBattleScene({
     }
 
     return () => {
+      // Clean up Effekseer system
+      if (sceneRef.current) {
+        const effekseerSystem = sceneRef.current.data.get('effekseerSystem');
+        if (effekseerSystem) {
+          effekseerSystem.destroyAllEffects();
+        }
+      }
+      
       if (gameRef.current) {
         gameRef.current.destroy(true);
         gameRef.current = null;
@@ -1133,27 +1149,25 @@ export function PhaserBattleScene({
         // Camera shake for impact
         scene.cameras.main.shake(200, 0.01);
         
-        // Enhanced player attack with sprite switching
+        // Enhanced player attack with sprite switching and Effekseer-style effects
         const originalX = playerSprite.getData('originalX');
         const switchSprite = scene.data.get('switchPlayerSprite');
+        const effekseer = scene.data.get('effekseerSystem');
         
-        // Step 1: Charge phase - switch to charge sprite
+        // Step 1: Charge phase - switch to charge sprite + spell casting effect
         switchSprite('custom-player-charge', 200);
         
-        // Pre-attack charge effect (energy building up)
-        const chargeAura = scene.add.circle(playerSprite.x, playerSprite.y, 50, 0x00FFFF, 0.4);
-        scene.tweens.add({
-          targets: chargeAura,
-          scaleX: 0.5,
-          scaleY: 0.5,
-          alpha: 0,
-          duration: 100,
-          onComplete: () => chargeAura.destroy()
-        });
+        // Professional spell casting effect during charge
+        const spellEffect = effekseer.createSpellCast(playerSprite.x + 20, playerSprite.y - 20, 0x00FFFF);
         
-        // Step 2: Attack phase - switch to attack sprite and lunge
+        // Step 2: Attack phase - switch to attack sprite and add explosion
         scene.time.delayedCall(150, () => {
           switchSprite('custom-player-attack', 400);
+          
+          // Create explosion effect at monster position when attack hits
+          scene.time.delayedCall(200, () => {
+            const explosionEffect = effekseer.createExplosion(monsterSprite.x, monsterSprite.y - 20, 0.8);
+          });
         });
         
         scene.tweens.add({
@@ -1238,6 +1252,12 @@ export function PhaserBattleScene({
             ease: 'Power2',
             onComplete: () => critText.destroy()
           });
+          
+          // Lightning strike effect for critical hits
+          const effekseer = scene.data.get('effekseerSystem');
+          if (effekseer) {
+            effekseer.createLightningStrike(monsterSprite.x, monsterSprite.y - 40);
+          }
         }
       }
     }
@@ -1335,11 +1355,17 @@ export function PhaserBattleScene({
         });
       }
       
-      // Player victory pose with victory sprite
+      // Player victory pose with victory sprite and healing light
       if (playerSprite) {
         const victoryAnimation = playerSprite.getData('victoryAnimation');
         if (victoryAnimation) {
           victoryAnimation();
+        }
+        
+        // Add healing light effect for victory celebration
+        const effekseer = scene.data.get('effekseerSystem');
+        if (effekseer) {
+          effekseer.createHealingLight(playerSprite.x, playerSprite.y);
         }
       }
       

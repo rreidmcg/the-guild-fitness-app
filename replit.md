@@ -23,7 +23,7 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack Query
 - **Styling**: Tailwind CSS with custom gaming theme variables
 - **UI Components**: Radix UI with shadcn/ui
-- **Graphics**: Advanced sprite system with custom asset support; Phaser.js for battle enhancements (animations, particle systems, HP bars); Three.js planned for 3D avatar display. Players can add custom PNG/JPG sprites to `/public/sprites/` directory (120x160px for players, 140x140px for monsters) with automatic fallback to ultra-realistic generated sprites using HTML5 Canvas techniques.
+- **Graphics**: Advanced sprite system with custom asset support; Phaser.js for battle enhancements (animations, particle systems, HP bars); Effekseer-style professional visual effects system for spell casting, explosions, lightning strikes, and healing animations; Three.js planned for 3D avatar display. Players can add custom PNG/JPG sprites to `/public/sprites/` directory (120x160px for players, 140x140px for monsters) with automatic fallback to ultra-realistic generated sprites using HTML5 Canvas techniques. Action sprites supported: idle, attack, victory, hurt, charge poses with dynamic switching during battles.
 - **UI/UX Decisions**: Dark gaming theme, mobile-responsive design with bottom navigation (Stats, Workouts, Battle, Shop, Leaderboard), currency header displaying gold, XP, and level. Progressive Web App (PWA) capabilities including offline functionality and push notifications. Visual feedback for workout session swiping (directional border highlights, opacity feedback). Mailbox UI refined for mobile with sender above subject, badge next to sender, and normal text preview.
 
 ### Backend
