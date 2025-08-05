@@ -14,6 +14,14 @@
 - **Stance**: Neutral battle-ready pose, standing upright
 - **Ground Level**: Character feet at ~90% from top of image
 
+### Action Sprite Variations
+- **player-idle-male.png**: Default idle pose for male avatars - martial arts stance with brown hair, tank top, green pants
+- **player.png**: Base idle pose sprite
+- **player-attack.png**: Attack animation frame
+- **player-victory.png**: Victory celebration pose
+- **player-hurt.png**: Damage taken reaction
+- **player-charge.png**: Charging/preparing attack pose
+
 ### Visual Style Guidelines
 - **Lighting**: Consistent light source from upper-left
 - **Contrast**: High contrast for visibility at small sizes

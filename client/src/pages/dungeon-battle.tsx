@@ -455,40 +455,9 @@ export default function DungeonBattlePage() {
       </div>
 
       {/* Phaser Battle Scene - DISABLED (Phaser and Effekseer systems temporarily disabled) */}
-      {false && battleState.enhancedMode && battleState.monster && userStats ? (
+      {false ? (
         <div className="fixed inset-0 z-30 bg-black">
-          <PhaserBattleScene
-            isActive={battleState.enhancedMode}
-            playerStats={{
-              currentHp: battleState.playerHp,
-              maxHp: battleState.playerMaxHp,
-              currentMp: battleState.playerMp,
-              maxMp: battleState.playerMaxMp,
-              strength: userStats.strength,
-              agility: userStats.agility,
-              username: userStats.username,
-              skinColor: userStats.skinColor,
-              hairColor: userStats.hairColor,
-              gender: userStats.gender
-            }}
-            monster={{
-              name: battleState.monster.name,
-              currentHp: battleState.monster.currentHp,
-              maxHp: battleState.monster.maxHp,
-              image: battleState.monster.image,
-              level: battleState.monster.level
-            }}
-            onBattleAction={(action) => {
-              if (action === 'attack') handleAttack();
-              if (action === 'flee') {
-                if (window.confirm("Are you sure you want to flee from battle?")) {
-                  handleRetreat();
-                }
-              }
-            }}
-            battleEvents={battleEvents}
-            battleBackground={battleState.zone?.background}
-          />
+          <div>Phaser Scene Disabled</div>
         </div>
       ) : null}
       

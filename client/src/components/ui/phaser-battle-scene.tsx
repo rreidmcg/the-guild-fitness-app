@@ -77,7 +77,9 @@ export function PhaserBattleScene({
       });
 
       // Load custom player sprites for different actions
-      this.load.image('custom-player', '/sprites/player.png');
+      // Use gender-specific idle sprite for males, fallback to general sprite
+      const idleSprite = playerStats.gender === 'male' ? '/sprites/player-idle-male.png' : '/sprites/player.png';
+      this.load.image('custom-player', idleSprite);
       this.load.image('custom-player-attack', '/sprites/player-attack.png');
       this.load.image('custom-player-victory', '/sprites/player-victory.png');
       this.load.image('custom-player-hurt', '/sprites/player-hurt.png');
