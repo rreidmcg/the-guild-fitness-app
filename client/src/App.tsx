@@ -123,6 +123,11 @@ function Router() {
           <PvEDungeons />
         </AuthGuard>
       </Route>
+      <Route path="/dungeon">
+        <AuthGuard>
+          <PvEDungeons />
+        </AuthGuard>
+      </Route>
       <Route path="/dungeon-battle/:id">
         <AuthGuard>
           <DungeonBattle />
