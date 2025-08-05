@@ -902,14 +902,78 @@ export function PhaserBattleScene({
         .setData('originalX', 200)
         .setData('originalY', 300);
       
-      // Add subtle idle animation to player
+      // Enhanced idle animation - gentle floating with breathing scale
       this.tweens.add({
         targets: playerSprite,
         y: playerSprite.y - 8,
+        scaleX: 1.03,
+        scaleY: 1.03,
         duration: 1800,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut'
+      });
+      
+      // Subtle rotation sway for more life-like movement
+      this.tweens.add({
+        targets: playerSprite,
+        rotation: 0.08,
+        duration: 2500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      // Victory pose animation (triggered when monster dies)
+      playerSprite.setData('victoryAnimation', () => {
+        this.tweens.add({
+          targets: playerSprite,
+          scaleX: 1.2,
+          scaleY: 1.2,
+          rotation: 0.2,
+          y: playerSprite.y - 20,
+          duration: 500,
+          ease: 'Back.easeOut',
+          onComplete: () => {
+            // Add sparkle particles for victory
+            const sparkles = this.add.particles(playerSprite.x, playerSprite.y, 'magic-particle', {
+              scale: { start: 0.2, end: 0.5 },
+              alpha: { start: 1, end: 0 },
+              tint: [0xFFD700, 0xFFA500, 0xFFFFFF],
+              lifespan: 1000,
+              quantity: 20,
+              speed: { min: 20, max: 100 }
+            });
+            
+            this.time.delayedCall(1500, () => sparkles.destroy());
+          }
+        });
+      });
+      
+      // Level up animation effect  
+      playerSprite.setData('levelUpAnimation', () => {
+        // Golden glow effect
+        const glow = this.add.circle(playerSprite.x, playerSprite.y, 80, 0xFFD700, 0.3);
+        this.tweens.add({
+          targets: glow,
+          scaleX: 2,
+          scaleY: 2,
+          alpha: 0,
+          duration: 1000,
+          onComplete: () => glow.destroy()
+        });
+        
+        // Player celebration bounce
+        this.tweens.add({
+          targets: playerSprite,
+          y: playerSprite.y - 30,
+          scaleX: 1.15,
+          scaleY: 1.15,
+          duration: 300,
+          yoyo: true,
+          repeat: 1,
+          ease: 'Power2'
+        });
       });
       
       // Create monster sprite (right side) with menacing presence
@@ -1051,8 +1115,21 @@ export function PhaserBattleScene({
         // Camera shake for impact
         scene.cameras.main.shake(200, 0.01);
         
-        // Player lunge attack animation
+        // Enhanced player attack with power-up effects
         const originalX = playerSprite.getData('originalX');
+        
+        // Pre-attack charge effect (energy building up)
+        const chargeAura = scene.add.circle(playerSprite.x, playerSprite.y, 50, 0x00FFFF, 0.4);
+        scene.tweens.add({
+          targets: chargeAura,
+          scaleX: 0.5,
+          scaleY: 0.5,
+          alpha: 0,
+          duration: 100,
+          onComplete: () => chargeAura.destroy()
+        });
+        
+        // Player lunge attack with trail effect
         scene.tweens.add({
           targets: playerSprite,
           x: originalX + 80,
