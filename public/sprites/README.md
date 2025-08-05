@@ -6,10 +6,14 @@ Drop your custom sprite files into the `/public/sprites/` directory and they'll 
 ## File Requirements
 
 ### Player Sprites
-- **Filename**: `player.png`
-- **Dimensions**: 120x160 pixels (3:4 ratio)
+- **Base Idle**: `player.png` - Standing idle pose, facing right
+- **Attack**: `player-attack.png` - Lunging attack pose, facing right
+- **Victory**: `player-victory.png` - Arms raised celebration pose
+- **Hurt**: `player-hurt.png` - Recoiling from damage pose
+- **Charge**: `player-charge.png` - Powering up before attack pose
+- **Dimensions**: 120x160 pixels (3:4 ratio) for all sprites
 - **Format**: PNG with transparency (recommended) or JPG
-- **Style**: Any style you want - realistic, cartoon, pixel art, etc.
+- **Style**: Keep consistent style across all action poses
 
 ### Monster Sprites
 - **Filename Pattern**: `monster-[name].png`

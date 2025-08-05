@@ -75,8 +75,12 @@ export function PhaserBattleScene({
         console.log('Failed to load:', file.src);
       });
 
-      // Try to load custom player sprite (load without error if missing)
+      // Load custom player sprites for different actions
       this.load.image('custom-player', '/sprites/player.png');
+      this.load.image('custom-player-attack', '/sprites/player-attack.png');
+      this.load.image('custom-player-victory', '/sprites/player-victory.png');
+      this.load.image('custom-player-hurt', '/sprites/player-hurt.png');
+      this.load.image('custom-player-charge', '/sprites/player-charge.png');
       
       // Only try to load custom monster sprite if it might exist
       const monsterFileName = monster.name.toLowerCase().replace(/\s+/g, '-');
@@ -926,11 +930,13 @@ export function PhaserBattleScene({
       
       // Victory pose animation (triggered when monster dies)
       playerSprite.setData('victoryAnimation', () => {
+        // Switch to victory sprite
+        switchPlayerSprite('custom-player-victory', 2000);
+        
         this.tweens.add({
           targets: playerSprite,
           scaleX: 1.2,
           scaleY: 1.2,
-          rotation: 0.2,
           y: playerSprite.y - 20,
           duration: 500,
           ease: 'Back.easeOut',
@@ -1040,9 +1046,21 @@ export function PhaserBattleScene({
         fontFamily: 'monospace'
       }).setOrigin(0.5);
       
+      // Helper function to switch player sprite
+      const switchPlayerSprite = (newSpriteKey: string, duration: number = 500) => {
+        if (this.textures.exists(newSpriteKey)) {
+          playerSprite.setTexture(newSpriteKey);
+          // Auto-return to idle after duration
+          this.time.delayedCall(duration, () => {
+            playerSprite.setTexture(playerSpriteKey);
+          });
+        }
+      };
+
       // Store references for updates
       this.data.set('playerSprite', playerSprite);
       this.data.set('monsterSprite', monsterSprite);
+      this.data.set('switchPlayerSprite', switchPlayerSprite);
       this.data.set('playerHpBar', playerHpBar);
       this.data.set('monsterHpBar', monsterHpBar);
       this.data.set('playerMpBar', playerMpBar);
@@ -1115,8 +1133,12 @@ export function PhaserBattleScene({
         // Camera shake for impact
         scene.cameras.main.shake(200, 0.01);
         
-        // Enhanced player attack with power-up effects
+        // Enhanced player attack with sprite switching
         const originalX = playerSprite.getData('originalX');
+        const switchSprite = scene.data.get('switchPlayerSprite');
+        
+        // Step 1: Charge phase - switch to charge sprite
+        switchSprite('custom-player-charge', 200);
         
         // Pre-attack charge effect (energy building up)
         const chargeAura = scene.add.circle(playerSprite.x, playerSprite.y, 50, 0x00FFFF, 0.4);
@@ -1129,13 +1151,16 @@ export function PhaserBattleScene({
           onComplete: () => chargeAura.destroy()
         });
         
-        // Player lunge attack with trail effect
+        // Step 2: Attack phase - switch to attack sprite and lunge
+        scene.time.delayedCall(150, () => {
+          switchSprite('custom-player-attack', 400);
+        });
+        
         scene.tweens.add({
           targets: playerSprite,
           x: originalX + 80,
-          scaleX: 1.2,
-          scaleY: 1.2,
           duration: 150,
+          delay: 150,
           ease: 'Power2',
           onComplete: () => {
             // Weapon slash effect
@@ -1254,8 +1279,13 @@ export function PhaserBattleScene({
           }
         });
         
-        // Player hit reaction
+        // Player hit reaction with hurt sprite
         const playerOriginalX = playerSprite.getData('originalX');
+        const switchSprite = scene.data.get('switchPlayerSprite');
+        
+        // Switch to hurt sprite during hit reaction
+        switchSprite('custom-player-hurt', 600);
+        
         scene.tweens.add({
           targets: playerSprite,
           x: playerOriginalX - 15,
@@ -1305,16 +1335,12 @@ export function PhaserBattleScene({
         });
       }
       
-      // Player victory pose
+      // Player victory pose with victory sprite
       if (playerSprite) {
-        scene.tweens.add({
-          targets: playerSprite,
-          scaleX: 1.2,
-          scaleY: 1.2,
-          y: playerSprite.y - 20,
-          duration: 1000,
-          ease: 'Bounce'
-        });
+        const victoryAnimation = playerSprite.getData('victoryAnimation');
+        if (victoryAnimation) {
+          victoryAnimation();
+        }
       }
       
       // Victory particles explosion
