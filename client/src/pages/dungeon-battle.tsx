@@ -428,7 +428,7 @@ export default function DungeonBattlePage() {
   if (true) { // Toggle this to enable new battle system
     return (
       <TurnBasedBattle
-        dungeonId={id!}
+        dungeonId={zoneId!}
         onBattleComplete={(result) => {
           if (result === 'victory') {
             toast({
