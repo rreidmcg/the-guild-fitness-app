@@ -80,7 +80,15 @@ export function PhaserBattleScene({
       // Use gender-specific idle sprite for males, fallback to general sprite
       const idleSprite = playerStats.gender === 'male' ? '/sprites/player-idle-male.png' : '/sprites/player.png';
       this.load.image('custom-player', idleSprite);
-      this.load.image('custom-player-attack', '/sprites/player-attack.png');
+      
+      // Load attack animation sprite sheet (21 frames in 6x4 grid with some empty spots)
+      this.load.spritesheet('player-attack-animation', '/sprites/player-attack-spritesheet.png', {
+        frameWidth: 64,  // Each frame is approximately 64x64 pixels
+        frameHeight: 64,
+        startFrame: 0,
+        endFrame: 20  // 21 frames total (0-20)
+      });
+      
       this.load.image('custom-player-victory', '/sprites/player-victory.png');
       this.load.image('custom-player-hurt', '/sprites/player-hurt.png');
       this.load.image('custom-player-charge', '/sprites/player-charge.png');
@@ -909,6 +917,16 @@ export function PhaserBattleScene({
         console.log('Using generated monster sprite');
       }
       
+      // Create attack animation from sprite sheet
+      if (this.textures.exists('player-attack-animation')) {
+        this.anims.create({
+          key: 'player-attack',
+          frames: this.anims.generateFrameNumbers('player-attack-animation', { start: 0, end: 20 }),
+          frameRate: 15, // 15 FPS for smooth but visible animation
+          repeat: 0 // Play once
+        });
+      }
+      
       // Create player sprite (left side) with idle animation
       const playerSprite = this.add.image(200, 300, playerSpriteKey)
         .setDisplaySize(120, 160) // Consistent dimensions
@@ -1162,9 +1180,34 @@ export function PhaserBattleScene({
         // Professional spell casting effect during charge
         const spellEffect = effekseer.createSpellCast(playerSprite.x + 20, playerSprite.y - 20, 0x00FFFF);
         
-        // Step 2: Attack phase - switch to attack sprite and add explosion
+        // Step 2: Attack phase - play sprite sheet animation and add explosion
         scene.time.delayedCall(150, () => {
-          switchSprite('custom-player-attack', 400);
+          // Check if player sprite is an animated sprite or can be converted
+          if (playerSprite.anims && scene.anims.exists('player-attack')) {
+            // Convert to animated sprite if needed and play attack animation
+            const animatedSprite = scene.add.sprite(playerSprite.x, playerSprite.y, 'player-attack-animation')
+              .setDisplaySize(120, 160)
+              .setData('type', 'player')
+              .setData('originalX', playerSprite.getData('originalX'))
+              .setData('originalY', playerSprite.getData('originalY'));
+            
+            // Hide original static sprite and replace with animated one
+            playerSprite.setVisible(false);
+            scene.data.set('playerSprite', animatedSprite);
+            
+            // Play attack animation
+            animatedSprite.play('player-attack');
+            
+            // When animation completes, switch back to idle sprite
+            animatedSprite.on('animationcomplete', () => {
+              playerSprite.setVisible(true);
+              animatedSprite.destroy();
+              scene.data.set('playerSprite', playerSprite);
+            });
+          } else {
+            // Fallback to simple sprite switching if animation fails
+            switchSprite('custom-player-attack', 400);
+          }
           
           // Create explosion effect at monster position when attack hits
           scene.time.delayedCall(200, () => {
