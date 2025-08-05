@@ -70,16 +70,17 @@ export function PhaserBattleScene({
     gameRef.current = new Phaser.Game(config);
 
     function preload(this: Phaser.Scene) {
-      // Try to load custom sprites first, fall back to generated sprites
-      const customPlayerSprite = '/sprites/player.png';
-      const customMonsterSprite = `/sprites/monster-${monster.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+      // Set up error handling for missing sprites
+      this.load.on('loaderror', (file: any) => {
+        console.log('Failed to load:', file.src);
+      });
+
+      // Try to load custom player sprite (load without error if missing)
+      this.load.image('custom-player', '/sprites/player.png');
       
-      // Check if custom sprites exist and load them
-      let useCustomSprites = false;
-      
-      // Load custom player sprite if available
-      this.load.image('custom-player', customPlayerSprite);
-      this.load.image('custom-monster', customMonsterSprite);
+      // Only try to load custom monster sprite if it might exist
+      const monsterFileName = monster.name.toLowerCase().replace(/\s+/g, '-');
+      this.load.image('custom-monster', `/sprites/monster-${monsterFileName}.png`);
       
       // Fallback: Create ultra-realistic generated sprites
       const canvas = document.createElement('canvas');
@@ -879,12 +880,19 @@ export function PhaserBattleScene({
       let playerSpriteKey = 'player-sprite-realistic';
       let monsterSpriteKey = 'monster-sprite-realistic';
       
-      // Check if custom sprites loaded successfully
-      if (this.textures.exists('custom-player')) {
+      // Check if custom sprites loaded successfully and have valid data
+      if (this.textures.exists('custom-player') && this.textures.get('custom-player').source[0]) {
         playerSpriteKey = 'custom-player';
+        console.log('Using custom player sprite');
+      } else {
+        console.log('Using generated player sprite');
       }
-      if (this.textures.exists('custom-monster')) {
+      
+      if (this.textures.exists('custom-monster') && this.textures.get('custom-monster').source[0]) {
         monsterSpriteKey = 'custom-monster';
+        console.log('Using custom monster sprite');
+      } else {
+        console.log('Using generated monster sprite');
       }
       
       // Create player sprite (left side) with idle animation
