@@ -23,14 +23,19 @@ export function BattleAvatar({ playerStats, className, isAttacking = false, onAt
   const FRAME_DURATION = 1000 / FPS; // 200ms per frame
 
   useEffect(() => {
+    console.log("BattleAvatar - isAttacking:", isAttacking, "isAnimating:", isAnimating);
+    
     if (isAttacking && !isAnimating) {
+      console.log("Starting attack animation");
       setIsAnimating(true);
       setCurrentFrame(0);
 
       const animationTimer = setInterval(() => {
         setCurrentFrame(prev => {
           const nextFrame = prev + 1;
+          console.log("Animation frame:", nextFrame, "of", TOTAL_FRAMES);
           if (nextFrame >= TOTAL_FRAMES) {
+            console.log("Attack animation complete");
             clearInterval(animationTimer);
             setIsAnimating(false);
             onAttackComplete?.();
