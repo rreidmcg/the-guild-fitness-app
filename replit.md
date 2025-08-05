@@ -41,7 +41,7 @@ Preferred communication style: Simple, everyday language.
 - **Gamification**:
     - **Dual Resource System**: HP (Health Points) and MP (Magic Points) with regeneration mechanics.
     - **Dual Economy System**: XP from workouts for progression, Gold from monster battles for purchases.
-    - **Combat System**: Stat-based combat mechanics influencing damage, HP, MP, and evasion. Battles award gold/currency, not experience points.
+    - **Combat System**: Stat-based combat mechanics influencing damage, HP, MP, and evasion. Battles award gold/currency, not experience points. Includes new Knighthood-inspired turn-based combat system with 4 actions per round, tap-to-attack mechanics, and ultimate meter building (10-15% per hit).
     - **Dungeon Progression**: Story-driven, exponential dungeon progression.
     - **Achievements**: Personal records and boss-themed title progression.
     - **Streak System**: Comprehensive streak bonus for consistent activity and an auto-streak freeze system.
