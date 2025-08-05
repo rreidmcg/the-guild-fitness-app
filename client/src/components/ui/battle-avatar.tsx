@@ -61,29 +61,27 @@ export function BattleAvatar({ playerStats, className, isAttacking = false, onAt
 
   if (isAnimating) {
     const { x, y } = getFramePosition(currentFrame);
+    console.log(`Frame ${currentFrame}: x=${x}, y=${y}`);
     
     return (
-      <div className={className}>
-        <div
-          className="w-48 h-48 sm:w-64 sm:h-64 md:w-96 md:h-96"
-          style={{
-            backgroundImage: `url(${attackAnimationSprite})`,
-            backgroundPosition: `-${x}px -${y}px`,
-            backgroundSize: `${FRAME_WIDTH * COLS}px ${FRAME_HEIGHT * ROWS}px`,
-            imageRendering: 'pixelated',
-            backgroundRepeat: 'no-repeat',
-            transform: 'scale(0.75)' // Scale down to fit better in battle
-          }}
-        />
-      </div>
+      <div 
+        className={`w-full h-full ${className}`}
+        style={{
+          backgroundImage: `url(${attackAnimationSprite})`,
+          backgroundPosition: `-${x}px -${y}px`,
+          backgroundSize: `${FRAME_WIDTH * COLS}px ${FRAME_HEIGHT * ROWS}px`,
+          imageRendering: 'pixelated',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
     );
   }
 
-  // Default to regular Avatar2D when not attacking
+  // Default to regular Avatar2D when not attacking - remove size to inherit from parent
   return (
     <Avatar2D 
       playerStats={playerStats}
-      className={className}
+      className={`w-full h-full ${className}`}
     />
   );
 }
