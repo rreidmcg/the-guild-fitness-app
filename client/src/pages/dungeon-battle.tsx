@@ -447,17 +447,55 @@ export default function DungeonBattlePage() {
     <BattleAccessGuard>
       <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
       
-      {/* Enhanced Mode Toggle - DISABLED (Phaser and Effekseer systems temporarily disabled) */}
+      {/* Enhanced Mode Toggle */}
       <div className="fixed top-20 right-4 z-50">
-        <div className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-800 text-gray-500 cursor-not-allowed">
-          ⚡ Basic Mode (Graphics Disabled)
-        </div>
+        <button
+          onClick={() => setBattleState(prev => ({ ...prev, enhancedMode: !prev.enhancedMode }))}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+            battleState.enhancedMode 
+              ? 'bg-purple-600 text-white' 
+              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+          }`}
+        >
+          {battleState.enhancedMode ? '🎮 Enhanced' : '⚡ Basic'}
+        </button>
       </div>
 
-      {/* Phaser Battle Scene - DISABLED (Phaser and Effekseer systems temporarily disabled) */}
-      {false ? (
+      {/* Phaser Battle Scene - Now with your custom male idle sprite! */}
+      {battleState.enhancedMode && battleState.monster && userStats ? (
         <div className="fixed inset-0 z-30 bg-black">
-          <div>Phaser Scene Disabled</div>
+          <PhaserBattleScene
+            isActive={battleState.enhancedMode}
+            playerStats={{
+              currentHp: battleState.playerHp,
+              maxHp: battleState.playerMaxHp,
+              currentMp: battleState.playerMp,
+              maxMp: battleState.playerMaxMp,
+              strength: userStats.strength,
+              agility: userStats.agility,
+              username: userStats.username,
+              skinColor: userStats.skinColor,
+              hairColor: userStats.hairColor,
+              gender: userStats.gender
+            }}
+            monster={{
+              name: battleState.monster.name,
+              currentHp: battleState.monster.currentHp,
+              maxHp: battleState.monster.maxHp,
+              image: battleState.monster.image,
+              level: battleState.monster.level
+            }}
+            onBattleAction={(action) => {
+              if (action === 'attack') handleAttack();
+              if (action === 'flee') {
+                if (window.confirm("Are you sure you want to flee from battle?")) {
+                  handleRetreat();
+                }
+              }
+            }}
+            battleEvents={battleEvents}
+            battleBackground={battleState.zone?.background}
+          />
         </div>
       ) : null}
       
