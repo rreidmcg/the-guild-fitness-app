@@ -46,6 +46,7 @@ import ProgramDay from "@/pages/program-day";
 import ProgramWorkout from "@/pages/program-workout";
 import WorkoutOverview from "@/pages/workout-overview";
 import WorkoutSessionResults from "@/pages/workout-session-results";
+import AvatarDemo from "@/pages/avatar-demo";
 
 function Router() {
   return (
@@ -141,6 +142,11 @@ function Router() {
       <Route path="/profile">
         <AuthGuard>
           <Profile />
+        </AuthGuard>
+      </Route>
+      <Route path="/avatar-demo">
+        <AuthGuard>
+          <AvatarDemo />
         </AuthGuard>
       </Route>
       <Route path="/leaderboard">

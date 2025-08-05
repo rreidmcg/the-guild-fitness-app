@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar2D } from "@/components/ui/avatar-2d";
+import { AvatarSelector } from "@/components/ui/avatar-selector";
 import { StatBar } from "@/components/ui/stat-bar";
 import { WardrobeModal } from "@/components/ui/wardrobe-modal";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
@@ -214,7 +215,15 @@ export default function Stats() {
                     ? "border-red-500 shadow-lg shadow-red-500/50" // G.M. avatar rarity
                     : "border-gray-500") // Common/default rarity
               }`}>
-                <Avatar2D user={safeUserStats} size="lg" />
+                <AvatarSelector 
+                  user={safeUserStats} 
+                  size="lg"
+                  showToggle={true}
+                  defaultMode="2d"
+                  interactive={true}
+                  showStats={false}
+                  animationState="idle"
+                />
               </div>
               
               {/* Character Stats Below Avatar */}
