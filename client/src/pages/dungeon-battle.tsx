@@ -447,22 +447,15 @@ export default function DungeonBattlePage() {
     <BattleAccessGuard>
       <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
       
-      {/* Enhanced Mode Toggle */}
+      {/* Enhanced Mode Toggle - DISABLED (Phaser and Effekseer systems temporarily disabled) */}
       <div className="fixed top-20 right-4 z-50">
-        <button
-          onClick={() => setBattleState(prev => ({ ...prev, enhancedMode: !prev.enhancedMode }))}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-            battleState.enhancedMode 
-              ? 'bg-purple-600 text-white' 
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
-        >
-          {battleState.enhancedMode ? '🎮 Enhanced' : '⚡ Basic'}
-        </button>
+        <div className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-800 text-gray-500 cursor-not-allowed">
+          ⚡ Basic Mode (Graphics Disabled)
+        </div>
       </div>
 
-      {/* Phaser Battle Scene - Only show when enhanced mode is active */}
-      {battleState.enhancedMode && battleState.monster && userStats ? (
+      {/* Phaser Battle Scene - DISABLED (Phaser and Effekseer systems temporarily disabled) */}
+      {false && battleState.enhancedMode && battleState.monster && userStats ? (
         <div className="fixed inset-0 z-30 bg-black">
           <PhaserBattleScene
             isActive={battleState.enhancedMode}
