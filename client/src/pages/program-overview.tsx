@@ -103,10 +103,10 @@ function DraggableWorkoutCard({ workout, isEditing, onWorkoutClick }: {
       {...(isEditing ? attributes : {})}
       onClick={() => !isEditing && onWorkoutClick(workout)}
       className={`
-        bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 
-        hover:border-green-400/40 transition-colors rounded-lg p-3
-        ${isDragging ? 'opacity-50 z-50' : ''}
-        ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}
+        bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 border
+        hover:border-green-400/40 transition-colors rounded-lg p-2
+        ${isDragging ? 'opacity-30' : ''}
+        ${isEditing ? 'cursor-grab active:cursor-grabbing touch-none' : 'cursor-pointer'}
         ${!isEditing ? 'hover:bg-green-500/15' : ''}
       `}
     >
@@ -452,10 +452,10 @@ export default function ProgramOverview() {
             </div>
 
             {/* Drag overlay */}
-            <DragOverlay>
+            <DragOverlay dropAnimation={null}>
               {draggedWorkout && (
-                <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 rounded-lg p-3 shadow-lg">
-                  <div className="mb-2">
+                <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 rounded-lg p-2 shadow-lg opacity-90 scale-95 border">
+                  <div className="mb-1">
                     <h4 className="font-semibold text-foreground text-sm">{draggedWorkout.workoutName}</h4>
                     <p className="text-xs text-muted-foreground">
                       {calculateEstimatedDuration(draggedWorkout.exercises)} min • {draggedWorkout.exercises.length} exercises
