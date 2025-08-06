@@ -453,7 +453,11 @@ export default function DungeonBattlePage() {
       <div className="fixed inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-black/20" />
 
       {/* Battle Scene */}
-      <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]" style={{ touchAction: 'none' }}>
+      <div 
+        className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)] cursor-pointer" 
+        style={{ touchAction: 'none' }}
+        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
+      >
         {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
         <div className="absolute top-4 left-0 right-0 z-20 px-4 md:px-8">
           <div className="max-w-2xl mx-auto">
@@ -644,52 +648,37 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Circular Icon Battle Interface - Transparent */}
-      <div className="fixed bottom-16 left-0 right-0 z-30">
-        {/* Mobile & Desktop Layout - Circular buttons */}
-        <div className="p-4 md:p-6">
-          {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-            <div className="flex justify-center items-center space-x-8 md:space-x-12 relative">
-              {/* Attack Button - Larger and positioned */}
-              <button 
-                className="w-24 h-24 md:w-30 md:h-30 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                onClick={handleAttack}
-                disabled={attackMutation.isPending}
-                style={{ transform: 'translate(50px, 50px)' }}
-              >
-                {attackMutation.isPending ? (
-                  <div className="animate-spin rounded-full h-9 w-9 md:h-12 md:w-12 border-b-2 border-white"></div>
-                ) : (
-                  <img 
-                    src={swordIconImage} 
-                    alt="Attack" 
-                    className="w-24 h-24 md:w-30 md:h-30 object-contain"
-                    style={{ imageRendering: 'pixelated' }}
-                  />
-                )}
-              </button>
-              
-              {/* Flee Button - Same size, moved down and right */}
-              <button 
-                className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                onClick={() => {
-                  if (window.confirm("Are you sure you want to flee from battle?")) {
-                    handleRetreat();
-                  }
-                }}
-                style={{ transform: 'translate(20px, 50px)' }}
-              >
-                <img 
-                  src={fleeButtonIcon} 
-                  alt="Flee" 
-                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                  style={{ imageRendering: 'pixelated' }}
-                />
-              </button>
-            </div>
-          ) : (
-            <div className="text-center text-lg md:text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50">
+      {/* Flee Button - Bottom Left Corner */}
+      <div className="fixed bottom-4 left-4 z-30">
+        <button 
+          className="w-16 h-16 md:w-20 md:h-20 bg-black/30 hover:bg-black/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 border-2 border-red-400/50"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering the battle screen click
+            if (window.confirm("Are you sure you want to flee from battle?")) {
+              handleRetreat();
+            }
+          }}
+        >
+          <img 
+            src={fleeButtonIcon} 
+            alt="Flee" 
+            className="w-12 h-12 md:w-16 md:h-16 object-contain"
+            style={{ imageRendering: 'pixelated' }}
+          />
+        </button>
+      </div>
+
+      {/* Battle Status - Bottom Center */}
+      <div className="fixed bottom-4 left-0 right-0 z-30">
+        <div className="flex justify-center">
+          {!battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
+            <div className="text-center text-lg md:text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50 px-8">
               ⏳ ENEMY TURN
+            </div>
+          )}
+          {attackMutation.isPending && (
+            <div className="text-center text-lg md:text-xl font-bold text-white tracking-wider uppercase py-4 bg-blue-900/50 rounded-lg border-2 border-blue-400/50 px-8">
+              ⚔️ ATTACKING...
             </div>
           )}
         </div>
