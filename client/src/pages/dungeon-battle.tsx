@@ -455,7 +455,7 @@ export default function DungeonBattlePage() {
       {/* Battle Scene */}
       <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]" style={{ touchAction: 'none' }}>
         {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
-        <div className="absolute top-20 left-0 right-0 z-20 px-4 md:px-8">
+        <div className="absolute top-4 left-0 right-0 z-20 px-4 md:px-8">
           <div className="max-w-2xl mx-auto">
             {battleState.monster && (
               <div className="text-center">
