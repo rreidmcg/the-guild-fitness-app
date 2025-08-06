@@ -178,12 +178,14 @@ export default function Workouts() {
   };
 
   const handleStartProgram = (program: WorkoutProgram) => {
+    console.log('handleStartProgram called for program:', program.id);
+    console.log('Navigating to program overview:', `/program-overview?program=${program.id}`);
     toast({
-      title: "Starting Workout",
-      description: `Beginning ${program.name} workout session...`,
+      title: "Opening Program",
+      description: `Viewing ${program.name} workout overview...`,
     });
-    // Navigate to workout session with program ID
-    navigate(`/workout-session/${program.id}`);
+    // Navigate to program overview page
+    navigate(`/program-overview?program=${program.id}`);
   };
 
   const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein' | 'sleep', checked: boolean) => {
