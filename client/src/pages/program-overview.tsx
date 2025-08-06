@@ -417,7 +417,7 @@ export default function ProgramOverview() {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className="space-y-4">
+            <div className="space-y-0">
               {workoutCalendar.map(({ week, days }) => (
                 <Card key={week}>
                   <CardHeader className="pb-2">
