@@ -11,6 +11,25 @@ import { useToast } from "@/hooks/use-toast";
 
 // Import battle system defensive styles
 import "../styles/battle-system.css";
+
+// Haptic feedback utility
+const hapticFeedback = {
+  light: () => {
+    if (navigator.vibrate) {
+      navigator.vibrate(50); // Light tap for successful attacks
+    }
+  },
+  medium: () => {
+    if (navigator.vibrate) {
+      navigator.vibrate(100); // Medium vibration for critical hits
+    }
+  },
+  heavy: () => {
+    if (navigator.vibrate) {
+      navigator.vibrate([150, 50, 150]); // Strong pattern for taking damage
+    }
+  }
+};
 import { 
   Shield, 
   Heart, 
@@ -334,6 +353,15 @@ export default function DungeonBattlePage() {
     const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
     const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
 
+    // Haptic feedback for player attacks
+    if (playerDamage !== null) {
+      if (data.playerCriticalHit) {
+        hapticFeedback.medium(); // Medium vibration for critical hits
+      } else {
+        hapticFeedback.light(); // Light tap for regular attacks
+      }
+    }
+
     // Start player lunge and monster flash (taking damage), and screen shake on hit
     setBattleState(prev => ({
       ...prev,
@@ -364,6 +392,13 @@ export default function DungeonBattlePage() {
       // Handle monster counter-attack (only when player's turn is completely over)
       if (monsterDamage !== null && data.attacksRemaining === 0) {
         setTimeout(() => {
+          // Haptic feedback for player taking damage
+          if (data.monsterCriticalHit) {
+            hapticFeedback.heavy(); // Strong pattern for critical damage taken
+          } else {
+            hapticFeedback.heavy(); // Strong pattern for any damage taken
+          }
+
           setBattleState(prev => ({
             ...prev,
             playerHp: data.playerHp,
