@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
-import { WorkoutCard } from "@/components/ui/workout-card";
+
 import { ArrowLeft, Trophy, Clock, Calendar, Target, Activity, Zap } from "lucide-react";
 
 interface ProgramWorkout {
@@ -144,8 +144,8 @@ export default function ProgramOverview() {
   // Convert program workouts to the format expected by WorkoutCard
   const convertToWorkoutFormat = (programWorkout: ProgramWorkout) => ({
     id: programWorkout.id,
-    name: programWorkout.name,
-    description: programWorkout.description,
+    name: programWorkout.workoutName,
+    description: programWorkout.instructions || `Week ${programWorkout.weekNumber} - ${programWorkout.dayName}`,
     exercises: programWorkout.exercises,
     estimatedDuration: calculateEstimatedDuration(programWorkout.exercises),
     totalExercises: programWorkout.exercises.length,
@@ -211,13 +211,55 @@ export default function ProgramOverview() {
               <h2 className="text-xl font-bold mb-4 text-foreground">{weekName}</h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {weekWorkouts
-                  .sort((a, b) => a.dayNumber - b.dayNumber)
+                  .sort((a, b) => a.dayName.localeCompare(b.dayName))
                   .map((workout) => (
-                    <WorkoutCard
+                    <Card 
                       key={workout.id}
-                      workout={convertToWorkoutFormat(workout)}
+                      className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 hover:border-green-400/40 transition-colors cursor-pointer"
                       onClick={() => navigate(`/workout-overview?workout=${workout.id}&program=true`)}
-                    />
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                              <Target className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">{workout.workoutName}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {workout.dayName} • {calculateEstimatedDuration(workout.exercises)} min
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className="bg-green-500 text-white">
+                            {workout.exercises.length} exercises
+                          </Badge>
+                        </div>
+                        
+                        {workout.instructions && (
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {workout.instructions}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                          <span className="flex items-center">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {calculateEstimatedDuration(workout.exercises)} min
+                          </span>
+                          <span className="flex items-center">
+                            <Target className="w-3 h-3 mr-1" />
+                            {workout.exercises.length} exercises
+                          </span>
+                          {workout.rounds && (
+                            <span className="flex items-center">
+                              <Activity className="w-3 h-3 mr-1" />
+                              {workout.rounds} rounds
+                            </span>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
               </div>
             </div>
