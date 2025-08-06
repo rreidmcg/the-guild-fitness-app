@@ -180,6 +180,11 @@ interface BattleState {
   screenShaking: boolean;
   playerCriticalHit: boolean;
   monsterCriticalHit: boolean;
+  attacksRemaining: number;
+  attackCount: number;
+  lastAttackTime: number;
+  isCombo: boolean;
+  comboMultiplier: number;
 }
 
 
@@ -210,7 +215,12 @@ export default function DungeonBattlePage() {
     monsterFlashing: false,
     screenShaking: false,
     playerCriticalHit: false,
-    monsterCriticalHit: false
+    monsterCriticalHit: false,
+    attacksRemaining: 3,
+    attackCount: 0,
+    lastAttackTime: 0,
+    isCombo: false,
+    comboMultiplier: 1.0
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -286,7 +296,9 @@ export default function DungeonBattlePage() {
         body: {
           monster: battleState.monster,
           playerHp: battleState.playerHp,
-          playerMp: battleState.playerMp
+          playerMp: battleState.playerMp,
+          attackCount: battleState.attackCount,
+          lastAttackTime: battleState.lastAttackTime
         }
       });
     },
@@ -317,7 +329,13 @@ export default function DungeonBattlePage() {
       playerDamage: playerDamage,
       monsterFlashing: playerDamage !== null,
       screenShaking: playerDamage !== null,
-      playerCriticalHit: data.playerCriticalHit || false
+      playerCriticalHit: data.playerCriticalHit || false,
+      attacksRemaining: data.attacksRemaining,
+      attackCount: data.attackCount,
+      lastAttackTime: data.lastAttackTime,
+      isCombo: data.isCombo || false,
+      comboMultiplier: data.comboMultiplier || 1.0,
+      isPlayerTurn: data.attacksRemaining > 0 // Continue player turn if attacks remaining
     }));
 
     // After player lunge, clear player attack effects
@@ -331,8 +349,8 @@ export default function DungeonBattlePage() {
         playerCriticalHit: false
       }));
 
-      // Pause before monster counter-attack
-      if (monsterDamage !== null) {
+      // Handle monster counter-attack (only when player's turn is completely over)
+      if (monsterDamage !== null && data.attacksRemaining === 0) {
         setTimeout(() => {
           setBattleState(prev => ({
             ...prev,
@@ -342,7 +360,7 @@ export default function DungeonBattlePage() {
             battleLog: [...prev.battleLog, ...data.battleLog],
             battleResult: data.battleResult,
             totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-            isPlayerTurn: data.battleResult === 'ongoing' ? true : true, // Keep player turn active for continuous attacks
+            isPlayerTurn: false, // Monster's turn now
             monsterLunging: true,
             monsterDamage: monsterDamage,
             playerFlashing: true,
@@ -350,7 +368,7 @@ export default function DungeonBattlePage() {
             monsterCriticalHit: data.monsterCriticalHit || false
           }));
 
-          // Clear monster attack effects
+          // Clear monster attack effects and reset player turn
           setTimeout(() => {
             setBattleState(prev => ({
               ...prev,
@@ -358,12 +376,16 @@ export default function DungeonBattlePage() {
               monsterDamage: null,
               playerFlashing: false,
               screenShaking: false,
-              monsterCriticalHit: false
+              monsterCriticalHit: false,
+              isPlayerTurn: true, // Reset to player turn
+              attacksRemaining: 3, // Reset attacks for new turn
+              attackCount: 0,
+              lastAttackTime: 0
             }));
           }, 800);
-        }, 600); // Pause between attacks
-      } else {
-        // No monster counter-attack, just update state
+        }, 600);
+      } else if (data.attacksRemaining === 0 && monsterDamage === null) {
+        // Player turn ended but no monster attack (monster defeated)
         setBattleState(prev => ({
           ...prev,
           playerHp: data.playerHp,
@@ -372,7 +394,18 @@ export default function DungeonBattlePage() {
           battleLog: [...prev.battleLog, ...data.battleLog],
           battleResult: data.battleResult,
           totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-          isPlayerTurn: data.battleResult === 'ongoing' ? true : true
+          isPlayerTurn: false
+        }));
+      } else {
+        // Continue player turn, just update state
+        setBattleState(prev => ({
+          ...prev,
+          playerHp: data.playerHp,
+          playerMp: data.playerMp,
+          monster: data.monster,
+          battleLog: [...prev.battleLog, ...data.battleLog],
+          battleResult: data.battleResult,
+          totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0)
         }));
       }
     }, 800);
@@ -390,6 +423,9 @@ export default function DungeonBattlePage() {
             currentMonsterIndex: nextIndex,
             battleResult: 'ongoing',
             isPlayerTurn: true,
+            attacksRemaining: 3,
+            attackCount: 0,
+            lastAttackTime: 0,
             battleLog: [...prev.battleLog, `A wild ${nextMonster.name} appears!`]
           }));
         }, 2000);
@@ -456,7 +492,7 @@ export default function DungeonBattlePage() {
       <div 
         className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)] cursor-pointer" 
         style={{ touchAction: 'none' }}
-        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
+        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' && battleState.attacksRemaining > 0 ? handleAttack : undefined}
       >
         {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
         <div className="absolute top-4 left-0 right-0 z-20 px-4 md:px-8">
@@ -666,6 +702,42 @@ export default function DungeonBattlePage() {
             style={{ imageRendering: 'pixelated' }}
           />
         </button>
+      </div>
+
+      {/* Attack Indicators - Bottom Center */}
+      <div className="fixed bottom-16 left-0 right-0 z-30">
+        <div className="flex justify-center">
+          {battleState.battleResult === 'ongoing' && (
+            <div className="flex gap-2 items-center">
+              {/* Attack dots */}
+              {[1, 2, 3].map((dotIndex) => (
+                <div
+                  key={dotIndex}
+                  className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
+                    dotIndex <= (3 - battleState.attacksRemaining)
+                      ? 'bg-gray-600 border-gray-500' // Used attacks - dark
+                      : battleState.isCombo && dotIndex === (3 - battleState.attacksRemaining + 1)
+                      ? 'bg-orange-400 border-orange-300 animate-pulse' // Next attack in combo - orange glow
+                      : 'bg-yellow-400 border-yellow-300' // Available attacks - bright yellow
+                  }`}
+                  style={{
+                    boxShadow: dotIndex <= (3 - battleState.attacksRemaining)
+                      ? 'none'
+                      : battleState.isCombo && dotIndex === (3 - battleState.attacksRemaining + 1)
+                      ? '0 0 8px rgba(251, 146, 60, 0.6)'
+                      : '0 0 6px rgba(250, 204, 21, 0.4)'
+                  }}
+                />
+              ))}
+              {/* Combo indicator */}
+              {battleState.isCombo && battleState.attackCount > 1 && (
+                <div className="ml-2 text-orange-400 font-bold text-sm animate-pulse">
+                  {battleState.attackCount}x COMBO!
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Battle Status - Bottom Center */}

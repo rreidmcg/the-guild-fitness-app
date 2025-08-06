@@ -3207,7 +3207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/battle/attack", async (req, res) => {
     try {
       const userId = requireAuth(req);
-      const { monster, playerHp, playerMp } = req.body;
+      const { monster, playerHp, playerMp, attackCount = 0, lastAttackTime = 0 } = req.body;
       
       // Check battle access
       const user = await storage.getUser(userId);
@@ -3219,6 +3219,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Monster data is required" });
       }
 
+      const currentTime = Date.now();
+      const timeSinceLastAttack = currentTime - lastAttackTime;
+      
+      // Determine if this is part of a combo (attacks within 2 seconds)
+      const isCombo = attackCount > 0 && timeSinceLastAttack < 2000;
+      const newAttackCount = isCombo ? attackCount + 1 : 1;
+      
+      // Calculate combo multiplier (1x, 1.15x, 1.3x for attacks 1, 2, 3)
+      let comboMultiplier = 1.0;
+      if (isCombo) {
+        switch (newAttackCount) {
+          case 2: comboMultiplier = 1.15; break;
+          case 3: comboMultiplier = 1.3; break;
+          default: comboMultiplier = 1.0; break;
+        }
+      }
+
       // Calculate player stats with equipment bonuses
       const playerAttack = (user.strength || 0) + Math.floor((user.agility || 0) / 2);
       const playerDefense = (user.stamina || 0) + Math.floor((user.strength || 0) / 3);
@@ -3227,6 +3244,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const baseDamage = Math.max(1, playerAttack - Math.floor(monster.level * 1.5));
       const damageVariance = Math.floor(Math.random() * Math.max(1, baseDamage * 0.3));
       let playerDamage = baseDamage + damageVariance;
+      
+      // Apply combo multiplier
+      playerDamage = Math.floor(playerDamage * comboMultiplier);
       
       // Check for critical hit (15% chance based on agility)
       const critChance = Math.min(0.15 + (user.agility * 0.01), 0.35); // 15% base + 1% per agility, max 35%
@@ -3240,7 +3260,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newMonsterHp = Math.max(0, monster.currentHp - playerDamage);
       
       // Initialize battle log
-      const battleLog = [`You deal ${playerDamage} damage to ${monster.name}!${isCriticalHit ? ' CRITICAL HIT!' : ''}`];
+      let comboText = '';
+      if (isCombo && newAttackCount > 1) {
+        comboText = ` (${newAttackCount}x COMBO!)`;
+      }
+      const battleLog = [`You deal ${playerDamage} damage to ${monster.name}!${isCriticalHit ? ' CRITICAL HIT!' : ''}${comboText}`];
       
       // Check if monster is defeated
       let battleResult = 'ongoing';
@@ -3272,26 +3296,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
           battleLog,
           battleResult,
           goldEarned,
-          playerCriticalHit: isCriticalHit
+          playerCriticalHit: isCriticalHit,
+          attacksRemaining: 0,
+          comboMultiplier: comboMultiplier,
+          attackCount: newAttackCount,
+          lastAttackTime: currentTime,
+          isCombo: isCombo && newAttackCount > 1
         });
       }
       
-      // Monster counter-attack if still alive
-      const monsterDamage = Math.max(1, monster.attack - playerDefense);
-      const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
-      let actualMonsterDamage = monsterDamage + monsterDamageVariance;
+      // Determine attacks remaining and if monster should counter-attack
+      const attacksRemaining = 3 - newAttackCount;
+      let isMonsterCrit = false;
+      let actualMonsterDamage = 0;
+      let newPlayerHp = playerHp;
       
-      // Monster critical hit (10% chance)
-      const monsterCritChance = 0.10;
-      const isMonsterCrit = Math.random() < monsterCritChance;
-      
-      if (isMonsterCrit) {
-        actualMonsterDamage = Math.floor(actualMonsterDamage * 1.3); // 1.3x damage for monster crits
+      // Monster counter-attacks only when player has used all 3 attacks
+      if (attacksRemaining === 0) {
+        const monsterDamage = Math.max(1, monster.attack - playerDefense);
+        const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
+        actualMonsterDamage = monsterDamage + monsterDamageVariance;
+        
+        // Monster critical hit (10% chance)
+        const monsterCritChance = 0.10;
+        isMonsterCrit = Math.random() < monsterCritChance;
+        
+        if (isMonsterCrit) {
+          actualMonsterDamage = Math.floor(actualMonsterDamage * 1.3); // 1.3x damage for monster crits
+        }
+        
+        newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
+        
+        battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!${isMonsterCrit ? ' CRITICAL HIT!' : ''}`);
       }
-      
-      const newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
-      
-      battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!${isMonsterCrit ? ' CRITICAL HIT!' : ''}`);
       
       if (newPlayerHp <= 0) {
         battleResult = 'defeat';
@@ -3309,7 +3346,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         battleResult,
         goldEarned: 0,
         playerCriticalHit: isCriticalHit,
-        monsterCriticalHit: isMonsterCrit
+        monsterCriticalHit: isMonsterCrit,
+        attacksRemaining: attacksRemaining,
+        comboMultiplier: comboMultiplier,
+        attackCount: newAttackCount,
+        lastAttackTime: currentTime,
+        isCombo: isCombo && newAttackCount > 1
       });
       
     } catch (error) {
