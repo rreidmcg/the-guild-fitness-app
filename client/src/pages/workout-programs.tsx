@@ -248,6 +248,8 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
               <Button 
                 className="w-full" 
                 onClick={() => {
+                  console.log('Start Program button clicked for program:', program.id);
+                  console.log('Navigating to:', `/program-overview?program=${program.id}`);
                   navigate(`/program-overview?program=${program.id}`);
                 }}
               >
