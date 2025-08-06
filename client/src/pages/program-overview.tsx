@@ -68,15 +68,22 @@ export default function ProgramOverview() {
   const programId = params.get('program');
   const navigate = useNavigate();
 
-  const { data: program, isLoading: programLoading } = useQuery<WorkoutProgram>({
+  console.log('ProgramOverview - programId:', programId);
+
+  const { data: program, isLoading: programLoading, error: programError } = useQuery<WorkoutProgram>({
     queryKey: ["/api/workout-programs", programId],
     enabled: !!programId,
   });
 
-  const { data: programWorkouts, isLoading: workoutsLoading } = useQuery<ProgramWorkout[]>({
-    queryKey: ["/api/workout-programs", programId, "workouts"],
+  const { data: programWorkouts, isLoading: workoutsLoading, error: workoutsError } = useQuery<ProgramWorkout[]>({
+    queryKey: [`/api/workout-programs/${programId}/workouts`],
     enabled: !!programId,
   });
+
+  console.log('Program data:', program);
+  console.log('Program workouts:', programWorkouts);
+  console.log('Program error:', programError);
+  console.log('Workouts error:', workoutsError);
 
   const difficultyColors = {
     novice: "bg-green-500",
