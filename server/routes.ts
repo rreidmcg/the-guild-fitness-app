@@ -2139,13 +2139,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.toggleDailyQuest(userId, questType, completed);
       res.json(result);
     } catch (error) {
-      console.error("Toggle daily quest error:", error);
-      console.error("Error details:", {
-        userId: getCurrentUserId(req),
-        questType: req.body?.questType,
-        completed: req.body?.completed,
-        stack: error.stack
-      });
       res.status(500).json({ error: "Failed to toggle daily quest" });
     }
   });
