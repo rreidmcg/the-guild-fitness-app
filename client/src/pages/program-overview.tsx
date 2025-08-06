@@ -201,13 +201,10 @@ export default function ProgramOverview() {
       console.log('Updating workout:', data);
       return await apiRequest(`/api/program-workouts/${data.workoutId}`, {
         method: "PATCH",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           weekNumber: data.weekNumber,
           dayName: data.dayName,
-        }),
+        },
       });
     },
     onSuccess: (data) => {
