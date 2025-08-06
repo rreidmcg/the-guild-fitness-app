@@ -231,7 +231,7 @@ export default function ProgramOverview() {
                     <Card 
                       key={workout.id}
                       className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 hover:border-green-400/40 transition-colors cursor-pointer"
-                      onClick={() => navigate(`/workout-overview?workout=${workout.id}&program=true`)}
+                      onClick={() => navigate(`/workout-overview?workout=${workout.id}&program=true&programId=${workout.programId}`)}
                     >
                       <CardContent className="p-4">
                         <div className="mb-3">
