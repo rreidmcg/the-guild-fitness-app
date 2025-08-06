@@ -9,10 +9,13 @@ import { ArrowLeft, Play, Clock, Target, Dumbbell, Edit3 } from "lucide-react";
 export default function WorkoutOverview() {
   const params = new URLSearchParams(window.location.search);
   const workoutId = params.get('workout');
+  const isProgram = params.get('program') === 'true';
+  const programId = params.get('programId'); // Get program ID for navigation
   const navigate = useNavigate();
 
+  // Query for either program workout or regular workout
   const { data: workout, isLoading } = useQuery<any>({
-    queryKey: ["/api/workouts", workoutId],
+    queryKey: isProgram ? ["/api/program-workouts", workoutId] : ["/api/workouts", workoutId],
     enabled: !!workoutId,
   });
 
@@ -41,8 +44,8 @@ export default function WorkoutOverview() {
             <CardContent className="p-6 text-center">
               <h2 className="text-xl font-semibold mb-2">Workout Not Found</h2>
               <p className="text-muted-foreground mb-4">The workout you're looking for doesn't exist.</p>
-              <Button onClick={() => navigate('/quests')}>
-                Back to Quests
+              <Button onClick={() => navigate(isProgram ? `/program-overview?program=${programId}` : '/quests')}>
+                {isProgram ? 'Back to Program' : 'Back to Quests'}
               </Button>
             </CardContent>
           </Card>
@@ -96,12 +99,18 @@ export default function WorkoutOverview() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/quests')}
+            onClick={() => {
+              if (isProgram && workout?.programId) {
+                navigate(`/program-overview?program=${workout.programId}`);
+              } else {
+                navigate('/quests');
+              }
+            }}
             className="p-2"
           >
             <ArrowLeft className="w-4 h-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-foreground">{workout.name}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{workout.name || workout.workoutName}</h1>
         </div>
 
         {/* Workout Info */}
@@ -130,30 +139,34 @@ export default function WorkoutOverview() {
               </div>
             </div>
             
-            {workout.description && (
+            {(workout.description || workout.instructions) && (
               <div className="mb-4">
-                <div className="text-sm font-medium text-foreground mb-1">Description</div>
-                <p className="text-muted-foreground">{workout.description}</p>
+                <div className="text-sm font-medium text-foreground mb-1">
+                  {isProgram ? 'Instructions' : 'Description'}
+                </div>
+                <p className="text-muted-foreground">{workout.description || workout.instructions}</p>
               </div>
             )}
 
             <div className="flex gap-2">
               <Button 
-                onClick={() => navigate(`/workout-session/${workoutId}`)}
+                onClick={() => navigate(`/workout-session/${workoutId}${isProgram ? '?program=true' : ''}`)}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
                 size="lg"
               >
                 <Play className="w-5 h-5 mr-2" />
                 Start Workout
               </Button>
-              <Button 
-                onClick={() => navigate(`/workout-builder?edit=${workoutId}`)}
-                variant="outline"
-                size="lg"
-                className="py-3"
-              >
-                <Edit3 className="w-5 h-5" />
-              </Button>
+              {!isProgram && (
+                <Button 
+                  onClick={() => navigate(`/workout-builder?edit=${workoutId}`)}
+                  variant="outline"
+                  size="lg"
+                  className="py-3"
+                >
+                  <Edit3 className="w-5 h-5" />
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -168,24 +181,30 @@ export default function WorkoutOverview() {
             
             // If no section is specified, auto-group by exercise category
             if (!sectionName) {
-              const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
-              const category = exerciseDetails?.category;
-              
-              switch (category) {
-                case 'warmup':
-                  sectionName = 'Warm Up';
-                  break;
-                case 'strength':
-                  sectionName = 'Main Workout';
-                  break;
-                case 'cardio':
-                  sectionName = 'Cool Down';
-                  break;
-                case 'bodyweight':
-                  sectionName = 'Warm Up';  // Group bodyweight with warm up
-                  break;
-                default:
-                  sectionName = 'Main Workout';
+              // For program workouts, exercises already have names and categories
+              if (isProgram) {
+                sectionName = 'Main Workout'; // Default for program workouts
+              } else {
+                // For regular workouts, look up exercise details by ID
+                const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
+                const category = exerciseDetails?.category;
+                
+                switch (category) {
+                  case 'warmup':
+                    sectionName = 'Warm Up';
+                    break;
+                  case 'strength':
+                    sectionName = 'Main Workout';
+                    break;
+                  case 'cardio':
+                    sectionName = 'Cool Down';
+                    break;
+                  case 'bodyweight':
+                    sectionName = 'Warm Up';  // Group bodyweight with warm up
+                    break;
+                  default:
+                    sectionName = 'Main Workout';
+                }
               }
             }
             
@@ -251,7 +270,11 @@ export default function WorkoutOverview() {
                 <CardContent className="space-y-4">
                   {/* Regular exercises */}
                   {regularExercises.map((exercise: any, index: number) => {
-                    const exerciseName = getExerciseName(exercise.exerciseId);
+                    // Handle different exercise data structures
+                    const exerciseName = isProgram ? 
+                      exercise.name : // Program workouts have name directly
+                      getExerciseName(exercise.exerciseId); // Regular workouts use ID lookup
+                    
                     const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
                     const setsCount = exercise.sets || 1;
                     const reps = exercise.reps || '';
@@ -300,7 +323,10 @@ export default function WorkoutOverview() {
                       
                       <div className="space-y-3">
                         {supersetExercises.map((exercise: any, index: number) => {
-                          const exerciseName = getExerciseName(exercise.exerciseId);
+                          // Handle different exercise data structures for supersets too
+                          const exerciseName = isProgram ? 
+                            exercise.name : // Program workouts have name directly
+                            getExerciseName(exercise.exerciseId); // Regular workouts use ID lookup
                           const exerciseDetails = exercises?.find(ex => ex.id === exercise.exerciseId);
                           const setsCount = exercise.sets || 1;
                           const reps = exercise.reps || '';

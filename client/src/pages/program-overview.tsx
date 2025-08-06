@@ -1,9 +1,14 @@
-import { useParams, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Clock, Target, Users, Play } from "lucide-react";
-import { useNavigate } from "@/hooks/use-navigate";
+import { Badge } from "@/components/ui/badge";
+import { ParallaxBackground } from "@/components/ui/parallax-background";
+import { DndContext, DragEndEvent, DragOverlay, useDraggable, useDroppable } from "@dnd-kit/core";
+import { apiRequest } from "@/lib/queryClient";
+import { useState } from "react";
+
+import { ArrowLeft, Trophy, Clock, Calendar, Target, Activity, Zap, Edit, Save, X } from "lucide-react";
 
 interface ProgramWorkout {
   id: number;
@@ -11,6 +16,9 @@ interface ProgramWorkout {
   weekNumber: number;
   dayName: string;
   workoutName: string;
+  instructions?: string;
+  rounds?: number;
+  restSeconds?: number;
   exercises: Array<{
     name: string;
     reps?: string;
@@ -18,13 +26,11 @@ interface ProgramWorkout {
     holdTime?: string;
     instructions?: string;
   }>;
-  instructions: string;
-  rounds?: number;
-  restSeconds?: number;
 }
 
 interface WorkoutProgram {
   id: number;
+  creatorId?: number;
   name: string;
   description: string;
   durationWeeks: number;
@@ -38,220 +44,449 @@ interface WorkoutProgram {
   priceFormatted: string;
 }
 
-export default function ProgramOverview() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const programId = parseInt(id || "0");
+interface CalendarDay {
+  dayName: string;
+  weekNumber: number;
+  workouts: ProgramWorkout[];
+}
 
-  // Fetch program details
-  const { data: program, isLoading: programLoading } = useQuery<WorkoutProgram>({
-    queryKey: [`/api/workout-programs/${programId}`],
+// Calculate estimated workout duration based on exercises
+function calculateEstimatedDuration(exercises: any[]): number {
+  if (!exercises || exercises.length === 0) return 30;
+  
+  let totalTime = 0;
+  
+  exercises.forEach((exercise) => {
+    const sets = exercise.sets || 3;
+    const restTime = exercise.restTime || 60; // seconds
+    
+    // Estimate 45 seconds per set + rest time between sets
+    const setTime = 45; // seconds per set
+    const exerciseTime = (sets * setTime) + ((sets - 1) * restTime);
+    totalTime += exerciseTime;
+  });
+  
+  // Add 5 minutes for general warm-up/transition time
+  totalTime += 300;
+  
+  // Convert to minutes and round
+  return Math.round(totalTime / 60);
+}
+
+// Draggable workout card component
+function DraggableWorkoutCard({ workout, isEditing, onWorkoutClick }: { 
+  workout: ProgramWorkout; 
+  isEditing: boolean;
+  onWorkoutClick: (workout: ProgramWorkout) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
+    id: `workout-${workout.id}`,
+    data: { workout },
+    disabled: !isEditing,
+  });
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...(isEditing ? listeners : {})}
+      {...(isEditing ? attributes : {})}
+      onClick={() => !isEditing && onWorkoutClick(workout)}
+      className={`
+        bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 border
+        hover:border-green-400/40 transition-colors rounded-lg p-2
+        ${isDragging ? 'opacity-30' : ''}
+        ${isEditing ? 'cursor-grab active:cursor-grabbing touch-none' : 'cursor-pointer'}
+        ${!isEditing ? 'hover:bg-green-500/15' : ''}
+      `}
+    >
+      <div className="mb-2">
+        <h4 className="font-semibold text-foreground text-sm">{workout.workoutName}</h4>
+        <p className="text-xs text-muted-foreground">
+          {calculateEstimatedDuration(workout.exercises)} min • {workout.exercises.length} exercises
+        </p>
+      </div>
+      {workout.instructions && (
+        <p className="text-xs text-muted-foreground truncate">
+          {workout.instructions.substring(0, 50)}...
+        </p>
+      )}
+    </div>
+  );
+}
+
+// Droppable day cell component
+function DroppableDay({ day, weekNumber, workouts, isEditing, onWorkoutClick }: {
+  day: string;
+  weekNumber: number;
+  workouts: ProgramWorkout[];
+  isEditing: boolean;
+  onWorkoutClick: (workout: ProgramWorkout) => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `day-${weekNumber}-${day}`,
+    data: { day, weekNumber },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`
+        border rounded-lg p-2 min-h-[120px] space-y-1
+        ${isOver && isEditing ? 'border-blue-500 bg-blue-50/20 dark:bg-blue-950/20' : 'border-border'}
+        ${isEditing ? 'hover:border-blue-400' : ''}
+      `}
+    >
+      <div className="space-y-1">
+        {workouts.map((workout) => (
+          <DraggableWorkoutCard 
+            key={workout.id}
+            workout={workout} 
+            isEditing={isEditing}
+            onWorkoutClick={onWorkoutClick}
+          />
+        ))}
+        {workouts.length === 0 && isEditing && (
+          <div className="text-xs text-muted-foreground text-center py-4 border-2 border-dashed border-border rounded">
+            Drop workout here
+          </div>
+        )}
+        {workouts.length === 0 && !isEditing && (
+          <div className="text-xs text-muted-foreground text-center py-4">
+            Rest day
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ProgramOverview() {
+  const params = new URLSearchParams(window.location.search);
+  const programId = params.get('program');
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [draggedWorkout, setDraggedWorkout] = useState<ProgramWorkout | null>(null);
+
+  // Query for current user to check permissions
+  const { data: userStats } = useQuery({
+    queryKey: ["/api/user/stats"],
+  });
+
+  const { data: program, isLoading: programLoading, error: programError } = useQuery<WorkoutProgram>({
+    queryKey: ["/api/workout-programs", programId],
     enabled: !!programId,
   });
 
-  // Fetch program workouts
-  const { data: workouts, isLoading: workoutsLoading } = useQuery<ProgramWorkout[]>({
+  const { data: programWorkouts, isLoading: workoutsLoading, error: workoutsError } = useQuery<ProgramWorkout[]>({
     queryKey: [`/api/workout-programs/${programId}/workouts`],
-    enabled: !!programId && program?.isPurchased,
+    enabled: !!programId,
+  });
+
+  // Mutation to update workout schedule
+  const updateWorkoutMutation = useMutation({
+    mutationFn: async (data: { workoutId: number; weekNumber: number; dayName: string }) => {
+      return await apiRequest(`/api/program-workouts/${data.workoutId}`, {
+        method: "PATCH",
+        body: {
+          weekNumber: data.weekNumber,
+          dayName: data.dayName,
+        },
+      });
+    },
+    onMutate: async (variables) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
+
+      // Snapshot the previous value
+      const previousWorkouts = queryClient.getQueryData([`/api/workout-programs/${programId}/workouts`]);
+
+      // Optimistically update the cache
+      queryClient.setQueryData([`/api/workout-programs/${programId}/workouts`], (old: ProgramWorkout[] | undefined) => {
+        if (!old) return old;
+        return old.map(workout => 
+          workout.id === variables.workoutId 
+            ? { ...workout, weekNumber: variables.weekNumber, dayName: variables.dayName }
+            : workout
+        );
+      });
+
+      // Return context with the previous and new values
+      return { previousWorkouts };
+    },
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousWorkouts) {
+        queryClient.setQueryData([`/api/workout-programs/${programId}/workouts`], context.previousWorkouts);
+      }
+      console.error('Update failed:', error);
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
+    },
+  });
+
+  // Check if current user is the creator (for demo, allow editing for all users)
+  const canEdit = true; // TODO: check if userStats?.id === program?.creatorId
+
+  // Drag and drop handlers
+  const handleDragStart = (event: any) => {
+    const workout = event.active.data.current?.workout;
+    if (workout) {
+      setDraggedWorkout(workout);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setDraggedWorkout(null);
+
+    if (!over || !active.data.current?.workout) return;
+
+    const workout = active.data.current.workout as ProgramWorkout;
+    const dropData = over.data.current;
+    
+    if (dropData?.day && dropData?.weekNumber) {
+      // Only update if the day or week actually changed
+      if (workout.dayName !== dropData.day || workout.weekNumber !== dropData.weekNumber) {
+        updateWorkoutMutation.mutate({
+          workoutId: workout.id,
+          weekNumber: dropData.weekNumber,
+          dayName: dropData.day,
+        });
+      }
+    }
+  };
+
+  const handleWorkoutClick = (workout: ProgramWorkout) => {
+    navigate(`/workout-overview?workout=${workout.id}&program=true&programId=${workout.programId}`);
+  };
+
+  const difficultyColors: Record<string, string> = {
+    novice: "bg-green-500",
+    intermediate: "bg-yellow-500", 
+    advanced: "bg-red-500"
+  };
+
+  const difficultyIcons: Record<string, JSX.Element> = {
+    novice: <Target className="w-4 h-4" />,
+    intermediate: <Activity className="w-4 h-4" />,
+    advanced: <Zap className="w-4 h-4" />
+  };
+
+  // Create calendar structure
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const weeks = Array.from({ length: program?.durationWeeks || 1 }, (_, i) => i + 1);
+  
+  // Group workouts by week and day
+  const workoutCalendar = weeks.map(weekNumber => {
+    const weekDays = daysOfWeek.map(day => {
+      const dayWorkouts = (programWorkouts || []).filter(
+        w => w.weekNumber === weekNumber && w.dayName === day
+      );
+      return { day, workouts: dayWorkouts };
+    });
+    return { week: weekNumber, days: weekDays };
   });
 
   if (programLoading || workoutsLoading) {
     return (
-      <div className="min-h-screen bg-background p-6 pb-24">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="h-8 bg-muted animate-pulse rounded mb-6"></div>
-          <div className="h-64 bg-muted animate-pulse rounded-lg"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-32 bg-muted animate-pulse rounded-lg"></div>
-            ))}
+      <ParallaxBackground>
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
           </div>
         </div>
-      </div>
+      </ParallaxBackground>
     );
   }
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-background p-6 pb-24">
-        <div className="max-w-4xl mx-auto text-center py-12">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Program Not Found</h1>
-          <Button onClick={() => navigate("/workout-programs")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Programs
-          </Button>
+      <ParallaxBackground>
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <Card className="max-w-md mx-auto">
+              <CardContent className="p-6 text-center">
+                <h2 className="text-xl font-semibold mb-2">Program Not Found</h2>
+                <p className="text-muted-foreground mb-4">The program you're looking for doesn't exist.</p>
+                <Button onClick={() => navigate('/workout-programs')}>
+                  Back to Programs
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      </ParallaxBackground>
     );
   }
-
-  if (!program.isPurchased) {
-    return (
-      <div className="min-h-screen bg-background p-6 pb-24">
-        <div className="max-w-4xl mx-auto text-center py-12">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Program Not Available</h1>
-          <p className="text-muted-foreground mb-6">
-            You need to purchase this program to access its workouts.
-          </p>
-          <Button onClick={() => navigate("/workout-programs")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Browse Programs
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Group workouts by week
-  const workoutsByWeek = (workouts || []).reduce((acc, workout) => {
-    const week = workout.weekNumber || 1;
-    if (!acc[week]) acc[week] = [];
-    acc[week].push(workout);
-    return acc;
-  }, {} as Record<number, ProgramWorkout[]>);
-
-  const handleStartWorkout = (workout: ProgramWorkout) => {
-    navigate(`/program-workout/${programId}/${workout.id}`);
-  };
-
-  const handleViewDay = (workout: ProgramWorkout) => {
-    navigate(`/program-day/${programId}/${workout.id}`);
-  };
 
   return (
-    <div className="min-h-screen bg-background p-6 pb-24">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <ParallaxBackground>
+      <div className="min-h-screen bg-background text-foreground pb-20">
+        
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/workout-programs")}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">{program.name}</h1>
-            <p className="text-muted-foreground">{program.description}</p>
+        <div className="bg-card border-b border-border px-4 py-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-4 mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/quests')}
+                className="p-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">{program.name}</h1>
+                <p className="text-muted-foreground mt-0.5 text-sm">{program.description}</p>
+              </div>
+            </div>
+
+            {/* Program Info */}
+            <div className="flex justify-center">
+              <Badge 
+                className={`${difficultyColors[program.difficultyLevel.toLowerCase()]} text-white`}
+              >
+                {difficultyIcons[program.difficultyLevel.toLowerCase()]}
+                <span className="ml-1 capitalize">{program.difficultyLevel}</span>
+              </Badge>
+            </div>
           </div>
         </div>
 
-        {/* Program Overview */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground">Program Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.durationWeeks} weeks</span>
+        <div className="max-w-7xl mx-auto p-4 space-y-6">
+          
+          {/* Edit Toggle */}
+          {canEdit && (
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-foreground">Program Schedule</h2>
+                {isEditing && (
+                  <Badge variant="secondary" className="text-blue-600">
+                    <Edit className="w-3 h-3 mr-1" />
+                    Editing Mode
+                  </Badge>
+                )}
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Target className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.workoutsPerWeek}/week</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Clock className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.estimatedDuration} min</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Users className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.difficultyLevel}</span>
+              <div className="flex gap-2">
+                {isEditing ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditing(false)}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => setIsEditing(false)}
+                      disabled={updateWorkoutMutation.isPending}
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Done
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Schedule
+                  </Button>
+                )}
               </div>
             </div>
-            
-            {program.features && program.features.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-foreground mb-2">Program Features:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  {program.features.map((feature, index) => (
-                    <li key={index}>• {feature}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          )}
 
-        {/* Workout Days */}
-        <div className="space-y-6">
-          {Object.entries(workoutsByWeek)
-            .sort(([a], [b]) => parseInt(a) - parseInt(b))
-            .map(([weekNumber, weekWorkouts]) => (
-            <Card key={weekNumber} className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold text-foreground">
-                  Week {weekNumber}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {weekWorkouts.map((workout) => (
-                    <Card 
-                      key={workout.id} 
-                      className="bg-muted/30 border-border hover:border-primary/50 transition-colors cursor-pointer"
-                      onClick={() => handleViewDay(workout)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="space-y-3">
-                          <div>
-                            <h4 className="font-semibold text-foreground">{workout.dayName}</h4>
-                            <p className="text-sm text-muted-foreground">{workout.workoutName}</p>
-                          </div>
-                          
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>{workout.exercises?.length || 0} exercises</span>
-                            {workout.rounds && <span>{workout.rounds} rounds</span>}
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 text-xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewDay(workout);
-                              }}
-                            >
-                              View Details
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="flex-1 text-xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleStartWorkout(workout);
-                              }}
-                            >
-                              <Play className="w-3 h-3 mr-1" />
-                              Start
-                            </Button>
-                          </div>
+          {/* Calendar View */}
+          <DndContext
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="space-y-4">
+              {workoutCalendar.map(({ week, days }) => (
+                <Card key={week}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Calendar className="w-4 h-4 text-blue-500" />
+                      Week {week}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-2">
+                    {/* Days of week header */}
+                    <div className="grid grid-cols-7 gap-0 mb-2">
+                      {daysOfWeek.map(day => (
+                        <div key={day} className="text-center text-sm font-medium text-muted-foreground py-1">
+                          {day.slice(0, 3)}
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                      ))}
+                    </div>
+                    
+                    {/* Calendar grid */}
+                    <div className="grid grid-cols-7 gap-0">
+                      {days.map(({ day, workouts }) => (
+                        <DroppableDay
+                          key={`${week}-${day}`}
+                          day={day}
+                          weekNumber={week}
+                          workouts={workouts}
+                          isEditing={isEditing}
+                          onWorkoutClick={handleWorkoutClick}
+                        />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Drag overlay */}
+            <DragOverlay dropAnimation={null}>
+              {draggedWorkout && (
+                <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 rounded-lg p-2 shadow-lg opacity-90 scale-95 border">
+                  <div className="mb-1">
+                    <h4 className="font-semibold text-foreground text-sm">{draggedWorkout.workoutName}</h4>
+                    <p className="text-xs text-muted-foreground">
+                      {calculateEstimatedDuration(draggedWorkout.exercises)} min • {draggedWorkout.exercises.length} exercises
+                    </p>
+                  </div>
                 </div>
+              )}
+            </DragOverlay>
+          </DndContext>
+
+          {(!programWorkouts || programWorkouts.length === 0) && (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-semibold mb-2">No Workouts Found</h3>
+                <p className="text-muted-foreground">This program doesn't have any workouts configured yet.</p>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          )}
 
-        {(workouts || []).length === 0 && (
-          <Card className="bg-card border-border">
-            <CardContent className="text-center py-12">
-              <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2 text-foreground">No Workouts Available</h3>
-              <p className="text-muted-foreground">
-                This program doesn't have any workouts configured yet.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        </div>
       </div>
-    </div>
+    </ParallaxBackground>
   );
 }
