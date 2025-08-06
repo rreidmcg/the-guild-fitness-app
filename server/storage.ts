@@ -966,13 +966,14 @@ export class DatabaseStorage implements IStorage {
       return { success: false, remainingFreezes: user?.streakFreezeCount ?? 0 };
     }
     
-    // Use streak freeze - extend last streak date to today
+    // Use streak freeze - extend last streak date to today AND protect from atrophy
     const today = new Date().toISOString().split('T')[0];
     const newFreezeCount = (user.streakFreezeCount ?? 0) - 1;
     
     await this.updateUser(userId, {
       streakFreezeCount: newFreezeCount,
-      lastStreakDate: today
+      lastStreakDate: today,
+      lastActivityDate: today  // Also update activity date to protect from atrophy
     });
     
     return { success: true, remainingFreezes: newFreezeCount };

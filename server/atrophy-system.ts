@@ -72,9 +72,28 @@ export class AtrophySystem {
 
   /**
    * Apply 1% atrophy to XP and stats for a specific user
+   * First checks if user has streak freezes available and auto-applies one if possible
    */
   static async applyAtrophy(userId: number, userData: any): Promise<void> {
     try {
+      // Check if user has streak freezes available to prevent atrophy
+      if ((userData.streakFreezeCount || 0) > 0) {
+        // Auto-apply streak freeze to prevent atrophy
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        
+        await db
+          .update(users)
+          .set({
+            streakFreezeCount: (userData.streakFreezeCount || 0) - 1,
+            lastActivityDate: yesterday, // Mark activity for yesterday to prevent atrophy
+          })
+          .where(eq(users.id, userId));
+
+        console.log(`Auto-applied streak freeze for user ${userId} to prevent atrophy. Remaining freezes: ${(userData.streakFreezeCount || 0) - 1}`);
+        return; // Exit early - no atrophy applied
+      }
+
+      // No streak freezes available, proceed with atrophy
       // Calculate 1% reduction (minimum 1 point loss if they have any XP)
       const xpLoss = userData.experience > 0 ? Math.max(1, Math.floor(userData.experience * 0.01)) : 0;
       
