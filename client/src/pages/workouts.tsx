@@ -178,10 +178,6 @@ export default function Workouts() {
   };
 
   const handleStartProgram = (program: WorkoutProgram) => {
-    toast({
-      title: "Opening Program",
-      description: `Viewing ${program.name} workout overview...`,
-    });
     // Navigate to program overview page
     navigate(`/program-overview?program=${program.id}`);
   };
