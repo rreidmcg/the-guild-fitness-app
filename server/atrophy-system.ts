@@ -28,19 +28,18 @@ export class AtrophySystem {
    */
   static async processAtrophy(): Promise<void> {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     
     try {
-      // Get all users who haven't had activity in the last day and are not immune to atrophy
+      // Get all users who haven't had activity today and are not immune to atrophy
       const inactiveUsers = await db
         .select()
         .from(users)
         .where(
           and(
-            // Last activity was before yesterday or is null
+            // Last activity was before today or is null
             or(
               isNull(users.lastActivityDate),
-              lt(users.lastActivityDate, yesterday)
+              lt(users.lastActivityDate, today)
             ),
             // Atrophy immunity has expired or is null
             or(
@@ -51,13 +50,13 @@ export class AtrophySystem {
         );
 
       console.log(`Processing atrophy for ${inactiveUsers.length} inactive users`);
-      console.log(`Query conditions: today=${today}, yesterday=${yesterday}`);
+      console.log(`Query conditions: today=${today}`);
       if (inactiveUsers.length === 0) {
         // Debug: Let's see all users and their activity dates
         const allUsers = await db.select().from(users);
         console.log('All users activity status:');
         for (const user of allUsers) {
-          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeYesterday=${user.lastActivityDate ? user.lastActivityDate < yesterday : 'null'}`);
+          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeToday=${user.lastActivityDate ? user.lastActivityDate < today : 'null'}`);
         }
       }
 
