@@ -142,13 +142,12 @@ function DroppableDay({ day, weekNumber, workouts, isEditing, onWorkoutClick }: 
     <div
       ref={setNodeRef}
       className={`
-        border rounded-lg p-3 min-h-[120px] space-y-2
+        border rounded-lg p-2 min-h-[120px] space-y-1
         ${isOver && isEditing ? 'border-blue-500 bg-blue-50/20 dark:bg-blue-950/20' : 'border-border'}
         ${isEditing ? 'hover:border-blue-400' : ''}
       `}
     >
-      <div className="text-sm font-medium text-foreground mb-2">{day}</div>
-      <div className="space-y-2">
+      <div className="space-y-1">
         {workouts.map((workout) => (
           <DraggableWorkoutCard 
             key={workout.id}
@@ -365,7 +364,7 @@ export default function ProgramOverview() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto p-6 space-y-8">
+        <div className="max-w-7xl mx-auto p-4 space-y-6">
           
           {/* Edit Toggle */}
           {canEdit && (
@@ -418,27 +417,27 @@ export default function ProgramOverview() {
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
           >
-            <div className="space-y-8">
+            <div className="space-y-4">
               {workoutCalendar.map(({ week, days }) => (
                 <Card key={week}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-blue-500" />
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Calendar className="w-4 h-4 text-blue-500" />
                       Week {week}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-2">
                     {/* Days of week header */}
-                    <div className="grid grid-cols-7 gap-2 mb-4">
+                    <div className="grid grid-cols-7 gap-1 mb-2">
                       {daysOfWeek.map(day => (
-                        <div key={day} className="text-center text-sm font-medium text-muted-foreground p-2">
+                        <div key={day} className="text-center text-sm font-medium text-muted-foreground py-1">
                           {day.slice(0, 3)}
                         </div>
                       ))}
                     </div>
                     
                     {/* Calendar grid */}
-                    <div className="grid grid-cols-7 gap-2">
+                    <div className="grid grid-cols-7 gap-1">
                       {days.map(({ day, workouts }) => (
                         <DroppableDay
                           key={`${week}-${day}`}
