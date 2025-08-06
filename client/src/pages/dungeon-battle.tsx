@@ -177,7 +177,6 @@ interface BattleState {
   monsterDamage: number | null;
   playerFlashing: boolean;
   monsterFlashing: boolean;
-  playerAttacking: boolean;
 }
 
 
@@ -205,8 +204,7 @@ export default function DungeonBattlePage() {
     playerDamage: null,
     monsterDamage: null,
     playerFlashing: false,
-    monsterFlashing: false,
-    playerAttacking: false
+    monsterFlashing: false
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -277,9 +275,6 @@ export default function DungeonBattlePage() {
 
   const attackMutation = useMutation({
     mutationFn: async () => {
-      // Start attack animation
-      setBattleState(prev => ({ ...prev, playerAttacking: true }));
-      
       return await apiRequest("/api/battle/attack", {
         method: "POST",
         body: {
@@ -290,12 +285,9 @@ export default function DungeonBattlePage() {
       });
     },
     onSuccess: (data) => {
-      // Attack animation will complete first, then handle battle result
       handleBattleResult(data);
     },
     onError: () => {
-      // Stop attack animation on error
-      setBattleState(prev => ({ ...prev, playerAttacking: false }));
       toast({
         title: "Battle Error",
         description: "Something went wrong during battle.",
@@ -409,9 +401,7 @@ export default function DungeonBattlePage() {
     }
   }
 
-  const handleAttackAnimationComplete = () => {
-    setBattleState(prev => ({ ...prev, playerAttacking: false }));
-  };
+
 
   const handleRetreat = () => {
     navigate("/pve-dungeons");
@@ -560,8 +550,6 @@ export default function DungeonBattlePage() {
                 <BattleAvatar 
                   playerStats={userStats}
                   className="[&>div]:!bg-transparent [&>div]:!shadow-none [&>div]:!border-none [&>div]:!rounded-none"
-                  isAttacking={battleState.playerAttacking}
-                  onAttackComplete={handleAttackAnimationComplete}
                 />
               </div>
               {/* Monster Damage to Player */}
