@@ -198,7 +198,6 @@ export default function ProgramOverview() {
   // Mutation to update workout schedule
   const updateWorkoutMutation = useMutation({
     mutationFn: async (data: { workoutId: number; weekNumber: number; dayName: string }) => {
-      console.log('Updating workout:', data);
       return await apiRequest(`/api/program-workouts/${data.workoutId}`, {
         method: "PATCH",
         body: {
@@ -207,12 +206,36 @@ export default function ProgramOverview() {
         },
       });
     },
-    onSuccess: (data) => {
-      console.log('Update successful:', data);
-      queryClient.invalidateQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
+    onMutate: async (variables) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
+
+      // Snapshot the previous value
+      const previousWorkouts = queryClient.getQueryData([`/api/workout-programs/${programId}/workouts`]);
+
+      // Optimistically update the cache
+      queryClient.setQueryData([`/api/workout-programs/${programId}/workouts`], (old: ProgramWorkout[] | undefined) => {
+        if (!old) return old;
+        return old.map(workout => 
+          workout.id === variables.workoutId 
+            ? { ...workout, weekNumber: variables.weekNumber, dayName: variables.dayName }
+            : workout
+        );
+      });
+
+      // Return context with the previous and new values
+      return { previousWorkouts };
     },
-    onError: (error) => {
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousWorkouts) {
+        queryClient.setQueryData([`/api/workout-programs/${programId}/workouts`], context.previousWorkouts);
+      }
       console.error('Update failed:', error);
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
     },
   });
 
