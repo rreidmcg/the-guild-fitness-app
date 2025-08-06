@@ -199,16 +199,24 @@ export default function ProgramOverview() {
   // Mutation to update workout schedule
   const updateWorkoutMutation = useMutation({
     mutationFn: async (data: { workoutId: number; weekNumber: number; dayName: string }) => {
+      console.log('Updating workout:', data);
       return await apiRequest(`/api/program-workouts/${data.workoutId}`, {
         method: "PATCH",
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           weekNumber: data.weekNumber,
           dayName: data.dayName,
         }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Update successful:', data);
       queryClient.invalidateQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
+    },
+    onError: (error) => {
+      console.error('Update failed:', error);
     },
   });
 

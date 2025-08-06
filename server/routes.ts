@@ -280,6 +280,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const workoutId = parseInt(req.params.id);
       const userId = requireAuth(req);
       
+      console.log("PATCH request body:", req.body);
+      console.log("Raw body type:", typeof req.body);
+      
       // TODO: Add permission check to ensure user can edit this program
       const { weekNumber, dayName } = req.body;
       
