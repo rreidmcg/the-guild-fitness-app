@@ -69,6 +69,7 @@ export default function ProgramOverview() {
   const navigate = useNavigate();
 
   console.log('ProgramOverview - programId:', programId);
+  console.log('Current URL:', window.location.href);
 
   const { data: program, isLoading: programLoading, error: programError } = useQuery<WorkoutProgram>({
     queryKey: ["/api/workout-programs", programId],
@@ -82,6 +83,8 @@ export default function ProgramOverview() {
 
   console.log('Program data:', program);
   console.log('Program workouts:', programWorkouts);
+  console.log('Program loading:', programLoading);
+  console.log('Workouts loading:', workoutsLoading);
   console.log('Program error:', programError);
   console.log('Workouts error:', workoutsError);
 
