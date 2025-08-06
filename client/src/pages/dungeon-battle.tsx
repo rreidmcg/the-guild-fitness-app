@@ -538,8 +538,9 @@ export default function DungeonBattlePage() {
       {/* Battle Scene */}
       <div 
         className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)] cursor-pointer" 
-        style={{ touchAction: 'none' }}
+        style={{ touchAction: 'manipulation' }}
         onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
+        onTouchStart={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
       >
         {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
         <div className="absolute top-4 left-0 right-0 z-20 px-4 md:px-8">
@@ -596,7 +597,7 @@ export default function DungeonBattlePage() {
         </div>
 
         {/* Character Sprites - Battle Field with enhanced positioning */}
-        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
+        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'manipulation', userSelect: 'none' }}>
           {/* Player Character with HP/MP bars above (Invisible Card) */}
           <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
             {/* Player HP/MP Bars above character - No visible card */}
