@@ -53,7 +53,31 @@ export default function WorkoutOverview() {
 
   const workoutExercises = workout.exercises || [];
   const totalExercises = workoutExercises.length;
-  const estimatedTime = totalExercises * 3; // Rough estimate: 3 minutes per exercise
+  
+  // Calculate estimated workout duration based on exercises (same logic as quest page)
+  const calculateEstimatedDuration = (exercises: any[]): number => {
+    if (!exercises || exercises.length === 0) return 30;
+    
+    let totalTime = 0;
+    
+    exercises.forEach((exercise) => {
+      const sets = exercise.sets || 3;
+      const restTime = exercise.restTime || 60; // seconds
+      
+      // Estimate 45 seconds per set + rest time between sets
+      const setTime = 45; // seconds per set
+      const exerciseTime = (sets * setTime) + ((sets - 1) * restTime);
+      totalTime += exerciseTime;
+    });
+    
+    // Add 5 minutes for general warm-up/transition time
+    totalTime += 300;
+    
+    // Convert to minutes and round
+    return Math.round(totalTime / 60);
+  };
+  
+  const estimatedTime = calculateEstimatedDuration(workoutExercises);
 
   console.log('Workout data:', workout);
   console.log('Workout exercises:', workoutExercises);
