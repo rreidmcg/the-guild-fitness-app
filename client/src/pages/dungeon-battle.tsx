@@ -177,6 +177,7 @@ interface BattleState {
   monsterDamage: number | null;
   playerFlashing: boolean;
   monsterFlashing: boolean;
+  screenShaking: boolean;
 }
 
 
@@ -204,7 +205,8 @@ export default function DungeonBattlePage() {
     playerDamage: null,
     monsterDamage: null,
     playerFlashing: false,
-    monsterFlashing: false
+    monsterFlashing: false,
+    screenShaking: false
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -304,12 +306,13 @@ export default function DungeonBattlePage() {
     const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
     const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
 
-    // Start player lunge and monster flash (taking damage)
+    // Start player lunge and monster flash (taking damage), and screen shake on hit
     setBattleState(prev => ({
       ...prev,
       playerLunging: true,
       playerDamage: playerDamage,
-      monsterFlashing: playerDamage !== null
+      monsterFlashing: playerDamage !== null,
+      screenShaking: playerDamage !== null
     }));
 
     // After player lunge, clear player attack effects
@@ -318,7 +321,8 @@ export default function DungeonBattlePage() {
         ...prev,
         playerLunging: false,
         playerDamage: null,
-        monsterFlashing: false
+        monsterFlashing: false,
+        screenShaking: false
       }));
 
       // Pause before monster counter-attack
@@ -335,7 +339,8 @@ export default function DungeonBattlePage() {
             isPlayerTurn: data.battleResult === 'ongoing' ? true : true, // Keep player turn active for continuous attacks
             monsterLunging: true,
             monsterDamage: monsterDamage,
-            playerFlashing: true
+            playerFlashing: true,
+            screenShaking: monsterDamage !== null
           }));
 
           // Clear monster attack effects
@@ -344,7 +349,8 @@ export default function DungeonBattlePage() {
               ...prev,
               monsterLunging: false,
               monsterDamage: null,
-              playerFlashing: false
+              playerFlashing: false,
+              screenShaking: false
             }));
           }, 800);
         }, 600); // Pause between attacks
@@ -415,7 +421,14 @@ export default function DungeonBattlePage() {
 
   return (
     <BattleAccessGuard>
-      <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
+      <div 
+        className={`relative h-screen overflow-hidden ${battleState.screenShaking ? 'animate-pulse' : ''}`} 
+        style={{ 
+          touchAction: 'none', 
+          overscrollBehavior: 'none',
+          animation: battleState.screenShaking ? 'screen-shake 0.5s ease-in-out' : undefined
+        }}
+      >
       {/* Forest Background */}
       <div 
         className="fixed inset-0 z-0"
