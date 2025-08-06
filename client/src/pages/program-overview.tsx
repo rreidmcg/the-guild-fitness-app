@@ -428,7 +428,7 @@ export default function ProgramOverview() {
                   </CardHeader>
                   <CardContent className="p-2">
                     {/* Days of week header */}
-                    <div className="grid grid-cols-7 gap-1 mb-2">
+                    <div className="grid grid-cols-7 gap-0 mb-2">
                       {daysOfWeek.map(day => (
                         <div key={day} className="text-center text-sm font-medium text-muted-foreground py-1">
                           {day.slice(0, 3)}
@@ -437,7 +437,7 @@ export default function ProgramOverview() {
                     </div>
                     
                     {/* Calendar grid */}
-                    <div className="grid grid-cols-7 gap-1">
+                    <div className="grid grid-cols-7 gap-0">
                       {days.map(({ day, workouts }) => (
                         <DroppableDay
                           key={`${week}-${day}`}
