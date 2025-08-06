@@ -178,8 +178,6 @@ export default function Workouts() {
   };
 
   const handleStartProgram = (program: WorkoutProgram) => {
-    console.log('handleStartProgram called for program:', program.id);
-    console.log('Navigating to program overview:', `/program-overview?program=${program.id}`);
     toast({
       title: "Opening Program",
       description: `Viewing ${program.name} workout overview...`,

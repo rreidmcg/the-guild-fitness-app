@@ -68,9 +68,6 @@ export default function ProgramOverview() {
   const programId = params.get('program');
   const navigate = useNavigate();
 
-  console.log('ProgramOverview - programId:', programId);
-  console.log('Current URL:', window.location.href);
-
   const { data: program, isLoading: programLoading, error: programError } = useQuery<WorkoutProgram>({
     queryKey: ["/api/workout-programs", programId],
     enabled: !!programId,
@@ -80,13 +77,6 @@ export default function ProgramOverview() {
     queryKey: [`/api/workout-programs/${programId}/workouts`],
     enabled: !!programId,
   });
-
-  console.log('Program data:', program);
-  console.log('Program workouts:', programWorkouts);
-  console.log('Program loading:', programLoading);
-  console.log('Workouts loading:', workoutsLoading);
-  console.log('Program error:', programError);
-  console.log('Workouts error:', workoutsError);
 
   const difficultyColors = {
     novice: "bg-green-500",
@@ -222,21 +212,13 @@ export default function ProgramOverview() {
                       onClick={() => navigate(`/workout-overview?workout=${workout.id}&program=true`)}
                     >
                       <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                              <Target className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-foreground">{workout.workoutName}</h3>
-                              <p className="text-sm text-muted-foreground">
-                                {workout.dayName} • {calculateEstimatedDuration(workout.exercises)} min
-                              </p>
-                            </div>
+                        <div className="mb-3">
+                          <div>
+                            <h3 className="font-semibold text-foreground">{workout.workoutName}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {workout.dayName} • {calculateEstimatedDuration(workout.exercises)} min
+                            </p>
                           </div>
-                          <Badge className="bg-green-500 text-white">
-                            {workout.exercises.length} exercises
-                          </Badge>
                         </div>
                         
                         {workout.instructions && (
