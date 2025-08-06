@@ -216,7 +216,7 @@ export default function DungeonBattlePage() {
     screenShaking: false,
     playerCriticalHit: false,
     monsterCriticalHit: false,
-    attacksRemaining: 3,
+    attacksRemaining: 4,
     attackCount: 0,
     lastAttackTime: 0,
     isCombo: false,
@@ -293,7 +293,7 @@ export default function DungeonBattlePage() {
       screenShaking: false,
       playerCriticalHit: false,
       monsterCriticalHit: false,
-      attacksRemaining: 3,
+      attacksRemaining: 4,
       attackCount: 0,
       lastAttackTime: 0,
       isCombo: false,
@@ -390,7 +390,7 @@ export default function DungeonBattlePage() {
               screenShaking: false,
               monsterCriticalHit: false,
               isPlayerTurn: true, // Reset to player turn
-              attacksRemaining: 3, // Reset attacks for new turn
+              attacksRemaining: 4, // Reset attacks for new turn
               attackCount: 0,
               lastAttackTime: 0
             }));
@@ -435,7 +435,7 @@ export default function DungeonBattlePage() {
             currentMonsterIndex: nextIndex,
             battleResult: 'ongoing',
             isPlayerTurn: true,
-            attacksRemaining: 3,
+            attacksRemaining: 4,
             attackCount: 0,
             lastAttackTime: 0,
             battleLog: [...prev.battleLog, `A wild ${nextMonster.name} appears!`]
