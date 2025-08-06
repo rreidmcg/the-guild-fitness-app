@@ -134,6 +134,13 @@ export default function ProgramOverview() {
     return acc;
   }, {} as Record<string, ProgramWorkout[]>);
 
+  // Sort weeks numerically
+  const sortedWeeks = Object.entries(workoutsByWeek).sort((a, b) => {
+    const weekA = parseInt(a[0].replace('Week ', ''));
+    const weekB = parseInt(b[0].replace('Week ', ''));
+    return weekA - weekB;
+  });
+
   // Convert program workouts to the format expected by WorkoutCard
   const convertToWorkoutFormat = (programWorkout: ProgramWorkout) => ({
     id: programWorkout.id,
@@ -199,12 +206,27 @@ export default function ProgramOverview() {
         <div className="max-w-4xl mx-auto p-6 space-y-8">
           
           {/* Workout Schedule */}
-          {Object.entries(workoutsByWeek).map(([weekName, weekWorkouts]) => (
+          {sortedWeeks.map(([weekName, weekWorkouts]) => (
             <div key={weekName}>
               <h2 className="text-xl font-bold mb-4 text-foreground">{weekName}</h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {weekWorkouts
-                  .sort((a, b) => a.dayName.localeCompare(b.dayName))
+                  .sort((a, b) => {
+                    // Define day order: Monday = 1, Tuesday = 2, etc.
+                    const dayOrder = {
+                      'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 
+                      'Friday': 5, 'Saturday': 6, 'Sunday': 7
+                    };
+                    const dayA = dayOrder[a.dayName] || 8;
+                    const dayB = dayOrder[b.dayName] || 8;
+                    
+                    // First sort by day
+                    if (dayA !== dayB) {
+                      return dayA - dayB;
+                    }
+                    // Then by workout name for same day
+                    return a.workoutName.localeCompare(b.workoutName);
+                  })
                   .map((workout) => (
                     <Card 
                       key={workout.id}
