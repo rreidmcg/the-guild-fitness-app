@@ -320,7 +320,7 @@ export default function ProgramOverview() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/workout-programs')}
+                onClick={() => navigate('/quests')}
                 className="p-2"
               >
                 <ArrowLeft className="w-4 h-4" />
