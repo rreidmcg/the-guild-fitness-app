@@ -284,8 +284,20 @@ export default function DungeonBattlePage() {
       currentMonsterIndex: 0,
       totalGoldEarned: 0,
       zone,
-      showActionModal: false,
-      actionMode: 'main'
+      playerLunging: false,
+      monsterLunging: false,
+      playerDamage: null,
+      monsterDamage: null,
+      playerFlashing: false,
+      monsterFlashing: false,
+      screenShaking: false,
+      playerCriticalHit: false,
+      monsterCriticalHit: false,
+      attacksRemaining: 3,
+      attackCount: 0,
+      lastAttackTime: 0,
+      isCombo: false,
+      comboMultiplier: 1.0
     });
   };
 
@@ -492,7 +504,7 @@ export default function DungeonBattlePage() {
       <div 
         className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)] cursor-pointer" 
         style={{ touchAction: 'none' }}
-        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' && battleState.attacksRemaining > 0 ? handleAttack : undefined}
+        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
       >
         {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
         <div className="absolute top-4 left-0 right-0 z-20 px-4 md:px-8">
