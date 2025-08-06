@@ -24,22 +24,24 @@ export class AtrophySystem {
 
   /**
    * Check for users who need atrophy applied and apply it
-   * Should be called daily via a scheduled job
+   * Should be called daily at midnight to apply atrophy for the previous day's inactivity
    */
   static async processAtrophy(): Promise<void> {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     
     try {
-      // Get all users who haven't had activity today and are not immune to atrophy
+      // Get all users who didn't have activity YESTERDAY and are not immune to atrophy
+      // This gives users the full day to complete activities before being penalized
       const inactiveUsers = await db
         .select()
         .from(users)
         .where(
           and(
-            // Last activity was before today or is null
+            // Last activity was before yesterday or is null (didn't complete yesterday's activities)
             or(
               isNull(users.lastActivityDate),
-              lt(users.lastActivityDate, today)
+              lt(users.lastActivityDate, yesterday)
             ),
             // Atrophy immunity has expired or is null
             or(
@@ -50,13 +52,13 @@ export class AtrophySystem {
         );
 
       console.log(`Processing atrophy for ${inactiveUsers.length} inactive users`);
-      console.log(`Query conditions: today=${today}`);
+      console.log(`Query conditions: today=${today}, yesterday=${yesterday} (penalizing those inactive on ${yesterday})`);
       if (inactiveUsers.length === 0) {
         // Debug: Let's see all users and their activity dates
         const allUsers = await db.select().from(users);
         console.log('All users activity status:');
         for (const user of allUsers) {
-          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeToday=${user.lastActivityDate ? user.lastActivityDate < today : 'null'}`);
+          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, inactiveYesterday=${user.lastActivityDate ? user.lastActivityDate < yesterday : 'null'}`);
         }
       }
 
