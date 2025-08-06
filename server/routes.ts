@@ -274,38 +274,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update program workout schedule
-  app.patch("/api/program-workouts/:id", async (req, res) => {
-    try {
-      const workoutId = parseInt(req.params.id);
-      const userId = requireAuth(req);
-      
-      console.log("PATCH request body:", req.body);
-      console.log("Raw body type:", typeof req.body);
-      
-      // TODO: Add permission check to ensure user can edit this program
-      const { weekNumber, dayName } = req.body;
-      
-      if (!weekNumber || !dayName) {
-        return res.status(400).json({ error: "weekNumber and dayName are required" });
-      }
-      
-      const updatedWorkout = await storage.updateProgramWorkout(workoutId, {
-        weekNumber,
-        dayName
-      });
-      
-      if (!updatedWorkout) {
-        return res.status(404).json({ error: "Program workout not found" });
-      }
-      
-      res.json(updatedWorkout);
-    } catch (error) {
-      console.error("Error updating program workout:", error);
-      res.status(500).json({ error: "Failed to update program workout" });
-    }
-  });
-
   // Purchase workout program
   app.post("/api/purchase-program/:id", async (req, res) => {
     try {
@@ -3261,13 +3229,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isCombo = attackCount > 0 && timeSinceLastAttack < 2000;
       const newAttackCount = isCombo ? attackCount + 1 : 1;
       
-      // Calculate combo multiplier (1x, 1.15x, 1.3x, 1.5x for attacks 1, 2, 3, 4)
+      // Calculate combo multiplier (1x, 1.15x, 1.3x for attacks 1, 2, 3)
       let comboMultiplier = 1.0;
       if (isCombo) {
         switch (newAttackCount) {
           case 2: comboMultiplier = 1.15; break;
           case 3: comboMultiplier = 1.3; break;
-          case 4: comboMultiplier = 1.5; break;
           default: comboMultiplier = 1.0; break;
         }
       }
@@ -3342,12 +3309,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Determine attacks remaining and if monster should counter-attack
-      const attacksRemaining = 4 - newAttackCount;
+      const attacksRemaining = 3 - newAttackCount;
       let isMonsterCrit = false;
       let actualMonsterDamage = 0;
       let newPlayerHp = playerHp;
       
-      // Monster counter-attacks only when player has used all 4 attacks
+      // Monster counter-attacks only when player has used all 3 attacks
       if (attacksRemaining === 0) {
         const monsterDamage = Math.max(1, monster.attack - playerDefense);
         const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));

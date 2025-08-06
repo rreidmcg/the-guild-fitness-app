@@ -178,6 +178,10 @@ export default function Workouts() {
   };
 
   const handleStartProgram = (program: WorkoutProgram) => {
+    toast({
+      title: "Opening Program",
+      description: `Viewing ${program.name} workout overview...`,
+    });
     // Navigate to program overview page
     navigate(`/program-overview?program=${program.id}`);
   };
@@ -403,16 +407,12 @@ export default function Workouts() {
                 {myCustomWorkouts.map((workout: any) => (
                   <Card 
                     key={workout.id} 
-                    className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 hover:border-blue-400/40 transition-colors"
+                    className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/workout-overview?workout=${workout.id}`)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 
-                          className="font-semibold text-foreground cursor-pointer hover:text-blue-400"
-                          onClick={() => navigate(`/workout-overview?workout=${workout.id}`)}
-                        >
-                          {workout.name}
-                        </h3>
+                        <h3 className="font-semibold text-foreground">{workout.name}</h3>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button 
@@ -470,7 +470,7 @@ export default function Workouts() {
                         </DropdownMenu>
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">{workout.description || "Custom workout routine"}</p>
-                      <div className="flex items-center justify-between text-xs mb-4">
+                      <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground font-medium">
                           {workout.exercises?.length || 0} exercises
                         </span>
@@ -478,18 +478,6 @@ export default function Workouts() {
                           ~{calculateEstimatedDuration(workout.exercises || [])} min
                         </span>
                       </div>
-                      {/* Start Workout Button */}
-                      <Button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/workout-session/${workout.id}`);
-                        }}
-                        className="w-full bg-game-primary hover:bg-game-primary/90 text-white"
-                        size="sm"
-                      >
-                        <Play className="w-4 h-4 mr-2" />
-                        Start Workout
-                      </Button>
                     </CardContent>
                   </Card>
                 ))}

@@ -1,36 +1,32 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
-import { DndContext, DragEndEvent, DragOverlay, useDraggable, useDroppable } from "@dnd-kit/core";
-import { apiRequest } from "@/lib/queryClient";
-import { useState } from "react";
 
-import { ArrowLeft, Trophy, Clock, Calendar, Target, Activity, Zap, Edit, Save, X } from "lucide-react";
+import { ArrowLeft, Trophy, Clock, Calendar, Target, Activity, Zap } from "lucide-react";
 
 interface ProgramWorkout {
   id: number;
   programId: number;
   weekNumber: number;
+  dayNumber: number;
   dayName: string;
-  workoutName: string;
-  instructions?: string;
-  rounds?: number;
-  restSeconds?: number;
+  name: string;
+  description: string;
   exercises: Array<{
-    name: string;
-    reps?: string;
-    duration?: string;
-    holdTime?: string;
-    instructions?: string;
+    exerciseId: number;
+    sets: number;
+    reps: number;
+    weight?: number;
+    restTime: number;
+    rpe?: number;
   }>;
 }
 
 interface WorkoutProgram {
   id: number;
-  creatorId?: number;
   name: string;
   description: string;
   durationWeeks: number;
@@ -42,12 +38,6 @@ interface WorkoutProgram {
   features: string[];
   isPurchased: boolean;
   priceFormatted: string;
-}
-
-interface CalendarDay {
-  dayName: string;
-  weekNumber: number;
-  workouts: ProgramWorkout[];
 }
 
 // Calculate estimated workout duration based on exercises
@@ -73,117 +63,10 @@ function calculateEstimatedDuration(exercises: any[]): number {
   return Math.round(totalTime / 60);
 }
 
-// Draggable workout card component
-function DraggableWorkoutCard({ workout, isEditing, onWorkoutClick }: { 
-  workout: ProgramWorkout; 
-  isEditing: boolean;
-  onWorkoutClick: (workout: ProgramWorkout) => void;
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({
-    id: `workout-${workout.id}`,
-    data: { workout },
-    disabled: !isEditing,
-  });
-
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...(isEditing ? listeners : {})}
-      {...(isEditing ? attributes : {})}
-      onClick={() => !isEditing && onWorkoutClick(workout)}
-      className={`
-        bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 border
-        hover:border-green-400/40 transition-colors rounded-lg p-2
-        ${isDragging ? 'opacity-30' : ''}
-        ${isEditing ? 'cursor-grab active:cursor-grabbing touch-none' : 'cursor-pointer'}
-        ${!isEditing ? 'hover:bg-green-500/15' : ''}
-      `}
-    >
-      <div className="mb-2">
-        <h4 className="font-semibold text-foreground text-sm">{workout.workoutName}</h4>
-        <p className="text-xs text-muted-foreground">
-          {calculateEstimatedDuration(workout.exercises)} min • {workout.exercises.length} exercises
-        </p>
-      </div>
-      {workout.instructions && (
-        <p className="text-xs text-muted-foreground truncate">
-          {workout.instructions.substring(0, 50)}...
-        </p>
-      )}
-    </div>
-  );
-}
-
-// Droppable day cell component
-function DroppableDay({ day, weekNumber, workouts, isEditing, onWorkoutClick }: {
-  day: string;
-  weekNumber: number;
-  workouts: ProgramWorkout[];
-  isEditing: boolean;
-  onWorkoutClick: (workout: ProgramWorkout) => void;
-}) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: `day-${weekNumber}-${day}`,
-    data: { day, weekNumber },
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`
-        border rounded-lg p-2 min-h-[120px] space-y-1
-        ${isOver && isEditing ? 'border-blue-500 bg-blue-50/20 dark:bg-blue-950/20' : 'border-border'}
-        ${isEditing ? 'hover:border-blue-400' : ''}
-      `}
-    >
-      <div className="space-y-1">
-        {workouts.map((workout) => (
-          <DraggableWorkoutCard 
-            key={workout.id}
-            workout={workout} 
-            isEditing={isEditing}
-            onWorkoutClick={onWorkoutClick}
-          />
-        ))}
-        {workouts.length === 0 && isEditing && (
-          <div className="text-xs text-muted-foreground text-center py-4 border-2 border-dashed border-border rounded">
-            Drop workout here
-          </div>
-        )}
-        {workouts.length === 0 && !isEditing && (
-          <div className="text-xs text-muted-foreground text-center py-4">
-            Rest day
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function ProgramOverview() {
   const params = new URLSearchParams(window.location.search);
   const programId = params.get('program');
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  
-  const [isEditing, setIsEditing] = useState(false);
-  const [draggedWorkout, setDraggedWorkout] = useState<ProgramWorkout | null>(null);
-
-  // Query for current user to check permissions
-  const { data: userStats } = useQuery({
-    queryKey: ["/api/user/stats"],
-  });
 
   const { data: program, isLoading: programLoading, error: programError } = useQuery<WorkoutProgram>({
     queryKey: ["/api/workout-programs", programId],
@@ -195,112 +78,17 @@ export default function ProgramOverview() {
     enabled: !!programId,
   });
 
-  // Mutation to update workout schedule
-  const updateWorkoutMutation = useMutation({
-    mutationFn: async (data: { workoutId: number; weekNumber: number; dayName: string }) => {
-      return await apiRequest(`/api/program-workouts/${data.workoutId}`, {
-        method: "PATCH",
-        body: {
-          weekNumber: data.weekNumber,
-          dayName: data.dayName,
-        },
-      });
-    },
-    onMutate: async (variables) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
-
-      // Snapshot the previous value
-      const previousWorkouts = queryClient.getQueryData([`/api/workout-programs/${programId}/workouts`]);
-
-      // Optimistically update the cache
-      queryClient.setQueryData([`/api/workout-programs/${programId}/workouts`], (old: ProgramWorkout[] | undefined) => {
-        if (!old) return old;
-        return old.map(workout => 
-          workout.id === variables.workoutId 
-            ? { ...workout, weekNumber: variables.weekNumber, dayName: variables.dayName }
-            : workout
-        );
-      });
-
-      // Return context with the previous and new values
-      return { previousWorkouts };
-    },
-    onError: (error, variables, context) => {
-      // Rollback on error
-      if (context?.previousWorkouts) {
-        queryClient.setQueryData([`/api/workout-programs/${programId}/workouts`], context.previousWorkouts);
-      }
-      console.error('Update failed:', error);
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure we have the latest data
-      queryClient.invalidateQueries({ queryKey: [`/api/workout-programs/${programId}/workouts`] });
-    },
-  });
-
-  // Check if current user is the creator (for demo, allow editing for all users)
-  const canEdit = true; // TODO: check if userStats?.id === program?.creatorId
-
-  // Drag and drop handlers
-  const handleDragStart = (event: any) => {
-    const workout = event.active.data.current?.workout;
-    if (workout) {
-      setDraggedWorkout(workout);
-    }
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setDraggedWorkout(null);
-
-    if (!over || !active.data.current?.workout) return;
-
-    const workout = active.data.current.workout as ProgramWorkout;
-    const dropData = over.data.current;
-    
-    if (dropData?.day && dropData?.weekNumber) {
-      // Only update if the day or week actually changed
-      if (workout.dayName !== dropData.day || workout.weekNumber !== dropData.weekNumber) {
-        updateWorkoutMutation.mutate({
-          workoutId: workout.id,
-          weekNumber: dropData.weekNumber,
-          dayName: dropData.day,
-        });
-      }
-    }
-  };
-
-  const handleWorkoutClick = (workout: ProgramWorkout) => {
-    navigate(`/workout-overview?workout=${workout.id}&program=true&programId=${workout.programId}`);
-  };
-
-  const difficultyColors: Record<string, string> = {
+  const difficultyColors = {
     novice: "bg-green-500",
     intermediate: "bg-yellow-500", 
     advanced: "bg-red-500"
   };
 
-  const difficultyIcons: Record<string, JSX.Element> = {
+  const difficultyIcons = {
     novice: <Target className="w-4 h-4" />,
     intermediate: <Activity className="w-4 h-4" />,
     advanced: <Zap className="w-4 h-4" />
   };
-
-  // Create calendar structure
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const weeks = Array.from({ length: program?.durationWeeks || 1 }, (_, i) => i + 1);
-  
-  // Group workouts by week and day
-  const workoutCalendar = weeks.map(weekNumber => {
-    const weekDays = daysOfWeek.map(day => {
-      const dayWorkouts = (programWorkouts || []).filter(
-        w => w.weekNumber === weekNumber && w.dayName === day
-      );
-      return { day, workouts: dayWorkouts };
-    });
-    return { week: weekNumber, days: weekDays };
-  });
 
   if (programLoading || workoutsLoading) {
     return (
@@ -336,6 +124,30 @@ export default function ProgramOverview() {
     );
   }
 
+  // Group workouts by week
+  const workoutsByWeek = (programWorkouts || []).reduce((acc, workout) => {
+    const weekKey = `Week ${workout.weekNumber}`;
+    if (!acc[weekKey]) {
+      acc[weekKey] = [];
+    }
+    acc[weekKey].push(workout);
+    return acc;
+  }, {} as Record<string, ProgramWorkout[]>);
+
+  // Convert program workouts to the format expected by WorkoutCard
+  const convertToWorkoutFormat = (programWorkout: ProgramWorkout) => ({
+    id: programWorkout.id,
+    name: programWorkout.workoutName,
+    description: programWorkout.instructions || `Week ${programWorkout.weekNumber} - ${programWorkout.dayName}`,
+    exercises: programWorkout.exercises,
+    estimatedDuration: calculateEstimatedDuration(programWorkout.exercises),
+    totalExercises: programWorkout.exercises.length,
+    isProgramWorkout: true,
+    programId: programWorkout.programId,
+    weekNumber: programWorkout.weekNumber,
+    dayName: programWorkout.dayName
+  });
+
   return (
     <ParallaxBackground>
       <div className="min-h-screen bg-background text-foreground pb-20">
@@ -347,7 +159,7 @@ export default function ProgramOverview() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/quests')}
+                onClick={() => navigate('/workout-programs')}
                 className="p-2"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -359,121 +171,84 @@ export default function ProgramOverview() {
             </div>
 
             {/* Program Info */}
-            <div className="flex justify-center">
-              <Badge 
-                className={`${difficultyColors[program.difficultyLevel.toLowerCase()]} text-white`}
-              >
-                {difficultyIcons[program.difficultyLevel.toLowerCase()]}
-                <span className="ml-1 capitalize">{program.difficultyLevel}</span>
-              </Badge>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-500">{program.durationWeeks}</div>
+                <div className="text-sm text-muted-foreground">Weeks</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-500">{program.workoutsPerWeek}</div>
+                <div className="text-sm text-muted-foreground">Per Week</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-500">{program.estimatedDuration}min</div>
+                <div className="text-sm text-muted-foreground">Est. Time</div>
+              </div>
+              <div className="text-center">
+                <Badge 
+                  className={`${difficultyColors[program.difficultyLevel.toLowerCase()]} text-white`}
+                >
+                  {difficultyIcons[program.difficultyLevel.toLowerCase()]}
+                  <span className="ml-1 capitalize">{program.difficultyLevel}</span>
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto p-4 space-y-6">
+        <div className="max-w-4xl mx-auto p-6 space-y-8">
           
-          {/* Edit Toggle */}
-          {canEdit && (
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-bold text-foreground">Program Schedule</h2>
-                {isEditing && (
-                  <Badge variant="secondary" className="text-blue-600">
-                    <Edit className="w-3 h-3 mr-1" />
-                    Editing Mode
-                  </Badge>
-                )}
-              </div>
-              <div className="flex gap-2">
-                {isEditing ? (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setIsEditing(false)}
+          {/* Workout Schedule */}
+          {Object.entries(workoutsByWeek).map(([weekName, weekWorkouts]) => (
+            <div key={weekName}>
+              <h2 className="text-xl font-bold mb-4 text-foreground">{weekName}</h2>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {weekWorkouts
+                  .sort((a, b) => a.dayName.localeCompare(b.dayName))
+                  .map((workout) => (
+                    <Card 
+                      key={workout.id}
+                      className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 hover:border-green-400/40 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/workout-overview?workout=${workout.id}&program=true`)}
                     >
-                      <X className="w-4 h-4 mr-2" />
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => setIsEditing(false)}
-                      disabled={updateWorkoutMutation.isPending}
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      Done
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Schedule
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Calendar View */}
-          <DndContext
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="space-y-4">
-              {workoutCalendar.map(({ week, days }) => (
-                <Card key={week}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Calendar className="w-4 h-4 text-blue-500" />
-                      Week {week}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-2">
-                    {/* Days of week header */}
-                    <div className="grid grid-cols-7 gap-0 mb-2">
-                      {daysOfWeek.map(day => (
-                        <div key={day} className="text-center text-sm font-medium text-muted-foreground py-1">
-                          {day.slice(0, 3)}
+                      <CardContent className="p-4">
+                        <div className="mb-3">
+                          <div>
+                            <h3 className="font-semibold text-foreground">{workout.workoutName}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {workout.dayName} • {calculateEstimatedDuration(workout.exercises)} min
+                            </p>
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                    
-                    {/* Calendar grid */}
-                    <div className="grid grid-cols-7 gap-0">
-                      {days.map(({ day, workouts }) => (
-                        <DroppableDay
-                          key={`${week}-${day}`}
-                          day={day}
-                          weekNumber={week}
-                          workouts={workouts}
-                          isEditing={isEditing}
-                          onWorkoutClick={handleWorkoutClick}
-                        />
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        
+                        {workout.instructions && (
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {workout.instructions}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                          <span className="flex items-center">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {calculateEstimatedDuration(workout.exercises)} min
+                          </span>
+                          <span className="flex items-center">
+                            <Target className="w-3 h-3 mr-1" />
+                            {workout.exercises.length} exercises
+                          </span>
+                          {workout.rounds && (
+                            <span className="flex items-center">
+                              <Activity className="w-3 h-3 mr-1" />
+                              {workout.rounds} rounds
+                            </span>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
             </div>
-
-            {/* Drag overlay */}
-            <DragOverlay dropAnimation={null}>
-              {draggedWorkout && (
-                <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/20 rounded-lg p-2 shadow-lg opacity-90 scale-95 border">
-                  <div className="mb-1">
-                    <h4 className="font-semibold text-foreground text-sm">{draggedWorkout.workoutName}</h4>
-                    <p className="text-xs text-muted-foreground">
-                      {calculateEstimatedDuration(draggedWorkout.exercises)} min • {draggedWorkout.exercises.length} exercises
-                    </p>
-                  </div>
-                </div>
-              )}
-            </DragOverlay>
-          </DndContext>
+          ))}
 
           {(!programWorkouts || programWorkouts.length === 0) && (
             <Card>

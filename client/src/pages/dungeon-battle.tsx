@@ -11,25 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 
 // Import battle system defensive styles
 import "../styles/battle-system.css";
-
-// Haptic feedback utility
-const hapticFeedback = {
-  light: () => {
-    if (navigator.vibrate) {
-      navigator.vibrate(50); // Light tap for successful attacks
-    }
-  },
-  medium: () => {
-    if (navigator.vibrate) {
-      navigator.vibrate(100); // Medium vibration for critical hits
-    }
-  },
-  heavy: () => {
-    if (navigator.vibrate) {
-      navigator.vibrate([150, 50, 150]); // Strong pattern for taking damage
-    }
-  }
-};
 import { 
   Shield, 
   Heart, 
@@ -235,7 +216,7 @@ export default function DungeonBattlePage() {
     screenShaking: false,
     playerCriticalHit: false,
     monsterCriticalHit: false,
-    attacksRemaining: 4,
+    attacksRemaining: 3,
     attackCount: 0,
     lastAttackTime: 0,
     isCombo: false,
@@ -303,20 +284,8 @@ export default function DungeonBattlePage() {
       currentMonsterIndex: 0,
       totalGoldEarned: 0,
       zone,
-      playerLunging: false,
-      monsterLunging: false,
-      playerDamage: null,
-      monsterDamage: null,
-      playerFlashing: false,
-      monsterFlashing: false,
-      screenShaking: false,
-      playerCriticalHit: false,
-      monsterCriticalHit: false,
-      attacksRemaining: 4,
-      attackCount: 0,
-      lastAttackTime: 0,
-      isCombo: false,
-      comboMultiplier: 1.0
+      showActionModal: false,
+      actionMode: 'main'
     });
   };
 
@@ -353,15 +322,6 @@ export default function DungeonBattlePage() {
     const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
     const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
 
-    // Haptic feedback for player attacks
-    if (playerDamage !== null) {
-      if (data.playerCriticalHit) {
-        hapticFeedback.medium(); // Medium vibration for critical hits
-      } else {
-        hapticFeedback.light(); // Light tap for regular attacks
-      }
-    }
-
     // Start player lunge and monster flash (taking damage), and screen shake on hit
     setBattleState(prev => ({
       ...prev,
@@ -392,13 +352,6 @@ export default function DungeonBattlePage() {
       // Handle monster counter-attack (only when player's turn is completely over)
       if (monsterDamage !== null && data.attacksRemaining === 0) {
         setTimeout(() => {
-          // Haptic feedback for player taking damage
-          if (data.monsterCriticalHit) {
-            hapticFeedback.heavy(); // Strong pattern for critical damage taken
-          } else {
-            hapticFeedback.heavy(); // Strong pattern for any damage taken
-          }
-
           setBattleState(prev => ({
             ...prev,
             playerHp: data.playerHp,
@@ -425,7 +378,7 @@ export default function DungeonBattlePage() {
               screenShaking: false,
               monsterCriticalHit: false,
               isPlayerTurn: true, // Reset to player turn
-              attacksRemaining: 4, // Reset attacks for new turn
+              attacksRemaining: 3, // Reset attacks for new turn
               attackCount: 0,
               lastAttackTime: 0
             }));
@@ -470,7 +423,7 @@ export default function DungeonBattlePage() {
             currentMonsterIndex: nextIndex,
             battleResult: 'ongoing',
             isPlayerTurn: true,
-            attacksRemaining: 4,
+            attacksRemaining: 3,
             attackCount: 0,
             lastAttackTime: 0,
             battleLog: [...prev.battleLog, `A wild ${nextMonster.name} appears!`]
@@ -538,9 +491,8 @@ export default function DungeonBattlePage() {
       {/* Battle Scene */}
       <div 
         className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)] cursor-pointer" 
-        style={{ touchAction: 'manipulation' }}
-        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
-        onTouchStart={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
+        style={{ touchAction: 'none' }}
+        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' && battleState.attacksRemaining > 0 ? handleAttack : undefined}
       >
         {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
         <div className="absolute top-4 left-0 right-0 z-20 px-4 md:px-8">
@@ -597,7 +549,7 @@ export default function DungeonBattlePage() {
         </div>
 
         {/* Character Sprites - Battle Field with enhanced positioning */}
-        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'manipulation', userSelect: 'none' }}>
+        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
           {/* Player Character with HP/MP bars above (Invisible Card) */}
           <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
             {/* Player HP/MP Bars above character - No visible card */}
@@ -758,20 +710,20 @@ export default function DungeonBattlePage() {
           {battleState.battleResult === 'ongoing' && (
             <div className="flex gap-2 items-center">
               {/* Attack dots */}
-              {[1, 2, 3, 4].map((dotIndex) => (
+              {[1, 2, 3].map((dotIndex) => (
                 <div
                   key={dotIndex}
                   className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
-                    dotIndex <= (4 - battleState.attacksRemaining)
+                    dotIndex <= (3 - battleState.attacksRemaining)
                       ? 'bg-gray-600 border-gray-500' // Used attacks - dark
-                      : battleState.isCombo && dotIndex === (4 - battleState.attacksRemaining + 1)
+                      : battleState.isCombo && dotIndex === (3 - battleState.attacksRemaining + 1)
                       ? 'bg-orange-400 border-orange-300 animate-pulse' // Next attack in combo - orange glow
                       : 'bg-yellow-400 border-yellow-300' // Available attacks - bright yellow
                   }`}
                   style={{
-                    boxShadow: dotIndex <= (4 - battleState.attacksRemaining)
+                    boxShadow: dotIndex <= (3 - battleState.attacksRemaining)
                       ? 'none'
-                      : battleState.isCombo && dotIndex === (4 - battleState.attacksRemaining + 1)
+                      : battleState.isCombo && dotIndex === (3 - battleState.attacksRemaining + 1)
                       ? '0 0 8px rgba(251, 146, 60, 0.6)'
                       : '0 0 6px rgba(250, 204, 21, 0.4)'
                   }}
