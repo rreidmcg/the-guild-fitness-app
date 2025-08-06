@@ -359,27 +359,13 @@ export default function ProgramOverview() {
             </div>
 
             {/* Program Info */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-500">{program.durationWeeks}</div>
-                <div className="text-sm text-muted-foreground">Weeks</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-500">{program.workoutsPerWeek}</div>
-                <div className="text-sm text-muted-foreground">Per Week</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-500">{program.estimatedDuration}min</div>
-                <div className="text-sm text-muted-foreground">Est. Time</div>
-              </div>
-              <div className="text-center">
-                <Badge 
-                  className={`${difficultyColors[program.difficultyLevel.toLowerCase()]} text-white`}
-                >
-                  {difficultyIcons[program.difficultyLevel.toLowerCase()]}
-                  <span className="ml-1 capitalize">{program.difficultyLevel}</span>
-                </Badge>
-              </div>
+            <div className="flex justify-center">
+              <Badge 
+                className={`${difficultyColors[program.difficultyLevel.toLowerCase()]} text-white`}
+              >
+                {difficultyIcons[program.difficultyLevel.toLowerCase()]}
+                <span className="ml-1 capitalize">{program.difficultyLevel}</span>
+              </Badge>
             </div>
           </div>
         </div>
