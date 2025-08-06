@@ -722,20 +722,20 @@ export default function DungeonBattlePage() {
           {battleState.battleResult === 'ongoing' && (
             <div className="flex gap-2 items-center">
               {/* Attack dots */}
-              {[1, 2, 3].map((dotIndex) => (
+              {[1, 2, 3, 4].map((dotIndex) => (
                 <div
                   key={dotIndex}
                   className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
-                    dotIndex <= (3 - battleState.attacksRemaining)
+                    dotIndex <= (4 - battleState.attacksRemaining)
                       ? 'bg-gray-600 border-gray-500' // Used attacks - dark
-                      : battleState.isCombo && dotIndex === (3 - battleState.attacksRemaining + 1)
+                      : battleState.isCombo && dotIndex === (4 - battleState.attacksRemaining + 1)
                       ? 'bg-orange-400 border-orange-300 animate-pulse' // Next attack in combo - orange glow
                       : 'bg-yellow-400 border-yellow-300' // Available attacks - bright yellow
                   }`}
                   style={{
-                    boxShadow: dotIndex <= (3 - battleState.attacksRemaining)
+                    boxShadow: dotIndex <= (4 - battleState.attacksRemaining)
                       ? 'none'
-                      : battleState.isCombo && dotIndex === (3 - battleState.attacksRemaining + 1)
+                      : battleState.isCombo && dotIndex === (4 - battleState.attacksRemaining + 1)
                       ? '0 0 8px rgba(251, 146, 60, 0.6)'
                       : '0 0 6px rgba(250, 204, 21, 0.4)'
                   }}
