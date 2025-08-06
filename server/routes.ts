@@ -3261,12 +3261,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isCombo = attackCount > 0 && timeSinceLastAttack < 2000;
       const newAttackCount = isCombo ? attackCount + 1 : 1;
       
-      // Calculate combo multiplier (1x, 1.15x, 1.3x for attacks 1, 2, 3)
+      // Calculate combo multiplier (1x, 1.15x, 1.3x, 1.5x for attacks 1, 2, 3, 4)
       let comboMultiplier = 1.0;
       if (isCombo) {
         switch (newAttackCount) {
           case 2: comboMultiplier = 1.15; break;
           case 3: comboMultiplier = 1.3; break;
+          case 4: comboMultiplier = 1.5; break;
           default: comboMultiplier = 1.0; break;
         }
       }
@@ -3341,12 +3342,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Determine attacks remaining and if monster should counter-attack
-      const attacksRemaining = 3 - newAttackCount;
+      const attacksRemaining = 4 - newAttackCount;
       let isMonsterCrit = false;
       let actualMonsterDamage = 0;
       let newPlayerHp = playerHp;
       
-      // Monster counter-attacks only when player has used all 3 attacks
+      // Monster counter-attacks only when player has used all 4 attacks
       if (attacksRemaining === 0) {
         const monsterDamage = Math.max(1, monster.attack - playerDefense);
         const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
