@@ -1,26 +1,28 @@
-import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Clock, Target, Users, Play } from "lucide-react";
-import { useNavigate } from "@/hooks/use-navigate";
+import { Badge } from "@/components/ui/badge";
+import { ParallaxBackground } from "@/components/ui/parallax-background";
+import { WorkoutCard } from "@/components/ui/workout-card";
+import { ArrowLeft, Trophy, Clock, Calendar, Target, Activity, Zap } from "lucide-react";
 
 interface ProgramWorkout {
   id: number;
   programId: number;
   weekNumber: number;
+  dayNumber: number;
   dayName: string;
-  workoutName: string;
+  name: string;
+  description: string;
   exercises: Array<{
-    name: string;
-    reps?: string;
-    duration?: string;
-    holdTime?: string;
-    instructions?: string;
+    exerciseId: number;
+    sets: number;
+    reps: number;
+    weight?: number;
+    restTime: number;
+    rpe?: number;
   }>;
-  instructions: string;
-  rounds?: number;
-  restSeconds?: number;
 }
 
 interface WorkoutProgram {
@@ -38,220 +40,194 @@ interface WorkoutProgram {
   priceFormatted: string;
 }
 
-export default function ProgramOverview() {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const programId = parseInt(id || "0");
+// Calculate estimated workout duration based on exercises
+function calculateEstimatedDuration(exercises: any[]): number {
+  if (!exercises || exercises.length === 0) return 30;
+  
+  let totalTime = 0;
+  
+  exercises.forEach((exercise) => {
+    const sets = exercise.sets || 3;
+    const restTime = exercise.restTime || 60; // seconds
+    
+    // Estimate 45 seconds per set + rest time between sets
+    const setTime = 45; // seconds per set
+    const exerciseTime = (sets * setTime) + ((sets - 1) * restTime);
+    totalTime += exerciseTime;
+  });
+  
+  // Add 5 minutes for general warm-up/transition time
+  totalTime += 300;
+  
+  // Convert to minutes and round
+  return Math.round(totalTime / 60);
+}
 
-  // Fetch program details
+export default function ProgramOverview() {
+  const params = new URLSearchParams(window.location.search);
+  const programId = params.get('program');
+  const navigate = useNavigate();
+
   const { data: program, isLoading: programLoading } = useQuery<WorkoutProgram>({
-    queryKey: [`/api/workout-programs/${programId}`],
+    queryKey: ["/api/workout-programs", programId],
     enabled: !!programId,
   });
 
-  // Fetch program workouts
-  const { data: workouts, isLoading: workoutsLoading } = useQuery<ProgramWorkout[]>({
-    queryKey: [`/api/workout-programs/${programId}/workouts`],
-    enabled: !!programId && program?.isPurchased,
+  const { data: programWorkouts, isLoading: workoutsLoading } = useQuery<ProgramWorkout[]>({
+    queryKey: ["/api/workout-programs", programId, "workouts"],
+    enabled: !!programId,
   });
+
+  const difficultyColors = {
+    novice: "bg-green-500",
+    intermediate: "bg-yellow-500", 
+    advanced: "bg-red-500"
+  };
+
+  const difficultyIcons = {
+    novice: <Target className="w-4 h-4" />,
+    intermediate: <Activity className="w-4 h-4" />,
+    advanced: <Zap className="w-4 h-4" />
+  };
 
   if (programLoading || workoutsLoading) {
     return (
-      <div className="min-h-screen bg-background p-6 pb-24">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="h-8 bg-muted animate-pulse rounded mb-6"></div>
-          <div className="h-64 bg-muted animate-pulse rounded-lg"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-32 bg-muted animate-pulse rounded-lg"></div>
-            ))}
+      <ParallaxBackground>
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
           </div>
         </div>
-      </div>
+      </ParallaxBackground>
     );
   }
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-background p-6 pb-24">
-        <div className="max-w-4xl mx-auto text-center py-12">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Program Not Found</h1>
-          <Button onClick={() => navigate("/workout-programs")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Programs
-          </Button>
+      <ParallaxBackground>
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-4 py-8">
+            <Card className="max-w-md mx-auto">
+              <CardContent className="p-6 text-center">
+                <h2 className="text-xl font-semibold mb-2">Program Not Found</h2>
+                <p className="text-muted-foreground mb-4">The program you're looking for doesn't exist.</p>
+                <Button onClick={() => navigate('/workout-programs')}>
+                  Back to Programs
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
-    );
-  }
-
-  if (!program.isPurchased) {
-    return (
-      <div className="min-h-screen bg-background p-6 pb-24">
-        <div className="max-w-4xl mx-auto text-center py-12">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Program Not Available</h1>
-          <p className="text-muted-foreground mb-6">
-            You need to purchase this program to access its workouts.
-          </p>
-          <Button onClick={() => navigate("/workout-programs")}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Browse Programs
-          </Button>
-        </div>
-      </div>
+      </ParallaxBackground>
     );
   }
 
   // Group workouts by week
-  const workoutsByWeek = (workouts || []).reduce((acc, workout) => {
-    const week = workout.weekNumber || 1;
-    if (!acc[week]) acc[week] = [];
-    acc[week].push(workout);
+  const workoutsByWeek = (programWorkouts || []).reduce((acc, workout) => {
+    const weekKey = `Week ${workout.weekNumber}`;
+    if (!acc[weekKey]) {
+      acc[weekKey] = [];
+    }
+    acc[weekKey].push(workout);
     return acc;
-  }, {} as Record<number, ProgramWorkout[]>);
+  }, {} as Record<string, ProgramWorkout[]>);
 
-  const handleStartWorkout = (workout: ProgramWorkout) => {
-    navigate(`/program-workout/${programId}/${workout.id}`);
-  };
-
-  const handleViewDay = (workout: ProgramWorkout) => {
-    navigate(`/program-day/${programId}/${workout.id}`);
-  };
+  // Convert program workouts to the format expected by WorkoutCard
+  const convertToWorkoutFormat = (programWorkout: ProgramWorkout) => ({
+    id: programWorkout.id,
+    name: programWorkout.name,
+    description: programWorkout.description,
+    exercises: programWorkout.exercises,
+    estimatedDuration: calculateEstimatedDuration(programWorkout.exercises),
+    totalExercises: programWorkout.exercises.length,
+    isProgramWorkout: true,
+    programId: programWorkout.programId,
+    weekNumber: programWorkout.weekNumber,
+    dayName: programWorkout.dayName
+  });
 
   return (
-    <div className="min-h-screen bg-background p-6 pb-24">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <ParallaxBackground>
+      <div className="min-h-screen bg-background text-foreground pb-20">
+        
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/workout-programs")}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">{program.name}</h1>
-            <p className="text-muted-foreground">{program.description}</p>
+        <div className="bg-card border-b border-border px-4 py-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-4 mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/workout-programs')}
+                className="p-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">{program.name}</h1>
+                <p className="text-muted-foreground mt-0.5 text-sm">{program.description}</p>
+              </div>
+            </div>
+
+            {/* Program Info */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-500">{program.durationWeeks}</div>
+                <div className="text-sm text-muted-foreground">Weeks</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-500">{program.workoutsPerWeek}</div>
+                <div className="text-sm text-muted-foreground">Per Week</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-500">{program.estimatedDuration}min</div>
+                <div className="text-sm text-muted-foreground">Est. Time</div>
+              </div>
+              <div className="text-center">
+                <Badge 
+                  className={`${difficultyColors[program.difficultyLevel.toLowerCase()]} text-white`}
+                >
+                  {difficultyIcons[program.difficultyLevel.toLowerCase()]}
+                  <span className="ml-1 capitalize">{program.difficultyLevel}</span>
+                </Badge>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Program Overview */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-foreground">Program Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.durationWeeks} weeks</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Target className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.workoutsPerWeek}/week</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Clock className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.estimatedDuration} min</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Users className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.difficultyLevel}</span>
+        <div className="max-w-4xl mx-auto p-6 space-y-8">
+          
+          {/* Workout Schedule */}
+          {Object.entries(workoutsByWeek).map(([weekName, weekWorkouts]) => (
+            <div key={weekName}>
+              <h2 className="text-xl font-bold mb-4 text-foreground">{weekName}</h2>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {weekWorkouts
+                  .sort((a, b) => a.dayNumber - b.dayNumber)
+                  .map((workout) => (
+                    <WorkoutCard
+                      key={workout.id}
+                      workout={convertToWorkoutFormat(workout)}
+                      onClick={() => navigate(`/workout-overview?workout=${workout.id}&program=true`)}
+                    />
+                  ))}
               </div>
             </div>
-            
-            {program.features && program.features.length > 0 && (
-              <div>
-                <h4 className="font-semibold text-foreground mb-2">Program Features:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  {program.features.map((feature, index) => (
-                    <li key={index}>• {feature}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          ))}
 
-        {/* Workout Days */}
-        <div className="space-y-6">
-          {Object.entries(workoutsByWeek)
-            .sort(([a], [b]) => parseInt(a) - parseInt(b))
-            .map(([weekNumber, weekWorkouts]) => (
-            <Card key={weekNumber} className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold text-foreground">
-                  Week {weekNumber}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {weekWorkouts.map((workout) => (
-                    <Card 
-                      key={workout.id} 
-                      className="bg-muted/30 border-border hover:border-primary/50 transition-colors cursor-pointer"
-                      onClick={() => handleViewDay(workout)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="space-y-3">
-                          <div>
-                            <h4 className="font-semibold text-foreground">{workout.dayName}</h4>
-                            <p className="text-sm text-muted-foreground">{workout.workoutName}</p>
-                          </div>
-                          
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>{workout.exercises?.length || 0} exercises</span>
-                            {workout.rounds && <span>{workout.rounds} rounds</span>}
-                          </div>
-                          
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="flex-1 text-xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewDay(workout);
-                              }}
-                            >
-                              View Details
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="flex-1 text-xs"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleStartWorkout(workout);
-                              }}
-                            >
-                              <Play className="w-3 h-3 mr-1" />
-                              Start
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+          {(!programWorkouts || programWorkouts.length === 0) && (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Trophy className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-lg font-semibold mb-2">No Workouts Found</h3>
+                <p className="text-muted-foreground">This program doesn't have any workouts configured yet.</p>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          )}
 
-        {(workouts || []).length === 0 && (
-          <Card className="bg-card border-border">
-            <CardContent className="text-center py-12">
-              <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50 text-muted-foreground" />
-              <h3 className="text-lg font-semibold mb-2 text-foreground">No Workouts Available</h3>
-              <p className="text-muted-foreground">
-                This program doesn't have any workouts configured yet.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        </div>
       </div>
-    </div>
+    </ParallaxBackground>
   );
 }

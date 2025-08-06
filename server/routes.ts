@@ -278,6 +278,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get individual program workout by ID  
+  app.get("/api/program-workouts/:id", async (req, res) => {
+    try {
+      const workoutId = parseInt(req.params.id);
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      
+      const workout = await storage.getProgramWorkout(workoutId);
+      if (!workout) {
+        return res.status(404).json({ error: "Program workout not found" });
+      }
+      
+      res.json(workout);
+    } catch (error) {
+      console.error("Error fetching program workout:", error);
+      res.status(500).json({ error: "Failed to fetch program workout" });
+    }
+  });
+
   // Purchase workout program
   app.post("/api/purchase-program/:id", async (req, res) => {
     try {

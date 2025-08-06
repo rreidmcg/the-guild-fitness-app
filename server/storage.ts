@@ -560,6 +560,11 @@ export class DatabaseStorage implements IStorage {
       .orderBy(programWorkouts.weekNumber, programWorkouts.dayName);
   }
 
+  async getProgramWorkout(workoutId: number): Promise<ProgramWorkout | undefined> {
+    const [workout] = await db.select().from(programWorkouts).where(eq(programWorkouts.id, workoutId));
+    return workout || undefined;
+  }
+
   // Wardrobe operations
   async getWardrobeItemsWithOwnership(userId: number): Promise<any[]> {
     try {
