@@ -274,6 +274,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update program workout schedule
+  app.patch("/api/program-workouts/:id", async (req, res) => {
+    try {
+      const workoutId = parseInt(req.params.id);
+      const userId = requireAuth(req);
+      
+      // TODO: Add permission check to ensure user can edit this program
+      const { weekNumber, dayName } = req.body;
+      
+      if (!weekNumber || !dayName) {
+        return res.status(400).json({ error: "weekNumber and dayName are required" });
+      }
+      
+      const updatedWorkout = await storage.updateProgramWorkout(workoutId, {
+        weekNumber,
+        dayName
+      });
+      
+      if (!updatedWorkout) {
+        return res.status(404).json({ error: "Program workout not found" });
+      }
+      
+      res.json(updatedWorkout);
+    } catch (error) {
+      console.error("Error updating program workout:", error);
+      res.status(500).json({ error: "Failed to update program workout" });
+    }
+  });
+
   // Purchase workout program
   app.post("/api/purchase-program/:id", async (req, res) => {
     try {

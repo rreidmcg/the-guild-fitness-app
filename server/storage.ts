@@ -85,6 +85,8 @@ export interface IStorage {
   getAllWorkoutPrograms(): Promise<WorkoutProgram[]>;
   getWorkoutProgram(id: number): Promise<WorkoutProgram | undefined>;
   getProgramWorkouts(programId: number): Promise<ProgramWorkout[]>;
+  getProgramWorkout(id: number): Promise<ProgramWorkout | undefined>;
+  updateProgramWorkout(id: number, updates: Partial<ProgramWorkout>): Promise<ProgramWorkout | undefined>;
   getUserPurchasedPrograms(userId: number): Promise<string[]>;
   purchaseWorkoutProgram(userId: number, programId: string): Promise<User>;
 
@@ -563,6 +565,14 @@ export class DatabaseStorage implements IStorage {
   async getProgramWorkout(workoutId: number): Promise<ProgramWorkout | undefined> {
     const [workout] = await db.select().from(programWorkouts).where(eq(programWorkouts.id, workoutId));
     return workout || undefined;
+  }
+
+  async updateProgramWorkout(id: number, updates: Partial<ProgramWorkout>): Promise<ProgramWorkout | undefined> {
+    const [updated] = await db.update(programWorkouts)
+      .set(updates)
+      .where(eq(programWorkouts.id, id))
+      .returning();
+    return updated || undefined;
   }
 
   // Wardrobe operations
