@@ -23,7 +23,7 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack Query
 - **Styling**: Tailwind CSS with custom gaming theme variables
 - **UI Components**: Radix UI with shadcn/ui
-- **Graphics**: Custom 2D avatar system with dynamic battle animations; Three.js implemented for full 3D avatar display with stat-based appearance modifications.
+- **Graphics**: Custom 2D avatar system with dynamic battle animations; Three.js planned for 3D avatar display.
 - **UI/UX Decisions**: Dark gaming theme, mobile-responsive design with bottom navigation (Stats, Workouts, Battle, Shop, Leaderboard), currency header displaying gold, XP, and level. Progressive Web App (PWA) capabilities including offline functionality and push notifications. Visual feedback for swipe interactions including directional border highlights and opacity transitions.
 
 ### Backend
@@ -37,11 +37,10 @@ Preferred communication style: Simple, everyday language.
 ### Core Features & System Design
 - **Authentication & User Management**: Secure registration/login, email verification, password recovery, username validation with profanity filtering and reserved words, admin access control. Features a title rarity system and RPG-style leveling.
 - **Character Progression**: RPG-style character progression with level, experience, and three-stat tracking (Strength, Stamina, Agility). Features an advanced stat allocation engine based on exercise science and an exponential leveling formula. Includes an Atrophy System with daily stat degradation for inactive users.
-- **3D Avatar System**: Complete 3D character visualization using Three.js with dynamic stat-based appearance modifications. Users can toggle between 2D and 3D views with the AvatarSelector component. Features include muscle mass scaling based on strength, height adjustments based on agility, customizable colors, and real-time stat display overlays.
 - **Gamification**:
     - **Dual Resource System**: HP (Health Points) and MP (Magic Points) with regeneration mechanics.
     - **Dual Economy System**: XP from workouts for progression, Gold from monster battles for purchases.
-    - **Combat System**: Stat-based combat mechanics influencing damage, HP, MP, and evasion. Battles award gold/currency, not experience points. Includes new Knighthood-inspired turn-based combat system with 4 actions per round, tap-to-attack mechanics, and ultimate meter building (10-15% per hit).
+    - **Combat System**: Stat-based combat mechanics influencing damage, HP, MP, and evasion. Battles award gold/currency, not experience points.
     - **Dungeon Progression**: Story-driven, exponential dungeon progression.
     - **Achievements**: Personal records and boss-themed title progression.
     - **Streak System**: Comprehensive streak bonus for consistent activity and an auto-streak freeze system.

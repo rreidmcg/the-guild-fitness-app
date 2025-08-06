@@ -22,7 +22,6 @@ import {
   Save,
   Edit3
 } from "lucide-react";
-import { AvatarSelector } from "@/components/ui/avatar-selector";
 
 export default function Profile() {
   const { toast } = useToast();

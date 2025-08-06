@@ -5,7 +5,6 @@ import { Trophy, Medal, Crown, Star, Dumbbell, Heart, Zap, X } from "lucide-reac
 import { getTitleComponent } from "@/lib/title-rarity";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Avatar2D } from "@/components/ui/avatar-2d";
-import { AvatarSelector } from "@/components/ui/avatar-selector";
 import { Badge } from "@/components/ui/badge";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 
@@ -223,15 +222,10 @@ export default function LeaderboardPage() {
               {/* Avatar Display */}
               <div className="flex justify-center">
                 <div className={`relative rounded-lg p-1 ${getAvatarRarityClass(selectedPlayer)}`}>
-                  <AvatarSelector 
+                  <Avatar2D 
                     user={selectedPlayer}
                     size="lg"
                     className="mx-auto"
-                    showToggle={true}
-                    defaultMode="2d"
-                    interactive={true}
-                    showStats={false}
-                    animationState="idle"
                   />
                 </div>
               </div>

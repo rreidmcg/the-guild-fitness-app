@@ -29,7 +29,6 @@ import swordIconImage from "@assets/IMG_3799_1754013496468.png";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { BattleAvatar } from "@/components/ui/battle-avatar";
-import { TurnBasedBattle } from "@/components/ui/turn-based-battle";
 import { BattleAccessGuard } from "@/components/ui/battle-access-guard";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -423,26 +422,6 @@ export default function DungeonBattlePage() {
   }
 
   const progressPercent = ((battleState.currentMonsterIndex + (battleState.battleResult === 'victory' ? 1 : 0)) / battleState.zone.monsters.length) * 100;
-
-  // Use new turn-based battle system
-  if (true) { // Toggle this to enable new battle system
-    return (
-      <TurnBasedBattle
-        dungeonId={zoneId!}
-        onBattleComplete={(result) => {
-          if (result === 'victory') {
-            toast({
-              title: "Victory!",
-              description: "You defeated the enemy!",
-            });
-            queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-          }
-          navigate("/pve-dungeons");
-        }}
-        onBack={() => navigate("/pve-dungeons")}
-      />
-    );
-  }
 
   return (
     <BattleAccessGuard>
