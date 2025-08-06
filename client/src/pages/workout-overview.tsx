@@ -9,12 +9,10 @@ import { ArrowLeft, Play, Clock, Target, Dumbbell, Edit3 } from "lucide-react";
 export default function WorkoutOverview() {
   const params = new URLSearchParams(window.location.search);
   const workoutId = params.get('workout');
-  const isProgram = params.get('program') === 'true';
   const navigate = useNavigate();
 
-  // Query for either program workout or regular workout
   const { data: workout, isLoading } = useQuery<any>({
-    queryKey: isProgram ? ["/api/program-workouts", workoutId] : ["/api/workouts", workoutId],
+    queryKey: ["/api/workouts", workoutId],
     enabled: !!workoutId,
   });
 

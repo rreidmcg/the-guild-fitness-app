@@ -179,11 +179,11 @@ export default function Workouts() {
 
   const handleStartProgram = (program: WorkoutProgram) => {
     toast({
-      title: "Opening Program",
-      description: `Viewing ${program.name} workout overview...`,
+      title: "Starting Workout",
+      description: `Beginning ${program.name} workout session...`,
     });
-    // Navigate to program overview page
-    navigate(`/program-overview?program=${program.id}`);
+    // Navigate to workout session with program ID
+    navigate(`/workout-session/${program.id}`);
   };
 
   const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein' | 'sleep', checked: boolean) => {

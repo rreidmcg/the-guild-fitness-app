@@ -226,7 +226,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
+  app.get("/api/workout-programs/:id", async (req, res) => {
+    try {
+      const programId = parseInt(req.params.id);
+      const program = await storage.getWorkoutProgram(programId);
+      
+      if (!program) {
+        return res.status(404).json({ error: "Workout program not found" });
+      }
+      
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
+      const isPurchased = purchasedPrograms.includes(programId.toString()) || program.price === 0;
+      
+      res.json({
+        ...program,
+        isPurchased,
+        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+      });
+    } catch (error) {
+      console.error("Error fetching workout program:", error);
+      res.status(500).json({ error: "Failed to fetch workout program" });
+    }
+  });
 
   app.get("/api/workout-programs/:id/workouts", async (req, res) => {
     try {
@@ -253,24 +275,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching program workouts:", error);
       res.status(500).json({ error: "Failed to fetch program workouts" });
-    }
-  });
-
-  // Get individual program workout by ID  
-  app.get("/api/program-workouts/:id", async (req, res) => {
-    try {
-      const workoutId = parseInt(req.params.id);
-      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
-      
-      const workout = await storage.getProgramWorkout(workoutId);
-      if (!workout) {
-        return res.status(404).json({ error: "Program workout not found" });
-      }
-      
-      res.json(workout);
-    } catch (error) {
-      console.error("Error fetching program workout:", error);
-      res.status(500).json({ error: "Failed to fetch program workout" });
     }
   });
 
