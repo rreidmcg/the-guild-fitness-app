@@ -74,8 +74,8 @@ export class AtrophySystem {
    */
   static async applyAtrophy(userId: number, userData: any): Promise<void> {
     try {
-      // Calculate 1% reduction (minimum 1 point loss if they have any)
-      const xpLoss = Math.max(1, Math.floor(userData.experience * 0.01));
+      // Calculate 1% reduction (minimum 1 point loss if they have any XP)
+      const xpLoss = userData.experience > 0 ? Math.max(1, Math.floor(userData.experience * 0.01)) : 0;
       
       // Calculate 1% XP loss for individual stats (use XP fields, not stat levels)
       const strengthXpLoss = Math.max(userData.strengthXp > 0 ? 1 : 0, Math.floor((userData.strengthXp || 0) * 0.01));
@@ -109,7 +109,7 @@ export class AtrophySystem {
         })
         .where(eq(users.id, userId));
 
-      console.log(`Applied atrophy to user ${userId}: -${xpLoss} XP (Level ${userData.level} → ${newLevel}), STR: ${userData.strength} → ${newStrength}, STA: ${userData.stamina} → ${newStamina}, AGI: ${userData.agility} → ${newAgility}`);
+      console.log(`Applied atrophy to user ${userId}: -${xpLoss} XP (${userData.experience} → ${newExperience}, Level ${userData.level} → ${newLevel}), STR: ${userData.strength} → ${newStrength}, STA: ${userData.stamina} → ${newStamina}, AGI: ${userData.agility} → ${newAgility}`);
     } catch (error) {
       console.error(`Error applying atrophy to user ${userId}:`, error);
     }
