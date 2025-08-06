@@ -3226,13 +3226,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate damage dealt by player to monster
       const baseDamage = Math.max(1, playerAttack - Math.floor(monster.level * 1.5));
       const damageVariance = Math.floor(Math.random() * Math.max(1, baseDamage * 0.3));
-      const playerDamage = baseDamage + damageVariance;
+      let playerDamage = baseDamage + damageVariance;
+      
+      // Check for critical hit (15% chance based on agility)
+      const critChance = Math.min(0.15 + (user.agility * 0.01), 0.35); // 15% base + 1% per agility, max 35%
+      const isCriticalHit = Math.random() < critChance;
+      
+      if (isCriticalHit) {
+        playerDamage = Math.floor(playerDamage * 1.5); // 1.5x damage for crits
+      }
       
       // Apply damage to monster
       const newMonsterHp = Math.max(0, monster.currentHp - playerDamage);
       
       // Initialize battle log
-      const battleLog = [`You deal ${playerDamage} damage to ${monster.name}!`];
+      const battleLog = [`You deal ${playerDamage} damage to ${monster.name}!${isCriticalHit ? ' CRITICAL HIT!' : ''}`];
       
       // Check if monster is defeated
       let battleResult = 'ongoing';
@@ -3263,18 +3271,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           monster: { ...monster, currentHp: 0 },
           battleLog,
           battleResult,
-          goldEarned
+          goldEarned,
+          playerCriticalHit: isCriticalHit
         });
       }
       
       // Monster counter-attack if still alive
       const monsterDamage = Math.max(1, monster.attack - playerDefense);
       const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
-      const actualMonsterDamage = monsterDamage + monsterDamageVariance;
+      let actualMonsterDamage = monsterDamage + monsterDamageVariance;
+      
+      // Monster critical hit (10% chance)
+      const monsterCritChance = 0.10;
+      const isMonsterCrit = Math.random() < monsterCritChance;
+      
+      if (isMonsterCrit) {
+        actualMonsterDamage = Math.floor(actualMonsterDamage * 1.3); // 1.3x damage for monster crits
+      }
       
       const newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
       
-      battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!`);
+      battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!${isMonsterCrit ? ' CRITICAL HIT!' : ''}`);
       
       if (newPlayerHp <= 0) {
         battleResult = 'defeat';
@@ -3290,7 +3307,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         monster: { ...monster, currentHp: newMonsterHp },
         battleLog,
         battleResult,
-        goldEarned: 0
+        goldEarned: 0,
+        playerCriticalHit: isCriticalHit,
+        monsterCriticalHit: isMonsterCrit
       });
       
     } catch (error) {

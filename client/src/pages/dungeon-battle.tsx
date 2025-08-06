@@ -178,6 +178,8 @@ interface BattleState {
   playerFlashing: boolean;
   monsterFlashing: boolean;
   screenShaking: boolean;
+  playerCriticalHit: boolean;
+  monsterCriticalHit: boolean;
 }
 
 
@@ -206,7 +208,9 @@ export default function DungeonBattlePage() {
     monsterDamage: null,
     playerFlashing: false,
     monsterFlashing: false,
-    screenShaking: false
+    screenShaking: false,
+    playerCriticalHit: false,
+    monsterCriticalHit: false
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -312,7 +316,8 @@ export default function DungeonBattlePage() {
       playerLunging: true,
       playerDamage: playerDamage,
       monsterFlashing: playerDamage !== null,
-      screenShaking: playerDamage !== null
+      screenShaking: playerDamage !== null,
+      playerCriticalHit: data.playerCriticalHit || false
     }));
 
     // After player lunge, clear player attack effects
@@ -322,7 +327,8 @@ export default function DungeonBattlePage() {
         playerLunging: false,
         playerDamage: null,
         monsterFlashing: false,
-        screenShaking: false
+        screenShaking: false,
+        playerCriticalHit: false
       }));
 
       // Pause before monster counter-attack
@@ -340,7 +346,8 @@ export default function DungeonBattlePage() {
             monsterLunging: true,
             monsterDamage: monsterDamage,
             playerFlashing: true,
-            screenShaking: monsterDamage !== null
+            screenShaking: monsterDamage !== null,
+            monsterCriticalHit: data.monsterCriticalHit || false
           }));
 
           // Clear monster attack effects
@@ -350,7 +357,8 @@ export default function DungeonBattlePage() {
               monsterLunging: false,
               monsterDamage: null,
               playerFlashing: false,
-              screenShaking: false
+              screenShaking: false,
+              monsterCriticalHit: false
             }));
           }, 800);
         }, 600); // Pause between attacks
@@ -568,13 +576,20 @@ export default function DungeonBattlePage() {
               {/* Monster Damage to Player */}
               {battleState.monsterDamage && (
                 <div 
-                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-red-400 animate-bounce z-20"
+                  className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 font-bold z-20 ${
+                    battleState.monsterCriticalHit ? 'text-4xl' : 'text-2xl'
+                  }`}
                   style={{ 
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-                    animation: 'float-up 1s ease-out forwards'
+                    color: battleState.monsterCriticalHit ? '#ff4444' : '#ff6b6b',
+                    textShadow: battleState.monsterCriticalHit 
+                      ? '2px 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(255,68,68,0.8), 0 0 24px rgba(255,68,68,0.4)' 
+                      : '2px 2px 4px rgba(0,0,0,0.8)',
+                    animation: 'float-up 1s ease-out forwards',
+                    transform: battleState.monsterCriticalHit ? 'translate(-50%, -8px) scale(1.2)' : 'translate(-50%, -4px)'
                   }}
                 >
                   -{battleState.monsterDamage}
+                  {battleState.monsterCriticalHit && <span className="text-sm ml-1">CRIT!</span>}
                 </div>
               )}
             </div>
@@ -607,14 +622,20 @@ export default function DungeonBattlePage() {
                 {/* Player Damage to Monster */}
                 {battleState.playerDamage && (
                   <div 
-                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold z-20"
+                    className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 font-bold z-20 ${
+                      battleState.playerCriticalHit ? 'text-4xl' : 'text-2xl'
+                    }`}
                     style={{ 
-                      color: '#ffffff',
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255,255,255,0.5)',
-                      animation: 'float-up 1s ease-out forwards'
+                      color: battleState.playerCriticalHit ? '#ffd700' : '#ffffff',
+                      textShadow: battleState.playerCriticalHit 
+                        ? '2px 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(255,215,0,0.8), 0 0 24px rgba(255,215,0,0.4)' 
+                        : '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255,255,255,0.5)',
+                      animation: 'float-up 1s ease-out forwards',
+                      transform: battleState.playerCriticalHit ? 'translate(-50%, -8px) scale(1.2)' : 'translate(-50%, -4px)'
                     }}
                   >
                     -{battleState.playerDamage}
+                    {battleState.playerCriticalHit && <span className="text-sm ml-1">CRIT!</span>}
                   </div>
                 )}
               </div>
