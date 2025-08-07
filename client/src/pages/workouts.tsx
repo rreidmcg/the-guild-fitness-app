@@ -11,6 +11,7 @@ import { WorkoutLoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
 
 import { apiRequest } from "@/lib/queryClient";
+import { getWorkoutOverviewUrl, getProgramOverviewUrl } from "@/lib/url-utils";
 import type { WorkoutSession, WorkoutProgram, DailyProgress, User } from "@shared/schema";
 import { 
   Dumbbell, 
@@ -412,7 +413,7 @@ export default function Workouts() {
                   <Card 
                     key={workout.id} 
                     className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 hover:border-blue-400/40 transition-colors cursor-pointer"
-                    onClick={() => navigate(`/workout-overview?workout=${workout.id}`)}
+                    onClick={() => navigate(getWorkoutOverviewUrl(workout))}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">

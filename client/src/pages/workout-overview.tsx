@@ -1,15 +1,36 @@
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
 import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { ArrowLeft, Play, Clock, Target, Dumbbell, Edit3 } from "lucide-react";
+import { findBySlug, getWorkoutSessionUrl } from "@/lib/url-utils";
 
 export default function WorkoutOverview() {
+  const { slug } = useParams<{ slug?: string }>();
   const params = new URLSearchParams(window.location.search);
-  const workoutId = params.get('workout');
+  const queryWorkoutId = params.get('workout');
   const navigate = useNavigate();
+
+  // Fetch all workouts to support slug lookup
+  const { data: allWorkouts } = useQuery<any[]>({
+    queryKey: ["/api/workouts"],
+  });
+
+  // Determine workout ID from either slug or query parameter
+  let workoutId: string | null = null;
+  let workoutFromSlug: any = null;
+
+  if (slug) {
+    // Using slug-based URL
+    workoutFromSlug = findBySlug(allWorkouts, slug);
+    workoutId = workoutFromSlug?.id?.toString() || null;
+  } else if (queryWorkoutId) {
+    // Using query parameter (backwards compatibility)
+    workoutId = queryWorkoutId;
+  }
 
   const { data: workout, isLoading } = useQuery<any>({
     queryKey: ["/api/workouts", workoutId],
@@ -115,7 +136,13 @@ export default function WorkoutOverview() {
 
             <div className="flex gap-2">
               <Button 
-                onClick={() => navigate(`/workout-session/${workoutId}`)}
+                onClick={() => {
+                  if (workout) {
+                    navigate(getWorkoutSessionUrl(workout));
+                  } else if (workoutId) {
+                    navigate(`/workout-session/${workoutId}`);
+                  }
+                }}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
                 size="lg"
               >

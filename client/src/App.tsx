@@ -103,7 +103,17 @@ function Router() {
           <WorkoutOverview />
         </AuthGuard>
       </Route>
+      <Route path="/workout-overview/:slug">
+        <AuthGuard>
+          <WorkoutOverview />
+        </AuthGuard>
+      </Route>
       <Route path="/workout-session/:id">
+        <AuthGuard>
+          <WorkoutSession />
+        </AuthGuard>
+      </Route>
+      <Route path="/workout-session/:slug">
         <AuthGuard>
           <WorkoutSession />
         </AuthGuard>
@@ -164,6 +174,11 @@ function Router() {
         </AuthGuard>
       </Route>
       <Route path="/program-overview/:id">
+        <AuthGuard>
+          <ProgramOverview />
+        </AuthGuard>
+      </Route>
+      <Route path="/program-overview/:slug">
         <AuthGuard>
           <ProgramOverview />
         </AuthGuard>
