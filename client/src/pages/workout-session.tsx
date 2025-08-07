@@ -96,12 +96,14 @@ export default function WorkoutSession() {
         };
       });
       
+      console.log("Setting up workout exercises:", workoutExercises);
       setExerciseData(workoutExercises);
       setCurrentExerciseIndex(0);
       
       // Auto-start timer
       setIsTimerRunning(true);
       setStartTime(new Date());
+      console.log("Workout session initialized with", workoutExercises.length, "exercises");
     }
   }, [workout, exercises]);
 
@@ -224,6 +226,8 @@ export default function WorkoutSession() {
     navigate('/workouts');
   };
 
+  console.log("Loading states:", { workoutLoading, exercisesLoading, exerciseDataLength: exerciseData.length });
+  
   if (workoutLoading || exercisesLoading || exerciseData.length === 0) {
     return (
       <div className="min-h-screen bg-background p-6 pb-24">
@@ -238,6 +242,12 @@ export default function WorkoutSession() {
   const currentExercise = exerciseData[currentExerciseIndex];
   const totalExercises = exerciseData.length;
   const progress = ((currentExerciseIndex + 1) / totalExercises) * 100;
+  
+  console.log("Render debug:", {
+    exerciseDataLength: exerciseData.length,
+    currentExerciseIndex,
+    currentExercise: currentExercise ? { name: currentExercise.name, exerciseId: currentExercise.exerciseId } : null
+  });
 
   return (
     <div className="min-h-screen bg-background p-6 pb-24">
