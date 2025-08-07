@@ -28,7 +28,6 @@ import {
 import swordIconImage from "@assets/IMG_3799_1754013496468.png";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { Avatar2D } from "@/components/ui/avatar-2d";
-import { BattleAvatar } from "@/components/ui/battle-avatar";
 import { BattleAccessGuard } from "@/components/ui/battle-access-guard";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -177,7 +176,6 @@ interface BattleState {
   monsterDamage: number | null;
   playerFlashing: boolean;
   monsterFlashing: boolean;
-  playerAttacking: boolean;
 }
 
 
@@ -205,8 +203,7 @@ export default function DungeonBattlePage() {
     playerDamage: null,
     monsterDamage: null,
     playerFlashing: false,
-    monsterFlashing: false,
-    playerAttacking: false
+    monsterFlashing: false
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -277,9 +274,6 @@ export default function DungeonBattlePage() {
 
   const attackMutation = useMutation({
     mutationFn: async () => {
-      // Start attack animation
-      setBattleState(prev => ({ ...prev, playerAttacking: true }));
-      
       return await apiRequest("/api/battle/attack", {
         method: "POST",
         body: {
@@ -290,12 +284,9 @@ export default function DungeonBattlePage() {
       });
     },
     onSuccess: (data) => {
-      // Attack animation will complete first, then handle battle result
       handleBattleResult(data);
     },
     onError: () => {
-      // Stop attack animation on error
-      setBattleState(prev => ({ ...prev, playerAttacking: false }));
       toast({
         title: "Battle Error",
         description: "Something went wrong during battle.",
@@ -407,10 +398,6 @@ export default function DungeonBattlePage() {
     if (battleState.isPlayerTurn && battleState.battleResult === 'ongoing') {
       attackMutation.mutate();
     }
-  }
-
-  const handleAttackAnimationComplete = () => {
-    setBattleState(prev => ({ ...prev, playerAttacking: false }));
   };
 
   const handleRetreat = () => {
@@ -557,11 +544,9 @@ export default function DungeonBattlePage() {
                   filter: battleState.playerFlashing ? 'brightness(1.5) hue-rotate(0deg) saturate(2) sepia(1) contrast(1.2) drop-shadow(0 0 10px rgba(255,0,0,0.8))' : undefined
                 }}
               >
-                <BattleAvatar 
+                <Avatar2D 
                   playerStats={userStats}
                   className="[&>div]:!bg-transparent [&>div]:!shadow-none [&>div]:!border-none [&>div]:!rounded-none"
-                  isAttacking={battleState.playerAttacking}
-                  onAttackComplete={handleAttackAnimationComplete}
                 />
               </div>
               {/* Monster Damage to Player */}

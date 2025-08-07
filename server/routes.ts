@@ -1122,39 +1122,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/workout-sessions", async (req, res) => {
     try {
-      const userId = getCurrentUserId(req); 
-      if (!userId) { 
-        console.log("Workout session submission failed: No authentication");
-        return res.status(401).json({ 
-          error: "Authentication required", 
-          details: "Please log in again to save your workout"
-        }); 
-      }
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); } // Use the current logged-in user
       
       console.log("Workout session submission:", {
         userId,
         bodyKeys: Object.keys(req.body),
         exerciseCount: req.body.exercises?.length || 0,
         name: req.body.name,
-        duration: req.body.duration,
-        timestamp: new Date().toISOString()
+        duration: req.body.duration
       });
       
-      // Enhanced validation with detailed error messages
-      if (!req.body.name || typeof req.body.name !== 'string' || req.body.name.trim().length === 0) {
-        console.log("Workout session validation failed: Invalid name", req.body.name);
-        return res.status(400).json({ 
-          error: "Workout name is required",
-          details: "Please provide a valid workout name"
-        });
+      // Validate required fields
+      if (!req.body.name) {
+        return res.status(400).json({ error: "Workout name is required" });
       }
       
-      if (typeof req.body.duration !== 'number' || req.body.duration < 1 || req.body.duration > 1440) {
-        console.log("Workout session validation failed: Invalid duration", req.body.duration);
-        return res.status(400).json({ 
-          error: "Valid workout duration is required",
-          details: "Duration must be between 1 and 1440 minutes"
-        });
+      if (typeof req.body.duration !== 'number' || req.body.duration < 1) {
+        return res.status(400).json({ error: "Valid workout duration (in minutes) is required" });
       }
       
       // Calculate XP based on actual completed sets
@@ -1169,41 +1153,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "At least one exercise is required" });
       }
       
-      // Enhanced exercise validation
-      for (let i = 0; i < exercises.length; i++) {
-        const exercise = exercises[i];
+      // Validate each exercise
+      for (const exercise of exercises) {
         if (!exercise.exerciseId || !exercise.name) {
-          console.log(`Workout session validation failed: Exercise ${i} missing data`, exercise);
           return res.status(400).json({ 
-            error: `Exercise ${i + 1} is missing required data`,
-            details: "Each exercise must have an exerciseId and name"
+            error: "Each exercise must have an exerciseId and name" 
           });
         }
         
-        if (!Array.isArray(exercise.sets) || exercise.sets.length === 0) {
-          console.log(`Workout session validation failed: Exercise ${i} has no sets`, exercise.sets);
+        if (!Array.isArray(exercise.sets)) {
           return res.status(400).json({ 
-            error: `Exercise ${i + 1} has no sets`,
-            details: "Each exercise must have at least one set"
+            error: "Each exercise must have a sets array" 
           });
         }
-        
-        // Validate each set has required properties
-        exercise.sets.forEach((set: any, setIndex: number) => {
-          if (typeof set.completed !== 'boolean') {
-            set.completed = false; // Default to not completed
-          }
-          // Ensure numeric values are valid
-          if (set.reps && (typeof set.reps !== 'number' || set.reps < 0)) {
-            set.reps = 0;
-          }
-          if (set.weight && (typeof set.weight !== 'number' || set.weight < 0)) {
-            set.weight = 0;
-          }
-          if (set.duration && (typeof set.duration !== 'number' || set.duration < 0)) {
-            set.duration = 0;
-          }
-        });
       }
       
       // Count total completed sets across all exercises
@@ -1247,23 +1209,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get user data for stat updates
       const user = await storage.getUser(userId);
       if (!user) {
-        console.log("Workout session failed: User not found", userId);
-        return res.status(404).json({ 
-          error: "User not found",
-          details: "Your account could not be found. Please log in again."
-        });
+        return res.status(404).json({ error: "User not found" });
       }
       
-      console.log("Creating workout session for user:", userId, "with data:", {
-        name: sessionData.name,
-        duration: sessionData.duration,
-        xpEarned: sessionData.xpEarned,
-        exerciseCount: sessionData.exercises.length,
-        totalCompletedSets
-      });
-      
       const session = await storage.createWorkoutSession(sessionData);
-      console.log("Workout session created successfully:", session.id);
       
       // Update user stats with the XP and stat gains using proper progression system
       // Apply streak bonus to main XP and stat XP
@@ -1334,68 +1283,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         newAchievements: newAchievements
       });
     } catch (error) {
-      console.error("=== WORKOUT SESSION ERROR ===");
-      console.error("Error:", error);
-      console.error("User ID:", getCurrentUserId(req));
-      console.error("Request body:", JSON.stringify(req.body, null, 2));
-      console.error("Timestamp:", new Date().toISOString());
-      console.error("===============================");
+      console.error("Workout session error:", error);
+      console.error("Request body:", req.body);
       
       if (error instanceof Error) {
-        // Database-specific errors
+        // Check for specific error types
         if (error.message.includes('invalid input syntax')) {
-          return res.status(400).json({ 
-            error: "Invalid workout data format", 
-            details: "Some workout data is in an invalid format. Please try again.",
-            userFriendly: true
+          res.status(400).json({ 
+            error: "Database validation failed", 
+            details: "Invalid data format provided"
           });
-        } else if (error.message.includes('violates not null')) {
-          return res.status(400).json({ 
-            error: "Missing required workout data", 
-            details: "Some required workout information is missing. Please complete all exercises.",
-            userFriendly: true
+        } else if (error.message.includes('violates')) {
+          res.status(400).json({ 
+            error: "Database constraint violation", 
+            details: "Required data missing or invalid"
           });
-        } else if (error.message.includes('foreign key constraint')) {
-          return res.status(400).json({ 
-            error: "Invalid workout reference", 
-            details: "The workout you're trying to save references invalid data. Please restart the workout.",
-            userFriendly: true
-          });
-        }
-        // Authentication/session errors
-        else if (error.message.includes('session') || error.message.includes('auth')) {
-          return res.status(401).json({ 
-            error: "Session expired", 
-            details: "Your session has expired. Please log in again to save your workout.",
-            shouldRetry: true,
-            userFriendly: true
-          });
-        }
-        // Network/timeout errors
-        else if (error.message.includes('timeout') || error.message.includes('connection')) {
-          return res.status(503).json({ 
-            error: "Connection error", 
-            details: "There was a connection issue. Your workout data has been preserved. Please try again.",
-            shouldRetry: true,
-            userFriendly: true
-          });
-        }
-        // Generic server errors
-        else {
-          return res.status(500).json({ 
-            error: "Server error while saving workout", 
-            details: "There was an unexpected error saving your workout. Please try again or contact support if this continues.",
-            technicalDetails: error.message,
-            shouldRetry: true,
-            userFriendly: true
+        } else {
+          res.status(500).json({ 
+            error: "Failed to save workout session", 
+            details: error.message 
           });
         }
       } else {
-        return res.status(500).json({ 
-          error: "Unknown error saving workout",
-          details: "An unexpected error occurred. Please try again or contact support if this continues.",
-          shouldRetry: true,
-          userFriendly: true
+        res.status(500).json({ 
+          error: "Unknown error occurred while saving workout session" 
         });
       }
     }

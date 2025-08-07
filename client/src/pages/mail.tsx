@@ -326,29 +326,26 @@ export default function MailPage() {
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        {/* Sender name and mail type in same row */}
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="text-lg font-bold text-foreground">
-                            {mailItem.senderName}
-                          </span>
+                        <div className="flex items-center space-x-2 mb-1">
+                          {getMailTypeIcon(mailItem.mailType)}
                           <Badge className={getMailTypeBadge(mailItem.mailType)}>
                             {mailItem.mailType}
                           </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {mailItem.senderName}
+                          </span>
                           {!mailItem.isRead && (
                             <Badge variant="secondary" className="bg-blue-500 text-white text-xs">
                               New
                             </Badge>
                           )}
                         </div>
-                        
-                        <CardTitle className="text-sm font-semibold mb-2">
+                        <CardTitle className="text-base font-semibold">
                           {mailItem.subject}
                         </CardTitle>
-                        
-                        {/* Content preview - not bolded */}
-                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                        <CardDescription className="line-clamp-2 text-sm">
                           {mailItem.content}
-                        </p>
+                        </CardDescription>
                       </div>
                       <div className="text-right flex flex-col items-end space-y-1">
                         <span className="text-xs text-muted-foreground">

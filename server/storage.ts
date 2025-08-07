@@ -512,7 +512,7 @@ export class DatabaseStorage implements IStorage {
 
   async upsertUserExercisePreference(preference: InsertUserExercisePreferences): Promise<UserExercisePreferences> {
     console.log('Storage: Upserting exercise preference:', preference);
-    const existing = await this.getUserExercisePreference(preference.userId!, preference.exerciseId!);
+    const existing = await this.getUserExercisePreference(preference.userId, preference.exerciseId);
     console.log('Storage: Existing preference found:', existing);
     
     if (existing) {
@@ -526,8 +526,8 @@ export class DatabaseStorage implements IStorage {
         .update(userExercisePreferences)
         .set(updateData)
         .where(and(
-          eq(userExercisePreferences.userId, preference.userId!),
-          eq(userExercisePreferences.exerciseId, preference.exerciseId!)
+          eq(userExercisePreferences.userId, preference.userId),
+          eq(userExercisePreferences.exerciseId, preference.exerciseId)
         ))
         .returning();
       console.log('Storage: Updated preference result:', updated);
@@ -1736,6 +1736,7 @@ Start your fitness journey today and watch your character grow stronger with eve
 
 **The Guild Development Team**`,
       mailType: "announcement",
+      isRead: false,
       rewards: null,
       rewardsClaimed: false,
       expiresAt: null
