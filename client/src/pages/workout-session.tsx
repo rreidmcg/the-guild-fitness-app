@@ -168,6 +168,10 @@ export default function WorkoutSession() {
           };
         });
         setExerciseData(workoutExercises);
+        
+        // Auto-start the workout timer for new sessions
+        setIsActive(true);
+        setStartTime(new Date());
       }
     }
   }, [workout, exercises, sessionKey]);
@@ -1041,25 +1045,8 @@ export default function WorkoutSession() {
             <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4">
               <Play className="w-12 h-12 !text-white" />
             </div>
-            <h3 className="text-2xl font-bold mb-2 text-foreground">Start Your Workout</h3>
-            <p className="text-muted-foreground">Press start to begin tracking your session</p>
-          </div>
-        ) : !isActive && !startTime ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-game-primary rounded-full flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-game-primary/90 transition-colors"
-                 onClick={handleStartPause}>
-              <Play className="w-12 h-12 !text-white" />
-            </div>
-            <h3 className="text-2xl font-bold mb-2 text-foreground">Ready to Start!</h3>
-            <p className="text-muted-foreground mb-6">Tap the play button to begin your workout</p>
-            <Button 
-              size="lg"
-              onClick={handleStartPause}
-              className="bg-game-primary hover:bg-game-primary/90 text-white py-4 px-8 rounded-full text-lg"
-            >
-              <Play className="w-6 h-6 mr-2 text-white" />
-              Start Workout
-            </Button>
+            <h3 className="text-2xl font-bold mb-2 text-foreground">Loading Exercises</h3>
+            <p className="text-muted-foreground">Preparing your workout session...</p>
           </div>
         ) : (
           <div className="text-center py-12 space-y-6">
