@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock, Target, Users, Play } from "lucide-react";
 import { useNavigate } from "@/hooks/use-navigate";
+import { findBySlug } from "@/lib/url-utils";
 
 interface ProgramWorkout {
   id: number;
@@ -41,18 +42,41 @@ interface WorkoutProgram {
 export default function ProgramOverview() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const programId = parseInt(id || "0");
+  
+  // Fetch all programs to support slug lookup
+  const { data: allPrograms } = useQuery<WorkoutProgram[]>({
+    queryKey: ["/api/workout-programs"],
+  });
 
-  // Fetch program details
-  const { data: program, isLoading: programLoading } = useQuery<WorkoutProgram>({
+  // Determine program ID from either slug or ID
+  let programId: number = 0;
+  let program: WorkoutProgram | undefined;
+
+  if (id) {
+    const numericId = parseInt(id);
+    if (!isNaN(numericId)) {
+      // It's an ID
+      programId = numericId;
+    } else {
+      // It's a slug - find by name
+      program = findBySlug(allPrograms, id);
+      programId = program?.id || 0;
+    }
+  }
+
+  // Fetch program details using the determined programId
+  const { data: programDetails, isLoading: programLoading } = useQuery<WorkoutProgram>({
     queryKey: [`/api/workout-programs/${programId}`],
     enabled: !!programId,
   });
 
+  // Use the program from slug lookup or the fetched programDetails
+  const finalProgram = program || programDetails;
+
   // Fetch program workouts
   const { data: workouts, isLoading: workoutsLoading } = useQuery<ProgramWorkout[]>({
     queryKey: [`/api/workout-programs/${programId}/workouts`],
-    enabled: !!programId && program?.isPurchased,
+    enabled: !!programId && finalProgram?.isPurchased,
   });
 
   if (programLoading || workoutsLoading) {
@@ -71,7 +95,7 @@ export default function ProgramOverview() {
     );
   }
 
-  if (!program) {
+  if (!finalProgram) {
     return (
       <div className="min-h-screen bg-background p-6 pb-24">
         <div className="max-w-4xl mx-auto text-center py-12">
@@ -85,7 +109,7 @@ export default function ProgramOverview() {
     );
   }
 
-  if (!program.isPurchased) {
+  if (!finalProgram.isPurchased) {
     return (
       <div className="min-h-screen bg-background p-6 pb-24">
         <div className="max-w-4xl mx-auto text-center py-12">
@@ -132,8 +156,8 @@ export default function ProgramOverview() {
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">{program.name}</h1>
-            <p className="text-muted-foreground">{program.description}</p>
+            <h1 className="text-3xl font-bold text-foreground">{finalProgram.name}</h1>
+            <p className="text-muted-foreground">{finalProgram.description}</p>
           </div>
         </div>
 
@@ -146,27 +170,27 @@ export default function ProgramOverview() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.durationWeeks} weeks</span>
+                <span className="text-muted-foreground">{finalProgram.durationWeeks} weeks</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Target className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.workoutsPerWeek}/week</span>
+                <span className="text-muted-foreground">{finalProgram.workoutsPerWeek}/week</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.estimatedDuration} min</span>
+                <span className="text-muted-foreground">{finalProgram.estimatedDuration} min</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Users className="w-4 h-4 text-primary" />
-                <span className="text-muted-foreground">{program.difficultyLevel}</span>
+                <span className="text-muted-foreground">{finalProgram.difficultyLevel}</span>
               </div>
             </div>
             
-            {program.features && program.features.length > 0 && (
+            {finalProgram.features && finalProgram.features.length > 0 && (
               <div>
                 <h4 className="font-semibold text-foreground mb-2">Program Features:</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  {program.features.map((feature, index) => (
+                  {finalProgram.features.map((feature, index) => (
                     <li key={index}>• {feature}</li>
                   ))}
                 </ul>

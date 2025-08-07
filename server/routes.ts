@@ -35,6 +35,16 @@ function requireAuth(req: any): number {
   return userId;
 }
 
+// Helper function to generate URL-safe slug from name (server-side)
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+}
+
 // Initialize Stripe
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
@@ -201,13 +211,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get individual program details
+  // Get individual program details (supports both ID and slug)
   app.get("/api/workout-programs/:id", async (req, res) => {
     try {
-      const programId = parseInt(req.params.id);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const param = req.params.id;
       
-      const program = await storage.getWorkoutProgram(programId);
+      let program;
+      let programId: number;
+      
+      // Check if param is a number (ID) or a string (slug)
+      const numericId = parseInt(param);
+      if (!isNaN(numericId)) {
+        // It's an ID
+        programId = numericId;
+        program = await storage.getWorkoutProgram(programId);
+      } else {
+        // It's a slug - need to find by name
+        const allPrograms = await storage.getWorkoutPrograms();
+        program = allPrograms.find(p => generateSlug(p.name) === param);
+        programId = program?.id || 0;
+      }
+      
       if (!program) {
         return res.status(404).json({ error: "Program not found" });
       }
@@ -223,30 +248,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching program details:", error);
       res.status(500).json({ error: "Failed to fetch program details" });
-    }
-  });
-
-  app.get("/api/workout-programs/:id", async (req, res) => {
-    try {
-      const programId = parseInt(req.params.id);
-      const program = await storage.getWorkoutProgram(programId);
-      
-      if (!program) {
-        return res.status(404).json({ error: "Workout program not found" });
-      }
-      
-      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
-      const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const isPurchased = purchasedPrograms.includes(programId.toString()) || program.price === 0;
-      
-      res.json({
-        ...program,
-        isPurchased,
-        priceFormatted: `$${(program.price / 100).toFixed(2)}`
-      });
-    } catch (error) {
-      console.error("Error fetching workout program:", error);
-      res.status(500).json({ error: "Failed to fetch workout program" });
     }
   });
 
@@ -1042,8 +1043,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/workouts/:id", async (req, res) => {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
-      const workoutId = parseInt(req.params.id);
-      const workout = await storage.getWorkout(workoutId);
+      const param = req.params.id;
+      
+      let workout;
+      
+      // Check if param is a number (ID) or a string (slug)
+      const workoutId = parseInt(param);
+      if (!isNaN(workoutId)) {
+        // It's an ID
+        workout = await storage.getWorkout(workoutId);
+      } else {
+        // It's a slug - need to find by name
+        const userWorkouts = await storage.getUserWorkouts(userId);
+        workout = userWorkouts.find(w => generateSlug(w.name) === param);
+      }
       
       if (!workout || workout.userId !== userId) {
         return res.status(404).json({ error: "Workout not found" });
@@ -1051,6 +1064,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(workout);
     } catch (error) {
+      console.error("Error fetching workout:", error);
       res.status(500).json({ error: "Failed to fetch workout" });
     }
   });
