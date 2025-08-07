@@ -167,11 +167,16 @@ export default function WorkoutSession() {
             sets: setsArray // Replace the number with an array
           };
         });
+        console.log("Setting up workout exercises:", workoutExercises.length, "exercises");
         setExerciseData(workoutExercises);
         
         // Auto-start the workout timer for new sessions
         setIsActive(true);
         setStartTime(new Date());
+        
+        // Ensure we start at the first exercise
+        setCurrentExerciseIndex(0);
+        console.log("Workout session initialized with", workoutExercises.length, "exercises, starting at index 0");
       }
     }
   }, [workout, exercises, sessionKey]);
@@ -796,7 +801,14 @@ export default function WorkoutSession() {
       <div className="max-w-md mx-auto p-6">
 
         {/* Minimalist Exercise Interface */}
-        {exerciseData.length > 0 && currentExerciseIndex < exerciseData.length ? (
+        {(() => {
+          console.log("Render condition check:", {
+            exerciseDataLength: exerciseData.length,
+            currentExerciseIndex,
+            condition: exerciseData.length > 0 && currentExerciseIndex < exerciseData.length
+          });
+          return exerciseData.length > 0 && currentExerciseIndex < exerciseData.length;
+        })() ? (
           <div className="space-y-6">
             {/* Section Title */}
             <div className="text-center">
