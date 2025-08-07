@@ -228,7 +228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         program = await storage.getWorkoutProgram(programId);
       } else {
         // It's a slug - need to find by name
-        const allPrograms = await storage.getWorkoutPrograms();
+        const allPrograms = await storage.getAllWorkoutPrograms();
         program = allPrograms.find(p => generateSlug(p.name) === param);
         programId = program?.id || 0;
       }

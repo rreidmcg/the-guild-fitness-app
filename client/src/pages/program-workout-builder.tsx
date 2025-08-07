@@ -158,7 +158,7 @@ export default function ProgramWorkoutBuilder() {
         description: "Program workout created successfully!",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/workout-programs', programId, 'workouts'] });
-      navigate(`/program-overview/${program?.name?.toLowerCase().replace(/\s+/g, '-')}`);
+      navigate(`/program-overview/${programId}`);
     },
     onError: (error: any) => {
       toast({
@@ -186,7 +186,7 @@ export default function ProgramWorkoutBuilder() {
         description: "Program workout updated successfully!",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/workout-programs', programId, 'workouts'] });
-      navigate(`/program-overview/${program?.name?.toLowerCase().replace(/\s+/g, '-')}`);
+      navigate(`/program-overview/${programId}`);
     },
     onError: (error: any) => {
       toast({
@@ -306,7 +306,7 @@ export default function ProgramWorkoutBuilder() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => navigate(`/program-overview/${program.name?.toLowerCase().replace(/\s+/g, '-')}`)}
+                onClick={() => navigate(`/program-overview/${programId}`)}
                 className="hover:bg-muted"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -538,7 +538,7 @@ export default function ProgramWorkoutBuilder() {
           {/* Action Buttons */}
           <div className="flex gap-4">
             <Button 
-              onClick={() => navigate(`/program-overview/${program.name?.toLowerCase().replace(/\s+/g, '-')}`)}
+              onClick={() => navigate(`/program-overview/${programId}`)}
               variant="ghost"
               className="flex-1"
             >

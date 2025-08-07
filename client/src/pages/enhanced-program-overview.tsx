@@ -38,7 +38,7 @@ export default function EnhancedProgramOverview() {
 
   const { data: programWorkouts = [], isLoading: workoutsLoading } = useQuery({
     queryKey: ['/api/workout-programs', programId, 'workouts'],
-    enabled: !!program?.isPurchased,
+    enabled: !!programId && !!program?.isPurchased,
   });
 
   if (programLoading || workoutsLoading) {
