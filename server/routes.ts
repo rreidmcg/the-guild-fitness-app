@@ -1124,49 +1124,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); } // Use the current logged-in user
       
-      console.log("Workout session submission:", {
-        userId,
-        bodyKeys: Object.keys(req.body),
-        exerciseCount: req.body.exercises?.length || 0,
-        name: req.body.name,
-        duration: req.body.duration
-      });
-      
-      // Validate required fields
-      if (!req.body.name) {
-        return res.status(400).json({ error: "Workout name is required" });
-      }
-      
-      if (typeof req.body.duration !== 'number' || req.body.duration < 1) {
-        return res.status(400).json({ error: "Valid workout duration (in minutes) is required" });
-      }
-      
       // Calculate XP based on actual completed sets
       const exercises = req.body.exercises || [];
-      
-      // Validate exercises array
-      if (!Array.isArray(exercises)) {
-        return res.status(400).json({ error: "Exercises must be an array" });
-      }
-      
-      if (exercises.length === 0) {
-        return res.status(400).json({ error: "At least one exercise is required" });
-      }
-      
-      // Validate each exercise
-      for (const exercise of exercises) {
-        if (!exercise.exerciseId || !exercise.name) {
-          return res.status(400).json({ 
-            error: "Each exercise must have an exerciseId and name" 
-          });
-        }
-        
-        if (!Array.isArray(exercise.sets)) {
-          return res.status(400).json({ 
-            error: "Each exercise must have a sets array" 
-          });
-        }
-      }
       
       // Count total completed sets across all exercises
       let totalCompletedSets = 0;
@@ -1284,30 +1243,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Workout session error:", error);
-      console.error("Request body:", req.body);
-      
       if (error instanceof Error) {
-        // Check for specific error types
-        if (error.message.includes('invalid input syntax')) {
-          res.status(400).json({ 
-            error: "Database validation failed", 
-            details: "Invalid data format provided"
-          });
-        } else if (error.message.includes('violates')) {
-          res.status(400).json({ 
-            error: "Database constraint violation", 
-            details: "Required data missing or invalid"
-          });
-        } else {
-          res.status(500).json({ 
-            error: "Failed to save workout session", 
-            details: error.message 
-          });
-        }
+        res.status(400).json({ error: "Invalid session data", details: error.message });
       } else {
-        res.status(500).json({ 
-          error: "Unknown error occurred while saving workout session" 
-        });
+        res.status(400).json({ error: "Invalid session data" });
       }
     }
   });

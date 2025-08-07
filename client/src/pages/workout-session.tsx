@@ -50,8 +50,6 @@ export default function WorkoutSession() {
   const [pageLoaded, setPageLoaded] = useState(false);
   // Simple navigation state for arrow controls
   const [isNavigating, setIsNavigating] = useState(false);
-  // Session persistence
-  const [sessionKey, setSessionKey] = useState<string>("");
 
   const { data: userStats, isLoading: statsLoading } = useQuery<User>({
     queryKey: ["/api/user/stats"],
@@ -74,109 +72,32 @@ export default function WorkoutSession() {
     enabled: !!userStats,
   });
 
-  // Generate session key for persistence
-  useEffect(() => {
-    if (id && userStats?.id) {
-      const key = `workout_session_${userStats.id}_${id}`;
-      setSessionKey(key);
-    }
-  }, [id, userStats]);
-
-  // Save workout state to localStorage
-  const saveWorkoutState = (data: any) => {
-    if (sessionKey) {
-      try {
-        const stateToSave = {
-          ...data,
-          timestamp: Date.now()
-        };
-        localStorage.setItem(sessionKey, JSON.stringify(stateToSave));
-        console.log("Workout state saved to localStorage");
-      } catch (error) {
-        console.error("Failed to save workout state:", error);
-      }
-    }
-  };
-
-  // Load workout state from localStorage
-  const loadWorkoutState = () => {
-    if (sessionKey) {
-      try {
-        const saved = localStorage.getItem(sessionKey);
-        if (saved) {
-          const state = JSON.parse(saved);
-          // Check if state is less than 24 hours old
-          if (Date.now() - state.timestamp < 24 * 60 * 60 * 1000) {
-            console.log("Restored workout state from localStorage");
-            return state;
-          } else {
-            // Clean up old state
-            localStorage.removeItem(sessionKey);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load workout state:", error);
-      }
-    }
-    return null;
-  };
-
-  // Clear workout state from localStorage
-  const clearWorkoutState = () => {
-    if (sessionKey) {
-      localStorage.removeItem(sessionKey);
-      console.log("Workout state cleared from localStorage");
-    }
-  };
-
   // Load workout data into exercise state with exercise names
   useEffect(() => {
-    if (workout && (workout as any).exercises && exercises && sessionKey) {
-      // First try to restore from localStorage
-      const savedState = loadWorkoutState();
-      
-      if (savedState && savedState.exerciseData) {
-        console.log("Restoring workout session from saved state");
-        setExerciseData(savedState.exerciseData);
-        setCompletedSets(savedState.completedSets || {});
-        setSetMetrics(savedState.setMetrics || {});
-        setCurrentExerciseIndex(savedState.currentExerciseIndex || 0);
-        setIsActive(savedState.isActive || false);
-        setTime(savedState.time || 0);
-        setStartTime(savedState.startTime ? new Date(savedState.startTime) : null);
-        setPerceivedEffort(savedState.perceivedEffort || 7);
+    if (workout && (workout as any).exercises && exercises) {
+      const workoutExercises = (workout as any).exercises.map((workoutEx: any) => {
+        const exerciseDetails = exercises.find(ex => ex.id === workoutEx.exerciseId);
         
-        toast({
-          title: "Session Restored",
-          description: "Your workout progress has been restored from where you left off.",
-          duration: 3000,
-        });
-      } else {
-        // Initialize new workout session
-        const workoutExercises = (workout as any).exercises.map((workoutEx: any) => {
-          const exerciseDetails = exercises.find(ex => ex.id === workoutEx.exerciseId);
-          
-          // Convert sets from number to array for session tracking
-          const setsArray = Array.from({ length: workoutEx.sets || 0 }, (_, index) => ({
-            id: index,
-            reps: workoutEx.reps || 0,
-            weight: workoutEx.weight || 0,
-            duration: workoutEx.duration || undefined,
-            completed: false
-          }));
-          
-          return {
-            ...workoutEx,
-            name: exerciseDetails?.name || `Exercise ${workoutEx.exerciseId}`,
-            category: exerciseDetails?.category || 'strength',
-            muscleGroups: exerciseDetails?.muscleGroups || [],
-            sets: setsArray // Replace the number with an array
-          };
-        });
-        setExerciseData(workoutExercises);
-      }
+        // Convert sets from number to array for session tracking
+        const setsArray = Array.from({ length: workoutEx.sets || 0 }, (_, index) => ({
+          id: index,
+          reps: workoutEx.reps || 0,
+          weight: workoutEx.weight || 0,
+          duration: workoutEx.duration || undefined,
+          completed: false
+        }));
+        
+        return {
+          ...workoutEx,
+          name: exerciseDetails?.name || `Exercise ${workoutEx.exerciseId}`,
+          category: exerciseDetails?.category || 'strength',
+          muscleGroups: exerciseDetails?.muscleGroups || [],
+          sets: setsArray // Replace the number with an array
+        };
+      });
+      setExerciseData(workoutExercises);
     }
-  }, [workout, exercises, sessionKey]);
+  }, [workout, exercises]);
 
   // Initialize set metrics with saved preferences or workout defaults
   useEffect(() => {
@@ -205,23 +126,6 @@ export default function WorkoutSession() {
     }
   }, [exerciseData, exercisePreferences]);
 
-  // Auto-save workout state whenever it changes
-  useEffect(() => {
-    if (sessionKey && exerciseData.length > 0) {
-      const workoutState = {
-        exerciseData,
-        completedSets,
-        setMetrics,
-        currentExerciseIndex,
-        isActive,
-        time,
-        startTime: startTime?.toISOString(),
-        perceivedEffort
-      };
-      saveWorkoutState(workoutState);
-    }
-  }, [exerciseData, completedSets, setMetrics, currentExerciseIndex, isActive, time, startTime, perceivedEffort, sessionKey]);
-
   // Page loading effect with minimum delay for tips
   useEffect(() => {
     const loadTimer = setTimeout(() => {
@@ -230,37 +134,6 @@ export default function WorkoutSession() {
     }, 2500); // Increased from 800ms to allow time to read tips
     return () => clearTimeout(loadTimer);
   }, []);
-
-  // Handle page visibility changes (phone lock detection)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        console.log("Page hidden - workout timer paused");
-        // Page is hidden (phone locked), timer will naturally pause
-      } else {
-        console.log("Page visible - workout timer resumed");
-        // Page is visible again, timer will resume
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  // Prevent accidental navigation away during active workout
-  useEffect(() => {
-    if (isActive && exerciseData.length > 0) {
-      const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-        const message = "You have an active workout session. Your progress will be saved automatically.";
-        event.preventDefault();
-        event.returnValue = message;
-        return message;
-      };
-
-      window.addEventListener('beforeunload', handleBeforeUnload);
-      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-    }
-  }, [isActive, exerciseData]);
 
   // Timer effect and start tracking
   useEffect(() => {
@@ -300,18 +173,12 @@ export default function WorkoutSession() {
 
   const completeWorkoutMutation = useMutation({
     mutationFn: async (sessionData: any) => {
-      console.log("Submitting workout session data:", sessionData);
       return await apiRequest("/api/workout-sessions", {
         method: "POST",
         body: sessionData,
       });
     },
     onSuccess: (result) => {
-      console.log("Workout session completed successfully:", result);
-      
-      // Clear saved workout state since workout is completed
-      clearWorkoutState();
-      
       queryClient.invalidateQueries({ queryKey: ["/api/workout-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       
@@ -319,14 +186,10 @@ export default function WorkoutSession() {
       setCompletedSession(result);
       setShowVictoryModal(true);
     },
-    onError: (error: any) => {
-      console.error("Workout completion error:", error);
-      const errorMessage = error?.response?.data?.error || error?.message || "Failed to complete workout";
-      const errorDetails = error?.response?.data?.details;
-      
+    onError: () => {
       toast({
-        title: "Workout Logging Error",
-        description: errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage,
+        title: "Error",
+        description: "Failed to complete workout",
         variant: "destructive",
       });
     },
@@ -568,20 +431,17 @@ export default function WorkoutSession() {
         const metrics = setMetrics[setKey] || {};
         
         return {
-          reps: Number(metrics.reps || exercise.reps || 10) || 10,
-          weight: Number(metrics.weight || exercise.weight || 0) || 0,
-          duration: Number(metrics.duration || exercise.duration || 0) || 0,
-          rpe: Number(metrics.rpe || 7) || 7,
+          reps: metrics.reps || exercise.reps || 10,
+          weight: metrics.weight || exercise.weight || 0,
+          duration: metrics.duration || exercise.duration || 0,
+          rpe: metrics.rpe || 7,
           completed: isCompleted
         };
       });
 
-      // Ensure exerciseId is valid
-      const exerciseId = Number(exercise.exerciseId || exercise.id) || 1;
-      
       return {
-        exerciseId: exerciseId,
-        name: exercise.name || `Exercise ${exerciseId}`,
+        exerciseId: exercise.exerciseId || exercise.id || 0,
+        name: exercise.name,
         category: exercise.category || "strength",
         statTypes: exercise.statTypes || { strength: 1 },
         sets: completedSetsData
@@ -594,25 +454,14 @@ export default function WorkoutSession() {
       ? Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60)) // Minutes
       : Math.floor(time / 60); // Fallback to timer if no start time
 
-    // Calculate total volume for completed sets
-    let totalVolume = 0;
-    completedExercises.forEach(exercise => {
-      exercise.sets.forEach(set => {
-        if (set.completed) {
-          totalVolume += (set.weight || 0) * (set.reps || 0);
-        }
-      });
-    });
-
     const sessionData = {
-      userId: userStats?.id, // Explicitly include userId
-      workoutId: parseInt(id || "0") || null, // Allow null if no workout ID
-      name: String((workout as any)?.name || "Workout Session"),
-      duration: Math.max(1, actualDuration), // Ensure minimum 1 minute
-      totalVolume: totalVolume,
+      workoutId: parseInt(id || "0"),
+      name: (workout as any)?.name || "Workout Session",
+      duration: actualDuration,
+      totalVolume: 0, // Will be calculated from exercises
       xpEarned: 0, // Will be calculated server-side
-      statsEarned: { strength: 0, stamina: 0, agility: 0 },
-      perceivedEffort: Math.max(1, Math.min(10, perceivedEffort)), // Clamp RPE between 1-10
+      statsEarned: {},
+      perceivedEffort,
       exercises: completedExercises,
     };
     
