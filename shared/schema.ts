@@ -225,7 +225,6 @@ export const dailyProgress = pgTable("daily_progress", {
 // Workout programs (structured fitness plans)
 export const workoutPrograms = pgTable("workout_programs", {
   id: serial("id").primaryKey(),
-  creatorId: integer("creator_id").references(() => users.id), // User who created this program
   name: text("name").notNull(),
   description: text("description"),
   durationWeeks: integer("duration_weeks").default(4),

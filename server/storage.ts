@@ -85,8 +85,6 @@ export interface IStorage {
   getAllWorkoutPrograms(): Promise<WorkoutProgram[]>;
   getWorkoutProgram(id: number): Promise<WorkoutProgram | undefined>;
   getProgramWorkouts(programId: number): Promise<ProgramWorkout[]>;
-  getProgramWorkout(id: number): Promise<ProgramWorkout | undefined>;
-  updateProgramWorkout(id: number, updates: Partial<ProgramWorkout>): Promise<ProgramWorkout | undefined>;
   getUserPurchasedPrograms(userId: number): Promise<string[]>;
   purchaseWorkoutProgram(userId: number, programId: string): Promise<User>;
 
@@ -562,19 +560,6 @@ export class DatabaseStorage implements IStorage {
       .orderBy(programWorkouts.weekNumber, programWorkouts.dayName);
   }
 
-  async getProgramWorkout(workoutId: number): Promise<ProgramWorkout | undefined> {
-    const [workout] = await db.select().from(programWorkouts).where(eq(programWorkouts.id, workoutId));
-    return workout || undefined;
-  }
-
-  async updateProgramWorkout(id: number, updates: Partial<ProgramWorkout>): Promise<ProgramWorkout | undefined> {
-    const [updated] = await db.update(programWorkouts)
-      .set(updates)
-      .where(eq(programWorkouts.id, id))
-      .returning();
-    return updated || undefined;
-  }
-
   // Wardrobe operations
   async getWardrobeItemsWithOwnership(userId: number): Promise<any[]> {
     try {
@@ -785,7 +770,7 @@ export class DatabaseStorage implements IStorage {
     
     // Store previous state
     const previousAllCompleted = progress.hydration && progress.steps && progress.protein && progress.sleep;
-    const previousThreeOrMoreCompleted = [progress.hydration, progress.steps, progress.protein, progress.sleep].filter(Boolean).length >= 3;
+    const previousTwoOrMoreCompleted = [progress.hydration, progress.steps, progress.protein, progress.sleep].filter(Boolean).length >= 2;
     const wasXpAwarded = progress.xpAwarded;
     const wasStreakFreezeAwarded = progress.streakFreezeAwarded;
     
@@ -796,7 +781,7 @@ export class DatabaseStorage implements IStorage {
     
     // Check completion states after this change
     const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein && updatedProgress.sleep;
-    const threeOrMoreCompleted = [updatedProgress.hydration, updatedProgress.steps, updatedProgress.protein, updatedProgress.sleep].filter(Boolean).length >= 3;
+    const twoOrMoreCompleted = [updatedProgress.hydration, updatedProgress.steps, updatedProgress.protein, updatedProgress.sleep].filter(Boolean).length >= 2;
     let xpAwarded = false;
     let streakFreezeAwarded = false;
     let xpRemoved = false;
@@ -833,8 +818,8 @@ export class DatabaseStorage implements IStorage {
         }
       }
       
-      if (threeOrMoreCompleted && !updatedProgress.streakFreezeAwarded) {
-        // Award streak freeze if user has less than 2 (requires 3 of 4 quests)
+      if (twoOrMoreCompleted && !updatedProgress.streakFreezeAwarded) {
+        // Award streak freeze if user has less than 2 (requires 2 of 4 quests)
         const user = await this.getUser(userId);
         if (user && (user.streakFreezeCount ?? 0) < 2) {
           await this.updateUser(userId, {
@@ -849,8 +834,8 @@ export class DatabaseStorage implements IStorage {
         }
       }
       
-      // Record daily quest activity to prevent atrophy when 3+ quests are completed
-      if (threeOrMoreCompleted) {
+      // Record daily quest activity to prevent atrophy when 2+ quests are completed
+      if (twoOrMoreCompleted) {
         await import("./atrophy-system.js").then(module => {
           module.AtrophySystem.recordActivity(userId);
         });
@@ -881,8 +866,8 @@ export class DatabaseStorage implements IStorage {
           }
         }
         
-        // Remove streak freeze if it was awarded and we now have less than 3 quests
-        if (previousThreeOrMoreCompleted && !threeOrMoreCompleted && wasStreakFreezeAwarded) {
+        // Remove streak freeze if it was awarded and we now have less than 2 quests
+        if (previousTwoOrMoreCompleted && !twoOrMoreCompleted && wasStreakFreezeAwarded) {
           if ((user.streakFreezeCount ?? 0) > 0) {
             await this.updateUser(userId, {
               streakFreezeCount: (user.streakFreezeCount ?? 0) - 1
@@ -937,8 +922,8 @@ export class DatabaseStorage implements IStorage {
     ].filter(Boolean).length;
     
     // Check if streak requirements are met:
-    // - 3 of 4 daily quests completed OR at least 1 workout completed
-    const streakRequirementMet = completedQuests >= 3 || todaysWorkouts.length > 0;
+    // - 2 of 4 daily quests completed OR at least 1 workout completed
+    const streakRequirementMet = completedQuests >= 2 || todaysWorkouts.length > 0;
     
     if (streakRequirementMet) {
       // Extend or start streak
@@ -981,14 +966,13 @@ export class DatabaseStorage implements IStorage {
       return { success: false, remainingFreezes: user?.streakFreezeCount ?? 0 };
     }
     
-    // Use streak freeze - extend last streak date to today AND protect from atrophy
+    // Use streak freeze - extend last streak date to today
     const today = new Date().toISOString().split('T')[0];
     const newFreezeCount = (user.streakFreezeCount ?? 0) - 1;
     
     await this.updateUser(userId, {
       streakFreezeCount: newFreezeCount,
-      lastStreakDate: today,
-      lastActivityDate: today  // Also update activity date to protect from atrophy
+      lastStreakDate: today
     });
     
     return { success: true, remainingFreezes: newFreezeCount };

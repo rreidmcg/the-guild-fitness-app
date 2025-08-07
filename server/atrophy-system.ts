@@ -24,21 +24,20 @@ export class AtrophySystem {
 
   /**
    * Check for users who need atrophy applied and apply it
-   * Should be called daily at midnight to apply atrophy for the previous day's inactivity
+   * Should be called daily via a scheduled job
    */
   static async processAtrophy(): Promise<void> {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     
     try {
-      // Get all users who didn't have activity YESTERDAY and are not immune to atrophy
-      // This gives users the full day to complete activities before being penalized
+      // Get all users who haven't had activity in the last day and are not immune to atrophy
       const inactiveUsers = await db
         .select()
         .from(users)
         .where(
           and(
-            // Last activity was before yesterday or is null (didn't complete yesterday's activities)
+            // Last activity was before yesterday or is null
             or(
               isNull(users.lastActivityDate),
               lt(users.lastActivityDate, yesterday)
@@ -52,13 +51,13 @@ export class AtrophySystem {
         );
 
       console.log(`Processing atrophy for ${inactiveUsers.length} inactive users`);
-      console.log(`Query conditions: today=${today}, yesterday=${yesterday} (penalizing those inactive on ${yesterday})`);
+      console.log(`Query conditions: today=${today}, yesterday=${yesterday}`);
       if (inactiveUsers.length === 0) {
         // Debug: Let's see all users and their activity dates
         const allUsers = await db.select().from(users);
         console.log('All users activity status:');
         for (const user of allUsers) {
-          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, inactiveYesterday=${user.lastActivityDate ? user.lastActivityDate < yesterday : 'null'}`);
+          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeYesterday=${user.lastActivityDate ? user.lastActivityDate < yesterday : 'null'}`);
         }
       }
 
@@ -72,30 +71,11 @@ export class AtrophySystem {
 
   /**
    * Apply 1% atrophy to XP and stats for a specific user
-   * First checks if user has streak freezes available and auto-applies one if possible
    */
   static async applyAtrophy(userId: number, userData: any): Promise<void> {
     try {
-      // Check if user has streak freezes available to prevent atrophy
-      if ((userData.streakFreezeCount || 0) > 0) {
-        // Auto-apply streak freeze to prevent atrophy
-        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        
-        await db
-          .update(users)
-          .set({
-            streakFreezeCount: (userData.streakFreezeCount || 0) - 1,
-            lastActivityDate: yesterday, // Mark activity for yesterday to prevent atrophy
-          })
-          .where(eq(users.id, userId));
-
-        console.log(`Auto-applied streak freeze for user ${userId} to prevent atrophy. Remaining freezes: ${(userData.streakFreezeCount || 0) - 1}`);
-        return; // Exit early - no atrophy applied
-      }
-
-      // No streak freezes available, proceed with atrophy
-      // Calculate 1% reduction (minimum 1 point loss if they have any XP)
-      const xpLoss = userData.experience > 0 ? Math.max(1, Math.floor(userData.experience * 0.01)) : 0;
+      // Calculate 1% reduction (minimum 1 point loss if they have any)
+      const xpLoss = Math.max(1, Math.floor(userData.experience * 0.01));
       
       // Calculate 1% XP loss for individual stats (use XP fields, not stat levels)
       const strengthXpLoss = Math.max(userData.strengthXp > 0 ? 1 : 0, Math.floor((userData.strengthXp || 0) * 0.01));
@@ -129,7 +109,7 @@ export class AtrophySystem {
         })
         .where(eq(users.id, userId));
 
-      console.log(`Applied atrophy to user ${userId}: -${xpLoss} XP (${userData.experience} → ${newExperience}, Level ${userData.level} → ${newLevel}), STR: ${userData.strength} → ${newStrength}, STA: ${userData.stamina} → ${newStamina}, AGI: ${userData.agility} → ${newAgility}`);
+      console.log(`Applied atrophy to user ${userId}: -${xpLoss} XP (Level ${userData.level} → ${newLevel}), STR: ${userData.strength} → ${newStrength}, STA: ${userData.stamina} → ${newStamina}, AGI: ${userData.agility} → ${newAgility}`);
     } catch (error) {
       console.error(`Error applying atrophy to user ${userId}:`, error);
     }

@@ -178,8 +178,12 @@ export default function Workouts() {
   };
 
   const handleStartProgram = (program: WorkoutProgram) => {
-    // Navigate to program overview page
-    navigate(`/program-overview?program=${program.id}`);
+    toast({
+      title: "Starting Workout",
+      description: `Beginning ${program.name} workout session...`,
+    });
+    // Navigate to workout session with program ID
+    navigate(`/workout-session/${program.id}`);
   };
 
   const handleQuestCheck = (questType: 'hydration' | 'steps' | 'protein' | 'sleep', checked: boolean) => {
@@ -217,8 +221,12 @@ export default function Workouts() {
               <div className="flex flex-col items-center space-y-2">
                 <div className="flex items-center justify-center space-x-4 text-sm">
                   <div className="flex items-center space-x-1">
+                    <Star className="w-4 h-4 text-yellow-500" />
+                    <span className="text-foreground">Each Quest: +5 XP</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
                     <Snowflake className="w-4 h-4 text-blue-500" />
-                    <span className="text-foreground">3+ Quests: Streak Freeze</span>
+                    <span className="text-foreground">2+ Quests: Streak Freeze</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Star className="w-4 h-4 text-orange-500" />
@@ -251,10 +259,10 @@ export default function Workouts() {
                   ? dailyProgress?.xpAwarded 
                     ? "All Complete! Rewards Earned"
                     : "All Complete! Processing rewards..."
-                  : [dailyProgress?.hydration, dailyProgress?.steps, dailyProgress?.protein, dailyProgress?.sleep].filter(Boolean).length >= 3
+                  : [dailyProgress?.hydration, dailyProgress?.steps, dailyProgress?.protein, dailyProgress?.sleep].filter(Boolean).length >= 2
                     ? dailyProgress?.streakFreezeAwarded
-                      ? "3+ Complete! Streak Freeze Earned"
-                      : "3+ Complete! Processing rewards..."
+                      ? "2+ Complete! Streak Freeze Earned"
+                      : "2+ Complete! Processing rewards..."
                     : ""
                 }
               </div>

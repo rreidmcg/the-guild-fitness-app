@@ -11,25 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 
 // Import battle system defensive styles
 import "../styles/battle-system.css";
-
-// Haptic feedback utility
-const hapticFeedback = {
-  light: () => {
-    if (navigator.vibrate) {
-      navigator.vibrate(50); // Light tap for successful attacks
-    }
-  },
-  medium: () => {
-    if (navigator.vibrate) {
-      navigator.vibrate(100); // Medium vibration for critical hits
-    }
-  },
-  heavy: () => {
-    if (navigator.vibrate) {
-      navigator.vibrate([150, 50, 150]); // Strong pattern for taking damage
-    }
-  }
-};
 import { 
   Shield, 
   Heart, 
@@ -196,14 +177,7 @@ interface BattleState {
   monsterDamage: number | null;
   playerFlashing: boolean;
   monsterFlashing: boolean;
-  screenShaking: boolean;
-  playerCriticalHit: boolean;
-  monsterCriticalHit: boolean;
-  attacksRemaining: number;
-  attackCount: number;
-  lastAttackTime: number;
-  isCombo: boolean;
-  comboMultiplier: number;
+  playerAttacking: boolean;
 }
 
 
@@ -232,14 +206,7 @@ export default function DungeonBattlePage() {
     monsterDamage: null,
     playerFlashing: false,
     monsterFlashing: false,
-    screenShaking: false,
-    playerCriticalHit: false,
-    monsterCriticalHit: false,
-    attacksRemaining: 4,
-    attackCount: 0,
-    lastAttackTime: 0,
-    isCombo: false,
-    comboMultiplier: 1.0
+    playerAttacking: false
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -303,40 +270,32 @@ export default function DungeonBattlePage() {
       currentMonsterIndex: 0,
       totalGoldEarned: 0,
       zone,
-      playerLunging: false,
-      monsterLunging: false,
-      playerDamage: null,
-      monsterDamage: null,
-      playerFlashing: false,
-      monsterFlashing: false,
-      screenShaking: false,
-      playerCriticalHit: false,
-      monsterCriticalHit: false,
-      attacksRemaining: 4,
-      attackCount: 0,
-      lastAttackTime: 0,
-      isCombo: false,
-      comboMultiplier: 1.0
+      showActionModal: false,
+      actionMode: 'main'
     });
   };
 
   const attackMutation = useMutation({
     mutationFn: async () => {
+      // Start attack animation
+      setBattleState(prev => ({ ...prev, playerAttacking: true }));
+      
       return await apiRequest("/api/battle/attack", {
         method: "POST",
         body: {
           monster: battleState.monster,
           playerHp: battleState.playerHp,
-          playerMp: battleState.playerMp,
-          attackCount: battleState.attackCount,
-          lastAttackTime: battleState.lastAttackTime
+          playerMp: battleState.playerMp
         }
       });
     },
     onSuccess: (data) => {
+      // Attack animation will complete first, then handle battle result
       handleBattleResult(data);
     },
     onError: () => {
+      // Stop attack animation on error
+      setBattleState(prev => ({ ...prev, playerAttacking: false }));
       toast({
         title: "Battle Error",
         description: "Something went wrong during battle.",
@@ -353,29 +312,12 @@ export default function DungeonBattlePage() {
     const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
     const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
 
-    // Haptic feedback for player attacks
-    if (playerDamage !== null) {
-      if (data.playerCriticalHit) {
-        hapticFeedback.medium(); // Medium vibration for critical hits
-      } else {
-        hapticFeedback.light(); // Light tap for regular attacks
-      }
-    }
-
-    // Start player lunge and monster flash (taking damage), and screen shake on hit
+    // Start player lunge and monster flash (taking damage)
     setBattleState(prev => ({
       ...prev,
       playerLunging: true,
       playerDamage: playerDamage,
-      monsterFlashing: playerDamage !== null,
-      screenShaking: playerDamage !== null,
-      playerCriticalHit: data.playerCriticalHit || false,
-      attacksRemaining: data.attacksRemaining,
-      attackCount: data.attackCount,
-      lastAttackTime: data.lastAttackTime,
-      isCombo: data.isCombo || false,
-      comboMultiplier: data.comboMultiplier || 1.0,
-      isPlayerTurn: data.attacksRemaining > 0 // Continue player turn if attacks remaining
+      monsterFlashing: playerDamage !== null
     }));
 
     // After player lunge, clear player attack effects
@@ -384,21 +326,12 @@ export default function DungeonBattlePage() {
         ...prev,
         playerLunging: false,
         playerDamage: null,
-        monsterFlashing: false,
-        screenShaking: false,
-        playerCriticalHit: false
+        monsterFlashing: false
       }));
 
-      // Handle monster counter-attack (only when player's turn is completely over)
-      if (monsterDamage !== null && data.attacksRemaining === 0) {
+      // Pause before monster counter-attack
+      if (monsterDamage !== null) {
         setTimeout(() => {
-          // Haptic feedback for player taking damage
-          if (data.monsterCriticalHit) {
-            hapticFeedback.heavy(); // Strong pattern for critical damage taken
-          } else {
-            hapticFeedback.heavy(); // Strong pattern for any damage taken
-          }
-
           setBattleState(prev => ({
             ...prev,
             playerHp: data.playerHp,
@@ -407,32 +340,24 @@ export default function DungeonBattlePage() {
             battleLog: [...prev.battleLog, ...data.battleLog],
             battleResult: data.battleResult,
             totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-            isPlayerTurn: false, // Monster's turn now
+            isPlayerTurn: data.battleResult === 'ongoing' ? true : true, // Keep player turn active for continuous attacks
             monsterLunging: true,
             monsterDamage: monsterDamage,
-            playerFlashing: true,
-            screenShaking: monsterDamage !== null,
-            monsterCriticalHit: data.monsterCriticalHit || false
+            playerFlashing: true
           }));
 
-          // Clear monster attack effects and reset player turn
+          // Clear monster attack effects
           setTimeout(() => {
             setBattleState(prev => ({
               ...prev,
               monsterLunging: false,
               monsterDamage: null,
-              playerFlashing: false,
-              screenShaking: false,
-              monsterCriticalHit: false,
-              isPlayerTurn: true, // Reset to player turn
-              attacksRemaining: 4, // Reset attacks for new turn
-              attackCount: 0,
-              lastAttackTime: 0
+              playerFlashing: false
             }));
           }, 800);
-        }, 600);
-      } else if (data.attacksRemaining === 0 && monsterDamage === null) {
-        // Player turn ended but no monster attack (monster defeated)
+        }, 600); // Pause between attacks
+      } else {
+        // No monster counter-attack, just update state
         setBattleState(prev => ({
           ...prev,
           playerHp: data.playerHp,
@@ -441,18 +366,7 @@ export default function DungeonBattlePage() {
           battleLog: [...prev.battleLog, ...data.battleLog],
           battleResult: data.battleResult,
           totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-          isPlayerTurn: false
-        }));
-      } else {
-        // Continue player turn, just update state
-        setBattleState(prev => ({
-          ...prev,
-          playerHp: data.playerHp,
-          playerMp: data.playerMp,
-          monster: data.monster,
-          battleLog: [...prev.battleLog, ...data.battleLog],
-          battleResult: data.battleResult,
-          totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0)
+          isPlayerTurn: data.battleResult === 'ongoing' ? true : true
         }));
       }
     }, 800);
@@ -470,9 +384,6 @@ export default function DungeonBattlePage() {
             currentMonsterIndex: nextIndex,
             battleResult: 'ongoing',
             isPlayerTurn: true,
-            attacksRemaining: 4,
-            attackCount: 0,
-            lastAttackTime: 0,
             battleLog: [...prev.battleLog, `A wild ${nextMonster.name} appears!`]
           }));
         }, 2000);
@@ -498,7 +409,9 @@ export default function DungeonBattlePage() {
     }
   }
 
-
+  const handleAttackAnimationComplete = () => {
+    setBattleState(prev => ({ ...prev, playerAttacking: false }));
+  };
 
   const handleRetreat = () => {
     navigate("/pve-dungeons");
@@ -512,14 +425,7 @@ export default function DungeonBattlePage() {
 
   return (
     <BattleAccessGuard>
-      <div 
-        className={`relative h-screen overflow-hidden ${battleState.screenShaking ? 'animate-pulse' : ''}`} 
-        style={{ 
-          touchAction: 'none', 
-          overscrollBehavior: 'none',
-          animation: battleState.screenShaking ? 'screen-shake 0.5s ease-in-out' : undefined
-        }}
-      >
+      <div className="relative h-screen overflow-hidden" style={{ touchAction: 'none', overscrollBehavior: 'none' }}>
       {/* Forest Background */}
       <div 
         className="fixed inset-0 z-0"
@@ -536,14 +442,9 @@ export default function DungeonBattlePage() {
       <div className="fixed inset-0 z-[1] bg-gradient-to-b from-transparent via-transparent to-black/20" />
 
       {/* Battle Scene */}
-      <div 
-        className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)] cursor-pointer" 
-        style={{ touchAction: 'manipulation' }}
-        onClick={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
-        onTouchStart={battleState.isPlayerTurn && !attackMutation.isPending && battleState.battleResult === 'ongoing' ? handleAttack : undefined}
-      >
+      <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]" style={{ touchAction: 'none' }}>
         {/* Monster HP Bar - Top Center Prominent (Invisible Card) */}
-        <div className="absolute top-4 left-0 right-0 z-20 px-4 md:px-8">
+        <div className="absolute top-20 left-0 right-0 z-20 px-4 md:px-8">
           <div className="max-w-2xl mx-auto">
             {battleState.monster && (
               <div className="text-center">
@@ -597,7 +498,7 @@ export default function DungeonBattlePage() {
         </div>
 
         {/* Character Sprites - Battle Field with enhanced positioning */}
-        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'manipulation', userSelect: 'none' }}>
+        <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
           {/* Player Character with HP/MP bars above (Invisible Card) */}
           <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
             {/* Player HP/MP Bars above character - No visible card */}
@@ -659,25 +560,20 @@ export default function DungeonBattlePage() {
                 <BattleAvatar 
                   playerStats={userStats}
                   className="[&>div]:!bg-transparent [&>div]:!shadow-none [&>div]:!border-none [&>div]:!rounded-none"
+                  isAttacking={battleState.playerAttacking}
+                  onAttackComplete={handleAttackAnimationComplete}
                 />
               </div>
               {/* Monster Damage to Player */}
               {battleState.monsterDamage && (
                 <div 
-                  className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 font-bold z-20 ${
-                    battleState.monsterCriticalHit ? 'text-4xl' : 'text-2xl'
-                  }`}
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold text-red-400 animate-bounce z-20"
                   style={{ 
-                    color: battleState.monsterCriticalHit ? '#ff4444' : '#ff6b6b',
-                    textShadow: battleState.monsterCriticalHit 
-                      ? '2px 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(255,68,68,0.8), 0 0 24px rgba(255,68,68,0.4)' 
-                      : '2px 2px 4px rgba(0,0,0,0.8)',
-                    animation: 'float-up 1s ease-out forwards',
-                    transform: battleState.monsterCriticalHit ? 'translate(-50%, -8px) scale(1.2)' : 'translate(-50%, -4px)'
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                    animation: 'float-up 1s ease-out forwards'
                   }}
                 >
                   -{battleState.monsterDamage}
-                  {battleState.monsterCriticalHit && <span className="text-sm ml-1">CRIT!</span>}
                 </div>
               )}
             </div>
@@ -710,20 +606,14 @@ export default function DungeonBattlePage() {
                 {/* Player Damage to Monster */}
                 {battleState.playerDamage && (
                   <div 
-                    className={`absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 font-bold z-20 ${
-                      battleState.playerCriticalHit ? 'text-4xl' : 'text-2xl'
-                    }`}
+                    className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 text-2xl font-bold z-20"
                     style={{ 
-                      color: battleState.playerCriticalHit ? '#ffd700' : '#ffffff',
-                      textShadow: battleState.playerCriticalHit 
-                        ? '2px 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(255,215,0,0.8), 0 0 24px rgba(255,215,0,0.4)' 
-                        : '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255,255,255,0.5)',
-                      animation: 'float-up 1s ease-out forwards',
-                      transform: battleState.playerCriticalHit ? 'translate(-50%, -8px) scale(1.2)' : 'translate(-50%, -4px)'
+                      color: '#ffffff',
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(255,255,255,0.5)',
+                      animation: 'float-up 1s ease-out forwards'
                     }}
                   >
                     -{battleState.playerDamage}
-                    {battleState.playerCriticalHit && <span className="text-sm ml-1">CRIT!</span>}
                   </div>
                 )}
               </div>
@@ -732,73 +622,52 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Flee Button - Bottom Left Corner */}
-      <div className="fixed bottom-4 left-4 z-30">
-        <button 
-          className="w-16 h-16 md:w-20 md:h-20 bg-black/30 hover:bg-black/50 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 border-2 border-red-400/50"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent triggering the battle screen click
-            if (window.confirm("Are you sure you want to flee from battle?")) {
-              handleRetreat();
-            }
-          }}
-        >
-          <img 
-            src={fleeButtonIcon} 
-            alt="Flee" 
-            className="w-12 h-12 md:w-16 md:h-16 object-contain"
-            style={{ imageRendering: 'pixelated' }}
-          />
-        </button>
-      </div>
-
-      {/* Attack Indicators - Bottom Center */}
+      {/* Circular Icon Battle Interface - Transparent */}
       <div className="fixed bottom-16 left-0 right-0 z-30">
-        <div className="flex justify-center">
-          {battleState.battleResult === 'ongoing' && (
-            <div className="flex gap-2 items-center">
-              {/* Attack dots */}
-              {[1, 2, 3, 4].map((dotIndex) => (
-                <div
-                  key={dotIndex}
-                  className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
-                    dotIndex <= (4 - battleState.attacksRemaining)
-                      ? 'bg-gray-600 border-gray-500' // Used attacks - dark
-                      : battleState.isCombo && dotIndex === (4 - battleState.attacksRemaining + 1)
-                      ? 'bg-orange-400 border-orange-300 animate-pulse' // Next attack in combo - orange glow
-                      : 'bg-yellow-400 border-yellow-300' // Available attacks - bright yellow
-                  }`}
-                  style={{
-                    boxShadow: dotIndex <= (4 - battleState.attacksRemaining)
-                      ? 'none'
-                      : battleState.isCombo && dotIndex === (4 - battleState.attacksRemaining + 1)
-                      ? '0 0 8px rgba(251, 146, 60, 0.6)'
-                      : '0 0 6px rgba(250, 204, 21, 0.4)'
-                  }}
+        {/* Mobile & Desktop Layout - Circular buttons */}
+        <div className="p-4 md:p-6">
+          {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
+            <div className="flex justify-center items-center space-x-8 md:space-x-12 relative">
+              {/* Attack Button - Larger and positioned */}
+              <button 
+                className="w-24 h-24 md:w-30 md:h-30 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                onClick={handleAttack}
+                disabled={attackMutation.isPending}
+                style={{ transform: 'translate(50px, 50px)' }}
+              >
+                {attackMutation.isPending ? (
+                  <div className="animate-spin rounded-full h-9 w-9 md:h-12 md:w-12 border-b-2 border-white"></div>
+                ) : (
+                  <img 
+                    src={swordIconImage} 
+                    alt="Attack" 
+                    className="w-24 h-24 md:w-30 md:h-30 object-contain"
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                )}
+              </button>
+              
+              {/* Flee Button - Same size, moved down and right */}
+              <button 
+                className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to flee from battle?")) {
+                    handleRetreat();
+                  }
+                }}
+                style={{ transform: 'translate(20px, 50px)' }}
+              >
+                <img 
+                  src={fleeButtonIcon} 
+                  alt="Flee" 
+                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
+                  style={{ imageRendering: 'pixelated' }}
                 />
-              ))}
-              {/* Combo indicator */}
-              {battleState.isCombo && battleState.attackCount > 1 && (
-                <div className="ml-2 text-orange-400 font-bold text-sm animate-pulse">
-                  {battleState.attackCount}x COMBO!
-                </div>
-              )}
+              </button>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Battle Status - Bottom Center */}
-      <div className="fixed bottom-4 left-0 right-0 z-30">
-        <div className="flex justify-center">
-          {!battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
-            <div className="text-center text-lg md:text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50 px-8">
+          ) : (
+            <div className="text-center text-lg md:text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50">
               ⏳ ENEMY TURN
-            </div>
-          )}
-          {attackMutation.isPending && (
-            <div className="text-center text-lg md:text-xl font-bold text-white tracking-wider uppercase py-4 bg-blue-900/50 rounded-lg border-2 border-blue-400/50 px-8">
-              ⚔️ ATTACKING...
             </div>
           )}
         </div>

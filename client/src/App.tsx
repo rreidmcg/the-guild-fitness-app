@@ -163,11 +163,6 @@ function Router() {
           <WorkoutPrograms />
         </AuthGuard>
       </Route>
-      <Route path="/program-overview">
-        <AuthGuard>
-          <ProgramOverview />
-        </AuthGuard>
-      </Route>
       <Route path="/program-overview/:id">
         <AuthGuard>
           <ProgramOverview />

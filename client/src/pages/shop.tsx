@@ -586,9 +586,9 @@ export default function Shop() {
 
           <div className="mt-6">
             {/* Consumables Filter */}
-            {shopComponentState.activeTab === "consumables" && (
+            {activeTab === "consumables" && (
               <div className="mb-6">
-                <Select value={shopComponentState.selectedConsumableCategory} onValueChange={(value) => setShopComponentState(prev => ({ ...prev, selectedConsumableCategory: value }))}>
+                <Select value={selectedConsumableCategory} onValueChange={setSelectedConsumableCategory}>
                   <SelectTrigger className="w-48">
                     <SelectValue />
                   </SelectTrigger>
@@ -641,7 +641,7 @@ export default function Shop() {
           {/* Consumables Tab */}
           <TabsContent value="consumables">
             <div className="grid grid-cols-2 gap-4">
-              {filterPotionsByCategory(shopComponentState.selectedConsumableCategory).map((potion) => (
+              {filterPotionsByCategory(selectedConsumableCategory).map((potion) => (
                 <Card key={potion.id} className="bg-card border-border relative overflow-hidden">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xs font-bold text-foreground flex items-center">
