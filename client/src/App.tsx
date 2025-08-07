@@ -44,6 +44,7 @@ import AIWorkouts from "@/pages/ai-workouts";
 import ProgramOverview from "@/pages/program-overview";
 import ProgramDay from "@/pages/program-day";
 import ProgramWorkout from "@/pages/program-workout";
+import ProgramWorkoutBuilder from "@/pages/program-workout-builder";
 import WorkoutOverview from "@/pages/workout-overview";
 import WorkoutSessionResults from "@/pages/workout-session-results";
 
@@ -191,6 +192,16 @@ function Router() {
       <Route path="/program-workout/:programId/:workoutId">
         <AuthGuard>
           <ProgramWorkout />
+        </AuthGuard>
+      </Route>
+      <Route path="/program-workout-builder/:programId/:workoutId">
+        <AuthGuard>
+          <ProgramWorkoutBuilder />
+        </AuthGuard>
+      </Route>
+      <Route path="/workout-session/program-workout/:workoutId">
+        <AuthGuard>
+          <WorkoutSession />
         </AuthGuard>
       </Route>
       <Route path="/gem-shop">

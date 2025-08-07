@@ -557,7 +557,36 @@ export class DatabaseStorage implements IStorage {
   async getProgramWorkouts(programId: number): Promise<ProgramWorkout[]> {
     return await db.select().from(programWorkouts)
       .where(eq(programWorkouts.programId, programId))
-      .orderBy(programWorkouts.weekNumber, programWorkouts.dayName);
+      .orderBy(programWorkouts.weekNumber, programWorkouts.dayNumber);
+  }
+
+  async getProgramWorkout(workoutId: number): Promise<ProgramWorkout | undefined> {
+    const [workout] = await db.select().from(programWorkouts)
+      .where(eq(programWorkouts.id, workoutId));
+    return workout || undefined;
+  }
+
+  async createProgramWorkout(programWorkout: InsertProgramWorkout): Promise<ProgramWorkout> {
+    const [workout] = await db
+      .insert(programWorkouts)
+      .values(programWorkout)
+      .returning();
+    return workout;
+  }
+
+  async updateProgramWorkout(workoutId: number, updates: Partial<ProgramWorkout>): Promise<ProgramWorkout> {
+    const [workout] = await db
+      .update(programWorkouts)
+      .set(updates)
+      .where(eq(programWorkouts.id, workoutId))
+      .returning();
+    if (!workout) throw new Error("Program workout not found");
+    return workout;
+  }
+
+  async deleteProgramWorkout(workoutId: number): Promise<void> {
+    await db.delete(programWorkouts)
+      .where(eq(programWorkouts.id, workoutId));
   }
 
   // Wardrobe operations

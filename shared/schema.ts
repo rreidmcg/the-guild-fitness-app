@@ -238,23 +238,30 @@ export const workoutPrograms = pgTable("workout_programs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Program workouts (individual sessions within programs)
+// Program workouts (individual sessions within programs) - enhanced to match standalone workouts
 export const programWorkouts = pgTable("program_workouts", {
   id: serial("id").primaryKey(),
   programId: integer("program_id").references(() => workoutPrograms.id),
-  weekNumber: integer("week_number"),
-  dayName: text("day_name"),
-  workoutName: text("workout_name"),
+  weekNumber: integer("week_number").notNull(),
+  dayNumber: integer("day_number").notNull(), // 1-7 for days of week
+  name: text("name").notNull(),
+  description: text("description"),
+  // Updated to match standalone workout structure exactly
   exercises: json("exercises").$type<Array<{
-    name: string;
-    reps?: string;
-    duration?: string;
-    holdTime?: string;
-    instructions?: string;
+    exerciseId: number;
+    sets: number;
+    reps?: number;
+    duration?: number; // for time-based exercises
+    weight?: number;
+    restTime?: number;
+    section?: string; // section name (e.g., "Warm-up", "Main", "Cool-down")
+    supersetGroup?: string; // identifier for superset grouping
+    order?: number; // order within section
+    fields?: string[]; // tracking fields like ['weight', 'RIR', 'RPE', 'reps'] etc.
   }>>().notNull(),
-  instructions: text("instructions"),
-  rounds: integer("rounds"),
-  restSeconds: integer("rest_seconds"),
+  notes: text("notes"), // Additional instructions or notes
+  estimatedDuration: integer("estimated_duration"), // Estimated duration in minutes
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Wardrobe items that users can unlock/purchase
@@ -497,6 +504,7 @@ export const insertWorkoutProgramSchema = createInsertSchema(workoutPrograms).om
 
 export const insertProgramWorkoutSchema = createInsertSchema(programWorkouts).omit({
   id: true,
+  createdAt: true,
 });
 
 export const insertWorkoutPreferencesSchema = createInsertSchema(workoutPreferences).omit({
