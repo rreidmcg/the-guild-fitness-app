@@ -28,10 +28,7 @@ export function AtrophyWarning() {
             <div>
               <div className="text-xs font-medium text-green-100">New Player Protection</div>
               <div className="text-xs text-green-300">
-                Protected until {atrophyStatus.immunityEndsOn}
-              </div>
-              <div className="text-xs text-green-200/80 mt-1">
-                You won't lose XP for inactivity until this date
+                Protected from losing experience points due to inactivity until {atrophyStatus.immunityEndsOn}
               </div>
             </div>
           </div>
