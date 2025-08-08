@@ -68,7 +68,7 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
 
   if (isEmailSent) {
     return (
-      <Card className="w-full max-w-md bg-card border-border">
+      <Card className="w-full max-w-md bg-black/10 backdrop-blur-sm border border-white/30 shadow-2xl relative z-10">
         <CardHeader className="text-center">
           <CardTitle className="text-foreground">Check Your Email</CardTitle>
           <CardDescription className="text-muted-foreground">
@@ -94,7 +94,7 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
   }
 
   return (
-    <Card className="w-full max-w-md bg-card border-border">
+    <Card className="w-full max-w-md bg-black/10 backdrop-blur-sm border border-white/30 shadow-2xl relative z-10">
       <CardHeader className="text-center">
         <CardTitle className="text-foreground">Forgot Password</CardTitle>
         <CardDescription className="text-muted-foreground">
@@ -113,7 +113,7 @@ export default function ForgotPasswordForm({ onBack }: ForgotPasswordFormProps) 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="placeholder:text-muted-foreground/50 placeholder:transition-opacity focus:placeholder:opacity-0"
+              className="bg-black/30 border-white/30 placeholder:text-muted-foreground/70 placeholder:transition-opacity focus:placeholder:opacity-0"
               required
             />
           </div>
