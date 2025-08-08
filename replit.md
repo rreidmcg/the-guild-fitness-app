@@ -17,6 +17,11 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **Cleaner Badge Placement**: Moved mail type badges to the right of sender names and removed redundant icons
 - **New Player Protection Clarity**: Added detailed explanation that new players are "Protected from losing experience points due to inactivity until [date]"
 
+**Onboarding & User Experience:**
+- **Comprehensive Onboarding System**: Created guided tour that introduces new users to character progression, workout XP system, future dungeons/PvP features, and app navigation
+- **Help & FAQ Integration**: Added detailed FAQ section to settings page covering XP earning, character stats, daily quests, streak system, atrophy protection, and upcoming features
+- **Tutorial Restart Option**: Users can replay the onboarding tour anytime from the settings page to refresh their understanding of app features
+
 **Critical Bug Fixes:**
 - **Fixed Atrophy System**: Resolved issue where XP was being lost on every app redeployment by removing atrophy processing from startup sequence
 - **Enhanced Atrophy Timing**: Modified atrophy system to require 2 consecutive days of inactivity before XP loss begins, providing more grace period for players

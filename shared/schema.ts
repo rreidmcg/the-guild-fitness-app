@@ -59,6 +59,7 @@ export const users = pgTable("users", {
   fitnessGoal: text("fitness_goal"), // "lose_weight", "gain_muscle", "improve_endurance", "general_fitness"
   measurementUnit: text("measurement_unit").default("metric"), // "metric" or "imperial"
   timezone: text("timezone"), // User's timezone for daily quest resets (e.g., "America/New_York")
+  hasCompletedOnboarding: boolean("has_completed_onboarding").default(false), // Whether user has completed the onboarding flow
   // Subscription fields
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),

@@ -7,11 +7,13 @@ import { Avatar2D } from "@/components/ui/avatar-2d";
 import { ProfileEditDialog } from "@/components/ui/profile-edit-dialog";
 import { ChangePasswordDialog } from "@/components/ui/change-password-dialog";
 import { ParallaxBackground } from "@/components/ui/parallax-background";
+import { HelpFAQ } from "@/components/ui/help-faq";
+import { useOnboarding } from "@/hooks/use-onboarding";
 import { useBackgroundMusic } from "@/contexts/background-music-context";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "@/hooks/use-navigate";
+import { useLocation } from "wouter";
 
 
 import { 
@@ -28,7 +30,8 @@ import {
   Vibrate,
   Moon,
   Smartphone,
-
+  BookOpen,
+  Play,
   BarChart3
 } from "lucide-react";
 
@@ -36,7 +39,8 @@ import {
 export default function Settings() {
   const { toast } = useToast();
   const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
-  const navigate = useNavigate();
+  const { openOnboarding } = useOnboarding();
+  const [, setLocation] = useLocation();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -289,30 +293,51 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Support */}
+        {/* Help & FAQ Section */}
         <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <HelpCircle className="w-5 h-5" />
-              <span>Help & Support</span>
+              <BookOpen className="w-5 h-5" />
+              <span>Help & Getting Started</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button variant="outline" className="flex items-center justify-center">
-                <HelpCircle className="w-4 h-4 mr-2" />
-                Help Center
+              <Button 
+                variant="outline" 
+                className="flex items-center justify-center"
+                onClick={openOnboarding}
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Restart Tutorial
               </Button>
               <Button variant="outline" className="flex items-center justify-center">
                 <Smartphone className="w-4 h-4 mr-2" />
                 Contact Support
               </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* FAQ Section */}
+        <HelpFAQ />
+
+        {/* Support */}
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <HelpCircle className="w-5 h-5" />
+              <span>Additional Support</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {(userStats as any)?.currentTitle === "<G.M.>" && (
                 <>
                   <Button 
                     variant="outline" 
                     className="flex items-center justify-center"
-                    onClick={() => navigate('/admin')}
+                    onClick={() => setLocation('/admin')}
                   >
                     <Shield className="w-4 h-4 mr-2" />
                     Admin Panel
@@ -320,7 +345,7 @@ export default function Settings() {
                   <Button 
                     variant="outline" 
                     className="flex items-center justify-center"
-                    onClick={() => navigate('/analytics')}
+                    onClick={() => setLocation('/analytics')}
                   >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     Analytics Dashboard

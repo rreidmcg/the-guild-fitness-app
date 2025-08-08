@@ -3022,6 +3022,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Complete onboarding
+  app.post("/api/user/complete-onboarding", requireAuth, async (req, res) => {
+    try {
+      await storage.updateUser(req.user!.id, { hasCompletedOnboarding: true });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error completing onboarding:", error);
+      res.status(500).json({ error: "Failed to complete onboarding" });
+    }
+  });
+
+  // Check onboarding status
+  app.get("/api/user/onboarding-status", requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.user!.id);
+      res.json({ hasCompletedOnboarding: user?.hasCompletedOnboarding || false });
+    } catch (error) {
+      console.error("Error checking onboarding status:", error);
+      res.status(500).json({ error: "Failed to check onboarding status" });
+    }
+  });
+
   // Admin routes (restricted to G.M. users)
   const isAdmin = async (req: any, res: any, next: any) => {
     try {

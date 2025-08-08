@@ -12,6 +12,8 @@ import { Volume2, VolumeX } from "lucide-react";
 import { useEffect } from "react";
 import { AuthGuard, PublicRoute } from "@/components/auth-guard";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { OnboardingModal } from "@/components/ui/onboarding-modal";
+import { useOnboarding } from "@/hooks/use-onboarding";
 import Stats from "@/pages/stats";
 import Workouts from "@/pages/workouts";
 import Settings from "@/pages/settings";
@@ -261,6 +263,7 @@ function Router() {
 function AppContent() {
   // Initialize timezone detection for daily quest resets
   useTimezone();
+  const { isOnboardingOpen, setIsOnboardingOpen, completeOnboarding } = useOnboarding();
 
   // Register service worker for PWA functionality
   useEffect(() => {
@@ -283,6 +286,11 @@ function AppContent() {
         <ScrollToTop />
         <Toaster />
         <Router />
+        <OnboardingModal 
+          isOpen={isOnboardingOpen}
+          onClose={() => setIsOnboardingOpen(false)}
+          onComplete={completeOnboarding}
+        />
       </div>
     </TooltipProvider>
   );
