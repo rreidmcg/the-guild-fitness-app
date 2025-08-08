@@ -88,7 +88,7 @@ export function LiabilityWaiverModal({
         </DialogHeader>
 
         <ScrollArea className="flex-1 px-6 max-h-[50vh] overflow-y-auto">
-          <div className="space-y-6 text-sm">
+          <div className="space-y-6 text-base leading-relaxed">
             {/* Medical Disclaimer Section */}
             <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4">
               <div className="flex items-start">
@@ -97,12 +97,12 @@ export function LiabilityWaiverModal({
                   <h3 className="font-semibold text-red-800 dark:text-red-200 mb-2">
                     IMPORTANT MEDICAL DISCLAIMER
                   </h3>
-                  <p className="text-red-700 dark:text-red-300 mb-3">
+                  <p className="text-red-800 dark:text-red-200 mb-3 text-base font-medium">
                     <strong>CONSULT YOUR PHYSICIAN:</strong> Before beginning any exercise program, 
                     including the use of The Guild: Gamified Fitness, you should consult with your physician 
                     or healthcare provider. This is especially important if you:
                   </p>
-                  <ul className="list-disc list-inside text-red-700 dark:text-red-300 space-y-1 ml-4">
+                  <ul className="list-disc list-inside text-red-800 dark:text-red-200 space-y-2 ml-4 text-base">
                     <li>Have any medical conditions or health concerns</li>
                     <li>Are pregnant or nursing</li>
                     <li>Are over age 35</li>
@@ -111,7 +111,7 @@ export function LiabilityWaiverModal({
                     <li>Take medications that may affect your ability to exercise</li>
                     <li>Have not exercised regularly in the past year</li>
                   </ul>
-                  <p className="text-red-700 dark:text-red-300 mt-3 font-semibold">
+                  <p className="text-red-800 dark:text-red-200 mt-4 font-bold text-base leading-relaxed">
                     STOP IMMEDIATELY if you experience pain, discomfort, dizziness, chest pain, 
                     shortness of breath, or any other concerning symptoms during exercise. 
                     Seek immediate medical attention if needed.
@@ -128,7 +128,7 @@ export function LiabilityWaiverModal({
                   <h3 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
                     ENTERTAINMENT PURPOSES ONLY
                   </h3>
-                  <p className="text-yellow-700 dark:text-yellow-300">
+                  <p className="text-yellow-800 dark:text-yellow-200 text-base font-medium leading-relaxed">
                     The Guild: Gamified Fitness is designed for <strong>entertainment purposes only</strong>. 
                     This application is not intended to diagnose, treat, cure, or prevent any medical 
                     condition or disease. The RPG elements, character progression, and gamification 
@@ -141,24 +141,24 @@ export function LiabilityWaiverModal({
 
             {/* Main Liability Waiver */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-foreground">ASSUMPTION OF RISK AND RELEASE OF LIABILITY</h3>
+              <h3 className="font-bold text-xl text-foreground mb-4">ASSUMPTION OF RISK AND RELEASE OF LIABILITY</h3>
               
-              <p className="text-foreground">
+              <p className="text-foreground text-base font-medium leading-relaxed mb-6">
                 By using The Guild: Gamified Fitness (the "App"), I acknowledge and agree to the following:
               </p>
 
-              <div className="space-y-3">
+              <div className="space-y-5">
                 <div>
-                  <h4 className="font-medium mb-1 text-foreground">1. Voluntary Participation</h4>
-                  <p className="text-foreground">
+                  <h4 className="font-semibold mb-2 text-foreground text-base">1. Voluntary Participation</h4>
+                  <p className="text-foreground text-base leading-relaxed">
                     I am voluntarily participating in fitness activities through this App. I understand 
                     that physical exercise involves inherent risks of injury, and I am participating at my own risk.
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1 text-foreground">2. Assumption of Risk</h4>
-                  <p className="text-foreground">
+                  <h4 className="font-semibold mb-2 text-foreground text-base">2. Assumption of Risk</h4>
+                  <p className="text-foreground text-base leading-relaxed">
                     I assume full responsibility for any risks, injuries, or damages, known or unknown, 
                     which I might incur as a result of participating in the fitness activities suggested 
                     by this App. This includes but is not limited to muscle strains, joint injuries, 
@@ -167,8 +167,8 @@ export function LiabilityWaiverModal({
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1 text-foreground">3. Release of Liability</h4>
-                  <p className="text-foreground">
+                  <h4 className="font-semibold mb-2 text-foreground text-base">3. Release of Liability</h4>
+                  <p className="text-foreground text-base leading-relaxed">
                     I hereby release, waive, discharge, and covenant not to sue the developers, owners, 
                     and operators of The Guild: Gamified Fitness, their agents, employees, or assigns from any 
                     and all liability, claims, demands, actions, or causes of action whatsoever arising 
@@ -178,8 +178,8 @@ export function LiabilityWaiverModal({
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1 text-foreground">4. Fitness Level and Limitations</h4>
-                  <p className="text-foreground">
+                  <h4 className="font-semibold mb-2 text-foreground text-base">4. Fitness Level and Limitations</h4>
+                  <p className="text-foreground text-base leading-relaxed">
                     I understand that it is my responsibility to know my physical limitations and to 
                     exercise within them. I will not attempt exercises or activities that are beyond 
                     my current fitness level or that cause pain or discomfort.
@@ -187,16 +187,16 @@ export function LiabilityWaiverModal({
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1 text-foreground">5. Equipment and Environment Safety</h4>
-                  <p className="text-foreground">
+                  <h4 className="font-semibold mb-2 text-foreground text-base">5. Equipment and Environment Safety</h4>
+                  <p className="text-foreground text-base leading-relaxed">
                     I am responsible for ensuring that any equipment I use is safe, appropriate, and 
                     in good working condition. I will exercise in a safe environment free from hazards.
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-medium mb-1 text-foreground">6. No Professional Advice</h4>
-                  <p className="text-foreground">
+                  <h4 className="font-semibold mb-2 text-foreground text-base">6. No Professional Advice</h4>
+                  <p className="text-foreground text-base leading-relaxed">
                     I understand that the App does not provide professional medical, fitness, or 
                     nutritional advice. Any information provided is for general educational and 
                     entertainment purposes only.
@@ -204,8 +204,8 @@ export function LiabilityWaiverModal({
                 </div>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-900 border rounded-lg p-4">
-                <p className="font-medium text-center text-foreground">
+              <div className="bg-gray-50 dark:bg-gray-900 border rounded-lg p-6 mt-6">
+                <p className="font-bold text-center text-foreground text-lg leading-relaxed">
                   I HAVE READ THIS WAIVER CAREFULLY AND UNDERSTAND ITS CONTENTS. 
                   I AM AWARE THAT BY USING THIS APP, I AM GIVING UP SUBSTANTIAL RIGHTS, 
                   INCLUDING MY RIGHT TO SUE FOR DAMAGES.
@@ -223,7 +223,7 @@ export function LiabilityWaiverModal({
                 checked={hasReadFully}
                 onCheckedChange={(checked) => setHasReadFully(checked as boolean)}
               />
-              <label htmlFor="read-fully" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
+              <label htmlFor="read-fully" className="text-base font-medium leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
                 I have read and understand the entire liability waiver above
               </label>
             </div>
@@ -234,7 +234,7 @@ export function LiabilityWaiverModal({
                 checked={agreedToTerms}
                 onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
               />
-              <label htmlFor="agree-terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
+              <label htmlFor="agree-terms" className="text-base font-medium leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-foreground">
                 I agree to all terms and conditions in this liability waiver and release
               </label>
             </div>

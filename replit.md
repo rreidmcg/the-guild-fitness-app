@@ -36,7 +36,7 @@ Preferred communication style: Simple, everyday language.
 - **Monorepo Structure**: Shared TypeScript schemas between frontend and backend for type safety.
 
 ### Core Features & System Design
-- **Authentication & User Management**: Secure registration/login, email verification, password recovery, username validation with profanity filtering and reserved words, admin access control. Includes a comprehensive title rarity system and RPG-style leveling.
+- **Authentication & User Management**: Secure registration/login with immediate account access (email verification no longer required for login but still required for password reset), password recovery, username validation with profanity filtering and reserved words, admin access control. Includes a comprehensive title rarity system and RPG-style leveling.
 - **Character Progression**: RPG-style character progression with level, experience, and three-stat tracking (Strength, Stamina, Agility). Features an advanced stat allocation engine and an exponential leveling formula. Includes an Atrophy System with daily stat degradation and activity tracking to prevent loss.
 - **Gamification**:
     - **Dual Resource System**: HP (Health Points) and MP (Magic Points) with regeneration mechanics.

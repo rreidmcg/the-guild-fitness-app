@@ -1013,13 +1013,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Invalid email or password" });
       }
 
-      // Check if email is verified (if email exists)
-      if (user.email && !user.emailVerified) {
-        return res.status(403).json({ 
-          error: "Please verify your email address before logging in",
-          emailVerificationRequired: true
-        });
-      }
+      // Email verification is no longer required for login
+      // Users can log in immediately after account creation
+      // Email verification is only required for password reset functionality
 
       // Set the user ID in session for proper authentication
       req.session.userId = user.id;
@@ -1134,6 +1130,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         // Don't reveal if email exists or not for security
         return res.json({ message: "If an account with that email exists, a password reset link has been sent." });
+      }
+
+      // Check if email is verified - required for password reset
+      if (!user.emailVerified) {
+        return res.status(403).json({ 
+          error: "Email address must be verified before you can reset your password. Please check your email for the verification link.",
+          emailVerificationRequired: true
+        });
       }
       
       // Generate password reset token
