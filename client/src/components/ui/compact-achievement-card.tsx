@@ -194,9 +194,9 @@ export function CompactAchievementCard({ achievements, userAchievements, userSta
                     {achievement.name}
                   </h4>
                   {isUnlocked && (
-                    <div className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400">
-                      <Trophy className="w-3 h-3" />
-                      <span className="hidden sm:inline">Unlocked</span>
+                    <div className="flex items-center gap-1 text-xs">
+                      <Trophy className="w-3 h-3 text-yellow-600 dark:text-yellow-400" />
+                      <span className="hidden sm:inline text-yellow-600 dark:text-yellow-400 font-medium">Unlocked</span>
                     </div>
                   )}
                 </div>
@@ -221,9 +221,9 @@ export function CompactAchievementCard({ achievements, userAchievements, userSta
                 )}
                 
                 {achievement.goldReward > 0 && (
-                  <div className="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-                    <Coins className="w-3 h-3" />
-                    <span>{achievement.goldReward} Gold</span>
+                  <div className="flex items-center gap-1 text-xs mt-1">
+                    <Coins className="w-3 h-3 text-yellow-600 dark:text-yellow-400" />
+                    <span className="text-yellow-600 dark:text-yellow-400 font-medium">{achievement.goldReward} Gold</span>
                   </div>
                 )}
               </div>
