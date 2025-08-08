@@ -173,7 +173,7 @@ export function AchievementDetailModal({ achievement, userAchievement, isOpen, o
               <h3 className="font-semibold mb-2">Rewards</h3>
               <div className="flex items-center gap-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
                 <Coins className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                <span className="text-sm font-medium">{achievement.goldReward} Gold Coins</span>
+                <span className="text-sm font-medium text-yellow-600 dark:text-yellow-400">{achievement.goldReward} Gold Coins</span>
               </div>
             </div>
           )}
