@@ -30,6 +30,9 @@ export function AtrophyWarning() {
               <div className="text-xs text-green-300">
                 Protected until {atrophyStatus.immunityEndsOn}
               </div>
+              <div className="text-xs text-green-200/80 mt-1">
+                You won't lose XP for inactivity until this date
+              </div>
             </div>
           </div>
         </CardContent>
