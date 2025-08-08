@@ -950,19 +950,19 @@ export class DatabaseStorage implements IStorage {
       todaysProgress?.sleep
     ].filter(Boolean).length;
     
-    // Check if streak requirements are met:
+    // Check if minimum activity requirements are met for streak advancement:
     // - 2 of 4 daily quests completed OR at least 1 workout completed
-    const streakRequirementMet = completedQuests >= 2 || todaysWorkouts.length > 0;
+    const minimumActivityMet = completedQuests >= 2 || todaysWorkouts.length > 0;
     
-    if (streakRequirementMet) {
-      // Extend or start streak
+    if (minimumActivityMet) {
+      // Only advance streak if minimum activity threshold is met
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayStr = yesterday.toISOString().split('T')[0];
       
       let newStreak = 1;
       if (user.lastStreakDate === yesterdayStr) {
-        // Continue existing streak
+        // Continue existing streak only if minimum activity was met
         newStreak = (user.currentStreak ?? 0) + 1;
       }
       

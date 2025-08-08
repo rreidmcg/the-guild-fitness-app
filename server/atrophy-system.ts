@@ -25,22 +25,24 @@ export class AtrophySystem {
   /**
    * Check for users who need atrophy applied and apply it
    * Should be called daily via a scheduled job
+   * Now requires 2 consecutive days of inactivity before applying atrophy
    */
   static async processAtrophy(): Promise<void> {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString().split('T')[0];
     
     try {
-      // Get all users who haven't had activity in the last day and are not immune to atrophy
+      // Get all users who haven't had activity for 2+ consecutive days and are not immune to atrophy
       const inactiveUsers = await db
         .select()
         .from(users)
         .where(
           and(
-            // Last activity was before yesterday or is null
+            // Last activity was before two days ago or is null (2+ days of inactivity)
             or(
               isNull(users.lastActivityDate),
-              lt(users.lastActivityDate, yesterday)
+              lt(users.lastActivityDate, twoDaysAgo)
             ),
             // Atrophy immunity has expired or is null
             or(
@@ -50,14 +52,14 @@ export class AtrophySystem {
           )
         );
 
-      console.log(`Processing atrophy for ${inactiveUsers.length} inactive users`);
-      console.log(`Query conditions: today=${today}, yesterday=${yesterday}`);
+      console.log(`Processing atrophy for ${inactiveUsers.length} inactive users (2+ days inactive)`);
+      console.log(`Query conditions: today=${today}, yesterday=${yesterday}, twoDaysAgo=${twoDaysAgo}`);
       if (inactiveUsers.length === 0) {
         // Debug: Let's see all users and their activity dates
         const allUsers = await db.select().from(users);
         console.log('All users activity status:');
         for (const user of allUsers) {
-          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeYesterday=${user.lastActivityDate ? user.lastActivityDate < yesterday : 'null'}`);
+          console.log(`  ${user.username}: lastActivity=${user.lastActivityDate}, immunity=${user.atrophyImmunityUntil}, beforeTwoDaysAgo=${user.lastActivityDate ? user.lastActivityDate < twoDaysAgo : 'null'}`);
         }
       }
 

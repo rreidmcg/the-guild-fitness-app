@@ -152,7 +152,7 @@ export class DailyResetSystem implements DailyResetService {
           eq(sql`DATE(${workoutSessions.completedAt})`, yesterdayStr)
         ));
 
-      // Check if streak requirements were met yesterday
+      // Check if minimum activity requirements were met yesterday
       const completedQuests = yesterdayProgress[0] ? [
         yesterdayProgress[0].hydration,
         yesterdayProgress[0].steps,
@@ -160,10 +160,10 @@ export class DailyResetSystem implements DailyResetService {
         yesterdayProgress[0].sleep
       ].filter(Boolean).length : 0;
 
-      const streakRequirementMet = completedQuests >= 2 || yesterdayWorkouts.length > 0;
+      const minimumActivityMet = completedQuests >= 2 || yesterdayWorkouts.length > 0;
 
-      // If requirements weren't met and user has an active streak, auto-apply freeze
-      if (!streakRequirementMet && user[0].currentStreak && user[0].currentStreak > 0) {
+      // If minimum activity wasn't met and user has an active streak, auto-apply freeze
+      if (!minimumActivityMet && user[0].currentStreak && user[0].currentStreak > 0) {
         // Apply streak freeze automatically
         await db.update(users)
           .set({
