@@ -3488,6 +3488,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Development Assistant API Routes
+  // POST /api/dev/review-code - Review code for bugs and improvements
+  app.post("/api/dev/review-code", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const user = await storage.getUser(userId);
+      
+      // Only allow admin users (G.M. title or admin role)
+      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { filePath, code } = req.body;
+      if (!filePath) {
+        return res.status(400).json({ error: "File path is required" });
+      }
+
+      const review = await devAssistant.reviewCode(filePath, code);
+      res.json(review);
+    } catch (error) {
+      console.error("Code review error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Code review failed" });
+    }
+  });
+
+  // POST /api/dev/suggest-tests - Generate test suggestions
+  app.post("/api/dev/suggest-tests", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const user = await storage.getUser(userId);
+      
+      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { filePath, code } = req.body;
+      if (!filePath) {
+        return res.status(400).json({ error: "File path is required" });
+      }
+
+      const suggestions = await devAssistant.suggestTests(filePath, code);
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Test suggestion error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Test suggestion failed" });
+    }
+  });
+
+  // POST /api/dev/suggest-optimizations - Get performance optimization suggestions
+  app.post("/api/dev/suggest-optimizations", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const user = await storage.getUser(userId);
+      
+      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { filePath, code } = req.body;
+      if (!filePath) {
+        return res.status(400).json({ error: "File path is required" });
+      }
+
+      const optimizations = await devAssistant.suggestOptimizations(filePath, code);
+      res.json(optimizations);
+    } catch (error) {
+      console.error("Optimization suggestion error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Optimization suggestion failed" });
+    }
+  });
+
+  // POST /api/dev/debug-error - Analyze and debug errors
+  app.post("/api/dev/debug-error", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const user = await storage.getUser(userId);
+      
+      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { errorMessage, stackTrace, context } = req.body;
+      if (!errorMessage) {
+        return res.status(400).json({ error: "Error message is required" });
+      }
+
+      const analysis = await devAssistant.debugError(errorMessage, stackTrace, context);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Debug analysis error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Debug analysis failed" });
+    }
+  });
+
+  // POST /api/dev/review-architecture - Review overall codebase architecture
+  app.post("/api/dev/review-architecture", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const user = await storage.getUser(userId);
+      
+      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const review = await devAssistant.reviewArchitecture();
+      res.json(review);
+    } catch (error) {
+      console.error("Architecture review error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Architecture review failed" });
+    }
+  });
+
+  // POST /api/dev/suggest-refactoring - Get refactoring suggestions
+  app.post("/api/dev/suggest-refactoring", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const user = await storage.getUser(userId);
+      
+      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { filePath, code } = req.body;
+      if (!filePath) {
+        return res.status(400).json({ error: "File path is required" });
+      }
+
+      const suggestions = await devAssistant.suggestRefactoring(filePath, code);
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Refactoring suggestion error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Refactoring suggestion failed" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
@@ -3532,140 +3667,5 @@ function calculateLevel(experience: number): number {
   
   return level - 1;
 }
-
-// Development Assistant API Routes
-// POST /api/dev/review-code - Review code for bugs and improvements
-app.post("/api/dev/review-code", async (req, res) => {
-  try {
-    const userId = requireAuth(req);
-    const user = await storage.getUser(userId);
-    
-    // Only allow admin users (G.M. title or admin role)
-    if (!user || (user.title !== "G.M." && !user.isAdmin)) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
-    const { filePath, code } = req.body;
-    if (!filePath) {
-      return res.status(400).json({ error: "File path is required" });
-    }
-
-    const review = await devAssistant.reviewCode(filePath, code);
-    res.json(review);
-  } catch (error) {
-    console.error("Code review error:", error);
-    res.status(500).json({ error: error instanceof Error ? error.message : "Code review failed" });
-  }
-});
-
-// POST /api/dev/suggest-tests - Generate test suggestions
-app.post("/api/dev/suggest-tests", async (req, res) => {
-  try {
-    const userId = requireAuth(req);
-    const user = await storage.getUser(userId);
-    
-    if (!user || (user.title !== "G.M." && !user.isAdmin)) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
-    const { filePath, code } = req.body;
-    if (!filePath) {
-      return res.status(400).json({ error: "File path is required" });
-    }
-
-    const suggestions = await devAssistant.suggestTests(filePath, code);
-    res.json(suggestions);
-  } catch (error) {
-    console.error("Test suggestion error:", error);
-    res.status(500).json({ error: error instanceof Error ? error.message : "Test suggestion failed" });
-  }
-});
-
-// POST /api/dev/suggest-optimizations - Get performance optimization suggestions  
-app.post("/api/dev/suggest-optimizations", async (req, res) => {
-  try {
-    const userId = requireAuth(req);
-    const user = await storage.getUser(userId);
-    
-    if (!user || (user.title !== "G.M." && !user.isAdmin)) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
-    const { filePath, code } = req.body;
-    if (!filePath) {
-      return res.status(400).json({ error: "File path is required" });
-    }
-
-    const optimizations = await devAssistant.suggestOptimizations(filePath, code);
-    res.json(optimizations);
-  } catch (error) {
-    console.error("Optimization suggestion error:", error);
-    res.status(500).json({ error: error instanceof Error ? error.message : "Optimization suggestion failed" });
-  }
-});
-
-// POST /api/dev/debug-error - Analyze and debug errors
-app.post("/api/dev/debug-error", async (req, res) => {
-  try {
-    const userId = requireAuth(req);
-    const user = await storage.getUser(userId);
-    
-    if (!user || (user.title !== "G.M." && !user.isAdmin)) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
-    const { errorMessage, stackTrace, context } = req.body;
-    if (!errorMessage) {
-      return res.status(400).json({ error: "Error message is required" });
-    }
-
-    const analysis = await devAssistant.debugError(errorMessage, stackTrace || "", context);
-    res.json(analysis);
-  } catch (error) {
-    console.error("Debug analysis error:", error);
-    res.status(500).json({ error: error instanceof Error ? error.message : "Debug analysis failed" });
-  }
-});
-
-// POST /api/dev/review-architecture - Review overall codebase architecture
-app.post("/api/dev/review-architecture", async (req, res) => {
-  try {
-    const userId = requireAuth(req);
-    const user = await storage.getUser(userId);
-    
-    if (!user || (user.title !== "G.M." && !user.isAdmin)) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
-    const review = await devAssistant.reviewArchitecture();
-    res.json(review);
-  } catch (error) {
-    console.error("Architecture review error:", error);
-    res.status(500).json({ error: error instanceof Error ? error.message : "Architecture review failed" });
-  }
-});
-
-// POST /api/dev/suggest-refactoring - Get refactoring suggestions
-app.post("/api/dev/suggest-refactoring", async (req, res) => {
-  try {
-    const userId = requireAuth(req);
-    const user = await storage.getUser(userId);
-    
-    if (!user || (user.title !== "G.M." && !user.isAdmin)) {
-      return res.status(403).json({ error: "Admin access required" });
-    }
-
-    const { filePath, code } = req.body;
-    if (!filePath) {
-      return res.status(400).json({ error: "File path is required" });
-    }
-
-    const suggestions = await devAssistant.suggestRefactoring(filePath, code);
-    res.json(suggestions);
-  } catch (error) {
-    console.error("Refactoring suggestion error:", error);
-    res.status(500).json({ error: error instanceof Error ? error.message : "Refactoring suggestion failed" });
-  }
-});
 
 export { calculateLevel };
