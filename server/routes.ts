@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { storage } from "./storage";
 import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, insertProgramWorkoutSchema, users, playerInventory } from "@shared/schema";
 import { db } from "./db";
@@ -1118,6 +1119,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password reset routes
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      
+      // Check if user exists
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if email exists or not for security
+        return res.json({ message: "If an account with that email exists, a password reset link has been sent." });
+      }
+      
+      // Generate password reset token
+      const resetToken = authUtils.generateVerificationToken();
+      const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+      
+      // Update user with reset token and expiry
+      await storage.updateUser(user.id, {
+        passwordResetToken: resetToken,
+        passwordResetExpiry: resetExpiry
+      });
+      
+      // Send password reset email
+      const emailSent = await authUtils.sendPasswordResetEmail(email, user.username, resetToken);
+      
+      if (!emailSent) {
+        console.error("Failed to send password reset email for:", email);
+        return res.status(500).json({ error: "Failed to send reset email. Please try again later." });
+      }
+      
+      res.json({ message: "If an account with that email exists, a password reset link has been sent." });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ error: "Failed to process password reset request" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      
+      if (!token || !newPassword) {
+        return res.status(400).json({ error: "Token and new password are required" });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters long" });
+      }
+      
+      // Find user by reset token
+      const user = await storage.getUserByResetToken(token);
+      if (!user) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+      
+      // Check if token has expired
+      const now = new Date();
+      if (!user.passwordResetExpiry || now > user.passwordResetExpiry) {
+        return res.status(400).json({ error: "Reset token has expired" });
+      }
+      
+      // Hash the new password
+      const hashedPassword = await authUtils.hashPassword(newPassword);
+      
+      // Update user password and clear reset token
+      await storage.updateUser(user.id, {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetExpiry: null
+      });
+      
+      res.json({ message: "Password reset successful" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
   // Email verification route
   app.get("/verify-email", async (req, res) => {
     try {
@@ -1166,6 +1249,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         </body></html>
       `);
     }
+  });
+
+  // Password reset page route
+  app.get("/reset-password", (req, res) => {
+    // This will be handled by the frontend router
+    // The Vite dev server will serve the frontend app which will handle this route
+    res.sendFile(path.join(process.cwd(), 'dist', 'index.html'));
   });
 
   // Admin routes - only accessible to users with <G.M.> title

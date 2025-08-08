@@ -26,6 +26,7 @@ import Profile from "@/pages/profile";
 import Inventory from "@/pages/inventory";
 import SignupPage from "@/pages/signup";
 import LoginPage from "@/pages/login";
+import ResetPasswordPage from "@/pages/reset-password";
 import AdminDashboard from "@/pages/admin";
 import Leaderboard from "@/pages/leaderboard";
 import Analytics from "@/pages/analytics";
@@ -60,6 +61,11 @@ function Router() {
       <Route path="/login">
         <PublicRoute>
           <LoginPage />
+        </PublicRoute>
+      </Route>
+      <Route path="/reset-password">
+        <PublicRoute>
+          <ResetPasswordPage />
         </PublicRoute>
       </Route>
       
