@@ -327,23 +327,22 @@ export default function MailPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
-                          {getMailTypeIcon(mailItem.mailType)}
+                          <span className="text-lg font-bold text-foreground">
+                            {mailItem.senderName}
+                          </span>
                           <Badge className={getMailTypeBadge(mailItem.mailType)}>
                             {mailItem.mailType}
                           </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {mailItem.senderName}
-                          </span>
                           {!mailItem.isRead && (
                             <Badge variant="secondary" className="bg-blue-500 text-white text-xs">
                               New
                             </Badge>
                           )}
                         </div>
-                        <CardTitle className="text-base font-semibold">
+                        <CardTitle className="text-sm font-bold text-foreground">
                           {mailItem.subject}
                         </CardTitle>
-                        <CardDescription className="line-clamp-2 text-sm">
+                        <CardDescription className="line-clamp-2 text-sm font-normal text-muted-foreground">
                           {mailItem.content}
                         </CardDescription>
                       </div>
