@@ -12,6 +12,14 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **Improved Liability Waiver**: Enhanced text readability with larger fonts, better contrast, and improved spacing for better user experience during signup
 - **Email Service Integration**: Implemented Nodemailer as primary email service with Gmail SMTP, maintaining MailerSend as fallback option
 
+**Mail Interface & New Player Experience:**
+- **Enhanced Mail Hierarchy**: Improved visual hierarchy with larger bold sender names, smaller bold subjects, and light-weight body previews
+- **Cleaner Badge Placement**: Moved mail type badges to the right of sender names and removed redundant icons
+- **New Player Protection Clarity**: Added detailed explanation that new players are "Protected from losing experience points due to inactivity until [date]"
+
+**Critical Bug Fixes:**
+- **Fixed Atrophy System**: Resolved issue where XP was being lost on every app redeployment by removing atrophy processing from startup sequence
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

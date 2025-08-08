@@ -71,8 +71,8 @@ app.use((req, res, next) => {
   }
 
   // Setup daily atrophy processing
-  // Run once at startup, then every 24 hours
-  AtrophySystem.processAtrophy().catch(console.error);
+  // Only run atrophy processing every 24 hours, not on startup
+  // This prevents XP loss during app redeployments
   setInterval(() => {
     AtrophySystem.processAtrophy().catch(console.error);
   }, 24 * 60 * 60 * 1000); // 24 hours
