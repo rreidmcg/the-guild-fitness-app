@@ -4,6 +4,14 @@
 
 The Guild: Gamified Fitness is a full-stack fitness tracking application that gamifies the workout experience through RPG-style character progression. Users can create and track workouts, earning experience and building character stats (strength, stamina, agility). The app features a mobile-friendly interface with a custom 2D avatar system, fostering long-term engagement through a unique blend of fitness and fantasy. The project aims to provide an engaging and sustainable fitness journey, with ambitions for continued content expansion and community features.
 
+## Recent Changes (January 2025)
+
+**Authentication & UX Improvements:**
+- **Streamlined Login Process**: Removed email verification requirement for initial login - users can now access their accounts immediately after registration
+- **Enhanced Security**: Email verification still required for password reset functionality to maintain account security
+- **Improved Liability Waiver**: Enhanced text readability with larger fonts, better contrast, and improved spacing for better user experience during signup
+- **Email Service Integration**: Implemented Nodemailer as primary email service with Gmail SMTP, maintaining MailerSend as fallback option
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
