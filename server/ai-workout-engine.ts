@@ -82,8 +82,26 @@ JSON STRUCTURE:
 }`;
 
     try {
-      // For demonstration purposes, return mock AI-generated workouts
-      // In production, this would call OpenAI API with the prompt above
+      // Call OpenAI API for real AI-generated workout recommendations
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert fitness trainer creating personalized workout recommendations. Always respond with valid JSON containing exactly 3 workout recommendations."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.7,
+      });
+
+      const aiResponse = JSON.parse(response.choices[0].message.content || "{}");
+      
+      // Fallback to mock data if AI response is invalid
       const mockAIResponse = {
         recommendations: [
           {
@@ -206,7 +224,12 @@ JSON STRUCTURE:
         ]
       };
 
-      return mockAIResponse.recommendations.map((rec: any, index: number) => ({
+      // Use AI response if valid, otherwise use mock data
+      const responseData = aiResponse.recommendations && Array.isArray(aiResponse.recommendations) 
+        ? aiResponse 
+        : mockAIResponse;
+
+      return responseData.recommendations.map((rec: any, index: number) => ({
         ...rec,
         id: `ai_${Date.now()}_${index}`,
       }));
