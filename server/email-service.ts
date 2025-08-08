@@ -1,4 +1,6 @@
-// Email service using MailerSend API for transactional emails
+// Email service using MailerSend API and Nodemailer as fallback for transactional emails
+import nodemailer from 'nodemailer';
+
 interface EmailParams {
   to: string;
   subject: string;
@@ -6,12 +8,60 @@ interface EmailParams {
   text?: string;
 }
 
-export async function sendEmail(params: EmailParams): Promise<boolean> {
+// Nodemailer transporter for Gmail SMTP
+let nodemailerTransporter: nodemailer.Transporter | null = null;
+
+function createNodemailerTransporter() {
+  if (nodemailerTransporter) return nodemailerTransporter;
+  
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  
+  if (!gmailUser || !gmailPass) {
+    console.warn('Gmail credentials not configured for Nodemailer');
+    return null;
+  }
+  
+  nodemailerTransporter = nodemailer.createTransporter({
+    service: 'gmail',
+    auth: {
+      user: gmailUser,
+      pass: gmailPass // This should be an App Password, not your regular password
+    }
+  });
+  
+  console.log('✅ Nodemailer transporter created for Gmail SMTP');
+  return nodemailerTransporter;
+}
+
+// Send email via Nodemailer (Gmail SMTP)
+async function sendEmailViaNodemailer(params: EmailParams): Promise<boolean> {
+  const transporter = createNodemailerTransporter();
+  if (!transporter) return false;
+  
+  try {
+    const info = await transporter.sendMail({
+      from: `"The Guild: Gamified Fitness" <${process.env.GMAIL_USER}>`,
+      to: params.to,
+      subject: params.subject,
+      html: params.html,
+      text: params.text || params.html.replace(/<[^>]*>/g, '') // Strip HTML for text version
+    });
+    
+    console.log(`✅ Email sent successfully to ${params.to} via Nodemailer/Gmail:`, info.messageId);
+    return true;
+  } catch (error) {
+    console.error('Nodemailer/Gmail error:', error);
+    return false;
+  }
+}
+
+// Send email via MailerSend API
+async function sendEmailViaMailerSend(params: EmailParams): Promise<boolean> {
   const apiKey = process.env.MAILERSEND_API_KEY;
   
   if (!apiKey) {
-    console.warn("MailerSend API key not configured - logging email notification instead");
-    logEmailNotification(params);
+    console.warn('MailerSend API key not configured');
     return false;
   }
 
@@ -43,7 +93,6 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`MailerSend API error (${response.status}):`, errorText);
-      logEmailNotification(params);
       return false;
     }
 
@@ -64,9 +113,31 @@ export async function sendEmail(params: EmailParams): Promise<boolean> {
     
   } catch (error) {
     console.error('MailerSend connection error:', error);
-    logEmailNotification(params);
     return false;
   }
+}
+
+// Main email sending function with fallback support
+export async function sendEmail(params: EmailParams): Promise<boolean> {
+  console.log(`📧 Attempting to send email to: ${params.to}`);
+  
+  // Try Nodemailer first (Gmail SMTP) - more reliable for development
+  const nodemailerSuccess = await sendEmailViaNodemailer(params);
+  if (nodemailerSuccess) {
+    return true;
+  }
+  
+  console.log('⚠️ Nodemailer failed, trying MailerSend...');
+  
+  // Fallback to MailerSend
+  const mailerSendSuccess = await sendEmailViaMailerSend(params);
+  if (mailerSendSuccess) {
+    return true;
+  }
+  
+  console.log('❌ All email services failed, logging notification instead');
+  logEmailNotification(params);
+  return false;
 }
 
 function logEmailNotification(params: EmailParams) {
