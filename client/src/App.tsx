@@ -29,7 +29,7 @@ import Inventory from "@/pages/inventory";
 import SignupPage from "@/pages/signup";
 import LoginPage from "@/pages/login";
 import ResetPasswordPage from "@/pages/reset-password";
-import AdminDashboard from "@/pages/admin";
+import AdminPage from "@/pages/admin";
 import Leaderboard from "@/pages/leaderboard";
 import Analytics from "@/pages/analytics";
 import WorkoutPrograms from "@/pages/workout-programs";
@@ -221,7 +221,7 @@ function Router() {
       </Route>
       <Route path="/admin">
         <AuthGuard>
-          <AdminDashboard />
+          <AdminPage />
         </AuthGuard>
       </Route>
       <Route path="/dev-tools">

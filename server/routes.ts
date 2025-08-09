@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
 import { storage } from "./storage";
-import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, insertProgramWorkoutSchema, users, playerInventory } from "@shared/schema";
+import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, insertProgramWorkoutSchema, users, playerInventory, insertCustomAvatarSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
 import { authUtils } from "./auth";
@@ -14,6 +14,7 @@ import { workoutValidator } from "./workout-validation";
 import { aiWorkoutEngine } from "./ai-workout-engine";
 import { sendEmail, generateLiabilityWaiverEmail, generateAdminWaiverNotification } from "./email-service";
 import { devAssistant } from "./dev-assistant";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import Stripe from "stripe";
 
 // Extend the Request type to include session
@@ -3966,6 +3967,198 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Refactoring suggestion error:", error);
       res.status(500).json({ error: error instanceof Error ? error.message : "Refactoring suggestion failed" });
+    }
+  });
+
+  // Custom Avatar Admin routes
+  app.get("/api/admin/avatars", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const avatars = await storage.getAllCustomAvatars();
+      res.json(avatars);
+    } catch (error) {
+      console.error("Error fetching custom avatars:", error);
+      res.status(500).json({ error: "Failed to fetch avatars" });
+    }
+  });
+
+  app.post("/api/admin/avatars", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const avatarData = insertCustomAvatarSchema.parse(req.body);
+      const objectStorageService = new ObjectStorageService();
+      
+      // Normalize the image URL from upload URL to storage path
+      const normalizedImageUrl = objectStorageService.normalizeAvatarPath(avatarData.imageUrl);
+      
+      const avatar = await storage.createCustomAvatar({
+        ...avatarData,
+        imageUrl: normalizedImageUrl,
+        createdBy: userId,
+      });
+
+      res.status(201).json(avatar);
+    } catch (error: any) {
+      console.error("Error creating custom avatar:", error);
+      res.status(500).json({ error: error.message || "Failed to create avatar" });
+    }
+  });
+
+  app.put("/api/admin/avatars/:id", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const avatarId = parseInt(req.params.id);
+      if (!avatarId || isNaN(avatarId)) {
+        return res.status(400).json({ error: "Invalid avatar ID" });
+      }
+
+      const updateData = req.body;
+      
+      // If imageUrl is being updated, normalize it
+      if (updateData.imageUrl) {
+        const objectStorageService = new ObjectStorageService();
+        updateData.imageUrl = objectStorageService.normalizeAvatarPath(updateData.imageUrl);
+      }
+
+      const updatedAvatar = await storage.updateCustomAvatar(avatarId, updateData);
+      res.json(updatedAvatar);
+    } catch (error: any) {
+      console.error("Error updating custom avatar:", error);
+      res.status(500).json({ error: error.message || "Failed to update avatar" });
+    }
+  });
+
+  app.put("/api/admin/avatars/:id/toggle", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const avatarId = parseInt(req.params.id);
+      if (!avatarId || isNaN(avatarId)) {
+        return res.status(400).json({ error: "Invalid avatar ID" });
+      }
+
+      const { isActive } = req.body;
+      const updatedAvatar = await storage.updateCustomAvatar(avatarId, { isActive });
+      res.json(updatedAvatar);
+    } catch (error: any) {
+      console.error("Error toggling avatar status:", error);
+      res.status(500).json({ error: error.message || "Failed to toggle avatar status" });
+    }
+  });
+
+  app.delete("/api/admin/avatars/:id", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const avatarId = parseInt(req.params.id);
+      if (!avatarId || isNaN(avatarId)) {
+        return res.status(400).json({ error: "Invalid avatar ID" });
+      }
+
+      await storage.deleteCustomAvatar(avatarId);
+      res.json({ success: true, message: "Avatar deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting custom avatar:", error);
+      res.status(500).json({ error: error.message || "Failed to delete avatar" });
+    }
+  });
+
+  app.post("/api/admin/avatars/upload-url", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req);
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getAvatarUploadURL();
+      res.json({ uploadURL });
+    } catch (error: any) {
+      console.error("Error getting avatar upload URL:", error);
+      res.status(500).json({ error: error.message || "Failed to get upload URL" });
+    }
+  });
+
+  // Avatar serving route for users
+  app.get("/avatars/:avatarPath(*)", async (req, res) => {
+    try {
+      const avatarPath = `/avatars/${req.params.avatarPath}`;
+      const objectStorageService = new ObjectStorageService();
+      
+      const avatarFile = await objectStorageService.getAvatarFile(avatarPath);
+      await objectStorageService.downloadObject(avatarFile, res);
+    } catch (error) {
+      console.error("Error serving avatar:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.status(404).json({ error: "Avatar not found" });
+      }
+      return res.status(500).json({ error: "Failed to serve avatar" });
+    }
+  });
+
+  // Public asset serving route
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    try {
+      const filePath = req.params.filePath;
+      const objectStorageService = new ObjectStorageService();
+      
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      
+      await objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
     }
   });
 

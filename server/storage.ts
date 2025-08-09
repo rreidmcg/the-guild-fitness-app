@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, userExercisePreferences, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, fitnessGoalProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, userExercisePreferences, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, fitnessGoalProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests, customAvatars, userCustomAvatars,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -9,6 +9,8 @@ import {
   type ProgramWorkout, type InsertProgramWorkout,
   type WardrobeItem, type InsertWardrobeItem,
   type UserWardrobe, type InsertUserWardrobe,
+  type CustomAvatar, type InsertCustomAvatar,
+  type UserCustomAvatar, type InsertUserCustomAvatar,
   type DailyProgress, type InsertDailyProgress,
   type FitnessGoalProgress, type InsertFitnessGoalProgress,
   type PlayerMail, type InsertPlayerMail,
@@ -162,6 +164,16 @@ export interface IStorage {
   // Streak system operations
   updateStreak(userId: number): Promise<void>;
   useStreakFreeze(userId: number): Promise<{ success: boolean; remainingFreezes: number }>;
+
+  // Custom Avatar operations
+  getAllCustomAvatars(): Promise<CustomAvatar[]>;
+  getCustomAvatar(id: number): Promise<CustomAvatar | undefined>;
+  createCustomAvatar(avatar: InsertCustomAvatar): Promise<CustomAvatar>;
+  updateCustomAvatar(id: number, updates: Partial<CustomAvatar>): Promise<CustomAvatar>;
+  deleteCustomAvatar(id: number): Promise<void>;
+  getUserCustomAvatars(userId: number): Promise<UserCustomAvatar[]>;
+  purchaseCustomAvatar(userId: number, avatarId: number): Promise<UserCustomAvatar>;
+  hasUserPurchasedAvatar(userId: number, avatarId: number): Promise<boolean>;
 
   // Admin operations
   getAllUsers(): Promise<User[]>;
@@ -1965,6 +1977,60 @@ Start your fitness journey today and watch your character grow stronger with eve
       staminaTrend,
       agilityTrend
     };
+  }
+
+  // Custom Avatar operations
+  async getAllCustomAvatars(): Promise<CustomAvatar[]> {
+    return await db.select().from(customAvatars).orderBy(desc(customAvatars.createdAt));
+  }
+
+  async getCustomAvatar(id: number): Promise<CustomAvatar | undefined> {
+    const [avatar] = await db.select().from(customAvatars).where(eq(customAvatars.id, id));
+    return avatar || undefined;
+  }
+
+  async createCustomAvatar(avatar: InsertCustomAvatar): Promise<CustomAvatar> {
+    const [newAvatar] = await db.insert(customAvatars).values(avatar).returning();
+    return newAvatar;
+  }
+
+  async updateCustomAvatar(id: number, updates: Partial<CustomAvatar>): Promise<CustomAvatar> {
+    const [updatedAvatar] = await db
+      .update(customAvatars)
+      .set(updates)
+      .where(eq(customAvatars.id, id))
+      .returning();
+    return updatedAvatar;
+  }
+
+  async deleteCustomAvatar(id: number): Promise<void> {
+    await db.delete(customAvatars).where(eq(customAvatars.id, id));
+  }
+
+  async getUserCustomAvatars(userId: number): Promise<UserCustomAvatar[]> {
+    return await db
+      .select()
+      .from(userCustomAvatars)
+      .where(eq(userCustomAvatars.userId, userId))
+      .orderBy(desc(userCustomAvatars.purchasedAt));
+  }
+
+  async purchaseCustomAvatar(userId: number, avatarId: number): Promise<UserCustomAvatar> {
+    const [userAvatar] = await db
+      .insert(userCustomAvatars)
+      .values({ userId, avatarId })
+      .onConflictDoNothing()
+      .returning();
+    return userAvatar;
+  }
+
+  async hasUserPurchasedAvatar(userId: number, avatarId: number): Promise<boolean> {
+    const [userAvatar] = await db
+      .select()
+      .from(userCustomAvatars)
+      .where(and(eq(userCustomAvatars.userId, userId), eq(userCustomAvatars.avatarId, avatarId)))
+      .limit(1);
+    return !!userAvatar;
   }
 }
 

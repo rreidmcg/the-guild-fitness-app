@@ -292,6 +292,32 @@ export const programWorkouts = pgTable("program_workouts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Custom avatar items that can be uploaded by admins
+export const customAvatars = pgTable("custom_avatars", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  rarity: text("rarity").default("common"), // 'common', 'rare', 'epic', 'legendary', 'mythic'
+  borderColor: text("border_color").default("#6B7280"), // Hex color for avatar border
+  price: integer("price").default(0), // Gold cost (0 = free)
+  gemPrice: integer("gem_price").default(0), // Premium gem cost
+  unlockLevel: integer("unlock_level").default(1), // Level required to unlock
+  imageUrl: text("image_url").notNull(), // URL to the avatar image file
+  isActive: boolean("is_active").default(true), // Can be disabled by admins
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: integer("created_by").references(() => users.id), // Admin who created it
+});
+
+// User's purchased/unlocked custom avatars
+export const userCustomAvatars = pgTable("user_custom_avatars", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  avatarId: integer("avatar_id").references(() => customAvatars.id, { onDelete: "cascade" }),
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+}, (table) => ({
+  userAvatarUnique: uniqueIndex("user_custom_avatar_idx").on(table.userId, table.avatarId),
+}));
+
 // Wardrobe items that users can unlock/purchase
 export const wardrobeItems = pgTable("wardrobe_items", {
   id: serial("id").primaryKey(),
@@ -546,6 +572,16 @@ export const insertWorkoutPreferencesSchema = createInsertSchema(workoutPreferen
   updatedAt: true,
 });
 
+export const insertCustomAvatarSchema = createInsertSchema(customAvatars).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserCustomAvatarSchema = createInsertSchema(userCustomAvatars).omit({
+  id: true,
+  purchasedAt: true,
+});
+
 export const insertWorkoutRecommendationSchema = createInsertSchema(workoutRecommendations).omit({
   id: true,
   generatedAt: true,
@@ -578,6 +614,10 @@ export type WorkoutProgram = typeof workoutPrograms.$inferSelect;
 export type InsertWorkoutProgram = z.infer<typeof insertWorkoutProgramSchema>;
 export type ProgramWorkout = typeof programWorkouts.$inferSelect;
 export type InsertProgramWorkout = z.infer<typeof insertProgramWorkoutSchema>;
+export type CustomAvatar = typeof customAvatars.$inferSelect;
+export type InsertCustomAvatar = z.infer<typeof insertCustomAvatarSchema>;
+export type UserCustomAvatar = typeof userCustomAvatars.$inferSelect;
+export type InsertUserCustomAvatar = z.infer<typeof insertUserCustomAvatarSchema>;
 export type WardrobeItem = typeof wardrobeItems.$inferSelect;
 export type InsertWardrobeItem = z.infer<typeof insertWardrobeItemSchema>;
 export type UserWardrobe = typeof userWardrobe.$inferSelect;
