@@ -114,11 +114,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = requireAuth(req);
       
-      // Check if user is admin (allow both G.M. and regular users for demo purposes)
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(403).json({ error: "User not found" });
-      }
+      // For demo purposes, allow any authenticated user to generate links
+      console.log("Generating magic link for user:", userId);
       
       const { description } = req.body;
       
