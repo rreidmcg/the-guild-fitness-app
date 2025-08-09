@@ -741,34 +741,31 @@ export default function WorkoutSession() {
 
 
             {/* Navigation Arrows */}
-            <div className="flex items-center justify-center gap-6 pt-4 pb-2">
+            <div className="flex items-center justify-between mb-4">
               <Button
-                variant="outline"
-                size="lg"
+                variant="ghost"
+                size="sm"
                 onClick={handlePreviousExercise}
                 disabled={currentExerciseIndex === 0 || isNavigating}
-                className="h-12 w-12 rounded-full p-0 border-2"
+                className="text-muted-foreground hover:text-foreground transition-all duration-200"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </Button>
               
-              <div className="text-center min-w-[100px]">
-                <div className="text-lg font-semibold">
-                  {currentExerciseIndex + 1} / {exerciseData.length}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Exercise
+              <div className="text-center">
+                <div className="text-sm text-muted-foreground">
+                  {currentExerciseIndex + 1} of {exerciseData.length}
                 </div>
               </div>
               
               <Button
-                variant="outline"
-                size="lg"
+                variant="ghost"
+                size="sm"
                 onClick={handleNextExercise}
                 disabled={currentExerciseIndex === exerciseData.length - 1 || isNavigating}
-                className="h-12 w-12 rounded-full p-0 border-2"
+                className="text-muted-foreground hover:text-foreground transition-all duration-200"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5" />
               </Button>
             </div>
             
