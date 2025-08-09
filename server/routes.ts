@@ -56,6 +56,88 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Demo access routes
+  app.get("/demo/:token", async (req, res) => {
+    try {
+      const { token } = req.params;
+      
+      // Import DemoService here to avoid circular dependencies
+      const { DemoService } = await import("./demo-service.js");
+      const result = await DemoService.validateMagicLink(token);
+      
+      if (!result.valid) {
+        if (result.expired) {
+          return res.status(410).send(`
+            <html>
+              <head><title>Demo Link Expired</title></head>
+              <body style="font-family: Arial; text-align: center; padding: 50px;">
+                <h1>Demo Link Expired</h1>
+                <p>This demo link has expired. Please request a new one.</p>
+              </body>
+            </html>
+          `);
+        }
+        return res.status(404).send(`
+          <html>
+            <head><title>Invalid Demo Link</title></head>
+            <body style="font-family: Arial; text-align: center; padding: 50px;">
+              <h1>Invalid Demo Link</h1>
+              <p>This demo link is not valid or has already been used.</p>
+            </body>
+          </html>
+        `);
+      }
+      
+      // Log in the demo user
+      req.session.userId = result.userId;
+      
+      // Redirect to main app
+      return res.redirect('/');
+      
+    } catch (error) {
+      console.error('Demo access error:', error);
+      return res.status(500).send(`
+        <html>
+          <head><title>Demo Error</title></head>
+          <body style="font-family: Arial; text-align: center; padding: 50px;">
+            <h1>Demo Access Error</h1>
+            <p>There was an error accessing the demo. Please try again.</p>
+          </body>
+        </html>
+      `);
+    }
+  });
+  
+  // Admin route to generate magic links
+  app.post("/api/admin/generate-magic-link", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      // Check if user is admin
+      const user = await storage.getUserById(userId);
+      if (!user || user.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { description } = req.body;
+      
+      // Import DemoService here to avoid circular dependencies
+      const { DemoService } = await import("./demo-service.js");
+      const result = await DemoService.generateMagicLink(description || "Demo Access");
+      
+      return res.json({
+        success: true,
+        magicLink: result.url,
+        token: result.token,
+        expiresIn: "24 hours"
+      });
+      
+    } catch (error) {
+      console.error('Generate magic link error:', error);
+      return res.status(500).json({ error: "Failed to generate magic link" });
+    }
+  });
   // Workout recommendations route (premium feature) - DISABLED to save API costs
   /*
   app.get("/api/workout-recommendations", async (req, res) => {

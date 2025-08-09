@@ -73,6 +73,9 @@ export const users = pgTable("users", {
   liabilityWaiverIpAddress: text("liability_waiver_ip_address"),
   // Account moderation fields
   isBanned: boolean("is_banned").default(false),
+  
+  // Demo access
+  isDemoAccount: boolean("is_demo_account").default(false),
   banReason: text("ban_reason"),
   bannedAt: timestamp("banned_at"),
   bannedUntil: timestamp("banned_until"), // null = permanent ban
@@ -619,6 +622,17 @@ export const socialShares = pgTable("social_shares", {
   }>(),
   likesCount: integer("likes_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Magic links table for demo access
+export const magicLinks = pgTable("magic_links", {
+  id: serial("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  userId: integer("user_id").references(() => users.id),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  isUsed: boolean("is_used").default(false),
+  description: text("description"), // e.g., "Audit Demo Access"
 });
 
 // Social share likes

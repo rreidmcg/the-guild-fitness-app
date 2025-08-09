@@ -51,6 +51,7 @@ import ProgramWorkoutBuilder from "@/pages/program-workout-builder";
 import WorkoutOverview from "@/pages/workout-overview";
 import WorkoutSessionResults from "@/pages/workout-session-results";
 import DevToolsPage from "@/pages/dev-tools";
+import DemoAdmin from "@/pages/demo-admin";
 
 function Router() {
   return (
@@ -226,6 +227,11 @@ function Router() {
       <Route path="/dev-tools">
         <AuthGuard>
           <DevToolsPage />
+        </AuthGuard>
+      </Route>
+      <Route path="/demo-admin">
+        <AuthGuard>
+          <DemoAdmin />
         </AuthGuard>
       </Route>
       <Route path="/checkout">
