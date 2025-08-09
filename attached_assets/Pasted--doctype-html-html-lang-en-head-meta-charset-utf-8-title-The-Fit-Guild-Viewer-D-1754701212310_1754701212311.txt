@@ -48,7 +48,7 @@
 <script>
 (async () => {
   try {
-    const data = await fetch('/api/viewer.json', { cache:'no-store' }).then(r=>r.json());
+    const data = await fetch('/viewer.json', { cache:'no-store' }).then(r=>r.json());
 
     document.getElementById('acct').innerHTML =
       `<p><strong>Username:</strong> ${data.account.username}</p>

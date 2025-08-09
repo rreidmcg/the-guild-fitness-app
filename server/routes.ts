@@ -57,90 +57,128 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  // Static viewer API endpoint that bypasses Vite completely  
-  app.get("/api/static-viewer", (req, res) => {
-    console.log("Serving static viewer page");
+  // Dynamic viewer page with JSON data
+  app.get("/api/viewer", (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache');
-    res.status(200).end(`<!doctype html>
+    res.send(`<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>The Fit Guild – Viewer Demo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  body { font-family: system-ui, sans-serif; padding: 20px; background: #0b0b0b; color: #f2f2f2; }
-  h1 { color: #e63946; }
-  section { margin-bottom: 2rem; }
-  .card { background: #151515; padding: 1rem; border-radius: 8px; }
-  ul { list-style: none; padding: 0; }
-  li { margin-bottom: 0.5rem; }
-  strong { color: #fff; }
-</style>
+  <meta charset="utf-8" />
+  <title>The Fit Guild – Viewer Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background: #0b0b0b; color: #f2f2f2; }
+    h1 { color: #e63946; }
+    section { margin-bottom: 2rem; }
+    .card { background: #151515; padding: 1rem; border-radius: 8px; }
+    ul { list-style: none; padding: 0; }
+    li { margin-bottom: 0.5rem; }
+    strong { color: #fff; }
+    .muted { color:#b2b2b2; font-size:.9rem }
+  </style>
 </head>
 <body>
 <h1>📜 The Fit Guild – Read-Only Demo</h1>
 
 <section>
   <h2>👤 Account</h2>
-  <div class="card">
-    <p><strong>Username:</strong> demo_viewer</p>
-    <p><strong>Level:</strong> 12</p>
-    <p><strong>XP:</strong> 4,560 / 5,000</p>
-    <p><strong>Streak:</strong> 5 days (🔥 1.5× bonus active)</p>
-  </div>
+  <div class="card" id="acct"></div>
 </section>
 
 <section>
   <h2>💪 Last Workouts</h2>
-  <div class="card">
-    <ul>
-      <li>Full-body Strength – 48 min – +120 XP</li>
-      <li>Zone 2 Run – 32 min – +80 XP</li>
-      <li>HIIT Circuit – 22 min – +90 XP</li>
-    </ul>
-  </div>
+  <div class="card"><ul id="wos"></ul></div>
 </section>
 
 <section>
   <h2>🗡 Dungeon Progress</h2>
-  <div class="card">
-    <p><strong>Current dungeon:</strong> Goblin Mines – Floor 3/5</p>
-    <p><strong>Boss titles earned:</strong> Goblin Slayer, Orc Breaker</p>
-    <p><strong>Potions:</strong> 2x Health, 1x Stamina</p>
-  </div>
+  <div class="card" id="dng"></div>
 </section>
 
 <section>
   <h2>🏆 Leaderboard (Top 5)</h2>
-  <div class="card">
-    <ol>
-      <li>PlayerOne – 12,450 XP</li>
-      <li>FitnessFury – 11,980 XP</li>
-      <li>demo_viewer – 4,560 XP</li>
-      <li>LevelGrinder – 3,200 XP</li>
-      <li>QuestQueen – 2,880 XP</li>
-    </ol>
-  </div>
+  <div class="card"><ol id="lb"></ol></div>
 </section>
 
 <section>
   <h2>🛒 Shop</h2>
-  <div class="card">
-    <ul>
-      <li>Founder Bundle – Unlocked ✅</li>
-      <li>Dragon Slayer Armor – 2,000 gold</li>
-      <li>XP Boost Potion – 500 gold</li>
-    </ul>
-  </div>
+  <div class="card"><ul id="shop"></ul></div>
 </section>
 
-<footer style="margin-top:3rem; font-size:0.85rem; color:#b2b2b2;">
-  <p>Viewer mode: static demo data – no actions can be taken.</p>
-</footer>
+<p class="muted">Viewer mode: static demo data – no actions can be taken.</p>
 
+<script>
+(async () => {
+  try {
+    const data = await fetch('/api/viewer.json', { cache:'no-store' }).then(r=>r.json());
+
+    document.getElementById('acct').innerHTML =
+      \`<p><strong>Username:</strong> \${data.account.username}</p>
+       <p><strong>Level:</strong> \${data.account.level}</p>
+       <p><strong>XP:</strong> \${data.account.xp} / \${data.account.xpToNext}</p>
+       <p><strong>Streak:</strong> \${data.account.streak} days \${data.account.streak>=3?'(🔥 1.5× bonus active)':''}</p>\`;
+
+    document.getElementById('wos').innerHTML =
+      data.workouts.map(w => \`<li>\${w.name} – \${w.minutes} min – +\${w.xp} XP</li>\`).join('');
+
+    document.getElementById('dng').innerHTML =
+      \`<p><strong>Current dungeon:</strong> \${data.dungeon.name} – Floor \${data.dungeon.floor}/\${data.dungeon.floors}</p>
+       <p><strong>Boss titles earned:</strong> \${data.dungeon.titles.join(', ') || '—'}</p>
+       <p><strong>Potions:</strong> \${data.dungeon.potions.join(', ') || '—'}</p>\`;
+
+    document.getElementById('lb').innerHTML =
+      data.leaderboard.map(p => \`<li>\${p.name} – \${p.xp} XP</li>\`).join('');
+
+    document.getElementById('shop').innerHTML =
+      data.shop.map(i => \`<li>\${i.name} – \${i.status || (i.price + ' gold')}</li>\`).join('');
+
+  } catch (e) {
+    document.body.insertAdjacentHTML('beforeend', \`<pre>\${String(e)}</pre>\`);
+  }
+})();
+</script>
 </body>
 </html>`);
+  });
+
+  // JSON data endpoint for viewer
+  app.get("/api/viewer.json", (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.json({
+      "account": {
+        "username": "demo_viewer",
+        "level": 12,
+        "xp": 4560,
+        "xpToNext": 5000,
+        "streak": 5
+      },
+      "workouts": [
+        { "name": "Full-body Strength", "minutes": 48, "xp": 120 },
+        { "name": "Zone 2 Run", "minutes": 32, "xp": 80 },
+        { "name": "HIIT Circuit", "minutes": 22, "xp": 90 }
+      ],
+      "dungeon": {
+        "name": "Goblin Mines",
+        "floor": 3,
+        "floors": 5,
+        "titles": ["Goblin Slayer", "Orc Breaker"],
+        "potions": ["Health x2", "Stamina x1"]
+      },
+      "leaderboard": [
+        { "name": "PlayerOne", "xp": 12450 },
+        { "name": "FitnessFury", "xp": 11980 },
+        { "name": "demo_viewer", "xp": 4560 },
+        { "name": "LevelGrinder", "xp": 3200 },
+        { "name": "QuestQueen", "xp": 2880 }
+      ],
+      "shop": [
+        { "name": "Founder Bundle", "status": "Unlocked ✅" },
+        { "name": "Dragon Slayer Armor", "price": 2000 },
+        { "name": "XP Boost Potion", "price": 500 }
+      ]
+    });
   });
   
   // Demo access routes

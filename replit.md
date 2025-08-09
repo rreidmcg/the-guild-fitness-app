@@ -17,6 +17,13 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **Cleaner Badge Placement**: Moved mail type badges to the right of sender names and removed redundant icons
 - **New Player Protection Clarity**: Added detailed explanation that new players are "Protected from losing experience points due to inactivity until [date]"
 
+**External Audit & Demo System:**
+- **Magic Link Authentication**: Secure demo access system with 24-hour token expiration for external security audits
+- **Demo Admin Interface**: Authenticated users can generate custom magic links with descriptions via `/demo-admin`
+- **Dynamic Viewer Page**: Read-only demo interface at `/api/viewer` with JSON data endpoint for external stakeholders
+- **Automated Demo Accounts**: Magic links automatically create Level 3 demo accounts with realistic progression, equipment, and currency
+- **Clean Leaderboard Management**: Demo accounts are automatically excluded from public leaderboards to maintain data integrity
+
 **Onboarding & User Experience:**
 - **Comprehensive Onboarding System**: Created guided tour that introduces new users to character progression, workout XP system, future dungeons/PvP features, and app navigation
 - **Help & FAQ Integration**: Added detailed FAQ section to settings page covering XP earning, character stats, daily quests, streak system, atrophy protection, and upcoming features
