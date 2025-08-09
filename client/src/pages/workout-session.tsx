@@ -12,6 +12,7 @@ import { Slider } from "@/components/ui/slider";
 import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
 import { WorkoutSummary } from "../components/WorkoutSummary";
 import { WorkoutLoadingState } from "@/components/ui/loading-spinner";
+import { EnhancedWorkoutTimer } from "@/components/ui/enhanced-workout-timer";
 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -551,6 +552,23 @@ export default function WorkoutSession() {
       </div>
 
       <div className="max-w-md mx-auto p-6">
+
+        {/* Enhanced Workout Timer */}
+        <div className="mb-8 bg-card border border-border rounded-lg p-6">
+          <div className="text-center">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Workout Timer</h2>
+            <EnhancedWorkoutTimer
+              estimatedMinutes={workout?.estimatedDuration || 15}
+              onWorkoutComplete={(finalMinutes) => {
+                // This will be called when the timer completes the workout
+                setIsActive(false);
+                setShowRPESelection(true);
+              }}
+              isActive={isActive}
+              onActiveChange={setIsActive}
+            />
+          </div>
+        </div>
 
         {/* Minimalist Exercise Interface */}
         {exerciseData.length > 0 && currentExerciseIndex < exerciseData.length ? (

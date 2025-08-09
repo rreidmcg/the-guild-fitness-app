@@ -84,3 +84,42 @@
   transform: translateX(var(--workout-slide-distance));
   opacity: 0;
 }
+
+/* Enhanced Battle System Animations */
+@keyframes rise-fade {
+  0% { opacity: 0; transform: translate(-50%, 8px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -24px); }
+}
+
+@keyframes hit-flash {
+  0% { filter: brightness(1.0); }
+  50% { filter: brightness(2.0); }
+  100% { filter: brightness(1.0); }
+}
+
+@keyframes push-back {
+  0% { transform: translate(-50%, -50%); }
+  50% { transform: translate(calc(-50% - 16px), -50%); }
+  100% { transform: translate(-50%, -50%); }
+}
+
+@keyframes dmg-pop {
+  0% { opacity: 0; transform: translate(-50%, 0) scale(0.8); }
+  15% { opacity: 1; transform: translate(-50%, -6px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -28px) scale(1); }
+}
+
+@keyframes dust-pop {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  60% { opacity: 0.9; transform: translate(10px, -6px) scale(1.2); }
+  100% { opacity: 0; transform: translate(18px, -10px) scale(1.4); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(-50%, -50%); }
+  20% { transform: translate(calc(-50% - 6px), -50%); }
+  40% { transform: translate(calc(-50% + 6px), -50%); }
+  60% { transform: translate(calc(-50% - 4px), -50%); }
+  80% { transform: translate(calc(-50% + 4px), -50%); }
+}
