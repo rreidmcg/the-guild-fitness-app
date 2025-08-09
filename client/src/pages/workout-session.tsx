@@ -501,17 +501,17 @@ export default function WorkoutSession() {
 
   // Show workout summary if completed
   if (showSummary && completedSession && userStats) {
-    const leveledUp = completedSession.newLevel && completedSession.newLevel > userStats.level;
+    const leveledUp = completedSession.newLevel && completedSession.newLevel > (userStats?.level || 1);
     
     // Calculate XP to next level
-    const currentLevel = leveledUp ? completedSession.newLevel : userStats.level;
-    const currentXP = leveledUp ? (userStats.experience + completedSession.xpEarned) : userStats.experience;
+    const currentLevel = leveledUp ? completedSession.newLevel : (userStats?.level || 1);
+    const currentXP = leveledUp ? ((userStats?.experience || 0) + completedSession.xpEarned) : (userStats?.experience || 0);
     const xpForNextLevel = Math.floor(100 * Math.pow(1.5, currentLevel));
     const xpToNextLevel = xpForNextLevel - currentXP;
     
     return (
       <WorkoutSummary
-        workoutName={workout?.name || "Workout"}
+        workoutName={(workout as any)?.name || "Workout"}
         xpGained={completedSession.xpEarned || 0}
         currentLevel={currentLevel}
         currentXP={currentXP}
@@ -558,14 +558,13 @@ export default function WorkoutSession() {
           <div className="text-center">
             <h2 className="text-lg font-semibold text-foreground mb-4">Workout Timer</h2>
             <EnhancedWorkoutTimer
-              estimatedMinutes={workout?.estimatedDuration || 15}
+              estimatedMinutes={(workout as any)?.estimatedDuration || 15}
               onWorkoutComplete={(finalMinutes) => {
                 // This will be called when the timer completes the workout
                 setIsActive(false);
                 setShowRPESelection(true);
               }}
-              isActive={isActive}
-              onActiveChange={setIsActive}
+              shouldStop={!isActive} // Stop the timer when workout is finished
             />
           </div>
         </div>

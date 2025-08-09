@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Play, Pause, Square } from "lucide-react";
+// No button icons needed anymore
 
 interface XpPopupProps {
   amount: number;
@@ -90,21 +90,20 @@ function TimeConfirmModal({ actualMinutes, estimatedMinutes, isOpen, onConfirm, 
 interface EnhancedWorkoutTimerProps {
   estimatedMinutes?: number;
   onWorkoutComplete: (finalMinutes: number) => void;
-  isActive: boolean;
-  onActiveChange: (active: boolean) => void;
+  shouldStop?: boolean;
 }
 
 export function EnhancedWorkoutTimer({ 
   estimatedMinutes = 15, 
-  onWorkoutComplete, 
-  isActive, 
-  onActiveChange 
+  onWorkoutComplete,
+  shouldStop = false
 }: EnhancedWorkoutTimerProps) {
   const [time, setTime] = useState(0);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [actualMinutes, setActualMinutes] = useState(0);
   const [showXpPopup, setShowXpPopup] = useState(false);
+  const [isActive, setIsActive] = useState(true); // Auto-start the timer
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Timer effect
@@ -145,30 +144,23 @@ export function EnhancedWorkoutTimer({
     return "text-green-400"; // Still early
   };
 
-  const handleStart = () => {
-    if (!isActive) {
-      setStartTime(new Date());
-      setTime(0);
+  // Effect to handle external stop signal
+  useEffect(() => {
+    if (shouldStop && isActive && startTime) {
+      setIsActive(false);
+      const finalMinutes = Math.max(0.1, time / 60);
+      const minOk = estimatedMinutes * 0.5;
+      const maxOk = estimatedMinutes * 2;
+
+      setActualMinutes(finalMinutes);
+
+      if (finalMinutes < minOk || finalMinutes > maxOk) {
+        setShowConfirmModal(true);
+      } else {
+        handleWorkoutComplete(finalMinutes);
+      }
     }
-    onActiveChange(!isActive);
-  };
-
-  const handleStop = () => {
-    if (!startTime) return;
-    
-    onActiveChange(false);
-    const finalMinutes = Math.max(0.1, time / 60);
-    const minOk = estimatedMinutes * 0.5;
-    const maxOk = estimatedMinutes * 2;
-
-    setActualMinutes(finalMinutes);
-
-    if (finalMinutes < minOk || finalMinutes > maxOk) {
-      setShowConfirmModal(true);
-    } else {
-      handleWorkoutComplete(finalMinutes);
-    }
-  };
+  }, [shouldStop, isActive, startTime, time, estimatedMinutes]);
 
   const handleWorkoutComplete = async (finalMinutes: number) => {
     // Calculate and show XP reward
@@ -198,27 +190,7 @@ export function EnhancedWorkoutTimer({
         {isActive ? "Workout in progress..." : `Estimated: ${estimatedMinutes} minutes`}
       </div>
 
-      {/* Control Buttons */}
-      <div className="flex gap-2">
-        <Button 
-          onClick={handleStart}
-          variant={isActive ? "secondary" : "default"}
-          className="flex items-center gap-2"
-        >
-          {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-          {isActive ? "Pause" : "Start"}
-        </Button>
-        
-        <Button 
-          onClick={handleStop}
-          disabled={!isActive && time === 0}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <Square className="w-4 h-4" />
-          Finish
-        </Button>
-      </div>
+
 
       {/* Time Confirmation Modal */}
       <TimeConfirmModal
