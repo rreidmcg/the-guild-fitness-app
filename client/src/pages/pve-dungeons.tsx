@@ -1,89 +1,46 @@
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@/hooks/use-navigate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BottomNav } from "@/components/ui/bottom-nav";
-import { EnhancedBattleSystem } from "@/components/ui/enhanced-battle-system";
+import { BattleLoadingState } from "@/components/ui/loading-spinner";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+
+// Import battle system defensive styles
+import "../styles/battle-system.css";
 import { 
-  ArrowLeft, 
   Sword, 
-  Crown,
+  Shield, 
+  Heart, 
+  Zap, 
   Trophy,
+  ArrowLeft,
+  Skull,
+  ChevronDown,
+  ChevronRight,
   Coins,
-  ShieldCheck,
-  Zap,
-  Target
+  X,
+  Clock,
+  Volume2,
+  VolumeX
 } from "lucide-react";
+import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
+import caveRatImage from "@assets/IMG_3670_1753151064629.png";
+import wildGoblinImage from "@assets/0F1ED511-7E0E-4062-A429-FB8B7BC6B4FE_1753151490494.png";
+import forestSpiderImage from "@assets/1B395958-75E1-4297-8F5E-27BED5DC1608_1753196270170.png";
+import battlePlayerImage from "@assets/IMG_3682_1753213695174.png";
+import forestBackgroundImage from "@assets/AD897CD2-5CB0-475D-B782-E09FD8D98DF7_1753153903824.png";
+import slimeKingImage from "@assets/BA7F4BEB-8274-40C6-8CB1-398C9BBD1581_1753841529625.png";
+import ratChieftainImage from "@assets/D974E952-8A54-4037-AC48-754ACAA0F285_1753839669430.png";
+import goblinWarlordImage from "@assets/36CF820D-0CC0-4C99-A780-79B6D125B307_1753844608679.png";
+import broodmotherImage from "@assets/CE5B8D2E-90AF-4DC0-A904-EDB98089C00A_1753845237897.png";
+import { Avatar2D } from "@/components/ui/avatar-2d";
+import { ParallaxBackground } from "@/components/ui/parallax-background";
+import { BattleAccessGuard } from "@/components/ui/battle-access-guard";
+import { useBackgroundMusic } from "@/contexts/background-music-context";
+import { queryClient } from "@/lib/queryClient";
 
-// Dungeon data
-const DUNGEONS = [
-  {
-    id: "slime-caverns",
-    name: "Slime Caverns",
-    description: "A damp underground cavern filled with gelatinous slimes",
-    minLevel: 1,
-    maxLevel: 6,
-    rank: "E",
-    monsters: [
-      { id: "green-slime", name: "Green Slime", level: 1, hp: 120, attack: 8, goldReward: 15 },
-      { id: "blue-slime", name: "Blue Slime", level: 2, hp: 150, attack: 12, goldReward: 20 },
-      { id: "slime-king", name: "Slime King", level: 4, hp: 350, attack: 20, goldReward: 50 }
-    ],
-    background: "from-green-900/20 to-emerald-900/20",
-    borderColor: "border-green-500/50"
-  },
-  {
-    id: "rat-warrens",
-    name: "Rat Warrens",
-    description: "Twisting tunnels infested with oversized rats",
-    minLevel: 2,
-    maxLevel: 7,
-    rank: "E",
-    monsters: [
-      { id: "giant-rat", name: "Giant Rat", level: 2, hp: 140, attack: 10, goldReward: 18 },
-      { id: "rat-warrior", name: "Rat Warrior", level: 4, hp: 200, attack: 16, goldReward: 35 },
-      { id: "rat-chieftain", name: "Rat Chieftain", level: 6, hp: 400, attack: 25, goldReward: 60 }
-    ],
-    background: "from-gray-900/20 to-stone-900/20",
-    borderColor: "border-gray-500/50"
-  },
-  {
-    id: "goblin-outpost",
-    name: "Goblin Outpost",
-    description: "A fortified camp of cunning goblins",
-    minLevel: 4,
-    maxLevel: 8,
-    rank: "E",
-    monsters: [
-      { id: "goblin-scout", name: "Goblin Scout", level: 4, hp: 180, attack: 14, goldReward: 25 },
-      { id: "goblin-warrior", name: "Goblin Warrior", level: 6, hp: 250, attack: 20, goldReward: 40 },
-      { id: "goblin-champion", name: "Goblin Champion", level: 8, hp: 500, attack: 30, goldReward: 80 }
-    ],
-    background: "from-red-900/20 to-orange-900/20",
-    borderColor: "border-red-500/50"
-  },
-  {
-    id: "spiders-nest",
-    name: "Spider's Nest",
-    description: "A web-covered lair of venomous arachnids",
-    minLevel: 6,
-    maxLevel: 10,
-    rank: "E",
-    monsters: [
-      { id: "web-spider", name: "Web Spider", level: 6, hp: 220, attack: 18, goldReward: 30 },
-      { id: "poison-spider", name: "Poison Spider", level: 8, hp: 300, attack: 24, goldReward: 45 },
-      { id: "spider-queen", name: "Spider Queen", level: 10, hp: 600, attack: 35, goldReward: 100 }
-    ],
-    background: "from-purple-900/20 to-violet-900/20",
-    borderColor: "border-purple-500/50"
-  }
-];
-
+// User stats type to match the API response
 interface UserStats {
   level: number;
   experience: number;
@@ -99,273 +56,374 @@ interface UserStats {
   currentMp: number;
   maxMp: number;
   username: string;
+  height?: number;
+  weight?: number;
+  fitnessGoal?: string;
+  skinColor?: string;
+  hairColor?: string;
+  gender?: string;
+  measurementUnit?: string;
 }
 
-export default function PveDungeonsPage() {
+interface Monster {
+  id: number;
+  name: string;
+  level: number;
+  maxHp: number;
+  currentHp: number;
+  attack: number;
+  goldReward: number;
+  description: string;
+  image?: string;
+  lastDefeatedAt?: number; // Timestamp when monster was last defeated
+}
+
+interface BattleState {
+  playerHp: number;
+  playerMaxHp: number;
+  playerMp: number;
+  playerMaxMp: number;
+  monster: Monster;
+  battleLog: string[];
+  isPlayerTurn: boolean;
+  battleResult: 'ongoing' | 'victory' | 'defeat';
+  remainingMonsters: Monster[];
+  currentMonsterIndex: number;
+  totalMonsters: number;
+}
+
+// Story-driven E-rank Dungeon Zones with progression
+interface DungeonZone {
+  id: string;
+  name: string;
+  description: string;
+  background: string;
+  monsters: Monster[];
+  storyIntro: string;
+  completionStory: string;
+}
+
+const ERANK_DUNGEON_ZONES: DungeonZone[] = [
+  {
+    id: "slime_caverns",
+    name: "The Slime Caverns",
+    description: "Dark, damp caves where gelatinous creatures multiply in the shadows",
+    background: "#1a2b3d",
+    storyIntro: "You enter the murky depths of the Slime Caverns. The air is thick with moisture and the sound of dripping echoes through the tunnels. Strange, luminescent slimes block your path...",
+    completionStory: "The caverns grow quiet as the last slime dissolves. Ancient runes on the walls begin to glow, revealing the path forward to deeper mysteries.",
+    monsters: [
+      { id: 1, name: "Tiny Slime", level: 1, maxHp: 12, currentHp: 12, attack: 3, goldReward: 1, description: "A small, translucent blob that quivers nervously", image: greenSlimeImage },
+      { id: 2, name: "Green Slime", level: 2, maxHp: 15, currentHp: 15, attack: 3, goldReward: 1, description: "A larger, more aggressive gelatinous creature", image: greenSlimeImage },
+      { id: 3, name: "Acidic Slime", level: 3, maxHp: 18, currentHp: 18, attack: 4, goldReward: 2, description: "A corrosive slime that burns through metal", image: greenSlimeImage },
+      { id: 4, name: "Bouncing Slime", level: 4, maxHp: 21, currentHp: 21, attack: 4, goldReward: 2, description: "An energetic slime that ricochets off walls", image: greenSlimeImage },
+      { id: 5, name: "Elder Slime", level: 5, maxHp: 24, currentHp: 24, attack: 5, goldReward: 3, description: "An ancient slime with crystalline formations", image: greenSlimeImage },
+      { id: 6, name: "Slime King", level: 6, maxHp: 30, currentHp: 30, attack: 5, goldReward: 5, description: "🏆 MINI-BOSS: The ruler of the slime caverns, pulsing with ancient power", image: slimeKingImage }
+    ]
+  },
+  {
+    id: "rat_warrens",
+    name: "The Rat Warrens",
+    description: "A maze of tunnels infested with oversized rodents and their corrupted kin",
+    background: "#2d1810",
+    storyIntro: "The narrow tunnels stretch endlessly before you, filled with the chittering of countless rats. Their red eyes gleam in the darkness as they sense an intruder in their domain...",
+    completionStory: "The warren falls silent. In the distance, you hear the echo of larger threats stirring in the depths, drawn by the commotion.",
+    monsters: [
+      { id: 7, name: "Sewer Rat", level: 2, maxHp: 18, currentHp: 18, attack: 4, goldReward: 2, description: "A disease-ridden rodent with yellowed fangs", image: caveRatImage },
+      { id: 8, name: "Cave Rat", level: 3, maxHp: 21, currentHp: 21, attack: 4, goldReward: 2, description: "A larger rat adapted to cave life", image: caveRatImage },
+      { id: 9, name: "Plague Rat", level: 4, maxHp: 24, currentHp: 24, attack: 5, goldReward: 3, description: "A sickly rat spreading corruption", image: caveRatImage },
+      { id: 10, name: "Giant Rat", level: 5, maxHp: 27, currentHp: 27, attack: 5, goldReward: 3, description: "An oversized rodent with massive claws", image: caveRatImage },
+      { id: 11, name: "War Rat", level: 6, maxHp: 30, currentHp: 30, attack: 6, goldReward: 4, description: "A battle-scarred rat veteran", image: caveRatImage },
+      { id: 12, name: "Rat Chieftain", level: 7, maxHp: 39, currentHp: 39, attack: 6, goldReward: 6, description: "🏆 MINI-BOSS: A massive rat wearing crude armor, leading its pack", image: ratChieftainImage }
+    ]
+  },
+  {
+    id: "goblin_outpost",
+    name: "The Goblin Outpost",
+    description: "A ramshackle camp where mischievous goblins plot their next raid",
+    background: "#1f2b1a",
+    storyIntro: "Crude wooden spikes and torn banners mark the goblin territory. The air smells of smoke and rotting food. Cackling voices grow louder as the goblins spot your approach...",
+    completionStory: "The outpost burns as the last goblin falls. Among the ashes, you find a crude map pointing to darker territories beyond.",
+    monsters: [
+      { id: 13, name: "Goblin Scout", level: 4, maxHp: 21, currentHp: 21, attack: 5, goldReward: 3, description: "A sneaky goblin carrying a rusty knife", image: wildGoblinImage },
+      { id: 14, name: "Wild Goblin", level: 5, maxHp: 24, currentHp: 24, attack: 5, goldReward: 3, description: "A fierce goblin warrior with crude weapons", image: wildGoblinImage },
+      { id: 15, name: "Goblin Raider", level: 6, maxHp: 27, currentHp: 27, attack: 6, goldReward: 4, description: "A goblin armed with stolen gear", image: wildGoblinImage },
+      { id: 16, name: "Goblin Shaman", level: 7, maxHp: 30, currentHp: 30, attack: 6, goldReward: 4, description: "A goblin mystic wielding dark magic", image: wildGoblinImage },
+      { id: 17, name: "Goblin Captain", level: 8, maxHp: 33, currentHp: 33, attack: 9, goldReward: 5, description: "A goblin officer commanding the troops", image: wildGoblinImage },
+      { id: 18, name: "Goblin Warlord", level: 10, maxHp: 48, currentHp: 48, attack: 10, goldReward: 8, description: "🏆 BOSS: A battle-scarred goblin chief with stolen armor and weapons", image: goblinWarlordImage }
+    ]
+  },
+  {
+    id: "spider_nest",
+    name: "The Spider's Nest",
+    description: "A web-covered lair where giant arachnids weave their deadly traps",
+    background: "#1a1a2e",
+    storyIntro: "Thick webs block every passage, and the skittering of eight legs echoes from all directions. The air is heavy with the scent of silk and venom...",
+    completionStory: "The great web collapses as the nest's guardian falls. In the silence, you notice passages leading deeper into the earth.",
+    monsters: [
+      { id: 19, name: "Web Spinner", level: 6, maxHp: 27, currentHp: 27, attack: 6, goldReward: 4, description: "A quick spider that weaves binding webs", image: forestSpiderImage },
+      { id: 20, name: "Forest Spider", level: 7, maxHp: 30, currentHp: 30, attack: 6, goldReward: 4, description: "A venomous hunter with razor-sharp fangs", image: forestSpiderImage },
+      { id: 21, name: "Poison Spider", level: 8, maxHp: 33, currentHp: 33, attack: 9, goldReward: 5, description: "A deadly arachnid dripping with venom", image: forestSpiderImage },
+      { id: 22, name: "Shadow Spider", level: 9, maxHp: 36, currentHp: 36, attack: 9, goldReward: 5, description: "A spider that strikes from the darkness", image: forestSpiderImage },
+      { id: 23, name: "Warrior Spider", level: 9, maxHp: 39, currentHp: 39, attack: 10, goldReward: 6, description: "A heavily armored spider guardian", image: forestSpiderImage },
+      { id: 24, name: "Broodmother", level: 10, maxHp: 48, currentHp: 48, attack: 10, goldReward: 8, description: "🏆 BOSS: An enormous spider surrounded by her countless offspring", image: broodmotherImage }
+    ]
+  }
+];
+
+// D-rank Dungeon Zones (Levels 11-20)
+const DRANK_DUNGEON_ZONES: DungeonZone[] = [
+  {
+    id: "orc_stronghold",
+    name: "The Orc Stronghold",
+    description: "A fortified camp where savage orcs prepare for war",
+    background: "#3d1a1a",
+    storyIntro: "Massive stone walls loom before you, adorned with crude spikes and trophies of past battles. The thunderous roars of orcs echo from within as they sharpen their weapons...",
+    completionStory: "The stronghold falls silent, its mighty gates shattered. In the ruins, you discover maps leading to even darker realms.",
+    monsters: [
+      { id: 25, name: "Orc Scout", level: 11, maxHp: 45, currentHp: 45, attack: 11, goldReward: 6, description: "A nimble orc warrior carrying crude weapons", image: wildGoblinImage },
+      { id: 26, name: "Orc Warrior", level: 12, maxHp: 48, currentHp: 48, attack: 12, goldReward: 7, description: "A fierce orc fighter with battle scars", image: wildGoblinImage },
+      { id: 27, name: "Orc Berserker", level: 13, maxHp: 51, currentHp: 51, attack: 13, goldReward: 8, description: "A rage-filled orc that knows no fear", image: wildGoblinImage },
+      { id: 28, name: "Orc Captain", level: 14, maxHp: 54, currentHp: 54, attack: 14, goldReward: 9, description: "An orc commander leading the troops", image: wildGoblinImage },
+      { id: 29, name: "Orc Champion", level: 15, maxHp: 57, currentHp: 57, attack: 15, goldReward: 10, description: "An elite orc warrior of legendary strength", image: wildGoblinImage },
+      { id: 30, name: "Orc Warlord", level: 16, maxHp: 72, currentHp: 72, attack: 16, goldReward: 15, description: "🏆 BOSS: The supreme commander of the orc armies", image: wildGoblinImage }
+    ]
+  },
+  {
+    id: "shadow_catacombs",
+    name: "The Shadow Catacombs", 
+    description: "Ancient burial chambers where undead horrors guard forgotten treasures",
+    background: "#1a1a3d",
+    storyIntro: "Cold stone corridors stretch endlessly into darkness. The air reeks of decay as skeletal remains animate with unholy purpose...",
+    completionStory: "The unholy presence dissipates as the last undead falls. Ancient secrets lie buried in these sacred halls.",
+    monsters: [
+      { id: 31, name: "Skeleton Warrior", level: 12, maxHp: 48, currentHp: 48, attack: 12, goldReward: 7, description: "An animated skeleton wielding rusted weapons", image: caveRatImage },
+      { id: 32, name: "Zombie Fighter", level: 13, maxHp: 51, currentHp: 51, attack: 13, goldReward: 8, description: "A shambling corpse seeking living flesh", image: caveRatImage },
+      { id: 33, name: "Wraith", level: 14, maxHp: 54, currentHp: 54, attack: 14, goldReward: 9, description: "A ghostly apparition that phases through matter", image: forestSpiderImage },
+      { id: 34, name: "Death Knight", level: 15, maxHp: 57, currentHp: 57, attack: 15, goldReward: 10, description: "A fallen paladin cursed to undeath", image: wildGoblinImage },
+      { id: 35, name: "Lich", level: 16, maxHp: 60, currentHp: 60, attack: 16, goldReward: 11, description: "An ancient spellcaster bound to eternal unlife", image: forestSpiderImage },
+      { id: 36, name: "Bone Lord", level: 17, maxHp: 81, currentHp: 81, attack: 17, goldReward: 17, description: "🏆 BOSS: Master of the undead legions", image: ratChieftainImage }
+    ]
+  }
+];
+
+export default function PvEDungeonsPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  const [selectedDungeon, setSelectedDungeon] = useState<any>(null);
-  const [selectedMonster, setSelectedMonster] = useState<any>(null);
-  const [showBattleModal, setShowBattleModal] = useState(false);
-  const [currentBattle, setCurrentBattle] = useState<any>(null);
+  // Removed modal state - dungeons now navigate directly to battle
 
   const { data: userStats } = useQuery<UserStats>({
     queryKey: ["/api/user/stats"],
   });
 
-  const battleMutation = useMutation({
-    mutationFn: async (battleData: any) => {
-      return await apiRequest("/api/battle/start", {
-        method: "POST",
-        body: battleData,
-      });
-    },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
-      toast({
-        title: "Battle Started!",
-        description: `Entering combat with ${selectedMonster?.name}`,
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Battle Error",
-        description: "Failed to start battle",
-        variant: "destructive",
-      });
-    },
-  });
+  // Removed scroll lock to allow scrolling to bottom of monster list
 
   if (!userStats) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-          <p className="mt-4 text-muted-foreground">Loading dungeons...</p>
-        </div>
-      </div>
-    );
+    return <BattleLoadingState message="Loading dungeon information..." />;
   }
 
   const userLevel = userStats.level || 1;
 
-  const startBattle = (dungeon: any, monster: any) => {
-    setSelectedDungeon(dungeon);
-    setSelectedMonster(monster);
-    setCurrentBattle({ dungeon, monster });
-    setShowBattleModal(true);
-  };
-
-  const handleBattleComplete = (result: any) => {
-    setShowBattleModal(false);
-    setCurrentBattle(null);
-    
-    if (result.battleResult === 'victory') {
-      toast({
-        title: "Victory!",
-        description: `You defeated ${selectedMonster?.name} and earned ${result.goldEarned} gold!`,
-      });
-    } else if (result.battleResult === 'defeat') {
-      toast({
-        title: "Defeated",
-        description: `${selectedMonster?.name} has bested you in combat.`,
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background text-foreground pb-20">
+    <BattleAccessGuard>
+      <ParallaxBackground showForestBackground={true}>
+        <div className="container mx-auto p-4 max-w-4xl">
       {/* Header */}
-      <div className="bg-card border-b border-border px-4 py-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/battle")}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Battle
+          </Button>
+        </div>
+        <h1 className="text-2xl font-bold text-center flex-1">PvE Dungeons</h1>
+        <div></div>
+      </div>
+
+      {/* E-Rank Dungeons */}
+      <Card className="mb-6 border-2 border-green-500/30 bg-gradient-to-br from-green-900/20 to-emerald-900/20">
+        <CardHeader>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="ghost" 
-                onClick={() => navigate("/battle")}
-                className="text-muted-foreground hover:text-foreground p-2"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">PvE Dungeons</h1>
-                <p className="text-muted-foreground mt-0.5 text-sm">Explore dangerous dungeons and battle monsters</p>
-              </div>
+            <div>
+              <CardTitle className="text-2xl text-green-400 flex items-center">
+                <Trophy className="h-6 w-6 mr-2" />
+                E-Rank Dungeons
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Levels 1-10 • 4 Zones • 24 Monsters Total
+              </p>
             </div>
             <div className="text-right">
               <div className="text-sm text-muted-foreground">Your Level</div>
-              <div className="text-xl font-bold text-green-400">{userLevel}</div>
+              <div className="text-2xl font-bold text-green-400">{userLevel}</div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Player Stats Summary */}
-        <Card className="mb-6 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/50">
-          <CardContent className="p-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div>
-                <div className="text-sm text-muted-foreground">HP</div>
-                <div className="text-lg font-bold text-red-400">
-                  {userStats.currentHp}/{userStats.maxHp}
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground">MP</div>
-                <div className="text-lg font-bold text-blue-400">
-                  {userStats.currentMp}/{userStats.maxMp}
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground">Gold</div>
-                <div className="text-lg font-bold text-yellow-400 flex items-center justify-center gap-1">
-                  <Coins className="w-4 h-4" />
-                  {userStats.gold}
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-muted-foreground">Battles Won</div>
-                <div className="text-lg font-bold text-green-400 flex items-center justify-center gap-1">
-                  <Trophy className="w-4 h-4" />
-                  {userStats.battlesWon}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Dungeons Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {DUNGEONS.map((dungeon) => {
-            const isAccessible = userLevel >= dungeon.minLevel;
-            const isRecommended = userLevel >= dungeon.minLevel && userLevel <= dungeon.maxLevel;
-            
-            return (
-              <Card 
-                key={dungeon.id}
-                className={`transition-all duration-300 hover:scale-105 ${
-                  isAccessible 
-                    ? `bg-gradient-to-br ${dungeon.background} border-2 ${dungeon.borderColor}` 
-                    : "bg-gradient-to-br from-gray-900/20 to-gray-800/20 border-2 border-gray-500/50 opacity-60"
-                }`}
-              >
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={`px-2 py-1 rounded text-xs font-bold ${
-                        isRecommended ? 'bg-green-600 text-white' : 
-                        isAccessible ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'
-                      }`}>
-                        {dungeon.rank}-Rank
-                      </div>
-                      <span className="text-lg">{dungeon.name}</span>
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Lv. {dungeon.minLevel}-{dungeon.maxLevel}
-                    </div>
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">{dungeon.description}</p>
-                </CardHeader>
-                
-                <CardContent>
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-sm">Monsters:</h4>
-                    {dungeon.monsters.map((monster: any) => (
-                      <div 
-                        key={monster.id}
-                        className={`flex items-center justify-between p-3 rounded-lg border ${
-                          isAccessible 
-                            ? "bg-card/50 border-border hover:bg-card/80 cursor-pointer transition-all duration-200" 
-                            : "bg-gray-800/30 border-gray-700 cursor-not-allowed"
-                        }`}
-                        onClick={isAccessible ? () => startBattle(dungeon, monster) : undefined}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-2">
-                            <Sword className="w-4 h-4 text-muted-foreground" />
-                            <span className="font-medium">{monster.name}</span>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            Lv. {monster.level}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 text-sm">
-                          <div className="flex items-center gap-1">
-                            <ShieldCheck className="w-3 h-3 text-red-400" />
-                            <span>{monster.hp} HP</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Zap className="w-3 h-3 text-yellow-400" />
-                            <span>{monster.attack} ATK</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Coins className="w-3 h-3 text-yellow-400" />
-                            <span>{monster.goldReward}</span>
-                          </div>
-                          {isAccessible && (
-                            <Button size="sm" variant="outline" className="ml-2">
-                              <Target className="w-3 h-3 mr-1" />
-                              Fight
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {!isAccessible && (
-                      <div className="text-center py-2">
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {ERANK_DUNGEON_ZONES.map((zone, index) => {
+              const minLevel = zone.monsters[0]?.level || 1;
+              const maxLevel = zone.monsters[zone.monsters.length - 1]?.level || 10;
+              const isAccessible = userLevel >= minLevel;
+              
+              return (
+                <Card 
+                  key={zone.id}
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                    isAccessible 
+                      ? 'border-green-500/50 bg-gradient-to-br from-green-900/10 to-emerald-900/10 hover:border-green-400' 
+                      : 'border-gray-600 bg-gray-900/20 opacity-60'
+                  }`}
+                  onClick={() => {
+                    if (isAccessible) {
+                      navigate(`/dungeon-battle/${zone.id}`);
+                    }
+                  }}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-bold text-lg text-foreground">{zone.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Requires Level {dungeon.minLevel}
+                          Levels {minLevel}-{maxLevel} • {zone.monsters.length} Monsters
                         </p>
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
+                      {!isAccessible && (
+                        <div className="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded">
+                          Level {minLevel} Required
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {zone.description}
+                    </p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-yellow-400 flex items-center">
+                        <Coins className="h-3 w-3 mr-1" />
+                        {zone.monsters.reduce((sum, m) => sum + m.goldReward, 0)} Gold Total
+                      </span>
+                      {isAccessible ? (
+                        <span className="text-green-400">Available</span>
+                      ) : (
+                        <span className="text-red-400">Locked</span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Battle Modal */}
-      <Dialog open={showBattleModal} onOpenChange={setShowBattleModal}>
-        <DialogContent className="sm:max-w-4xl bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-center text-2xl flex items-center justify-center gap-2">
-              <Sword className="w-6 h-6 text-red-400" />
-              {selectedMonster?.name} Battle
-            </DialogTitle>
-            <p className="text-center text-muted-foreground">
-              {selectedDungeon?.name} • Level {selectedMonster?.level}
+      {/* D-Rank Dungeons */}
+      <Card className="mb-6 border-2 border-blue-500/30 bg-gradient-to-br from-blue-900/20 to-indigo-900/20">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl text-blue-400 flex items-center">
+                <Trophy className="h-6 w-6 mr-2" />
+                D-Rank Dungeons
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Levels 11-20 • 2 Zones • 12 Monsters Total
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-muted-foreground">Your Level</div>
+              <div className="text-2xl font-bold text-blue-400">{userLevel}</div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {DRANK_DUNGEON_ZONES.map((zone, index) => {
+              const minLevel = zone.monsters[0]?.level || 11;
+              const maxLevel = zone.monsters[zone.monsters.length - 1]?.level || 20;
+              const isAccessible = userLevel >= minLevel;
+              
+              return (
+                <Card 
+                  key={zone.id}
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                    isAccessible 
+                      ? 'border-blue-500/50 bg-gradient-to-br from-blue-900/10 to-indigo-900/10 hover:border-blue-400' 
+                      : 'border-gray-600 bg-gray-900/20 opacity-60'
+                  }`}
+                  onClick={() => {
+                    if (isAccessible) {
+                      navigate(`/dungeon-battle/${zone.id}`);
+                    }
+                  }}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-bold text-lg text-foreground">{zone.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Levels {minLevel}-{maxLevel} • {zone.monsters.length} Monsters
+                        </p>
+                      </div>
+                      {!isAccessible && (
+                        <div className="text-xs bg-red-900/50 text-red-300 px-2 py-1 rounded">
+                          Level {minLevel} Required
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {zone.description}
+                    </p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-yellow-400 flex items-center">
+                        <Coins className="h-3 w-3 mr-1" />
+                        {zone.monsters.reduce((sum, m) => sum + m.goldReward, 0)} Gold Total
+                      </span>
+                      {isAccessible ? (
+                        <span className="text-blue-400">Available</span>
+                      ) : (
+                        <span className="text-red-400">Locked</span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Higher Rank Preview */}
+      <Card className="border-2 border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-violet-900/20">
+        <CardHeader>
+          <CardTitle className="text-xl text-purple-400 flex items-center">
+            <Trophy className="h-5 w-5 mr-2" />
+            C-Rank Dungeons
+          </CardTitle>
+          <p className="text-muted-foreground">
+            Levels 21-30 • Coming Soon
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="text-4xl mb-4">🔒</div>
+            <p className="text-muted-foreground">
+              Complete all D-Rank dungeons to unlock C-Rank content
             </p>
-          </DialogHeader>
-          
-          <div className="p-4">
-            {currentBattle && (
-              <EnhancedBattleSystem
-                monsterId={selectedMonster?.id}
-                onBattleComplete={handleBattleComplete}
-              />
-            )}
           </div>
-          
-          <div className="flex justify-center p-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowBattleModal(false)}
-            >
-              Retreat from Battle
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
 
-      <BottomNav />
-    </div>
+      {/* Modal removed - dungeons now navigate directly to battle */}
+      </div>
+    </ParallaxBackground>
+    </BattleAccessGuard>
   );
 }

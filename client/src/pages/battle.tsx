@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { BattleLoadingState } from "@/components/ui/loading-spinner";
-import { EnhancedBattleSystem } from "@/components/ui/enhanced-battle-system";
 import { 
   Sword, 
   Users,
@@ -252,31 +251,6 @@ export default function BattlePage() {
           </CardContent>
         </Card>
         </div>
-
-        {/* Interactive Battle Demo Section */}
-        {hasBattleAccess && (
-          <div className="mt-8">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-center text-2xl text-purple-400 flex items-center justify-center gap-2">
-                  <Sword className="w-6 h-6" />
-                  Combat Training Demo
-                </CardTitle>
-                <p className="text-center text-muted-foreground">
-                  Experience the enhanced battle system with combo mechanics, speed bonuses, and visual effects
-                </p>
-              </CardHeader>
-              <CardContent className="p-6">
-                <EnhancedBattleSystem
-                  onBattleComplete={(result) => {
-                    // Handle battle completion if needed
-                    console.log("Demo battle completed:", result);
-                  }}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        )}
         </div>
       </div>
       

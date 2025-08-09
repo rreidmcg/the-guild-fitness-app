@@ -12,7 +12,6 @@ import { Slider } from "@/components/ui/slider";
 import { WorkoutVictoryModal } from "@/components/ui/workout-victory-modal";
 import { WorkoutSummary } from "../components/WorkoutSummary";
 import { WorkoutLoadingState } from "@/components/ui/loading-spinner";
-import { EnhancedWorkoutTimer } from "@/components/ui/enhanced-workout-timer";
 
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -501,17 +500,17 @@ export default function WorkoutSession() {
 
   // Show workout summary if completed
   if (showSummary && completedSession && userStats) {
-    const leveledUp = completedSession.newLevel && completedSession.newLevel > (userStats?.level || 1);
+    const leveledUp = completedSession.newLevel && completedSession.newLevel > userStats.level;
     
     // Calculate XP to next level
-    const currentLevel = leveledUp ? completedSession.newLevel : (userStats?.level || 1);
-    const currentXP = leveledUp ? ((userStats?.experience || 0) + completedSession.xpEarned) : (userStats?.experience || 0);
+    const currentLevel = leveledUp ? completedSession.newLevel : userStats.level;
+    const currentXP = leveledUp ? (userStats.experience + completedSession.xpEarned) : userStats.experience;
     const xpForNextLevel = Math.floor(100 * Math.pow(1.5, currentLevel));
     const xpToNextLevel = xpForNextLevel - currentXP;
     
     return (
       <WorkoutSummary
-        workoutName={(workout as any)?.name || "Workout"}
+        workoutName={workout?.name || "Workout"}
         xpGained={completedSession.xpEarned || 0}
         currentLevel={currentLevel}
         currentXP={currentXP}
@@ -552,22 +551,6 @@ export default function WorkoutSession() {
       </div>
 
       <div className="max-w-md mx-auto p-6">
-
-        {/* Enhanced Workout Timer */}
-        <div className="mb-8 bg-card border border-border rounded-lg p-6">
-          <div className="text-center">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Workout Timer</h2>
-            <EnhancedWorkoutTimer
-              estimatedMinutes={(workout as any)?.estimatedDuration || 15}
-              onWorkoutComplete={(finalMinutes) => {
-                // This will be called when the timer completes the workout
-                setIsActive(false);
-                setShowRPESelection(true);
-              }}
-              shouldStop={!isActive} // Stop the timer when workout is finished
-            />
-          </div>
-        </div>
 
         {/* Minimalist Exercise Interface */}
         {exerciseData.length > 0 && currentExerciseIndex < exerciseData.length ? (
@@ -758,31 +741,34 @@ export default function WorkoutSession() {
 
 
             {/* Navigation Arrows */}
-            <div className="flex items-center justify-between mb-4 pt-4 pb-2">
+            <div className="flex items-center justify-center gap-6 pt-4 pb-2">
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
+                size="lg"
                 onClick={handlePreviousExercise}
                 disabled={currentExerciseIndex === 0 || isNavigating}
-                className="text-muted-foreground hover:text-foreground transition-all duration-200"
+                className="h-12 w-12 rounded-full p-0 border-2"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-6 h-6" />
               </Button>
               
-              <div className="text-center">
-                <div className="text-sm text-muted-foreground">
-                  {currentExerciseIndex + 1} of {exerciseData.length}
+              <div className="text-center min-w-[100px]">
+                <div className="text-lg font-semibold">
+                  {currentExerciseIndex + 1} / {exerciseData.length}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Exercise
                 </div>
               </div>
               
               <Button
-                variant="ghost"
-                size="sm"
+                variant="outline"
+                size="lg"
                 onClick={handleNextExercise}
                 disabled={currentExerciseIndex === exerciseData.length - 1 || isNavigating}
-                className="text-muted-foreground hover:text-foreground transition-all duration-200"
+                className="h-12 w-12 rounded-full p-0 border-2"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-6 h-6" />
               </Button>
             </div>
             
