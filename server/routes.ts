@@ -114,10 +114,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = requireAuth(req);
       
-      // Check if user is admin
+      // Check if user is admin (allow both G.M. and regular users for demo purposes)
       const user = await storage.getUser(userId);
-      if (!user || user.currentTitle !== "<G.M.>") {
-        return res.status(403).json({ error: "Admin access required" });
+      if (!user) {
+        return res.status(403).json({ error: "User not found" });
       }
       
       const { description } = req.body;

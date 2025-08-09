@@ -35,7 +35,9 @@ export default function DemoAdmin() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate magic link");
+        const errorData = await response.text();
+        console.error("Server response:", response.status, errorData);
+        throw new Error(`Server error: ${response.status} - ${errorData}`);
       }
 
       const data = await response.json();
@@ -46,9 +48,10 @@ export default function DemoAdmin() {
         description: "Demo access link has been created successfully.",
       });
     } catch (error) {
+      console.error("Magic link generation error:", error);
       toast({
-        title: "Generation Failed",
-        description: "Failed to generate magic link. Please try again.",
+        title: "Generation Failed", 
+        description: `Failed to generate magic link: ${error.message}`,
         variant: "destructive",
       });
     } finally {
