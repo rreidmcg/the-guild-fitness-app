@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Fit Guild – Workout & Battle Demo</title>
+<style>
+  :root{--bg:#0b0b0b;--fg:#f2f2f2;--muted:#b2b2b2;--brand:#e63946;--ghost:#262626;--card:#151515;}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:980px;margin:0 auto;padding:18px}
+  h1,h2{margin:.2rem 0 .6rem}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .card{background:var(--card);border:1px solid #1e1e1e;border-radius:12px;padding:16px;margin:12px 0}
+  input{background:#101010;color:var(--fg);border:1px solid #2a2a2a;border-radius:8px;padding:10px}
+  .btn{background:#262626;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer}
+  .btn.primary{background:var(--brand)}
+  .small{font-size:.9rem}
+
+  /* Workout timer */
+  #workout-timer{font:700 2rem/1.2 system-ui;letter-spacing:.5px}
+  #workout-timer.ok{color:#f2f2f2}
+  #workout-timer.soon{color:#ffd166}
+  #workout-timer.near{color:#ef476f}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:1000}
+  .modal{background:#141414;border:1px solid #2a2a2a;border-radius:12px;width:min(520px,92vw);padding:16px;color:#f2f2f2}
+  .modal h3{margin:0 0 .5rem}
+  .modal .row{margin:.75rem 0}
+  .modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:.5rem}
+
+  /* XP popup */
+  .xp-popup{position:fixed;left:50%;top:56px;transform:translateX(-50%);background:#1e1e1e;border:1px solid #2a2a2a;border-radius:10px;padding:10px 14px;z-index:1100;animation:rise-fade 1.2s ease-out forwards;pointer-events:none}
+  .xp-popup small{color:#b2b2b2;display:block;margin-top:2px}
+  @keyframes rise-fade{0%{opacity:0;transform:translate(-50%,8px)}10%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-24px)}}
+
+  /* Battle area */
+  .battle{display:grid;grid-template-columns:1fr;gap:10px}
+  .arena{position:relative;height:220px;background:linear-gradient(#0f0f0f,#121212);border:1px solid #1e1e1e;border-radius:12px;overflow:hidden}
+  .floor{position:absolute;left:0;right:0;bottom:0;height:60px;background:radial-gradient(ellipse at center,#202020 0%,#121212 70%);filter:blur(0.2px)}
+  .enemy{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);width:220px;height:140px;display:flex;align-items:center;justify-content:center}
+  .enemy-body{position:relative;width:120px;height:120px;border-radius:10px;background:#2b2b2b;border:2px solid #3a3a3a;box-shadow:inset 0 0 40px #1b1b1b}
+  .enemy-body.flash{animation:hit-flash .12s linear 1}
+  @keyframes hit-flash{0%{filter:brightness(1.0)}50%{filter:brightness(2.0)}100%{filter:brightness(1.0)}}
+
+  .hpbar{position:absolute;left:50%;top:10%;transform:translateX(-50%);width:260px;height:12px;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:6px;overflow:hidden}
+  .hpbar-fill{height:100%;width:100%;background:#06d6a0;transition:width .3s ease, background .2s ease}
+
+  /* Damage floats */
+  .dmg-float{position:absolute;left:50%;top:20%;transform:translateX(-50%);font:700 1.1rem/1 system-ui;color:#ffe066;text-shadow:0 1px 0 #000;animation:dmg-pop .8s ease-out forwards;pointer-events:none}
+  .dmg-float.crit{color:#ff4d6d}
+  .dmg-float.block{color:#8ecae6}
+  @keyframes dmg-pop{0%{opacity:0;transform:translate(-50%,0) scale(.8)}15%{opacity:1;transform:translate(-50%,-6px) scale(1)}100%{opacity:0;transform:translate(-50%,-28px) scale(1)}}
+
+  /* Pushback + dust */
+  .enemy.push{animation:push-back .22s ease-out 1}
+  @keyframes push-back{0%{transform:translate(-50%,-50%)}50%{transform:translate(calc(-50% - 16px),-50%)}100%{transform:translate(-50%,-50%)}}
+  .dust{position:absolute;bottom:12px;right:-12px;width:8px;height:8px;background:rgba(180,180,180,.25);border-radius:50%;filter:blur(1px);animation:dust-pop .4s ease-out forwards}
+  @keyframes dust-pop{0%{opacity:0;transform:translate(0,0) scale(.6)}60%{opacity:.9;transform:translate(10px,-6px) scale(1.2)}100%{opacity:0;transform:translate(18px,-10px) scale(1.4)}}
+
+  /* Enemy shake */
+  .shake{animation:shake .25s linear 1}
+  @keyframes shake{0%,100%{transform:translate(-50%,-50%)}20%{transform:translate(calc(-50% - 6px),-50%)}40%{transform:translate(calc(-50% + 6px),-50%)}60%{transform:translate(calc(-50% - 4px),-50%)}80%{transform:translate(calc(-50% + 4px),-50%)}}
+
+  /* Combo points */
+  .combo{display:flex;gap:6px;align-items:center}
+  .combo .pip{width:16px;height:16px;border-radius:50%;border:2px solid #555;background:transparent}
+  .combo .pip.full{background:#ffb703;border-color:#ffb703}
+  .combo .label{margin-left:6px;color:#ffb703;font-weight:700}
+  .quick-note{color:#ffd166;margin-left:8px}
+
+  /* Toast-ish note */
+  .note{color:#b2b2b2}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>The Fit Guild – Core Demo</h1>
+    <p class="muted small">All-in-one file: workout timer + battle with combo points, speed bonus, pushback, dust, and timed hit flash.</p>
+
+    <!-- WORKOUT -->
+    <section class="card">
+      <h2>Workout</h2>
+      <div class="row">
+        <label for="estMin">Estimated minutes:</label>
+        <input id="estMin" type="number" min="1" value="15" />
+        <button class="btn" onclick="LiveWorkout.start(Number(document.getElementById('estMin').value))">Begin Workout</button>
+        <button class="btn" id="stopBtn" onclick="LiveWorkout.stop()" disabled>Finish</button>
+        <span id="workout-status" class="note"></span>
+      </div>
+      <div id="workout-timer" class="ok" aria-live="polite">00:00</div>
+      <p class="muted small">Tip: Stop very early/late to see the confirmation prompt.</p>
+    </section>
+
+    <!-- BATTLE -->
+    <section class="card">
+      <h2>Dungeon Battle</h2>
+      <div class="battle">
+        <div class="arena" id="arena">
+          <div class="hpbar"><div id="enemyHpFill" class="hpbar-fill"></div></div>
+          <div class="enemy" id="enemy">
+            <div class="enemy-body" id="enemyBody"></div>
+          </div>
+          <div class="floor"></div>
+        </div>
+        <div class="row">
+          <div class="combo" aria-live="polite">
+            <div class="pip" id="cp1"></div>
+            <div class="pip" id="cp2"></div>
+            <div class="pip" id="cp3"></div>
+            <div class="pip" id="cp4"></div>
+            <div class="pip" id="cp5"></div>
+            <span class="label" id="cpLabel">Combo: 0</span>
+            <span class="quick-note" id="speedBonusNote" hidden>Speed bonus!</span>
+          </div>
+        </div>
+        <div class="row" style="gap:8px;">
+          <button class="btn primary" onclick="BattleUI.attack('quick')">Quick Attack</button>
+          <button class="btn" onclick="BattleUI.attack('heavy')">Heavy Attack</button>
+          <button class="btn" onclick="BattleUI.finisher()">Finisher</button>
+          <span class="note">Hit Quick repeatedly (≤700ms apart) to build combo & speed bonus.</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+  /* ======================= XP POPUP ======================= */
+  function showXpPopup(amount, base, mult) {
+    const el = document.createElement('div');
+    el.className = 'xp-popup';
+    el.innerHTML = `+${Math.round(amount)} XP${(base&&mult)?\`<small>Base \${base} × \${mult.toFixed(2)}×</small>\`:""}`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1300);
+  }
+
+  /* ======================= MODAL ======================= */
+  function showTimeConfirmModal({ actualMin, estimate, onConfirm }) {
+    const root = document.createElement('div');
+    root.className = 'modal-backdrop';
+    root.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+        <h3 id="m-title">Did this take about ${estimate} minutes?</h3>
+        <p>We recorded <strong>${actualMin.toFixed(1)} min</strong>, which is outside the normal range (½×–2× your estimate).</p>
+        <div class="row">
+          <label for="m-min">Edit minutes:</label>
+          <input id="m-min" type="number" min="1" step="1" value="${Math.round(estimate)}" />
+        </div>
+        <div class="actions">
+          <button id="m-use-actual" class="btn">Use ${actualMin.toFixed(1)} min</button>
+          <button id="m-use-est" class="btn">Use ${estimate} min</button>
+          <button id="m-save-edit" class="btn primary">Save edited</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(root);
+    const close = () => root.remove();
+    root.addEventListener('click', e => { if (e.target === root) close(); });
+    root.querySelector('#m-use-actual').onclick = () => (onConfirm(actualMin), close());
+    root.querySelector('#m-use-est').onclick   = () => (onConfirm(estimate), close());
+    root.querySelector('#m-save-edit').onclick = () => {
+      const v = Math.max(1, Number(root.querySelector('#m-min').value || estimate));
+      onConfirm(v); close();
+    };
+  }
+
+  /* ======================= WORKOUT ======================= */
+  const LiveWorkout = (() => {
+    let startTs = 0, est = 0, tmr = null;
+    const $timer = () => document.getElementById('workout-timer');
+    const $status= () => document.getElementById('workout-status');
+
+    function fmt(sec){ const m=Math.floor(sec/60), s=sec%60; return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
+
+    function tick(){
+      const sec = Math.max(0, Math.floor((Date.now()-startTs)/1000));
+      const el = $timer();
+      if (!el) return;
+      const pct = est ? (sec/60)/est : 0;
+      el.classList.remove('ok','soon','near');
+      el.classList.add(pct >= .9 ? 'near' : pct >= .5 ? 'soon' : 'ok');
+      el.textContent = fmt(sec);
+    }
+
+    async function saveWorkout(finalMinutes){
+      // TODO: swap with your API. This just shows XP feedback.
+      const base = Math.round(est * 5);      // ex: 5 XP per estimated minute
+      const streakMult = 1.0;                // set 1.5 if streak >= 3
+      const xp = base * streakMult;
+      showXpPopup(xp, base, streakMult);
+      const st = $status(); if (st) st.textContent = `Saved ${finalMinutes.toFixed(1)} min (estimate ${est} min).`;
+    }
+
+    return {
+      start(estimateMinutes){
+        if (tmr) clearInterval(tmr);
+        est = Math.max(1, Number(estimateMinutes||0));
+        startTs = Date.now();
+        tick();
+        tmr = setInterval(tick, 250);
+        document.getElementById('stopBtn').disabled = false;
+        const st = $status(); if (st) st.textContent = 'Running…';
+      },
+      async stop(){
+        if (!startTs) return;
+        clearInterval(tmr); tmr = null;
+        const actualMin = Math.max(0.1, (Date.now()-startTs)/60000);
+        const minOk = est*0.5, maxOk = est*2;
+
+        const finalize = async (finalMinutes)=>{
+          await saveWorkout(finalMinutes);
+          startTs = 0;
+          const el=$timer(); if (el){ el.classList.remove('soon','near'); el.classList.add('ok'); }
+          document.getElementById('stopBtn').disabled = true;
+        };
+
+        if (actualMin < minOk || actualMin > maxOk){
+          showTimeConfirmModal({ actualMin, estimate: est, onConfirm: finalize });
+        } else {
+          await finalize(actualMin);
+        }
+      }
+    };
+  })();
+
+  /* ======================= BATTLE W/ COMBO ======================= */
+  const BattleUI = (() => {
+    // Basic enemy stats
+    let maxHp = 350, hp = 350;
+
+    // Combo points like WoW Rogue (0..5)
+    let combo = 0, lastAttackTs = 0;
+    const comboCap = 5;
+
+    // Speed bonus if attacks are fast enough
+    const quickWindowMs = 700;     // time between attacks to count as "fast"
+    let speedBonusActive = false;
+    let speedStacks = 0;           // optional stacking up to 3
+    const speedMaxStacks = 3;
+    const speedPctPerStack = 0.1;  // +10% dmg per fast stack
+
+    const $ = sel => document.querySelector(sel);
+    const enemyEl = () => document.getElementById('enemy');
+    const bodyEl  = () => document.getElementById('enemyBody');
+    const hpFill  = () => document.getElementById('enemyHpFill');
+    const speedNote = () => document.getElementById('speedBonusNote');
+
+    function updateHpFill(){
+      const pct = Math.max(0, Math.min(1, hp/maxHp));
+      const fill = hpFill();
+      if (!fill) return;
+      fill.style.width = (pct*100).toFixed(1)+'%';
+      fill.style.background = pct > .5 ? '#06d6a0' : pct > .25 ? '#ffd166' : '#ef476f';
+    }
+
+    function setEnemy(hpValue){ maxHp = hpValue; hp = hpValue; updateHpFill(); }
+
+    function renderCombo(){
+      const pips = [$('#cp1'),$('#cp2'),$('#cp3'),$('#cp4'),$('#cp5')];
+      pips.forEach((p,i)=> (p && p.classList.toggle('full', i < combo)));
+      const lab = document.getElementById('cpLabel');
+      if (lab) lab.textContent = `Combo: ${combo}`;
+    }
+
+    function addDamageFloat(value, {crit=false, block=false}={}){
+      const host = enemyEl(); if (!host) return;
+      const d = document.createElement('div');
+      d.className = 'dmg-float' + (crit?' crit': block?' block':'');
+      d.textContent = block ? 'BLOCK' : (crit ? `CRIT ${value}` : `-${value}`);
+      host.appendChild(d);
+      setTimeout(()=>d.remove(), 850);
+    }
+
+    function pushbackAndDust(){
+      const e = enemyEl();
+      if (!e) return;
+      // retrigger animation
+      e.classList.remove('push'); void e.offsetWidth; e.classList.add('push');
+
+      // Dust burst
+      for (let i=0;i<3;i++){
+        const d = document.createElement('div');
+        d.className = 'dust';
+        e.appendChild(d);
+        setTimeout(()=>d.remove(), 420);
+      }
+    }
+
+    function hitFlashAt(whenMs=0){
+      // Flash timed with impact (delay = windup)
+      setTimeout(()=>{
+        const b = bodyEl(); if (!b) return;
+        b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
+      }, whenMs);
+    }
+
+    function shake(){
+      const e = enemyEl(); if (!e) return;
+      e.classList.remove('shake'); void e.offsetWidth; e.classList.add('shake');
+    }
+
+    function calcDamage(base, isFast){
+      // Speed stacks -> extra % per stack
+      const speedMult = 1 + (speedStacks * speedPctPerStack);
+      const comboMult = 1 + (combo * 0.2); // +20% per combo point
+      const fastBonus = isFast ? 1.1 : 1.0; // quick tap bonus
+      return Math.round(base * speedMult * comboMult * fastBonus);
+    }
+
+    function applyAttack({ base=20, windupMs=120, buildsCombo=true } = {}){
+      const now = Date.now();
+      const isFast = (now - lastAttackTs) <= quickWindowMs;
+      lastAttackTs = now;
+
+      // manage speed stacks
+      if (isFast){
+        speedStacks = Math.min(speedMaxStacks, speedStacks + 1);
+        speedBonusActive = true;
+      } else {
+        speedStacks = 0;
+        speedBonusActive = false;
+      }
+      if (speedNote()) speedNote().hidden = !speedBonusActive;
+
+      // build combo (capped)
+      if (buildsCombo) combo = Math.min(comboCap, combo + 1);
+      renderCombo();
+
+      // Windup, then impact: flash + damage + pushback + shake + float number
+      hitFlashAt(windupMs);
+      setTimeout(()=>{
+        const dmg = calcDamage(base, isFast);
+        hp = Math.max(0, hp - dmg);
+        updateHpFill();
+        addDamageFloat(dmg, {crit:false, block:false});
+        pushbackAndDust();
+        shake();
+        if (hp <= 0){
+          // Enemy defeated — reset for demo
+          setTimeout(()=>{ setEnemy(350); combo=0; speedStacks=0; speedBonusActive=false; renderCombo(); if (speedNote()) speedNote().hidden=true; }, 600);
+        }
+      }, windupMs);
+    }
+
+    function finisher(){
+      // Finisher consumes combo, deals more damage based on current combo
+      const base = 24 + combo * 12;   // scales with combo
+      const wind = 160;
+      // after finisher, combo resets
+      hitFlashAt(wind);
+      setTimeout(()=>{
+        const now = Date.now();
+        const isFast = (now - lastAttackTs) <= quickWindowMs;
+        lastAttackTs = now;
+
+        const dmg = calcDamage(base, isFast);
+        hp = Math.max(0, hp - dmg);
+        updateHpFill();
+        addDamageFloat(dmg, {crit:false});
+        pushbackAndDust(); shake();
+        combo = 0; renderCombo();
+        // keep speed bonus rules same as other attacks
+        if (isFast){
+          speedStacks = Math.min(speedMaxStacks, speedStacks + 1);
+          speedBonusActive = true;
+        } else {
+          speedStacks = 0; speedBonusActive = false;
+        }
+        if (speedNote()) speedNote().hidden = !speedBonusActive;
+        if (hp <= 0){
+          setTimeout(()=>{ setEnemy(350); combo=0; speedStacks=0; speedBonusActive=false; renderCombo(); if (speedNote()) speedNote().hidden=true; }, 600);
+        }
+      }, wind);
+    }
+
+    // Public API
+    return {
+      attack(type){
+        if (type === 'quick') {
+          applyAttack({ base: 16, windupMs: 90, buildsCombo: true });
+        } else if (type === 'heavy') {
+          applyAttack({ base: 28, windupMs: 180, buildsCombo: true });
+        }
+      },
+      finisher,
+      init(){ setEnemy(350); combo=0; speedStacks=0; speedBonusActive=false; renderCombo(); if (speedNote()) speedNote().hidden=true; }
+    };
+  })();
+
+  // init battle
+  BattleUI.init();
+  </script>
+</body>
+</html>
