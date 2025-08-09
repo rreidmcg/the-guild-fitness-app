@@ -60,9 +60,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Simple read-only viewer page 
   app.get("/api/viewer", (req, res) => {
     res.send(`<!doctype html>
-  // Simple read-only viewer page 
-  app.get("/api/viewer", (req, res) => {
-    res.send(\`<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -81,7 +78,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     <p>Features include RPG-style character progression, workout tracking, and gamification elements.</p>
   </div>
 </body>
-</html>\`);
+</html>`);
   });
 
   app.get("/api/viewer.json", (req, res) => {
@@ -133,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!result.valid) {
         if (result.expired) {
-          return res.status(410).send(\`
+          return res.status(410).send(`
             <html>
               <head><title>Demo Link Expired</title></head>
               <body style="font-family: Arial; text-align: center; padding: 50px;">
@@ -141,9 +138,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 <p>This demo link has expired. Please request a new one.</p>
               </body>
             </html>
-          \`);
+          `);
         }
-        return res.status(404).send(\`
+        return res.status(404).send(`
           <html>
             <head><title>Invalid Demo Link</title></head>
             <body style="font-family: Arial; text-align: center; padding: 50px;">
@@ -151,7 +148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               <p>This demo link is not valid or has already been used.</p>
             </body>
           </html>
-        \`);
+        `);
       }
       
       // Log in the demo user
@@ -162,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error) {
       console.error('Demo access error:', error);
-      return res.status(500).send(\`
+      return res.status(500).send(`
         <html>
           <head><title>Demo Error</title></head>
           <body style="font-family: Arial; text-align: center; padding: 50px;">
@@ -170,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             <p>There was an error accessing the demo. Please try again.</p>
           </body>
         </html>
-      \`);
+      `);
     }
   });
   
@@ -349,7 +346,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const programsWithStatus = programs.map(program => ({
         ...program,
         isPurchased: purchasedPrograms.includes(program.id.toString()) || program.price === 0,
-        priceFormatted: \`$\${(program.price / 100).toFixed(2)}\`
+        priceFormatted: `$${(program.price / 100).toFixed(2)}`
       }));
       
       res.json(programsWithStatus);
@@ -391,7 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         ...program,
         isPurchased,
-        priceFormatted: \`$\${(program.price / 100).toFixed(2)}\`
+        priceFormatted: `$${(program.price / 100).toFixed(2)}`
       });
     } catch (error) {
       console.error("Error fetching program details:", error);
@@ -665,7 +662,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         programId: sourceWorkout.programId,
         weekNumber: weekNumber || sourceWorkout.weekNumber,
         dayNumber: dayNumber || sourceWorkout.dayNumber,
-        name: name || \`\${sourceWorkout.name} (Copy)\`,
+        name: name || `${sourceWorkout.name} (Copy)`,
         description: sourceWorkout.description,
         exercises: sourceWorkout.exercises,
         notes: sourceWorkout.notes,
@@ -688,8 +685,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const formattedItems = items.map(item => ({
         ...item,
         priceFormatted: item.currency === 'usd' 
-          ? \`$\${(item.price / 100).toFixed(2)}\`
-          : \`\${item.price} 💎\`
+          ? `$${(item.price / 100).toFixed(2)}`
+          : `${item.price} 💎`
       }));
       
       res.json(formattedItems);
@@ -754,7 +751,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({ 
           success: true, 
           gemAmount: gemAmount,
-          message: \`\${gemAmount} gems added to your account!\` 
+          message: `${gemAmount} gems added to your account!` 
         });
       } else {
         res.status(400).json({ error: "Payment not completed" });
@@ -888,7 +885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create Stripe customer if doesn't exist
       if (!customerId) {
         const customer = await stripe.customers.create({
-          email: user.email || \`\${user.username}@fitness.app\`,
+          email: user.email || `${user.username}@fitness.app`,
           name: user.username,
           metadata: { userId: userId.toString() }
         });
@@ -3551,7 +3548,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         battleResult = 'victory';
         goldEarned = monster.goldReward || 25;
         
-        battleLog.push(\`\${monster.name} is defeated!\`);
+        battleLog.push(`${monster.name} is defeated!`);
         battleLog.push(`You gained ${goldEarned} gold!`);
         
         // Update user stats (only gold and battles won, no XP from battles)
@@ -3583,7 +3580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
       
-      battleLog.push(\`\${monster.name} attacks for \${actualMonsterDamage} damage!\`);
+      battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!`);
       
       if (newPlayerHp <= 0) {
         battleResult = 'defeat';
