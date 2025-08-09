@@ -33,6 +33,8 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **Fixed Atrophy System**: Resolved issue where XP was being lost on every app redeployment by removing atrophy processing from startup sequence
 - **Enhanced Atrophy Timing**: Modified atrophy system to require 2 consecutive days of inactivity before XP loss begins, providing more grace period for players
 - **Improved Streak Logic**: Strengthened streak advancement requirements to ensure minimum activity levels are met before advancing streaks
+- **Leaderboard GM Exclusion**: Successfully implemented filtering logic in storage layer to exclude GM accounts (Zero and Rob) from public leaderboards while preserving their admin functionality
+- **User Stat Initialization**: Fixed database schema so new users start with strength, stamina, and agility stats of 1 instead of 0, and updated existing users with proper baseline values
 
 ## User Preferences
 

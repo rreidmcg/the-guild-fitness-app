@@ -22,7 +22,7 @@ import {
   type AppRequest, type InsertAppRequest
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql, desc } from "drizzle-orm";
+import { eq, and, sql, desc, not } from "drizzle-orm";
 import { dailyResetService } from "./daily-reset-system.js";
 import { applyStreakBonus } from "./streak-bonus.js";
 
@@ -452,6 +452,11 @@ export class DatabaseStorage implements IStorage {
   async getLeaderboard(): Promise<User[]> {
     await this.ensureInitialized();
     return await db.select().from(users)
+      .where(and(
+        not(eq(users.username, 'Zero')),
+        not(eq(users.username, 'Rob')),
+        not(eq(users.isDemoAccount, true))
+      ))
       .orderBy(desc(users.experience))
       .limit(100);
   }
