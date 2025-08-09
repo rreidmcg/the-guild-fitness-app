@@ -226,6 +226,30 @@ export const dailyProgress = pgTable("daily_progress", {
   userDateIdx: uniqueIndex("user_date_idx").on(table.userId, table.date),
 }));
 
+// Fitness goal progress tracking
+export const fitnessGoalProgress = pgTable("fitness_goal_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  goalType: text("goal_type").notNull(), // "lose_weight", "gain_muscle", "improve_endurance", "general_fitness"
+  currentValue: integer("current_value").default(0),
+  targetValue: integer("target_value").notNull(),
+  unit: text("unit").notNull(), // "kg", "lbs", "percent", "minutes", "reps", "volume"
+  startDate: text("start_date").notNull(), // YYYY-MM-DD format
+  targetDate: text("target_date"), // YYYY-MM-DD format (optional)
+  isActive: boolean("is_active").default(true),
+  milestones: json("milestones").$type<Array<{
+    percentage: number; // 25, 50, 75, 100
+    value: number;
+    achieved: boolean;
+    achievedAt?: string; // YYYY-MM-DD format
+    reward?: string; // "xp_bonus", "title", "item"
+  }>>().default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userGoalIdx: uniqueIndex("user_goal_idx").on(table.userId, table.goalType),
+}));
+
 // Workout programs (structured fitness plans)
 export const workoutPrograms = pgTable("workout_programs", {
   id: serial("id").primaryKey(),
@@ -501,6 +525,12 @@ export const insertDailyProgressSchema = createInsertSchema(dailyProgress).omit(
   createdAt: true,
 });
 
+export const insertFitnessGoalProgressSchema = createInsertSchema(fitnessGoalProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertWorkoutProgramSchema = createInsertSchema(workoutPrograms).omit({
   id: true,
   createdAt: true,
@@ -566,6 +596,8 @@ export type PlayerInventory = typeof playerInventory.$inferSelect;
 export type InsertPlayerInventory = z.infer<typeof insertPlayerInventorySchema>;
 export type DailyProgress = typeof dailyProgress.$inferSelect;
 export type InsertDailyProgress = z.infer<typeof insertDailyProgressSchema>;
+export type FitnessGoalProgress = typeof fitnessGoalProgress.$inferSelect;
+export type InsertFitnessGoalProgress = z.infer<typeof insertFitnessGoalProgressSchema>;
 export type WorkoutPreferences = typeof workoutPreferences.$inferSelect;
 export type InsertWorkoutPreferences = z.infer<typeof insertWorkoutPreferencesSchema>;
 export type WorkoutRecommendation = typeof workoutRecommendations.$inferSelect;

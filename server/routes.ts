@@ -2509,6 +2509,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fitness Goal Progress endpoints
+  app.get("/api/fitness-goals", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); 
+      if (!userId) { 
+        return res.status(401).json({ error: "Authentication required" }); 
+      }
+      
+      const goals = await storage.getUserFitnessGoals(userId);
+      res.json(goals);
+    } catch (error) {
+      console.error("Error fetching fitness goals:", error);
+      res.status(500).json({ error: "Failed to fetch fitness goals" });
+    }
+  });
+
+  app.post("/api/fitness-goals", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); 
+      if (!userId) { 
+        return res.status(401).json({ error: "Authentication required" }); 
+      }
+      
+      const { goalType, targetValue, unit, targetDate } = req.body;
+      
+      if (!goalType || !targetValue || !unit) {
+        return res.status(400).json({ error: "Goal type, target value, and unit are required" });
+      }
+      
+      const validGoalTypes = ["lose_weight", "gain_muscle", "improve_endurance", "general_fitness"];
+      if (!validGoalTypes.includes(goalType)) {
+        return res.status(400).json({ error: "Invalid goal type" });
+      }
+      
+      const goalData = {
+        userId,
+        goalType,
+        targetValue: parseInt(targetValue),
+        unit,
+        startDate: new Date().toISOString().split('T')[0],
+        targetDate: targetDate || null,
+        currentValue: 0,
+        isActive: true,
+      };
+      
+      const newGoal = await storage.createFitnessGoal(goalData);
+      res.json(newGoal);
+    } catch (error) {
+      console.error("Error creating fitness goal:", error);
+      res.status(500).json({ error: "Failed to create fitness goal" });
+    }
+  });
+
+  app.put("/api/fitness-goals/:goalId", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); 
+      if (!userId) { 
+        return res.status(401).json({ error: "Authentication required" }); 
+      }
+      
+      const goalId = parseInt(req.params.goalId);
+      if (isNaN(goalId)) {
+        return res.status(400).json({ error: "Invalid goal ID" });
+      }
+      
+      const updates = req.body;
+      const updatedGoal = await storage.updateFitnessGoal(goalId, updates);
+      res.json(updatedGoal);
+    } catch (error) {
+      console.error("Error updating fitness goal:", error);
+      res.status(500).json({ error: "Failed to update fitness goal" });
+    }
+  });
+
+  app.post("/api/fitness-goals/update-progress", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); 
+      if (!userId) { 
+        return res.status(401).json({ error: "Authentication required" }); 
+      }
+      
+      const { goalType, currentValue } = req.body;
+      
+      if (!goalType || currentValue === undefined) {
+        return res.status(400).json({ error: "Goal type and current value are required" });
+      }
+      
+      const updatedGoal = await storage.updateGoalProgress(userId, goalType, parseInt(currentValue));
+      
+      if (!updatedGoal) {
+        return res.status(404).json({ error: "Active goal not found for this goal type" });
+      }
+      
+      // Check for milestone achievements
+      const milestoneResults = await storage.checkGoalMilestones(userId, updatedGoal.id);
+      
+      res.json({
+        goal: updatedGoal,
+        milestones: milestoneResults
+      });
+    } catch (error) {
+      console.error("Error updating goal progress:", error);
+      res.status(500).json({ error: "Failed to update goal progress" });
+    }
+  });
+
+  app.get("/api/fitness-goals/analytics", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); 
+      if (!userId) { 
+        return res.status(401).json({ error: "Authentication required" }); 
+      }
+      
+      const analytics = await storage.getFitnessGoalAnalytics(userId);
+      res.json(analytics);
+    } catch (error) {
+      console.error("Error fetching fitness goal analytics:", error);
+      res.status(500).json({ error: "Failed to fetch fitness goal analytics" });
+    }
+  });
+
   // Inventory endpoints
   app.get("/api/inventory", async (req, res) => {
     const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); } // Use the current logged-in user

@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, userExercisePreferences, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, userExercisePreferences, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, fitnessGoalProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -10,6 +10,7 @@ import {
   type WardrobeItem, type InsertWardrobeItem,
   type UserWardrobe, type InsertUserWardrobe,
   type DailyProgress, type InsertDailyProgress,
+  type FitnessGoalProgress, type InsertFitnessGoalProgress,
   type PlayerMail, type InsertPlayerMail,
   type Achievement, type InsertAchievement,
   type UserAchievement, type InsertUserAchievement,
@@ -128,6 +129,21 @@ export interface IStorage {
   updateDailyProgress(userId: number, date: string, updates: Partial<DailyProgress>): Promise<DailyProgress>;
   toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }>;
   completeDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep'): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean }>;
+
+  // Fitness goal progress operations
+  getUserFitnessGoals(userId: number): Promise<FitnessGoalProgress[]>;
+  createFitnessGoal(goal: InsertFitnessGoalProgress): Promise<FitnessGoalProgress>;
+  updateFitnessGoal(goalId: number, updates: Partial<FitnessGoalProgress>): Promise<FitnessGoalProgress>;
+  updateGoalProgress(userId: number, goalType: string, currentValue: number): Promise<FitnessGoalProgress | null>;
+  checkGoalMilestones(userId: number, goalId: number): Promise<{ achieved: any[], rewards: any[] }>;
+  getFitnessGoalAnalytics(userId: number): Promise<{
+    weeklyProgress: any[];
+    monthlyProgress: any[];
+    goalAchievements: any[];
+    strengthTrend: number[];
+    staminaTrend: number[];
+    agilityTrend: number[];
+  }>;
 
   // Mail system operations
   getPlayerMail(userId: number): Promise<PlayerMail[]>;
@@ -1777,6 +1793,178 @@ Start your fitness journey today and watch your character grow stronger with eve
     };
 
     await this.createPlayerMail(welcomeMail);
+  }
+
+  // Fitness goal progress operations
+  async getUserFitnessGoals(userId: number): Promise<FitnessGoalProgress[]> {
+    const results = await db.select()
+      .from(fitnessGoalProgress)
+      .where(eq(fitnessGoalProgress.userId, userId))
+      .orderBy(desc(fitnessGoalProgress.createdAt));
+    
+    return results;
+  }
+
+  async createFitnessGoal(goal: InsertFitnessGoalProgress): Promise<FitnessGoalProgress> {
+    const [newGoal] = await db.insert(fitnessGoalProgress)
+      .values({
+        ...goal,
+        milestones: [
+          { percentage: 25, value: Math.floor(goal.targetValue * 0.25), achieved: false },
+          { percentage: 50, value: Math.floor(goal.targetValue * 0.5), achieved: false },
+          { percentage: 75, value: Math.floor(goal.targetValue * 0.75), achieved: false },
+          { percentage: 100, value: goal.targetValue, achieved: false },
+        ]
+      })
+      .returning();
+    
+    return newGoal;
+  }
+
+  async updateFitnessGoal(goalId: number, updates: Partial<FitnessGoalProgress>): Promise<FitnessGoalProgress> {
+    const [updatedGoal] = await db.update(fitnessGoalProgress)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(fitnessGoalProgress.id, goalId))
+      .returning();
+    
+    return updatedGoal;
+  }
+
+  async updateGoalProgress(userId: number, goalType: string, currentValue: number): Promise<FitnessGoalProgress | null> {
+    const [goal] = await db.select()
+      .from(fitnessGoalProgress)
+      .where(and(
+        eq(fitnessGoalProgress.userId, userId),
+        eq(fitnessGoalProgress.goalType, goalType),
+        eq(fitnessGoalProgress.isActive, true)
+      ));
+
+    if (!goal) return null;
+
+    const [updatedGoal] = await db.update(fitnessGoalProgress)
+      .set({ currentValue, updatedAt: new Date() })
+      .where(eq(fitnessGoalProgress.id, goal.id))
+      .returning();
+
+    return updatedGoal;
+  }
+
+  async checkGoalMilestones(userId: number, goalId: number): Promise<{ achieved: any[], rewards: any[] }> {
+    const [goal] = await db.select()
+      .from(fitnessGoalProgress)
+      .where(eq(fitnessGoalProgress.id, goalId));
+
+    if (!goal) return { achieved: [], rewards: [] };
+
+    const achieved: any[] = [];
+    const rewards: any[] = [];
+    const updatedMilestones = goal.milestones?.map(milestone => {
+      if (!milestone.achieved && goal.currentValue >= milestone.value) {
+        milestone.achieved = true;
+        milestone.achievedAt = new Date().toISOString().split('T')[0];
+        achieved.push(milestone);
+        
+        // Award milestone rewards
+        const xpReward = Math.floor(milestone.percentage * 2); // 50 XP for 25%, 100 XP for 50%, etc.
+        rewards.push({ type: 'xp', value: xpReward });
+      }
+      return milestone;
+    }) || [];
+
+    if (achieved.length > 0) {
+      await db.update(fitnessGoalProgress)
+        .set({ milestones: updatedMilestones, updatedAt: new Date() })
+        .where(eq(fitnessGoalProgress.id, goalId));
+
+      // Award XP to user
+      for (const reward of rewards) {
+        if (reward.type === 'xp') {
+          await this.updateUserStats(userId, { experience: sql`experience + ${reward.value}` });
+        }
+      }
+    }
+
+    return { achieved, rewards };
+  }
+
+  async getFitnessGoalAnalytics(userId: number): Promise<{
+    weeklyProgress: any[];
+    monthlyProgress: any[];
+    goalAchievements: any[];
+    strengthTrend: number[];
+    staminaTrend: number[];
+    agilityTrend: number[];
+  }> {
+    // Get recent workout sessions for trends
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const sessions = await db.select()
+      .from(workoutSessions)
+      .where(and(
+        eq(workoutSessions.userId, userId),
+        sql`${workoutSessions.completedAt} >= ${thirtyDaysAgo.toISOString()}`
+      ))
+      .orderBy(workoutSessions.completedAt);
+
+    // Calculate weekly/monthly progress
+    const weeklyProgress: any[] = [];
+    const monthlyProgress: any[] = [];
+    
+    // Group sessions by week and month
+    const sessionsByWeek = new Map();
+    const sessionsByMonth = new Map();
+    
+    sessions.forEach(session => {
+      const date = new Date(session.completedAt!);
+      const weekKey = `${date.getFullYear()}-W${Math.ceil(date.getDate() / 7)}`;
+      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+      
+      if (!sessionsByWeek.has(weekKey)) {
+        sessionsByWeek.set(weekKey, { workouts: 0, totalXp: 0, totalVolume: 0 });
+      }
+      if (!sessionsByMonth.has(monthKey)) {
+        sessionsByMonth.set(monthKey, { workouts: 0, totalXp: 0, totalVolume: 0 });
+      }
+      
+      sessionsByWeek.get(weekKey).workouts++;
+      sessionsByWeek.get(weekKey).totalXp += session.xpEarned || 0;
+      sessionsByWeek.get(weekKey).totalVolume += session.totalVolume || 0;
+      
+      sessionsByMonth.get(monthKey).workouts++;
+      sessionsByMonth.get(monthKey).totalXp += session.xpEarned || 0;
+      sessionsByMonth.get(monthKey).totalVolume += session.totalVolume || 0;
+    });
+
+    sessionsByWeek.forEach((data, week) => {
+      weeklyProgress.push({ period: week, ...data });
+    });
+    
+    sessionsByMonth.forEach((data, month) => {
+      monthlyProgress.push({ period: month, ...data });
+    });
+
+    // Get goal achievements
+    const goals = await this.getUserFitnessGoals(userId);
+    const goalAchievements = goals.map(goal => ({
+      goalType: goal.goalType,
+      progress: Math.min(100, (goal.currentValue / goal.targetValue) * 100),
+      milestones: goal.milestones?.filter(m => m.achieved) || []
+    }));
+
+    // Calculate stat trends (simplified)
+    const strengthTrend = sessions.map(s => s.statsEarned?.strength || 0);
+    const staminaTrend = sessions.map(s => s.statsEarned?.stamina || 0);
+    const agilityTrend = sessions.map(s => s.statsEarned?.agility || 0);
+
+    return {
+      weeklyProgress,
+      monthlyProgress,
+      goalAchievements,
+      strengthTrend,
+      staminaTrend,
+      agilityTrend
+    };
   }
 }
 

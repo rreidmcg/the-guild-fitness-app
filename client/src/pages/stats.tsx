@@ -36,6 +36,8 @@ import {
   Shirt
 } from "lucide-react";
 import { CompactAchievementCard } from "@/components/ui/compact-achievement-card";
+import { FitnessGoalProgress } from "@/components/ui/fitness-goal-progress";
+import { FitnessAnalyticsDashboard } from "@/components/ui/fitness-analytics-dashboard";
 
 export default function Stats() {
   const navigate = useNavigate();
@@ -414,41 +416,94 @@ export default function Stats() {
           />
         )}
 
-        {/* Personal Records */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
-              <TrendingUp className="w-5 h-5 text-primary" />
+        {/* Tab Navigation */}
+        <Card className="bg-card border-border mb-6">
+          <CardContent className="p-0">
+            <div className="flex border-b border-border">
+              <button
+                onClick={() => setStatsPageState(prev => ({ ...prev, selectedTab: 'overview' }))}
+                className={`px-6 py-3 font-medium transition-colors ${
+                  statsPageState.selectedTab === 'overview'
+                    ? 'text-primary border-b-2 border-primary bg-background'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setStatsPageState(prev => ({ ...prev, selectedTab: 'goals' }))}
+                className={`px-6 py-3 font-medium transition-colors ${
+                  statsPageState.selectedTab === 'goals'
+                    ? 'text-primary border-b-2 border-primary bg-background'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Target className="w-4 h-4 mr-2 inline" />
+                Fitness Goals
+              </button>
+              <button
+                onClick={() => setStatsPageState(prev => ({ ...prev, selectedTab: 'analytics' }))}
+                className={`px-6 py-3 font-medium transition-colors ${
+                  statsPageState.selectedTab === 'analytics'
+                    ? 'text-primary border-b-2 border-primary bg-background'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <ChartLine className="w-4 h-4 mr-2 inline" />
+                Analytics
+              </button>
             </div>
-          </CardHeader>
-          <CardContent>
-            {topRecords.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No personal records yet. Complete workouts to set PRs!</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {topRecords.map((record) => (
-                  <Card key={record.id} className="bg-secondary border-border">
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <Trophy className="w-4 h-4 text-yellow-500" />
-                        <h3 className="font-semibold text-foreground">Exercise #{record.exerciseId}</h3>
-                      </div>
-                      <div className="text-2xl font-bold text-primary">{record.value}</div>
-                      <p className="text-sm text-muted-foreground">{record.recordType}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {record.achievedAt ? new Date(record.achievedAt).toLocaleDateString() : 'N/A'}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
           </CardContent>
         </Card>
+
+        {/* Tab Content */}
+        {statsPageState.selectedTab === 'overview' && (
+          <>
+            {/* Personal Records */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-bold text-foreground">Personal Records</CardTitle>
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                {topRecords.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Trophy className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No personal records yet. Complete workouts to set PRs!</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {topRecords.map((record) => (
+                      <Card key={record.id} className="bg-secondary border-border">
+                        <CardContent className="p-4">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <Trophy className="w-4 h-4 text-yellow-500" />
+                            <h3 className="font-semibold text-foreground">Exercise #{record.exerciseId}</h3>
+                          </div>
+                          <div className="text-2xl font-bold text-primary">{record.value}</div>
+                          <p className="text-sm text-muted-foreground">{record.recordType}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {record.achievedAt ? new Date(record.achievedAt).toLocaleDateString() : 'N/A'}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {statsPageState.selectedTab === 'goals' && (
+          <FitnessGoalProgress />
+        )}
+
+        {statsPageState.selectedTab === 'analytics' && (
+          <FitnessAnalyticsDashboard />
+        )}
 
 
       </div>
