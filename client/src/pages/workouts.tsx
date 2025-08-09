@@ -164,7 +164,7 @@ export default function Workouts() {
 
   const recentSessions = (workoutSessions || []).slice(0, 5);
   const programs = workoutPrograms || [];
-  const myCustomWorkouts = customWorkouts || [];
+  const myCustomWorkouts = (customWorkouts as any[]) || [];
   const myPurchasedPrograms = programs.filter((program: any) => program.isPurchased);
   // Filter out owned programs from the main programs list
   const availablePrograms = programs.filter((program: any) => !program.isPurchased);
@@ -491,55 +491,57 @@ export default function Workouts() {
           </CardContent>
         </Card>
 
-        {/* Programs */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <div className="flex items-center justify-between mb-3">
-              <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
-                <FileText className="w-5 h-5 text-amber-500" />
-                Programs
-              </CardTitle>
-              <Button 
-                onClick={() => navigate('/workout-builder')}
-                size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white"
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                Program
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {myPurchasedPrograms.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Crown className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-semibold mb-2 text-foreground">No programs yet</h3>
-                <p className="mb-4">Purchase professional workout programs from the shop.</p>
+        {/* Programs - Only visible to Zero */}
+        {userStats?.username === "Zero" && (
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between mb-3">
+                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-amber-500" />
+                  Programs
+                </CardTitle>
+                <Button 
+                  onClick={() => navigate('/workout-builder')}
+                  size="sm"
+                  className="bg-amber-600 hover:bg-amber-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Program
+                </Button>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {myPurchasedPrograms.map((program: any) => (
-                  <Card 
-                    key={program.id} 
-                    className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 hover:border-amber-400/40 transition-colors cursor-pointer"
-                    onClick={() => handleStartProgram(program)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="mb-3">
-                        <h3 className="font-semibold text-foreground">{program.name}</h3>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="bg-amber-500/20 text-amber-600 px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
-                        <span className="text-muted-foreground font-medium">{program.durationWeeks} weeks</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {myPurchasedPrograms.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Crown className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-semibold mb-2 text-foreground">No programs yet</h3>
+                  <p className="mb-4">Purchase professional workout programs from the shop.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {myPurchasedPrograms.map((program: any) => (
+                    <Card 
+                      key={program.id} 
+                      className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 hover:border-amber-400/40 transition-colors cursor-pointer"
+                      onClick={() => handleStartProgram(program)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="mb-3">
+                          <h3 className="font-semibold text-foreground">{program.name}</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{program.description}</p>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="bg-amber-500/20 text-amber-600 px-2 py-1 rounded font-medium">{program.difficultyLevel}</span>
+                          <span className="text-muted-foreground font-medium">{program.durationWeeks} weeks</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
 
 
@@ -605,14 +607,14 @@ export default function Workouts() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-semibold text-foreground mb-1">
-                          {session.workoutName || "Custom Workout"}
+                          {(session as any).workoutName || "Custom Workout"}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(session.completedAt).toLocaleDateString('en-US', {
+                          {session.completedAt && new Date(session.completedAt).toLocaleDateString('en-US', {
                             weekday: 'short',
                             month: 'short', 
                             day: 'numeric'
-                          })}
+                          }) || 'Unknown date'}
                         </p>
                       </div>
                       <div className="text-right">

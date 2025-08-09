@@ -339,6 +339,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/workout-programs", async (req, res) => {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
+      
       const programs = await storage.getAllWorkoutPrograms();
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
       
@@ -360,6 +367,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/workout-programs/:id", async (req, res) => {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
+      
       const param = req.params.id;
       
       let program;
@@ -401,6 +415,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const programId = parseInt(req.params.id);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
       
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
+      
       // Get program details first to check if it's free
       const program = await storage.getWorkoutProgram(programId);
       if (!program) {
@@ -429,6 +449,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const programId = req.params.id;
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
       
       // Check if already purchased
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
@@ -502,6 +528,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const workoutId = parseInt(req.params.workoutId);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
       
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
+      
       const workout = await storage.getProgramWorkout(workoutId);
       if (!workout) {
         return res.status(404).json({ error: "Program workout not found" });
@@ -533,6 +565,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const programId = parseInt(req.params.programId);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
       
       const validationResult = insertProgramWorkoutSchema.safeParse({
         ...req.body,
@@ -571,6 +609,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const workoutId = parseInt(req.params.workoutId);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
       
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
+      
       // Get existing workout to verify ownership
       const existingWorkout = await storage.getProgramWorkout(workoutId);
       if (!existingWorkout) {
@@ -604,6 +648,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const workoutId = parseInt(req.params.workoutId);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
       
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
+      
       // Get existing workout to verify ownership
       const existingWorkout = await storage.getProgramWorkout(workoutId);
       if (!existingWorkout) {
@@ -636,6 +686,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const workoutId = parseInt(req.params.workoutId);
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      
+      // Only allow Zero to access workout programs for now
+      const user = await storage.getUser(userId);
+      if (!user || user.username !== "Zero") {
+        return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
       const { weekNumber, dayNumber, name } = req.body;
       
       // Get source workout
