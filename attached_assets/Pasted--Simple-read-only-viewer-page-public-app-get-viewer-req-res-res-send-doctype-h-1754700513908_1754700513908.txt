@@ -1,0 +1,84 @@
+// Simple read-only viewer page (public)
+app.get("/viewer", (req, res) => {
+  res.send(`
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>The Fit Guild – Viewer Demo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body { font-family: system-ui, sans-serif; padding: 20px; background: #0b0b0b; color: #f2f2f2; }
+  h1 { color: #e63946; }
+  section { margin-bottom: 2rem; }
+  .card { background: #151515; padding: 1rem; border-radius: 8px; }
+  ul { list-style: none; padding: 0; }
+  li { margin-bottom: 0.5rem; }
+  strong { color: #fff; }
+</style>
+</head>
+<body>
+<h1>📜 The Fit Guild – Read-Only Demo</h1>
+
+<section>
+  <h2>👤 Account</h2>
+  <div class="card">
+    <p><strong>Username:</strong> demo_viewer</p>
+    <p><strong>Level:</strong> 12</p>
+    <p><strong>XP:</strong> 4,560 / 5,000</p>
+    <p><strong>Streak:</strong> 5 days (🔥 1.5× bonus active)</p>
+  </div>
+</section>
+
+<section>
+  <h2>💪 Last Workouts</h2>
+  <div class="card">
+    <ul>
+      <li>Full-body Strength – 48 min – +120 XP</li>
+      <li>Zone 2 Run – 32 min – +80 XP</li>
+      <li>HIIT Circuit – 22 min – +90 XP</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>🗡 Dungeon Progress</h2>
+  <div class="card">
+    <p><strong>Current dungeon:</strong> Goblin Mines – Floor 3/5</p>
+    <p><strong>Boss titles earned:</strong> Goblin Slayer, Orc Breaker</p>
+    <p><strong>Potions:</strong> 2x Health, 1x Stamina</p>
+  </div>
+</section>
+
+<section>
+  <h2>🏆 Leaderboard (Top 5)</h2>
+  <div class="card">
+    <ol>
+      <li>PlayerOne – 12,450 XP</li>
+      <li>FitnessFury – 11,980 XP</li>
+      <li>demo_viewer – 4,560 XP</li>
+      <li>LevelGrinder – 3,200 XP</li>
+      <li>QuestQueen – 2,880 XP</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <h2>🛒 Shop</h2>
+  <div class="card">
+    <ul>
+      <li>Founder Bundle – Unlocked ✅</li>
+      <li>Dragon Slayer Armor – 2,000 gold</li>
+      <li>XP Boost Potion – 500 gold</li>
+    </ul>
+  </div>
+</section>
+
+<footer style="margin-top:3rem; font-size:0.85rem; color:#b2b2b2;">
+  <p>Viewer mode: static demo data – no actions can be taken.</p>
+</footer>
+
+</body>
+</html>
+  `);
+});
