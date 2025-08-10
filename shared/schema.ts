@@ -221,6 +221,11 @@ export const dailyProgress = pgTable("daily_progress", {
   sleep: boolean("sleep").default(false), // New sleep quest (7+ hours)
   xpAwarded: boolean("xp_awarded").default(false), // Track if 5 XP was already given
   streakFreezeAwarded: boolean("streak_freeze_awarded").default(false), // Track if streak freeze was given
+  // Track individual XP amounts to prevent double XP exploit
+  hydrationXp: integer("hydration_xp").default(0), // XP awarded for hydration quest
+  stepsXp: integer("steps_xp").default(0), // XP awarded for steps quest  
+  proteinXp: integer("protein_xp").default(0), // XP awarded for protein quest
+  sleepXp: integer("sleep_xp").default(0), // XP awarded for sleep quest
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   userDateIdx: uniqueIndex("user_date_idx").on(table.userId, table.date),

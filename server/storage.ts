@@ -864,6 +864,12 @@ export class DatabaseStorage implements IStorage {
             experience: (user.experience ?? 0) + streakBonus.finalXp
           });
           
+          // Record the exact XP amount awarded for this quest to prevent double XP exploit
+          const xpColumnName = `${questType}Xp` as const;
+          await this.updateDailyProgress(userId, today, {
+            [xpColumnName]: streakBonus.finalXp
+          });
+          
           // Record activity to prevent atrophy
           const { AtrophySystem } = await import("./atrophy-system.js");
           await AtrophySystem.recordActivity(userId);
@@ -909,13 +915,23 @@ export class DatabaseStorage implements IStorage {
           });
         }
       } else {
-        // UNCHECKING A QUEST - Remove XP for individual quest (with original streak bonus that was applied)
+        // UNCHECKING A QUEST - Remove the exact XP amount that was originally awarded for this quest
         const user = await this.getUser(userId);
         if (user) {
-          const streakBonus = applyStreakBonus(5, user.currentStreak ?? 0);
-          await this.updateUser(userId, {
-            experience: Math.max(0, (user.experience ?? 0) - streakBonus.finalXp)
-          });
+          // Get the original XP amount that was awarded for this specific quest
+          const xpColumnName = `${questType}Xp` as const;
+          const originalXpAwarded = updatedProgress[xpColumnName] || 0;
+          
+          if (originalXpAwarded > 0) {
+            await this.updateUser(userId, {
+              experience: Math.max(0, (user.experience ?? 0) - originalXpAwarded)
+            });
+            
+            // Clear the tracked XP amount since quest is no longer completed
+            await this.updateDailyProgress(userId, today, {
+              [xpColumnName]: 0
+            });
+          }
           
           // Remove bonus XP if it was awarded and we no longer have all 4 quests
           if (previousAllCompleted && !allCompleted && wasXpAwarded) {
