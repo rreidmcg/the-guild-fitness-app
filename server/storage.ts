@@ -814,141 +814,152 @@ export class DatabaseStorage implements IStorage {
   async toggleDailyQuest(userId: number, questType: 'hydration' | 'steps' | 'protein' | 'sleep', completed: boolean): Promise<{ completed: boolean; xpAwarded: boolean; streakFreezeAwarded: boolean; xpRemoved?: boolean; streakFreezeRemoved?: boolean }> {
     await this.ensureInitialized();
     
-    // Get user's timezone for proper daily reset
-    const user = await this.getUser(userId);
-    const userTimezone = user?.timezone || undefined;
-    
-    // Check and perform daily reset if needed
-    await dailyResetService.checkAndResetDailyQuests(userId, userTimezone);
-    
-    // Use user's timezone to get current date
-    const today = dailyResetService.getCurrentDateForUser(userTimezone);
-    
-    // Get or create today's progress
-    let progress = await this.getDailyProgress(userId, today);
-    if (!progress) {
-      progress = await this.updateDailyProgress(userId, today, {});
-    }
-    
-    // Store previous state
-    const previousAllCompleted = progress.hydration && progress.steps && progress.protein && progress.sleep;
-    const previousTwoOrMoreCompleted = [progress.hydration, progress.steps, progress.protein, progress.sleep].filter(Boolean).length >= 2;
-    const wasXpAwarded = progress.xpAwarded;
-    const wasStreakFreezeAwarded = progress.streakFreezeAwarded;
-    
-    // Update the specific quest state
-    const updatedProgress = await this.updateDailyProgress(userId, today, {
-      [questType]: completed
-    });
-    
-    // Check completion states after this change
-    const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein && updatedProgress.sleep;
-    const twoOrMoreCompleted = [updatedProgress.hydration, updatedProgress.steps, updatedProgress.protein, updatedProgress.sleep].filter(Boolean).length >= 2;
-    let xpAwarded = false;
-    let streakFreezeAwarded = false;
-    let xpRemoved = false;
-    let streakFreezeRemoved = false;
-    
-    if (completed) {
-      // COMPLETING A QUEST - Award 5 XP for individual quest completion with streak bonus
+    try {
+      console.log(`[toggleDailyQuest] Starting for user ${userId}, quest: ${questType}, completed: ${completed}`);
+      
+      // Get user's timezone for proper daily reset
       const user = await this.getUser(userId);
-      if (user) {
-        const streakBonus = applyStreakBonus(5, user.currentStreak ?? 0);
-        await this.updateUser(userId, {
-          experience: (user.experience ?? 0) + streakBonus.finalXp
-        });
-        
-        // Record activity to prevent atrophy
-        const { AtrophySystem } = await import("./atrophy-system.js");
-        await AtrophySystem.recordActivity(userId);
+      if (!user) {
+        throw new Error(`User ${userId} not found`);
+      }
+      const userTimezone = user?.timezone || undefined;
+      
+      // Check and perform daily reset if needed
+      await dailyResetService.checkAndResetDailyQuests(userId, userTimezone);
+      
+      // Use user's timezone to get current date
+      const today = dailyResetService.getCurrentDateForUser(userTimezone);
+      
+      // Get or create today's progress
+      let progress = await this.getDailyProgress(userId, today);
+      if (!progress) {
+        progress = await this.updateDailyProgress(userId, today, {});
       }
       
-      // Award additional 5 XP bonus for completing all daily quests
-      if (allCompleted && !updatedProgress.xpAwarded) {
-        const updatedUser = await this.getUser(userId); // Get updated user data
-        if (updatedUser) {
-          const bonusStreakBonus = applyStreakBonus(5, updatedUser.currentStreak ?? 0);
-          await this.updateUser(userId, {
-            experience: (updatedUser.experience ?? 0) + bonusStreakBonus.finalXp // Add bonus XP with streak multiplier
-          });
-          
-          // Mark bonus XP as awarded
-          await this.updateDailyProgress(userId, today, {
-            xpAwarded: true
-          });
-          xpAwarded = true;
-        }
-      }
+      // Store previous state
+      const previousAllCompleted = progress.hydration && progress.steps && progress.protein && progress.sleep;
+      const previousTwoOrMoreCompleted = [progress.hydration, progress.steps, progress.protein, progress.sleep].filter(Boolean).length >= 2;
+      const wasXpAwarded = progress.xpAwarded;
+      const wasStreakFreezeAwarded = progress.streakFreezeAwarded;
       
-      if (twoOrMoreCompleted && !updatedProgress.streakFreezeAwarded) {
-        // Award streak freeze if user has less than 2 (requires 2 of 4 quests)
+      // Update the specific quest state
+      const updatedProgress = await this.updateDailyProgress(userId, today, {
+        [questType]: completed
+      });
+      
+      // Check completion states after this change
+      const allCompleted = updatedProgress.hydration && updatedProgress.steps && updatedProgress.protein && updatedProgress.sleep;
+      const twoOrMoreCompleted = [updatedProgress.hydration, updatedProgress.steps, updatedProgress.protein, updatedProgress.sleep].filter(Boolean).length >= 2;
+      let xpAwarded = false;
+      let streakFreezeAwarded = false;
+      let xpRemoved = false;
+      let streakFreezeRemoved = false;
+      
+      if (completed) {
+        // COMPLETING A QUEST - Award 5 XP for individual quest completion with streak bonus
         const user = await this.getUser(userId);
-        if (user && (user.streakFreezeCount ?? 0) < 2) {
+        if (user) {
+          const streakBonus = applyStreakBonus(5, user.currentStreak ?? 0);
           await this.updateUser(userId, {
-            streakFreezeCount: (user.streakFreezeCount ?? 0) + 1
+            experience: (user.experience ?? 0) + streakBonus.finalXp
           });
           
-          // Mark streak freeze as awarded
-          await this.updateDailyProgress(userId, today, {
-            streakFreezeAwarded: true
-          });
-          streakFreezeAwarded = true;
+          // Record activity to prevent atrophy
+          const { AtrophySystem } = await import("./atrophy-system.js");
+          await AtrophySystem.recordActivity(userId);
         }
-      }
-      
-      // Record daily quest activity to prevent atrophy when 2+ quests are completed
-      if (twoOrMoreCompleted) {
-        await import("./atrophy-system.js").then(module => {
-          module.AtrophySystem.recordActivity(userId);
-        });
-      }
-    } else {
-      // UNCHECKING A QUEST - Remove XP for individual quest (with original streak bonus that was applied)
-      const user = await this.getUser(userId);
-      if (user) {
-        const streakBonus = applyStreakBonus(5, user.currentStreak ?? 0);
-        await this.updateUser(userId, {
-          experience: Math.max(0, (user.experience ?? 0) - streakBonus.finalXp)
-        });
         
-        // Remove bonus XP if it was awarded and we no longer have all 4 quests
-        if (previousAllCompleted && !allCompleted && wasXpAwarded) {
+        // Award additional 5 XP bonus for completing all daily quests
+        if (allCompleted && !updatedProgress.xpAwarded) {
           const updatedUser = await this.getUser(userId); // Get updated user data
           if (updatedUser) {
             const bonusStreakBonus = applyStreakBonus(5, updatedUser.currentStreak ?? 0);
             await this.updateUser(userId, {
-              experience: Math.max(0, (updatedUser.experience ?? 0) - bonusStreakBonus.finalXp) // Remove bonus XP with streak multiplier
+              experience: (updatedUser.experience ?? 0) + bonusStreakBonus.finalXp // Add bonus XP with streak multiplier
             });
             
-            // Mark bonus XP as not awarded
+            // Mark bonus XP as awarded
             await this.updateDailyProgress(userId, today, {
-              xpAwarded: false
+              xpAwarded: true
             });
-            xpRemoved = true;
+            xpAwarded = true;
           }
         }
         
-        // Remove streak freeze if it was awarded and we now have less than 2 quests
-        if (previousTwoOrMoreCompleted && !twoOrMoreCompleted && wasStreakFreezeAwarded) {
-          if ((user.streakFreezeCount ?? 0) > 0) {
+        if (twoOrMoreCompleted && !updatedProgress.streakFreezeAwarded) {
+          // Award streak freeze if user has less than 2 (requires 2 of 4 quests)
+          const user = await this.getUser(userId);
+          if (user && (user.streakFreezeCount ?? 0) < 2) {
             await this.updateUser(userId, {
-              streakFreezeCount: (user.streakFreezeCount ?? 0) - 1
+              streakFreezeCount: (user.streakFreezeCount ?? 0) + 1
             });
             
-            // Mark streak freeze as not awarded
+            // Mark streak freeze as awarded
             await this.updateDailyProgress(userId, today, {
-              streakFreezeAwarded: false
+              streakFreezeAwarded: true
             });
-            streakFreezeRemoved = true;
+            streakFreezeAwarded = true;
+          }
+        }
+        
+        // Record daily quest activity to prevent atrophy when 2+ quests are completed
+        if (twoOrMoreCompleted) {
+          await import("./atrophy-system.js").then(module => {
+            module.AtrophySystem.recordActivity(userId);
+          });
+        }
+      } else {
+        // UNCHECKING A QUEST - Remove XP for individual quest (with original streak bonus that was applied)
+        const user = await this.getUser(userId);
+        if (user) {
+          const streakBonus = applyStreakBonus(5, user.currentStreak ?? 0);
+          await this.updateUser(userId, {
+            experience: Math.max(0, (user.experience ?? 0) - streakBonus.finalXp)
+          });
+          
+          // Remove bonus XP if it was awarded and we no longer have all 4 quests
+          if (previousAllCompleted && !allCompleted && wasXpAwarded) {
+            const updatedUser = await this.getUser(userId); // Get updated user data
+            if (updatedUser) {
+              const bonusStreakBonus = applyStreakBonus(5, updatedUser.currentStreak ?? 0);
+              await this.updateUser(userId, {
+                experience: Math.max(0, (updatedUser.experience ?? 0) - bonusStreakBonus.finalXp) // Remove bonus XP with streak multiplier
+              });
+              
+              // Mark bonus XP as not awarded
+              await this.updateDailyProgress(userId, today, {
+                xpAwarded: false
+              });
+              xpRemoved = true;
+            }
+          }
+          
+          // Remove streak freeze if it was awarded and we now have less than 2 quests
+          if (previousTwoOrMoreCompleted && !twoOrMoreCompleted && wasStreakFreezeAwarded) {
+            if ((user.streakFreezeCount ?? 0) > 0) {
+              await this.updateUser(userId, {
+                streakFreezeCount: (user.streakFreezeCount ?? 0) - 1
+              });
+              
+              // Mark streak freeze as not awarded
+              await this.updateDailyProgress(userId, today, {
+                streakFreezeAwarded: false
+              });
+              streakFreezeRemoved = true;
+            }
           }
         }
       }
+    
+      // Update streak after quest change
+      await this.updateStreak(userId);
+      
+      console.log(`[toggleDailyQuest] Completed successfully for user ${userId}. Result:`, { completed, xpAwarded, streakFreezeAwarded, xpRemoved, streakFreezeRemoved });
+      return { completed, xpAwarded, streakFreezeAwarded, xpRemoved, streakFreezeRemoved };
+    } catch (error) {
+      console.error(`[toggleDailyQuest] Error for user ${userId}:`, error);
+      throw error;
     }
-    
-    // Update streak after quest change
-    await this.updateStreak(userId);
-    
-    return { completed, xpAwarded, streakFreezeAwarded, xpRemoved, streakFreezeRemoved };
   }
 
   // Keep backwards compatibility

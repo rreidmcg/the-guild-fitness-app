@@ -2477,10 +2477,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Completed must be a boolean" });
       }
       
+      console.log(`Toggling daily quest for user ${userId}: ${questType} = ${completed}`);
       const result = await storage.toggleDailyQuest(userId, questType, completed);
+      console.log(`Daily quest toggle result:`, result);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error: "Failed to toggle daily quest" });
+      console.error("Daily quest toggle error:", error);
+      res.status(500).json({ error: "Failed to toggle daily quest", details: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -2493,10 +2496,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid quest type" });
       }
       
+      console.log(`Completing daily quest for user ${userId}: ${questType}`);
       const result = await storage.completeDailyQuest(userId, questType);
+      console.log(`Daily quest completion result:`, result);
       res.json(result);
     } catch (error) {
-      res.status(500).json({ error: "Failed to complete daily quest" });
+      console.error("Daily quest completion error:", error);
+      res.status(500).json({ error: "Failed to complete daily quest", details: error instanceof Error ? error.message : String(error) });
     }
   });
 
