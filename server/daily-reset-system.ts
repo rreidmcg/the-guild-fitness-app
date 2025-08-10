@@ -160,7 +160,7 @@ export class DailyResetSystem implements DailyResetService {
         yesterdayProgress[0].sleep
       ].filter(Boolean).length : 0;
 
-      const minimumActivityMet = completedQuests >= 2 || yesterdayWorkouts.length > 0;
+      const minimumActivityMet = completedQuests >= 3 || yesterdayWorkouts.length > 0;
 
       // If minimum activity wasn't met and user has an active streak, auto-apply freeze
       if (!minimumActivityMet && user[0].currentStreak && user[0].currentStreak > 0) {

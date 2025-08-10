@@ -123,7 +123,7 @@ export default function Workouts() {
           message = "All Daily Quests Complete!";
           description = `You earned a total of ${totalXp} XP!${hasStreakBonus ? ` (1.5x streak bonus!)` : ''} (Already have max Streak Freezes)`;
         } else if (data.streakFreezeAwarded) {
-          message = "2+ Quests Complete!";
+          message = "3+ Quests Complete!";
           description = `You earned ${baseXp} XP and a Streak Freeze!${hasStreakBonus ? ` (1.5x streak bonus!)` : ''}`;
         }
         
@@ -227,7 +227,7 @@ export default function Workouts() {
                   </div>
                   <div className="flex items-center space-x-1">
                     <Snowflake className="w-4 h-4 text-blue-500" />
-                    <span className="text-foreground">2+ Quests: Streak Freeze</span>
+                    <span className="text-foreground">3+ Quests: Streak Freeze</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Star className="w-4 h-4 text-orange-500" />
@@ -260,10 +260,10 @@ export default function Workouts() {
                   ? dailyProgress?.xpAwarded 
                     ? "All Complete! Rewards Earned"
                     : "All Complete! Processing rewards..."
-                  : [dailyProgress?.hydration, dailyProgress?.steps, dailyProgress?.protein, dailyProgress?.sleep].filter(Boolean).length >= 2
+                  : [dailyProgress?.hydration, dailyProgress?.steps, dailyProgress?.protein, dailyProgress?.sleep].filter(Boolean).length >= 3
                     ? dailyProgress?.streakFreezeAwarded
-                      ? "2+ Complete! Streak Freeze Earned"
-                      : "2+ Complete! Processing rewards..."
+                      ? "3+ Complete! Streak Freeze Earned"
+                      : "3+ Complete! Processing rewards..."
                     : ""
                 }
               </div>

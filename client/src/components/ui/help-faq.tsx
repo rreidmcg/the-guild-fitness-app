@@ -52,21 +52,21 @@ const faqData: FAQItem[] = [
   {
     id: "daily-quests",
     question: "What are daily quests and how do they work?",
-    answer: "Daily quests are simple health habits: drinking water (hydration), taking steps, eating protein, and getting good sleep. Complete 2 out of 4 quests OR do one workout to maintain your streak and earn bonus XP. They reset every day at midnight in your timezone.",
+    answer: "Daily quests are simple health habits: drinking water (hydration), taking steps, eating protein, and getting good sleep. Complete 3 out of 4 quests OR do one workout to maintain your streak and earn bonus XP. They reset every day at midnight in your timezone.",
     category: "Daily System",
     icon: Target
   },
   {
     id: "streak-system",
     question: "How does the streak system work?",
-    answer: "Maintain your streak by completing 2+ daily quests OR 1 workout each day. Streaks give XP multipliers (1.5x at 3+ days) and unlock special rewards. You get streak freezes to protect your progress during rest days or busy periods.",
+    answer: "Maintain your streak by completing 3+ daily quests OR 1 workout each day. Streaks give XP multipliers (1.5x at 3+ days) and unlock special rewards. You get streak freezes to protect your progress during rest days or busy periods.",
     category: "Streaks",
     icon: Calendar
   },
   {
     id: "atrophy-system",
     question: "Will I lose progress if I don't exercise?",
-    answer: "After 2 consecutive days of complete inactivity (no workouts AND less than 2 daily quests), you'll start losing 1% XP and stats daily. New players get protection for their first week. Use streak freezes or complete minimal daily quests to prevent this.",
+    answer: "After 2 consecutive days of complete inactivity (no workouts AND less than 3 daily quests), you'll start losing 1% XP and stats daily. New players get protection for their first week. Use streak freezes or complete minimal daily quests to prevent this.",
     category: "Progress Protection",
     icon: Heart
   },
