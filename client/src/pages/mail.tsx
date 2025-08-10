@@ -323,44 +323,51 @@ export default function MailPage() {
                   }`}
                   onClick={() => mailComponent_handleOpenMail(mailItem)}
                 >
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="text-lg font-bold text-foreground">
-                            {mailItem.senderName}
-                          </span>
-                          <Badge className={getMailTypeBadge(mailItem.mailType)}>
-                            {mailItem.mailType}
-                          </Badge>
-                          {!mailItem.isRead && (
-                            <Badge variant="secondary" className="bg-blue-500 text-white text-xs">
-                              New
+                  <CardHeader className="pb-2 pt-3 px-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        {/* Mobile-optimized header with sender and badges */}
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center space-x-2 min-w-0 flex-1">
+                            <span className="text-sm font-bold text-foreground truncate">
+                              {mailItem.senderName}
+                            </span>
+                            <Badge className={`${getMailTypeBadge(mailItem.mailType)} text-xs px-1 py-0 h-5 shrink-0`}>
+                              {mailItem.mailType}
                             </Badge>
-                          )}
+                          </div>
+                          <div className="flex items-center space-x-1 shrink-0">
+                            {!mailItem.isRead && (
+                              <Badge variant="secondary" className="bg-blue-500 text-white text-xs px-1 py-0 h-5">
+                                New
+                              </Badge>
+                            )}
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {formatTimeAgoCompact(new Date(mailItem.createdAt))}
+                            </span>
+                          </div>
                         </div>
-                        <CardTitle className="text-sm font-bold text-foreground">
+                        
+                        {/* Subject line with better mobile formatting */}
+                        <CardTitle className="text-xs font-semibold text-foreground mb-1 line-clamp-1">
                           {mailItem.subject}
                         </CardTitle>
-                        <CardDescription className="line-clamp-2 text-sm font-normal text-muted-foreground">
+                        
+                        {/* Content preview with reduced lines for mobile */}
+                        <CardDescription className="line-clamp-1 text-xs font-normal text-muted-foreground">
                           {mailItem.content}
                         </CardDescription>
                       </div>
-                      <div className="text-right flex flex-col items-end space-y-1">
-                        <span className="text-xs text-muted-foreground">
-                          {formatTimeAgoCompact(new Date(mailItem.createdAt))}
-                        </span>
-                        {mailItem.rewards && (
-                          <div className="flex items-center space-x-1">
-                            <Gift className="w-3 h-3 text-purple-500" />
-                            {!mailItem.rewardsClaimed ? (
-                              <span className="text-xs text-purple-600 font-medium">Rewards</span>
-                            ) : (
-                              <CheckCircle className="w-3 h-3 text-green-500" />
-                            )}
-                          </div>
-                        )}
-                      </div>
+                      
+                      {/* Rewards indicator - moved to right side */}
+                      {mailItem.rewards && (
+                        <div className="flex items-center shrink-0">
+                          <Gift className="w-3 h-3 text-purple-500" />
+                          {!mailItem.rewardsClaimed && (
+                            <span className="text-xs text-purple-600 font-medium ml-1">!</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </CardHeader>
                 </Card>
