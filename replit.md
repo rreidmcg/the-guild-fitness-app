@@ -35,7 +35,7 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **Improved Streak Logic**: Strengthened streak advancement requirements to ensure minimum activity levels are met before advancing streaks
 - **Updated Streak Freeze Requirement**: Changed streak freeze requirement from 2 to 3 daily quests completed across all systems, UI tooltips, FAQ content, onboarding flows, and documentation for better game balance and engagement
 - **Leaderboard GM Exclusion**: Successfully implemented filtering logic in storage layer to exclude GM accounts (Zero and Rob) from public leaderboards while preserving their admin functionality
-- **User Stat Initialization**: Fixed database schema so new users start with strength, stamina, and agility stats of 1 instead of 0, and updated existing users with proper baseline values
+- **User Stat Initialization**: Fixed database schema so new users start with strength, stamina, and agility stats of 1 instead of 0, and updated existing users with proper baseline values. Also removed explicit 0 values from user signup route to allow database defaults to work properly
 
 ## User Preferences
 

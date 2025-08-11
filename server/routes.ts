@@ -1221,9 +1221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         gender: avatarGender || gender,
         experience: 0,
         level: 1,
-        strength: 0,
-        stamina: 0,
-        agility: 0,
+        // strength, stamina, agility will use database defaults (1 each)
         gold: 10,
         currentHp: 10,
         currentMp: 0,
