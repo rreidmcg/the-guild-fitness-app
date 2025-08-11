@@ -44,7 +44,8 @@ import NotFound from "@/pages/not-found";
 import Achievements from "@/pages/achievements";
 import Premium from "@/pages/premium";
 import AIWorkouts from "@/pages/ai-workouts";
-import ProgramOverview from "@/pages/program-overview";
+import ProgramBuilder from "@/pages/ProgramBuilder";
+import ProgramOverview from "@/pages/ProgramOverview";
 import ProgramDay from "@/pages/program-day";
 import ProgramWorkout from "@/pages/program-workout";
 import ProgramWorkoutBuilder from "@/pages/program-workout-builder";
@@ -182,6 +183,11 @@ function Router() {
       <Route path="/workout-programs">
         <AuthGuard>
           <WorkoutPrograms />
+        </AuthGuard>
+      </Route>
+      <Route path="/program-builder">
+        <AuthGuard>
+          <ProgramBuilder />
         </AuthGuard>
       </Route>
       <Route path="/program-overview/:id">

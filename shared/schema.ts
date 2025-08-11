@@ -459,6 +459,60 @@ export const subscriptionHistory = pgTable("subscription_history", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Training programs created by coaches
+export const trainingPrograms = pgTable("training_programs", {
+  id: text("id").primaryKey(), // prog_xxx format
+  name: text("name").notNull(),
+  description: text("description"),
+  goal: text("goal"), // "Strength", "Stamina", "Balanced"
+  tags: text("tags").array().default([]),
+  equipment: text("equipment").array().default([]),
+  durationWeeks: integer("duration_weeks").notNull(),
+  daysPerWeek: integer("days_per_week").default(4),
+  status: text("status").default("draft"), // "draft", "published", "archived"
+  calendar: json("calendar").$type<Array<{
+    weekIndex: number;
+    days: Array<{
+      workoutId?: string;
+      rest?: boolean;
+      notes?: string;
+      progression?: {
+        kind: "load" | "rep" | "wave" | "deload";
+        spec: string;
+      };
+    }>;
+  }>>().notNull().default([]),
+  coachNotes: text("coach_notes"),
+  version: integer("version").default(1),
+  createdBy: integer("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User program completions and progress
+export const programCompletions = pgTable("program_completions", {
+  id: serial("id").primaryKey(),
+  programId: text("program_id").references(() => trainingPrograms.id),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  byWeek: json("by_week").$type<Array<{
+    weekIndex: number;
+    days: Array<{
+      status: "completed" | "missed" | "upcoming" | "rest";
+      completedAt?: number;
+      workoutMetricsId?: string;
+    }>;
+  }>>().notNull().default([]),
+  streak: integer("streak").default(0),
+  percentComplete: integer("percent_complete").default(0), // 0-100
+  startedAt: timestamp("started_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  userProgramIdx: uniqueIndex("user_program_idx").on(table.userId, table.programId),
+}));
+
 // Player abilities/skills
 export const abilities = pgTable("abilities", {
   id: serial("id").primaryKey(),
@@ -523,6 +577,52 @@ export const insertMonsterSchema = createInsertSchema(monsters).omit({
 export const insertAchievementSchema = createInsertSchema(achievements).omit({
   id: true,
 });
+
+export const insertTrainingProgramSchema = createInsertSchema(trainingPrograms).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProgramCompletionSchema = createInsertSchema(programCompletions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// TypeScript types
+export type TrainingProgram = typeof trainingPrograms.$inferSelect;
+export type InsertTrainingProgram = z.infer<typeof insertTrainingProgramSchema>;
+export type ProgramCompletion = typeof programCompletions.$inferSelect;
+export type InsertProgramCompletion = z.infer<typeof insertProgramCompletionSchema>;
+
+// Program Builder types for the frontend
+export type DayCell = {
+  workoutId?: string;
+  rest?: boolean;
+  notes?: string;
+  progression?: {
+    kind: "load" | "rep" | "wave" | "deload";
+    spec: string;
+  };
+};
+
+export type Week = {
+  weekIndex: number;
+  days: DayCell[];
+};
+
+export type CompletionStatus = "completed" | "missed" | "upcoming" | "rest";
+
+export type DayCompletion = {
+  status: CompletionStatus;
+  completedAt?: number;
+  workoutMetricsId?: string;
+};
+
+export type WeekCompletion = {
+  weekIndex: number;
+  days: DayCompletion[];
+};
 
 export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({
   id: true,

@@ -1,0 +1,220 @@
+Program Builder & Client Experience — Master Spec (Drop-in for Replit)
+
+Purpose
+
+Enable coaches to create multi-week training programs by arranging existing workouts on a weekly calendar, then let clients view an overview, navigate to today’s workout, and complete it with clean progress tracking.
+
+⸻
+
+Core Entities (Data Contract)
+
+{
+  "Program": {
+    "id": "prog_xxx",
+    "name": "Hero Program — Cycle 1",
+    "description": "Balanced concurrent block, 4x/week.",
+    "goal": "Strength|Stamina|Balanced",
+    "tags": ["concurrent","balanced"],
+    "equipment": ["DB","BB","Bike"],
+    "durationWeeks": 12,
+    "daysPerWeek": 4,
+    "status": "draft|published|archived",
+    "calendar": [
+      {
+        "weekIndex": 0,
+        "days": [
+          { "workoutId": "wo_fullA" },
+          { "workoutId": "wo_condZ2" },
+          { "rest": true, "notes": "Mobility optional" },
+          { "workoutId": "wo_fullB" },
+          { "workoutId": "wo_corefin" },
+          { "rest": true },
+          { "rest": true }
+        ]
+      }
+    ],
+    "coachNotes": "Focus on bracing this cycle.",
+    "version": 1
+  },
+
+  "Completion": {
+    "programId": "prog_xxx",
+    "userId": "user_123",
+    "byWeek": [
+      {
+        "weekIndex": 0,
+        "days": [
+          { "status": "completed|missed|upcoming|rest", "completedAt": 1736034000, "workoutMetricsId": "wm_001" }
+        ]
+      }
+    ],
+    "streak": 4,
+    "percentComplete": 8.3
+  }
+}
+
+
+⸻
+
+Coach Side: Program Builder (Admin)
+
+1) Create / Configure Program
+	•	Fields: name*, description, goal, tags, equipment, durationWeeks* (default 4), daysPerWeek (default 4).
+	•	Status: draft on create.
+	•	Editing duration: expanding adds empty weeks; shrinking prompts: “Trim weeks from end?” (destructive).
+
+2) Calendar View (Weeks × Days)
+	•	Grid: N week rows × 7 day columns (Mon–Sun header).
+	•	Cell states: Empty (“+ Assign”), Workout badge (title/ID), REST (grey).
+	•	Cell menu: Assign Workout / Toggle Rest / Add Note / Clear.
+	•	Drag & Drop: Move and Copy (Alt/Option-drag).
+	•	Drop onto empty → place.
+	•	Drop onto workout → Replace / Swap / Cancel dialog.
+	•	Drop onto REST → place and clear rest.
+	•	Multi-select: Shift+click (desktop) or “Select Days” toggle (mobile) to bulk Move/Copy/Clear.
+	•	Undo/Redo: one-level minimum.
+
+3) Assigning Workouts
+	•	Selector: Library / Recent / Favorites / Search.
+	•	Create New: opens Workout Builder modal/new tab; returns workoutId on save.
+
+4) Fast Duplication
+	•	Week menu: Duplicate Week, Copy Week, Paste Week, Clear Week, Delete Week.
+	•	Day menu: Copy Day, Paste Day.
+	•	Skeleton: “Generate Skeleton” places placeholders according to daysPerWeek.
+
+5) Progression Helpers (metadata only, v1)
+	•	Per-cell Progression Tag: +2.5% load, +1 rep, wave(70/80/75%), deload(-20%).
+	•	Checkbox “Apply forward same weekday.”
+
+6) Review & Publish
+	•	Summary panel: total workouts, estimated weekly minutes, rest day count.
+	•	Warnings: empty weeks, >2 consecutive empty training days, orphan weeks.
+	•	Publish: locks structure; still allows notes.
+	•	Export/Import JSON for backup/duplication.
+
+7) Validation
+	•	Program must have name, durationWeeks ≥ 1.
+	•	On publish: each week must have at least one assigned workout or explicit rest days covering all empties.
+	•	Import JSON schema checked; parse error shows line preview.
+
+8) Persistence / Analytics
+	•	Storage: localStorage / file / DB. Programs immutable by ID once published; updates create new version.
+	•	Events: program_created, program_updated, program_published, cell_assigned, cell_rest_toggled, drag_move, drag_copy, week_duplicated, week_copied, week_pasted.
+
+⸻
+
+Client Side: Program Overview & Navigation
+
+A) Program Overview Screen
+	•	Header: title, short description, goal, equipment, total weeks, workouts/week, coach notes.
+	•	Progress Summary: current position, % complete, weekly completion bar, streak.
+	•	Read-only Calendar: weeks × days with workout titles, REST markers, completion checkmarks.
+	•	Upcoming Workouts List: next 7–14 days with date, name, estimated time, status.
+
+B) Navigating to a Workout
+	•	From Calendar: tap today’s (or allowed) cell → Workout Detail.
+	•	From Upcoming List: tap card to open Workout Detail.
+	•	Permissions: past workouts read-only unless “Allow Makeups” is on; future workouts locked until date unless “Allow Early Start” is on.
+
+C) Workout Detail Screen
+	•	Title, section breakdown, sets/reps/load, timers, media, coach notes.
+	•	Start Workout button.
+	•	Make Substitution if enabled.
+	•	Mark Complete on finish; capture metrics.
+	•	Completing updates Completion store and Overview.
+
+D) UX Niceties
+	•	Week Switch: swipe or dropdown.
+	•	Day Switch: arrows or swipe.
+	•	Completion Feedback: animation.
+	•	Time Integrity: duration must be within 50–150% of estimate; confirm modal otherwise.
+
+⸻
+
+UI States & Controls (Coach)
+
+Calendar Cell
+	•	Empty: “+ Assign”
+	•	Workout: pill with title and “…” menu
+	•	REST: grey block
+	•	With Note: corner icon; hover/tap preview
+
+Top Bar
+	•	New Program, Rename, Publish/Unpublish
+	•	Export, Import
+	•	Generate Skeleton
+	•	Undo/Redo
+
+Week Header Menu
+	•	Duplicate / Copy / Paste / Clear / Delete
+
+Keyboard (desktop)
+	•	Del = Clear cell
+	•	Cmd/Ctrl+C/V = Copy/Paste Day
+	•	Alt/Option+Drag = Copy
+
+Mobile
+	•	Long-press = actions or drag
+	•	Select Days mode for bulk ops
+
+⸻
+
+Minimal Interfaces (TypeScript)
+
+type DayCell = {
+  workoutId?: string;
+  rest?: boolean;
+  notes?: string;
+  progression?: { kind: "load"|"rep"|"wave"|"deload"; spec: string };
+};
+
+type Week = { weekIndex: number; days: DayCell[] };
+
+type Program = {
+  id: string;
+  name: string;
+  description?: string;
+  goal?: "Strength"|"Stamina"|"Balanced";
+  tags?: string[];
+  equipment?: string[];
+  durationWeeks: number;
+  daysPerWeek?: number;
+  status: "draft"|"published"|"archived";
+  calendar: Week[];
+  coachNotes?: string;
+  version: number;
+};
+
+type CompletionStatus = "completed"|"missed"|"upcoming"|"rest";
+
+type DayCompletion = {
+  status: CompletionStatus;
+  completedAt?: number;
+  workoutMetricsId?: string;
+};
+
+type Completion = {
+  programId: string;
+  userId: string;
+  byWeek: { weekIndex: number; days: DayCompletion[] }[];
+  streak: number;
+  percentComplete: number;
+};
+
+
+⸻
+
+Definition of Done
+	•	Create/Edit/Delete/Duplicate Program
+	•	Calendar renders N weeks × 7 days
+	•	Assign/Toggle Rest/Add Note/Clear per cell
+	•	Drag-and-drop Move + Copy (desktop & mobile)
+	•	Copy/Paste Day & Week; Duplicate Week
+	•	Publish/unpublish with validation
+	•	Import/Export JSON
+	•	One-level Undo/Redo
+	•	Client Overview with Progress Summary, Calendar, Upcoming List
+	•	Workout Detail view with Start/Complete, metrics, substitutions
+	•	Completion state updates instantly (offline-tolerant)
+	•	Accessibility: focus states, ARIA labels, large tap targets on mobile

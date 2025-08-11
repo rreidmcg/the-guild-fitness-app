@@ -1,5 +1,5 @@
 import { 
-  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, userExercisePreferences, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, fitnessGoalProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests, customAvatars, userCustomAvatars,
+  users, exercises, workouts, workoutSessions, exercisePerformances, personalRecords, userExercisePreferences, workoutPrograms, programWorkouts, wardrobeItems, userWardrobe, dailyProgress, fitnessGoalProgress, playerMail, achievements, userAchievements, socialShares, socialShareLikes, liabilityWaivers, workoutPreferences, workoutFeedback, monsters, appRequests, customAvatars, userCustomAvatars, trainingPrograms, programCompletions,
   type User, type InsertUser, type Exercise, type InsertExercise, 
   type Workout, type InsertWorkout, type WorkoutSession, type InsertWorkoutSession,
   type ExercisePerformance, type InsertExercisePerformance,
@@ -22,7 +22,9 @@ import {
   type WorkoutPreferences, type InsertWorkoutPreferences,
   type WorkoutFeedback, type InsertWorkoutFeedback,
   type Monster, type InsertMonster,
-  type AppRequest, type InsertAppRequest
+  type AppRequest, type InsertAppRequest,
+  type TrainingProgram, type InsertTrainingProgram,
+  type ProgramCompletion, type InsertProgramCompletion
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, not } from "drizzle-orm";
@@ -202,6 +204,22 @@ export interface IStorage {
   getAllAppRequests(): Promise<AppRequest[]>;
   getUserAppRequests(userId: number): Promise<AppRequest[]>;
   updateAppRequestStatus(id: number, status: string, adminNotes?: string, reviewedBy?: number): Promise<AppRequest>;
+
+  // Training program operations
+  getAllTrainingPrograms(): Promise<TrainingProgram[]>;
+  getTrainingProgram(id: string): Promise<TrainingProgram | undefined>;
+  createTrainingProgram(program: InsertTrainingProgram): Promise<TrainingProgram>;
+  updateTrainingProgram(id: string, updates: Partial<TrainingProgram>): Promise<TrainingProgram>;
+  deleteTrainingProgram(id: string): Promise<void>;
+  publishTrainingProgram(id: string): Promise<TrainingProgram>;
+  archiveTrainingProgram(id: string): Promise<TrainingProgram>;
+  duplicateTrainingProgram(id: string, newName: string): Promise<TrainingProgram>;
+
+  // Program completion operations
+  getUserProgramCompletion(userId: number, programId: string): Promise<ProgramCompletion | undefined>;
+  startProgram(userId: number, programId: string): Promise<ProgramCompletion>;
+  updateProgramProgress(userId: number, programId: string, weekIndex: number, dayIndex: number, status: string, workoutMetricsId?: string): Promise<ProgramCompletion>;
+  calculateProgramProgress(userId: number, programId: string): Promise<{ streak: number; percentComplete: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2058,6 +2076,229 @@ Start your fitness journey today and watch your character grow stronger with eve
       .where(and(eq(userCustomAvatars.userId, userId), eq(userCustomAvatars.avatarId, avatarId)))
       .limit(1);
     return !!userAvatar;
+  }
+
+  // Training program operations
+  async getAllTrainingPrograms(): Promise<TrainingProgram[]> {
+    await this.ensureInitialized();
+    return await db
+      .select()
+      .from(trainingPrograms)
+      .orderBy(desc(trainingPrograms.createdAt));
+  }
+
+  async getTrainingProgram(id: string): Promise<TrainingProgram | undefined> {
+    await this.ensureInitialized();
+    const [program] = await db
+      .select()
+      .from(trainingPrograms)
+      .where(eq(trainingPrograms.id, id))
+      .limit(1);
+    return program;
+  }
+
+  async createTrainingProgram(program: InsertTrainingProgram): Promise<TrainingProgram> {
+    await this.ensureInitialized();
+    const [newProgram] = await db
+      .insert(trainingPrograms)
+      .values(program)
+      .returning();
+    return newProgram;
+  }
+
+  async updateTrainingProgram(id: string, updates: Partial<TrainingProgram>): Promise<TrainingProgram> {
+    await this.ensureInitialized();
+    const [updatedProgram] = await db
+      .update(trainingPrograms)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(trainingPrograms.id, id))
+      .returning();
+    return updatedProgram;
+  }
+
+  async deleteTrainingProgram(id: string): Promise<void> {
+    await this.ensureInitialized();
+    await db
+      .delete(trainingPrograms)
+      .where(eq(trainingPrograms.id, id));
+  }
+
+  async publishTrainingProgram(id: string): Promise<TrainingProgram> {
+    await this.ensureInitialized();
+    const [publishedProgram] = await db
+      .update(trainingPrograms)
+      .set({ status: "published", updatedAt: new Date() })
+      .where(eq(trainingPrograms.id, id))
+      .returning();
+    return publishedProgram;
+  }
+
+  async archiveTrainingProgram(id: string): Promise<TrainingProgram> {
+    await this.ensureInitialized();
+    const [archivedProgram] = await db
+      .update(trainingPrograms)
+      .set({ status: "archived", updatedAt: new Date() })
+      .where(eq(trainingPrograms.id, id))
+      .returning();
+    return archivedProgram;
+  }
+
+  async duplicateTrainingProgram(id: string, newName: string): Promise<TrainingProgram> {
+    await this.ensureInitialized();
+    const original = await this.getTrainingProgram(id);
+    if (!original) throw new Error("Program not found");
+
+    const duplicate: InsertTrainingProgram = {
+      id: `prog_${Date.now()}`,
+      name: newName,
+      description: original.description,
+      goal: original.goal,
+      tags: original.tags,
+      equipment: original.equipment,
+      durationWeeks: original.durationWeeks,
+      daysPerWeek: original.daysPerWeek,
+      calendar: original.calendar,
+      coachNotes: original.coachNotes,
+      version: 1,
+      createdBy: original.createdBy
+    };
+
+    return await this.createTrainingProgram(duplicate);
+  }
+
+  // Program completion operations
+  async getUserProgramCompletion(userId: number, programId: string): Promise<ProgramCompletion | undefined> {
+    await this.ensureInitialized();
+    const [completion] = await db
+      .select()
+      .from(programCompletions)
+      .where(and(
+        eq(programCompletions.userId, userId),
+        eq(programCompletions.programId, programId),
+        eq(programCompletions.isActive, true)
+      ))
+      .limit(1);
+    return completion;
+  }
+
+  async startProgram(userId: number, programId: string): Promise<ProgramCompletion> {
+    await this.ensureInitialized();
+    
+    // Get the program to initialize the completion structure
+    const program = await this.getTrainingProgram(programId);
+    if (!program) throw new Error("Program not found");
+
+    // Initialize completion structure
+    const byWeek = program.calendar.map(week => ({
+      weekIndex: week.weekIndex,
+      days: week.days.map((_, dayIndex) => ({
+        status: "upcoming" as const,
+        completedAt: undefined,
+        workoutMetricsId: undefined
+      }))
+    }));
+
+    const completion: InsertProgramCompletion = {
+      programId,
+      userId,
+      byWeek,
+      streak: 0,
+      percentComplete: 0,
+      startedAt: new Date(),
+      isActive: true
+    };
+
+    const [newCompletion] = await db
+      .insert(programCompletions)
+      .values(completion)
+      .onConflictDoUpdate({
+        target: [programCompletions.userId, programCompletions.programId],
+        set: {
+          byWeek: completion.byWeek,
+          isActive: true,
+          startedAt: completion.startedAt,
+          updatedAt: new Date()
+        }
+      })
+      .returning();
+
+    return newCompletion;
+  }
+
+  async updateProgramProgress(
+    userId: number, 
+    programId: string, 
+    weekIndex: number, 
+    dayIndex: number, 
+    status: string, 
+    workoutMetricsId?: string
+  ): Promise<ProgramCompletion> {
+    await this.ensureInitialized();
+    
+    const completion = await this.getUserProgramCompletion(userId, programId);
+    if (!completion) throw new Error("Program completion not found");
+
+    // Update the specific day's status
+    const updatedByWeek = [...completion.byWeek];
+    if (updatedByWeek[weekIndex] && updatedByWeek[weekIndex].days[dayIndex]) {
+      updatedByWeek[weekIndex].days[dayIndex] = {
+        status: status as any,
+        completedAt: status === "completed" ? Date.now() : undefined,
+        workoutMetricsId
+      };
+    }
+
+    // Calculate progress
+    const { streak, percentComplete } = await this.calculateProgramProgress(userId, programId);
+
+    const [updatedCompletion] = await db
+      .update(programCompletions)
+      .set({
+        byWeek: updatedByWeek,
+        streak,
+        percentComplete,
+        updatedAt: new Date()
+      })
+      .where(and(
+        eq(programCompletions.userId, userId),
+        eq(programCompletions.programId, programId)
+      ))
+      .returning();
+
+    return updatedCompletion;
+  }
+
+  async calculateProgramProgress(userId: number, programId: string): Promise<{ streak: number; percentComplete: number }> {
+    await this.ensureInitialized();
+    
+    const completion = await this.getUserProgramCompletion(userId, programId);
+    if (!completion) return { streak: 0, percentComplete: 0 };
+
+    let totalDays = 0;
+    let completedDays = 0;
+    let currentStreak = 0;
+    let streakBroken = false;
+
+    // Calculate from most recent to oldest to get current streak
+    for (let weekIndex = completion.byWeek.length - 1; weekIndex >= 0; weekIndex--) {
+      const week = completion.byWeek[weekIndex];
+      for (let dayIndex = week.days.length - 1; dayIndex >= 0; dayIndex--) {
+        const day = week.days[dayIndex];
+        if (day.status !== "rest") {
+          totalDays++;
+          if (day.status === "completed") {
+            completedDays++;
+            if (!streakBroken) currentStreak++;
+          } else if (day.status === "missed" && !streakBroken) {
+            streakBroken = true;
+          }
+        }
+      }
+    }
+
+    const percentComplete = totalDays > 0 ? Math.round((completedDays / totalDays) * 100) : 0;
+
+    return { streak: currentStreak, percentComplete };
   }
 }
 

@@ -4168,6 +4168,167 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Training Program Builder Routes
+  
+  // Get all training programs
+  app.get("/api/training-programs", async (req, res) => {
+    try {
+      const programs = await storage.getAllTrainingPrograms();
+      res.json(programs);
+    } catch (error) {
+      console.error("Error fetching training programs:", error);
+      res.status(500).json({ error: "Failed to fetch training programs" });
+    }
+  });
+
+  // Get single training program
+  app.get("/api/training-programs/:id", async (req, res) => {
+    try {
+      const program = await storage.getTrainingProgram(req.params.id);
+      if (!program) {
+        return res.status(404).json({ error: "Program not found" });
+      }
+      res.json(program);
+    } catch (error) {
+      console.error("Error fetching training program:", error);
+      res.status(500).json({ error: "Failed to fetch training program" });
+    }
+  });
+
+  // Create new training program
+  app.post("/api/training-programs", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      const programData = {
+        ...req.body,
+        id: `prog_${Date.now()}`,
+        createdBy: userId
+      };
+      
+      const program = await storage.createTrainingProgram(programData);
+      res.json(program);
+    } catch (error) {
+      console.error("Error creating training program:", error);
+      res.status(500).json({ error: "Failed to create training program" });
+    }
+  });
+
+  // Update training program
+  app.put("/api/training-programs/:id", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      const program = await storage.updateTrainingProgram(req.params.id, req.body);
+      res.json(program);
+    } catch (error) {
+      console.error("Error updating training program:", error);
+      res.status(500).json({ error: "Failed to update training program" });
+    }
+  });
+
+  // Delete training program
+  app.delete("/api/training-programs/:id", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      await storage.deleteTrainingProgram(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting training program:", error);
+      res.status(500).json({ error: "Failed to delete training program" });
+    }
+  });
+
+  // Publish training program
+  app.post("/api/training-programs/:id/publish", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      const program = await storage.publishTrainingProgram(req.params.id);
+      res.json(program);
+    } catch (error) {
+      console.error("Error publishing training program:", error);
+      res.status(500).json({ error: "Failed to publish training program" });
+    }
+  });
+
+  // Archive training program
+  app.post("/api/training-programs/:id/archive", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      const program = await storage.archiveTrainingProgram(req.params.id);
+      res.json(program);
+    } catch (error) {
+      console.error("Error archiving training program:", error);
+      res.status(500).json({ error: "Failed to archive training program" });
+    }
+  });
+
+  // Duplicate training program
+  app.post("/api/training-programs/:id/duplicate", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const { name } = req.body;
+      
+      const program = await storage.duplicateTrainingProgram(req.params.id, name);
+      res.json(program);
+    } catch (error) {
+      console.error("Error duplicating training program:", error);
+      res.status(500).json({ error: "Failed to duplicate training program" });
+    }
+  });
+
+  // Program Completion Routes
+  
+  // Get user's program completion
+  app.get("/api/program-completions/:programId", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      const completion = await storage.getUserProgramCompletion(userId, req.params.programId);
+      res.json(completion || null);
+    } catch (error) {
+      console.error("Error fetching program completion:", error);
+      res.status(500).json({ error: "Failed to fetch program completion" });
+    }
+  });
+
+  // Start a program
+  app.post("/api/program-completions/:programId/start", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      
+      const completion = await storage.startProgram(userId, req.params.programId);
+      res.json(completion);
+    } catch (error) {
+      console.error("Error starting program:", error);
+      res.status(500).json({ error: "Failed to start program" });
+    }
+  });
+
+  // Update program progress
+  app.post("/api/program-completions/:programId/progress", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const { weekIndex, dayIndex, status, workoutMetricsId } = req.body;
+      
+      const completion = await storage.updateProgramProgress(
+        userId,
+        req.params.programId,
+        weekIndex,
+        dayIndex,
+        status,
+        workoutMetricsId
+      );
+      res.json(completion);
+    } catch (error) {
+      console.error("Error updating program progress:", error);
+      res.status(500).json({ error: "Failed to update program progress" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
