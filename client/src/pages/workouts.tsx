@@ -501,7 +501,7 @@ export default function Workouts() {
                   Programs
                 </CardTitle>
                 <Button 
-                  onClick={() => navigate('/workout-builder')}
+                  onClick={() => navigate('/program-builder')}
                   size="sm"
                   className="bg-amber-600 hover:bg-amber-700 text-white"
                 >

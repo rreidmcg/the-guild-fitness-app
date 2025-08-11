@@ -39,21 +39,22 @@ export default function ProgramOverview() {
   };
 
   const getDayStatus = (weekIndex: number, dayIndex: number) => {
-    if (!completion?.byWeek[weekIndex]?.days[dayIndex]) return "upcoming";
+    if (!completion?.byWeek?.[weekIndex]?.days?.[dayIndex]) return "upcoming";
     return completion.byWeek[weekIndex].days[dayIndex].status;
   };
 
   const getUpcomingWorkouts = () => {
-    if (!program || !completion) return [];
+    if (!program || !completion || !program.calendar) return [];
     
     const upcoming = [];
     const today = new Date();
     
     for (let weekIndex = 0; weekIndex < program.calendar.length; weekIndex++) {
       const week = program.calendar[weekIndex];
+      if (!week || !week.days) continue;
       for (let dayIndex = 0; dayIndex < week.days.length; dayIndex++) {
         const dayCell = week.days[dayIndex];
-        if (dayCell.workoutId) {
+        if (dayCell && dayCell.workoutId) {
           const status = getDayStatus(weekIndex, dayIndex);
           if (status === "upcoming" && upcoming.length < 7) {
             const workoutDate = new Date(today);
@@ -96,29 +97,29 @@ export default function ProgramOverview() {
       <div className="program-overview__header">
         <div className="program-overview__header-content">
           <div className="program-overview__title-section">
-            <h1 className="program-overview__title">{program.name}</h1>
-            <p className="program-overview__description">{program.description}</p>
+            <h1 className="program-overview__title">{program?.name || "Unnamed Program"}</h1>
+            <p className="program-overview__description">{program?.description || "No description"}</p>
           </div>
           
           <div className="program-overview__meta">
             <div className="program-overview__meta-item">
               <Target className="h-5 w-5" />
-              <span>{program.goal}</span>
+              <span>{program?.goal || "No goal set"}</span>
             </div>
             <div className="program-overview__meta-item">
               <Calendar className="h-5 w-5" />
-              <span>{program.durationWeeks} weeks</span>
+              <span>{program?.durationWeeks || 4} weeks</span>
             </div>
             <div className="program-overview__meta-item">
               <Clock className="h-5 w-5" />
-              <span>{program.daysPerWeek} days/week</span>
+              <span>{program?.daysPerWeek || 3} days/week</span>
             </div>
           </div>
 
-          {program.equipment && program.equipment.length > 0 && (
+          {program?.equipment && program.equipment.length > 0 && (
             <div className="program-overview__equipment">
               <span className="font-medium">Equipment: </span>
-              {program.equipment.map((item, index) => (
+              {program.equipment.map((item: string, index: number) => (
                 <Badge key={item} variant="outline" className="mr-1">
                   {item}
                 </Badge>
@@ -136,16 +137,16 @@ export default function ProgramOverview() {
               <h2 className="text-lg font-semibold">Your Progress</h2>
               <div className="flex items-center space-x-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{completion.streak}</div>
+                  <div className="text-2xl font-bold text-primary">{completion?.streak || 0}</div>
                   <div className="text-sm text-muted-foreground">Day Streak</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{completion.percentComplete}%</div>
+                  <div className="text-2xl font-bold text-primary">{completion?.percentComplete || 0}%</div>
                   <div className="text-sm text-muted-foreground">Complete</div>
                 </div>
               </div>
             </div>
-            <Progress value={completion.percentComplete} className="h-3" />
+            <Progress value={completion?.percentComplete || 0} className="h-3" />
           </div>
         </Card>
       )}
@@ -167,8 +168,8 @@ export default function ProgramOverview() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentWeek(Math.min(program.calendar.length - 1, currentWeek + 1))}
-                disabled={currentWeek >= program.calendar.length - 1}
+                onClick={() => setCurrentWeek(Math.min((program.calendar?.length || 1) - 1, currentWeek + 1))}
+                disabled={currentWeek >= (program.calendar?.length || 1) - 1}
               >
                 Next Week →
               </Button>
@@ -182,7 +183,7 @@ export default function ProgramOverview() {
             
             <div className="program-overview__week-grid">
               {DAYS_OF_WEEK.map((day, dayIndex) => {
-                const dayCell = program.calendar[currentWeek]?.days[dayIndex];
+                const dayCell = program.calendar?.[currentWeek]?.days?.[dayIndex];
                 const status = getDayStatus(currentWeek, dayIndex);
 
                 return (
@@ -271,11 +272,11 @@ export default function ProgramOverview() {
       )}
 
       {/* Coach Notes */}
-      {program.coachNotes && (
+      {program?.coachNotes && (
         <Card className="program-overview__notes">
           <div className="p-6">
             <h2 className="text-lg font-semibold mb-2">Coach Notes</h2>
-            <p className="text-muted-foreground">{program.coachNotes}</p>
+            <p className="text-muted-foreground">{program?.coachNotes}</p>
           </div>
         </Card>
       )}
