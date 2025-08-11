@@ -41,6 +41,11 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 
 Preferred communication style: Simple, everyday language.
 
+**Project Management:**
+- Uses PRD.txt file with hierarchical numbering system (1.1, 1.2, etc.) for organized task tracking
+- Priority-based development with clear status indicators and dependency mapping
+- Taskmaster AI approach for comprehensive project organization
+
 **Development Standards:**
 - **Defensive Coding Mandatory**: All new components must follow BEM naming convention (block__element--modifier) and use component-isolated state management
 - **Component Boundaries**: Every major component must have clear CSS class prefixes and isolated styling to prevent conflicts
