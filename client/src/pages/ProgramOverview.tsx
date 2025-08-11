@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, Clock, Target, Trophy, ArrowRight, CheckCircle, Circle, Minus } from "lucide-react";
+import { Calendar, Clock, Target, Trophy, ArrowRight, CheckCircle, Circle, Minus, ArrowLeft } from "lucide-react";
 import type { TrainingProgram, ProgramCompletion, Workout } from "@shared/schema";
 
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -92,27 +92,47 @@ export default function ProgramOverview() {
   const upcomingWorkouts = getUpcomingWorkouts();
 
   return (
-    <div className="program-overview">
+    <div className="program-overview min-h-screen bg-background p-4 sm:p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
       {/* Program Header */}
       <div className="program-overview__header">
         <div className="program-overview__header-content">
-          <div className="program-overview__title-section">
-            <h1 className="program-overview__title">{program?.name || "Unnamed Program"}</h1>
-            <p className="program-overview__description">{program?.description || "No description"}</p>
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/workout-programs')}
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Programs
+            </Button>
+          </div>
+          <div className="program-overview__title-section mb-6">
+            <h1 className="program-overview__title text-3xl font-bold mb-2">{program?.name || "Unnamed Program"}</h1>
+            <p className="program-overview__description text-lg text-muted-foreground">{program?.description || "No description"}</p>
           </div>
           
-          <div className="program-overview__meta">
-            <div className="program-overview__meta-item">
-              <Target className="h-5 w-5" />
-              <span>{program?.goal || "No goal set"}</span>
+          <div className="program-overview__meta grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="program-overview__meta-item flex items-center gap-3 p-4 bg-card rounded-lg border">
+              <Target className="h-5 w-5 text-blue-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Goal</p>
+                <p className="font-medium">{program?.goal || "No goal set"}</p>
+              </div>
             </div>
-            <div className="program-overview__meta-item">
-              <Calendar className="h-5 w-5" />
-              <span>{program?.durationWeeks || 4} weeks</span>
+            <div className="program-overview__meta-item flex items-center gap-3 p-4 bg-card rounded-lg border">
+              <Calendar className="h-5 w-5 text-green-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Duration</p>
+                <p className="font-medium">{program?.durationWeeks || 4} weeks</p>
+              </div>
             </div>
-            <div className="program-overview__meta-item">
-              <Clock className="h-5 w-5" />
-              <span>{program?.daysPerWeek || 3} days/week</span>
+            <div className="program-overview__meta-item flex items-center gap-3 p-4 bg-card rounded-lg border">
+              <Clock className="h-5 w-5 text-orange-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Frequency</p>
+                <p className="font-medium">{program?.daysPerWeek || 3} days/week</p>
+              </div>
             </div>
           </div>
 
@@ -154,52 +174,55 @@ export default function ProgramOverview() {
       {/* Program Calendar */}
       <Card className="program-overview__calendar">
         <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Program Calendar</h2>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+            <div>
+              <h2 className="text-lg font-semibold">Program Calendar</h2>
+              <p className="text-sm text-muted-foreground">Week {currentWeek + 1} of {program.calendar?.length || 1}</p>
+            </div>
             <div className="flex space-x-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentWeek(Math.max(0, currentWeek - 1))}
                 disabled={currentWeek === 0}
+                className="flex items-center gap-2"
               >
-                ← Previous Week
+                <ArrowLeft className="h-3 w-3" />
+                Previous
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentWeek(Math.min((program.calendar?.length || 1) - 1, currentWeek + 1))}
                 disabled={currentWeek >= (program.calendar?.length || 1) - 1}
+                className="flex items-center gap-2"
               >
-                Next Week →
+                Next
+                <ArrowRight className="h-3 w-3" />
               </Button>
             </div>
           </div>
 
-          <div className="program-overview__week">
-            <div className="program-overview__week-header">
-              <h3 className="font-medium">Week {currentWeek + 1}</h3>
-            </div>
-            
-            <div className="program-overview__week-grid">
+          <div className="program-overview__week">            
+            <div className="grid grid-cols-7 gap-2 sm:gap-4">
               {DAYS_OF_WEEK.map((day, dayIndex) => {
                 const dayCell = program.calendar?.[currentWeek]?.days?.[dayIndex];
                 const status = getDayStatus(currentWeek, dayIndex);
 
                 return (
                   <div key={dayIndex} className="program-overview__day">
-                    <div className="program-overview__day-header">
+                    <div className="text-center font-medium text-sm text-muted-foreground mb-3 p-2 bg-muted/50 rounded-t-lg">
                       {day}
                     </div>
-                    <div className="program-overview__day-content">
+                    <div className="min-h-[120px] p-3 bg-card border border-border rounded-b-lg">
                       {dayCell?.rest ? (
-                        <div className="program-overview__day-rest">
-                          <Minus className="h-4 w-4" />
-                          <span>Rest</span>
+                        <div className="flex flex-col items-center justify-center h-full text-center">
+                          <Minus className="h-6 w-6 text-blue-500 mb-2" />
+                          <span className="text-sm font-medium text-blue-600">Rest Day</span>
                         </div>
                       ) : dayCell?.workoutId ? (
-                        <div className="program-overview__day-workout">
-                          <div className="program-overview__workout-status">
+                        <div className="flex flex-col h-full">
+                          <div className="flex items-center justify-between mb-2">
                             {status === "completed" ? (
                               <CheckCircle className="h-4 w-4 text-green-500" />
                             ) : status === "missed" ? (
@@ -208,13 +231,18 @@ export default function ProgramOverview() {
                               <Circle className="h-4 w-4 text-gray-400" />
                             )}
                           </div>
-                          <div className="program-overview__workout-name">
-                            {getWorkoutName(dayCell.workoutId)}
+                          <div className="flex-1 mb-3">
+                            <p className="text-sm font-medium text-foreground mb-1">
+                              {getWorkoutName(dayCell.workoutId)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {getWorkoutEstimatedTime(dayCell.workoutId)}
+                            </p>
                           </div>
                           {status === "upcoming" && (
                             <Button
                               size="sm"
-                              className="program-overview__start-btn"
+                              className="w-full text-xs py-1"
                               onClick={() => handleStartWorkout(currentWeek, dayIndex, dayCell.workoutId!)}
                             >
                               Start
@@ -222,8 +250,8 @@ export default function ProgramOverview() {
                           )}
                         </div>
                       ) : (
-                        <div className="program-overview__day-empty">
-                          Free Day
+                        <div className="flex flex-col items-center justify-center h-full text-center">
+                          <div className="text-sm text-muted-foreground">Free Day</div>
                         </div>
                       )}
                     </div>
@@ -280,6 +308,7 @@ export default function ProgramOverview() {
           </div>
         </Card>
       )}
+      </div>
     </div>
   );
 }

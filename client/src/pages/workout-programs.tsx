@@ -249,7 +249,7 @@ function ProgramCard({ program }: { program: WorkoutProgram }) {
                 className="w-full" 
                 onClick={() => {
                   console.log('Navigating to program overview:', program.id);
-                  navigate(`/program-overview/${program.id}`);
+                  navigate(`/program/${program.id}`);
                 }}
               >
                 <Play className="w-4 h-4 mr-2" />

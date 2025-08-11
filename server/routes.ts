@@ -348,16 +348,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const programs = await storage.getAllWorkoutPrograms();
+      const trainingPrograms = await storage.getAllTrainingPrograms();
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
       
-      // Add purchase status to each program (free programs are always considered "purchased")
+      // Convert training programs to workout program format for consistency
+      const formattedTrainingPrograms = trainingPrograms.map((tp: any) => ({
+        id: tp.id,
+        name: tp.name,
+        description: tp.description,
+        price: 0, // Training programs are free for now
+        priceFormatted: "Free",
+        durationWeeks: tp.durationWeeks || 4,
+        difficultyLevel: tp.difficulty || 'intermediate',
+        targetAudience: tp.goal || 'General fitness enthusiasts',
+        estimatedDuration: 45,
+        workoutsPerWeek: tp.daysPerWeek || 3,
+        features: [
+          `${tp.durationWeeks || 4} weeks of structured training`,
+          `${tp.daysPerWeek || 3} workouts per week`,
+          'Progress tracking',
+          'Coach notes included'
+        ],
+        isPurchased: true // Always consider training programs as purchased for now
+      }));
+      
+      // Add purchase status to each traditional program
       const programsWithStatus = programs.map(program => ({
         ...program,
         isPurchased: purchasedPrograms.includes(program.id.toString()) || program.price === 0,
         priceFormatted: `$${(program.price / 100).toFixed(2)}`
       }));
       
-      res.json(programsWithStatus);
+      // Combine both types of programs
+      const allPrograms = [...programsWithStatus, ...formattedTrainingPrograms];
+      
+      res.json(allPrograms);
     } catch (error) {
       console.error("Error fetching workout programs:", error);
       res.status(500).json({ error: "Failed to fetch workout programs" });
@@ -378,19 +403,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const param = req.params.id;
       
       let program;
-      let programId: number;
+      let programId: number | string;
+      let isTrainingProgram = false;
       
-      // Check if param is a number (ID) or a string (slug)
+      // Check if param is a number (ID) or a string (slug/training program ID)
       const numericId = parseInt(param);
       if (!isNaN(numericId)) {
-        // It's an ID
+        // It's a numeric ID - check traditional programs first
         programId = numericId;
         program = await storage.getWorkoutProgram(programId);
       } else {
-        // It's a slug - need to find by name
-        const allPrograms = await storage.getAllWorkoutPrograms();
-        program = allPrograms.find(p => generateSlug(p.name) === param);
-        programId = program?.id || 0;
+        // It's a string - could be a slug or training program ID
+        // First try as training program ID
+        const trainingProgram = await storage.getTrainingProgram(param);
+        if (trainingProgram) {
+          program = {
+            id: trainingProgram.id,
+            name: trainingProgram.name,
+            description: trainingProgram.description,
+            price: 0,
+            durationWeeks: trainingProgram.durationWeeks || 4,
+            difficultyLevel: trainingProgram.difficulty || 'intermediate',
+            targetAudience: trainingProgram.goal || 'General fitness enthusiasts',
+            estimatedDuration: 45,
+            workoutsPerWeek: trainingProgram.daysPerWeek || 3,
+            features: [
+              `${trainingProgram.durationWeeks || 4} weeks of structured training`,
+              `${trainingProgram.daysPerWeek || 3} workouts per week`,
+              'Progress tracking',
+              'Coach notes included'
+            ]
+          };
+          programId = param;
+          isTrainingProgram = true;
+        } else {
+          // Try as slug for traditional programs
+          const allPrograms = await storage.getAllWorkoutPrograms();
+          program = allPrograms.find(p => generateSlug(p.name) === param);
+          programId = program?.id || 0;
+        }
       }
       
       if (!program) {
@@ -398,12 +449,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const isPurchased = purchasedPrograms.includes(programId.toString()) || program.price === 0;
+      const isPurchased = isTrainingProgram || purchasedPrograms.includes(programId.toString()) || program.price === 0;
       
       res.json({
         ...program,
         isPurchased,
-        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+        priceFormatted: isTrainingProgram ? "Free" : `$${(program.price / 100).toFixed(2)}`,
+        isTrainingProgram
       });
     } catch (error) {
       console.error("Error fetching program details:", error);
@@ -420,6 +472,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUser(userId);
       if (!user || user.username !== "Zero") {
         return res.status(403).json({ error: "Programs are currently only available to Zero" });
+      }
+      
+      // Check if it's a training program first
+      const trainingProgram = await storage.getTrainingProgram(req.params.id);
+      if (trainingProgram) {
+        // Return the training program schedule directly
+        res.json(trainingProgram.schedule || []);
+        return;
       }
       
       // Get program details first to check if it's free

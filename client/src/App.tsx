@@ -190,6 +190,11 @@ function Router() {
           <ProgramBuilder />
         </AuthGuard>
       </Route>
+      <Route path="/program/:programId">
+        <AuthGuard>
+          <ProgramOverview />
+        </AuthGuard>
+      </Route>
       <Route path="/program-overview/:id">
         <AuthGuard>
           <ProgramOverview />
