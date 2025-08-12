@@ -147,23 +147,41 @@ export function WardrobeModal({ isOpen, onClose, user }: WardrobeModalProps) {
   };
 
   const handleApplyChanges = () => {
+    let titleChanged = false;
+    let skinChanged = false;
+    
+    // Check if title needs to be updated
     if (selectedTitle !== user?.currentTitle) {
       updateTitleMutation.mutate(selectedTitle);
+      titleChanged = true;
     }
     
-    // Convert legendary hunter skin IDs back to gender-based system for backend compatibility
-    let genderToSend = selectedSkin;
-    if (selectedSkin === "legendary_hunter_male") {
-      genderToSend = "male";
-    } else if (selectedSkin === "legendary_hunter_female") {
-      genderToSend = "female";
-    }
+    // Check if skin needs to be updated - properly handle legendary hunter skins
+    const currentSkinId = (() => {
+      if (user?.title === "The First Flame" || user?.hasLegendaryHunterSkin) {
+        return user?.gender === "female" ? "legendary_hunter_female" : "legendary_hunter_male";
+      }
+      if (user?.gender === "gm_avatar") {
+        return "gm_avatar";
+      }
+      return user?.gender || "male";
+    })();
     
-    if (genderToSend !== user?.gender) {
+    if (selectedSkin !== currentSkinId) {
+      // Convert legendary hunter skin IDs back to gender-based system for backend compatibility
+      let genderToSend = selectedSkin;
+      if (selectedSkin === "legendary_hunter_male") {
+        genderToSend = "male";
+      } else if (selectedSkin === "legendary_hunter_female") {
+        genderToSend = "female";
+      }
+      
       updateSkinMutation.mutate(genderToSend);
+      skinChanged = true;
     }
     
-    if (selectedTitle === user?.currentTitle && genderToSend === user?.gender) {
+    // Show appropriate message if no changes were made
+    if (!titleChanged && !skinChanged) {
       toast({
         title: "No Changes",
         description: "Your current title and avatar are already selected.",
