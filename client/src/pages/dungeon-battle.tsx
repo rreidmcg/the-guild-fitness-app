@@ -88,6 +88,7 @@ interface DungeonZone {
   monsters: Monster[];
   storyIntro: string;
   completionStory: string;
+  level?: number;
 }
 
 // Define the dungeon zones data
@@ -97,6 +98,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     name: "The Slime Caverns",
     description: "A damp cave system filled with bouncing green slimes",
     background: "#2d5016",
+    level: 1,
     storyIntro: "You descend into the damp, echoing caverns where the walls glisten with slime trails. The air is thick and humid...",
     completionStory: "The caverns fall silent as the last slime dissolves. You notice strange crystals embedded in the walls.",
     monsters: [
@@ -113,6 +115,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     name: "The Rat Warrens",
     description: "Underground tunnels infested with oversized rats",
     background: "#4a3728",
+    level: 2,
     storyIntro: "You squeeze through narrow tunnels as the sound of scurrying echoes around you. Red eyes gleam in the darkness...",
     completionStory: "The tunnels grow quiet as you defeat the last of the rat pack. You discover hidden passages leading deeper underground.",
     monsters: [
@@ -129,6 +132,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     name: "The Spider Forest",
     description: "Dark woods where massive spiders weave deadly webs",
     background: "#1a3d1a",
+    level: 3,
     storyIntro: "You enter the shadowy forest where enormous webs block your path and eight-legged creatures lurk in the canopy...",
     completionStory: "The forest grows quiet as the last spider retreats. You notice rare herbs growing beneath the cleared webs.",
     monsters: [
@@ -145,6 +149,7 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     name: "The Goblin Camps",
     description: "Crude settlements where savage goblins plot their raids",
     background: "#3d2b1f",
+    level: 4,
     storyIntro: "You approach the chaotic goblin encampment where crude weapons glint in firelight and war drums echo...",
     completionStory: "The camps fall silent as goblin resistance crumbles. You discover stolen treasures and crude maps.",
     monsters: [
@@ -166,7 +171,7 @@ interface BattleState {
   monster: Monster | null;
   battleLog: string[];
   isPlayerTurn: boolean;
-  battleResult: 'ongoing' | 'victory' | 'defeat';
+  battleResult: 'ongoing' | 'victory' | 'defeat' | 'dungeon_complete';
   currentMonsterIndex: number;
   totalGoldEarned: number;
   zone: DungeonZone | null;
@@ -326,7 +331,7 @@ export default function DungeonBattlePage() {
     const playerDamage = playerDamageMatch ? parseInt(playerDamageMatch[1]) : null;
     const monsterDamage = monsterDamageMatch ? parseInt(monsterDamageMatch[1]) : null;
 
-    // Start player lunge and monster flash (taking damage)
+    // Instant player lunge and monster flash (taking damage) for low latency
     setBattleState(prev => ({
       ...prev,
       playerLunging: true,
@@ -334,7 +339,7 @@ export default function DungeonBattlePage() {
       monsterFlashing: playerDamage !== null
     }));
 
-    // After player lunge, clear player attack effects
+    // Reduced delay for faster combat feel - 400ms instead of 800ms
     setTimeout(() => {
       setBattleState(prev => ({
         ...prev,
@@ -379,7 +384,7 @@ export default function DungeonBattlePage() {
                 playerFlashing: false,
                 isPlayerTurn: true
               }));
-            }, 800);
+            }, 400);
           }, 600);
         } else {
           // No monster counter-attack or battle ended, reset for next turn
@@ -413,7 +418,7 @@ export default function DungeonBattlePage() {
           isPlayerTurn: true
         }));
       }
-    }, 800);
+    }, 400);
 
     if (data.battleResult === 'victory') {
       // Move to next monster or complete dungeon
@@ -457,7 +462,7 @@ export default function DungeonBattlePage() {
     }
   };
 
-  // New combo attack system
+  // New combo attack system with instant response
   const handleComboAttack = () => {
     if (battleState.battleResult !== 'ongoing' || attackMutation.isPending) return;
     
@@ -478,17 +483,24 @@ export default function DungeonBattlePage() {
       newDamageMultiplier = 1.0;
     }
     
-    // Update state with combo progress
+    // INSTANT update state with combo progress - no waiting for server response
     setBattleState(prev => ({
       ...prev,
       comboPoints: newComboPoints,
       attacksRemaining: prev.attacksRemaining - 1,
       lastAttackTime: currentTime,
       damageMultiplier: newDamageMultiplier,
-      isInCombatTurn: true
+      isInCombatTurn: true,
+      // Instantly show player attack animation for responsiveness
+      playerLunging: true
     }));
+
+    // Clear attack animation quickly
+    setTimeout(() => {
+      setBattleState(prev => ({ ...prev, playerLunging: false }));
+    }, 300);
     
-    // Execute attack with current multiplier
+    // Execute attack with current multiplier in background
     attackMutation.mutate({ damageMultiplier: newDamageMultiplier });
   };
 
@@ -727,16 +739,23 @@ export default function DungeonBattlePage() {
       {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
         <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
           <div className="flex items-center justify-center space-x-2">
-            {[1, 2, 3, 4].map((point) => (
-              <div
-                key={point}
-                className={`w-4 h-4 md:w-6 md:h-6 rounded-full border-2 transition-all duration-300 ${
-                  point <= battleState.comboPoints
-                    ? 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50 combo-point-filled'
-                    : 'bg-gray-600/50 border-gray-500'
-                }`}
-              />
-            ))}
+            {[1, 2, 3, 4].map((point) => {
+              const isActive = point <= battleState.comboPoints;
+              const hasBonus = battleState.damageMultiplier > 1.0 && isActive;
+              
+              return (
+                <div
+                  key={point}
+                  className={`w-4 h-4 md:w-6 md:h-6 rounded-full border-2 transition-all duration-300 ${
+                    hasBonus
+                      ? 'bg-red-500 border-red-400 shadow-lg shadow-red-500/50 combo-point-bonus'
+                      : isActive
+                      ? 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50 combo-point-filled'
+                      : 'bg-gray-600/50 border-gray-500'
+                  }`}
+                />
+              );
+            })}
           </div>
           {battleState.damageMultiplier > 1.0 && (
             <div className="text-center text-yellow-300 font-bold text-sm md:text-lg mt-1 combo-multiplier-appear">
