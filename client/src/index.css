@@ -34,6 +34,41 @@
   }
 }
 
+/* Combo Point Animations */
+@keyframes comboPointPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 6px rgba(251, 191, 36, 0.5);
+  }
+}
+
+@keyframes comboFill {
+  from {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.combo-point-filled {
+  animation: comboFill 0.3s ease-out forwards;
+}
+
+.combo-multiplier-appear {
+  animation: comboPointPulse 0.5s ease-out;
+}
+
 :root {
   /* Bright Gaming Theme with Glowing Text */
   --background: hsl(215, 28%, 8%);  /* Dark slate background */

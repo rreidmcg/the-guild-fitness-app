@@ -176,6 +176,12 @@ interface BattleState {
   monsterDamage: number | null;
   playerFlashing: boolean;
   monsterFlashing: boolean;
+  // New combo system state
+  comboPoints: number; // 0-4 combo points
+  attacksRemaining: number; // Attacks left in current turn (0-4)
+  lastAttackTime: number; // Timestamp of last attack
+  damageMultiplier: number; // Current damage multiplier from combo
+  isInCombatTurn: boolean; // True when player is in their 4-attack turn
 }
 
 
@@ -203,7 +209,13 @@ export default function DungeonBattlePage() {
     playerDamage: null,
     monsterDamage: null,
     playerFlashing: false,
-    monsterFlashing: false
+    monsterFlashing: false,
+    // Initialize combo system
+    comboPoints: 0,
+    attacksRemaining: 4,
+    lastAttackTime: 0,
+    damageMultiplier: 1.0,
+    isInCombatTurn: false
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -267,19 +279,30 @@ export default function DungeonBattlePage() {
       currentMonsterIndex: 0,
       totalGoldEarned: 0,
       zone,
-      showActionModal: false,
-      actionMode: 'main'
+      playerLunging: false,
+      monsterLunging: false,
+      playerDamage: null,
+      monsterDamage: null,
+      playerFlashing: false,
+      monsterFlashing: false,
+      // Initialize combo system
+      comboPoints: 0,
+      attacksRemaining: 4,
+      lastAttackTime: 0,
+      damageMultiplier: 1.0,
+      isInCombatTurn: false
     });
   };
 
   const attackMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ damageMultiplier }: { damageMultiplier: number }) => {
       return await apiRequest("/api/battle/attack", {
         method: "POST",
         body: {
           monster: battleState.monster,
           playerHp: battleState.playerHp,
-          playerMp: battleState.playerMp
+          playerMp: battleState.playerMp,
+          damageMultiplier: damageMultiplier // Send combo multiplier to server
         }
       });
     },
@@ -320,9 +343,46 @@ export default function DungeonBattlePage() {
         monsterFlashing: false
       }));
 
-      // Pause before monster counter-attack
-      if (monsterDamage !== null) {
-        setTimeout(() => {
+      // Check if player turn is complete (no attacks remaining) or if monster/player is defeated
+      const turnComplete = battleState.attacksRemaining <= 1 || data.battleResult !== 'ongoing';
+      
+      if (turnComplete) {
+        // End player turn, monster counter-attacks if still alive
+        if (monsterDamage !== null && data.battleResult === 'ongoing') {
+          setTimeout(() => {
+            setBattleState(prev => ({
+              ...prev,
+              playerHp: data.playerHp,
+              playerMp: data.playerMp,
+              monster: data.monster,
+              battleLog: [...prev.battleLog, ...data.battleLog],
+              battleResult: data.battleResult,
+              totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
+              isPlayerTurn: false,
+              monsterLunging: true,
+              monsterDamage: monsterDamage,
+              playerFlashing: true,
+              // Reset for next turn
+              comboPoints: 0,
+              attacksRemaining: 4,
+              lastAttackTime: 0,
+              damageMultiplier: 1.0,
+              isInCombatTurn: false
+            }));
+
+            // Clear monster attack effects and return turn to player
+            setTimeout(() => {
+              setBattleState(prev => ({
+                ...prev,
+                monsterLunging: false,
+                monsterDamage: null,
+                playerFlashing: false,
+                isPlayerTurn: true
+              }));
+            }, 800);
+          }, 600);
+        } else {
+          // No monster counter-attack or battle ended, reset for next turn
           setBattleState(prev => ({
             ...prev,
             playerHp: data.playerHp,
@@ -331,24 +391,17 @@ export default function DungeonBattlePage() {
             battleLog: [...prev.battleLog, ...data.battleLog],
             battleResult: data.battleResult,
             totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-            isPlayerTurn: data.battleResult === 'ongoing' ? true : true, // Keep player turn active for continuous attacks
-            monsterLunging: true,
-            monsterDamage: monsterDamage,
-            playerFlashing: true
+            isPlayerTurn: data.battleResult === 'ongoing',
+            // Reset for next turn
+            comboPoints: 0,
+            attacksRemaining: 4,
+            lastAttackTime: 0,
+            damageMultiplier: 1.0,
+            isInCombatTurn: false
           }));
-
-          // Clear monster attack effects
-          setTimeout(() => {
-            setBattleState(prev => ({
-              ...prev,
-              monsterLunging: false,
-              monsterDamage: null,
-              playerFlashing: false
-            }));
-          }, 800);
-        }, 600); // Pause between attacks
+        }
       } else {
-        // No monster counter-attack, just update state
+        // Turn continues, just update battle state
         setBattleState(prev => ({
           ...prev,
           playerHp: data.playerHp,
@@ -357,7 +410,7 @@ export default function DungeonBattlePage() {
           battleLog: [...prev.battleLog, ...data.battleLog],
           battleResult: data.battleResult,
           totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
-          isPlayerTurn: data.battleResult === 'ongoing' ? true : true
+          isPlayerTurn: true
         }));
       }
     }, 800);
@@ -375,7 +428,13 @@ export default function DungeonBattlePage() {
             currentMonsterIndex: nextIndex,
             battleResult: 'ongoing',
             isPlayerTurn: true,
-            battleLog: [...prev.battleLog, `A wild ${nextMonster.name} appears!`]
+            battleLog: [...prev.battleLog, `A wild ${nextMonster.name} appears!`],
+            // Reset combo system for new monster
+            comboPoints: 0,
+            attacksRemaining: 4,
+            lastAttackTime: 0,
+            damageMultiplier: 1.0,
+            isInCombatTurn: false
           }));
         }, 2000);
       } else {
@@ -394,11 +453,42 @@ export default function DungeonBattlePage() {
     }
   };
 
-  const handleAttack = () => {
-    if (battleState.isPlayerTurn && battleState.battleResult === 'ongoing') {
-      attackMutation.mutate();
+  // New combo attack system
+  const handleComboAttack = () => {
+    if (battleState.battleResult !== 'ongoing' || attackMutation.isPending) return;
+    
+    const currentTime = Date.now();
+    const timeDifference = currentTime - battleState.lastAttackTime;
+    
+    // Check if this is a combo hit (within 200ms of last attack)
+    let newDamageMultiplier = 1.0;
+    let newComboPoints = battleState.comboPoints;
+    
+    if (battleState.lastAttackTime > 0 && timeDifference <= 200 && battleState.comboPoints < 4) {
+      // Combo hit! Stack damage
+      newComboPoints += 1;
+      newDamageMultiplier = 1.0 + (newComboPoints * 0.25); // Each combo point adds 25% damage
+    } else if (battleState.lastAttackTime > 0 && timeDifference > 200) {
+      // Too slow, reset combo
+      newComboPoints = 0;
+      newDamageMultiplier = 1.0;
     }
+    
+    // Update state with combo progress
+    setBattleState(prev => ({
+      ...prev,
+      comboPoints: newComboPoints,
+      attacksRemaining: prev.attacksRemaining - 1,
+      lastAttackTime: currentTime,
+      damageMultiplier: newDamageMultiplier,
+      isInCombatTurn: true
+    }));
+    
+    // Execute attack with current multiplier
+    attackMutation.mutate({ damageMultiplier: newDamageMultiplier });
   };
+
+  const handleAttack = handleComboAttack;
 
   const handleRetreat = () => {
     navigate("/pve-dungeons");
@@ -607,56 +697,81 @@ export default function DungeonBattlePage() {
         </div>
       </div>
 
-      {/* Circular Icon Battle Interface - Transparent */}
-      <div className="fixed bottom-16 left-0 right-0 z-30">
-        {/* Mobile & Desktop Layout - Circular buttons */}
-        <div className="p-4 md:p-6">
-          {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' ? (
-            <div className="flex justify-center items-center space-x-8 md:space-x-12 relative">
-              {/* Attack Button - Larger and positioned */}
-              <button 
-                className="w-24 h-24 md:w-30 md:h-30 bg-transparent hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                onClick={handleAttack}
-                disabled={attackMutation.isPending}
-                style={{ transform: 'translate(50px, 50px)' }}
-              >
-                {attackMutation.isPending ? (
-                  <div className="animate-spin rounded-full h-9 w-9 md:h-12 md:w-12 border-b-2 border-white"></div>
-                ) : (
-                  <img 
-                    src={swordIconImage} 
-                    alt="Attack" 
-                    className="w-24 h-24 md:w-30 md:h-30 object-contain"
-                    style={{ imageRendering: 'pixelated' }}
-                  />
-                )}
-              </button>
-              
-              {/* Flee Button - Same size, moved down and right */}
-              <button 
-                className="w-16 h-16 md:w-20 md:h-20 bg-transparent rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110"
-                onClick={() => {
-                  if (window.confirm("Are you sure you want to flee from battle?")) {
-                    handleRetreat();
-                  }
-                }}
-                style={{ transform: 'translate(20px, 50px)' }}
-              >
-                <img 
-                  src={fleeButtonIcon} 
-                  alt="Flee" 
-                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                  style={{ imageRendering: 'pixelated' }}
-                />
-              </button>
+      {/* Full-Screen Tap-to-Attack Interface */}
+      {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
+        <div 
+          className="fixed inset-0 z-40 cursor-pointer select-none"
+          onClick={handleAttack}
+          style={{ touchAction: 'manipulation', userSelect: 'none' }}
+        >
+          {/* Visual feedback overlay */}
+          <div className="absolute inset-0 bg-transparent hover:bg-white/5 transition-colors duration-100" />
+          
+          {/* Tap instruction text */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="text-center text-white/80 text-lg md:text-2xl font-bold animate-pulse">
+              TAP TO ATTACK
             </div>
-          ) : (
-            <div className="text-center text-lg md:text-xl font-bold text-yellow-200 tracking-wider uppercase py-4 bg-red-900/50 rounded-lg border-2 border-red-400/50">
-              ⏳ ENEMY TURN
+            {battleState.isInCombatTurn && (
+              <div className="text-center text-yellow-300 text-sm md:text-lg mt-2">
+                Attacks Remaining: {battleState.attacksRemaining}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Circular Combo Points Display - Top Center */}
+      {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
+        <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+          <div className="flex items-center justify-center space-x-2">
+            {[1, 2, 3, 4].map((point) => (
+              <div
+                key={point}
+                className={`w-4 h-4 md:w-6 md:h-6 rounded-full border-2 transition-all duration-300 ${
+                  point <= battleState.comboPoints
+                    ? 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50 combo-point-filled'
+                    : 'bg-gray-600/50 border-gray-500'
+                }`}
+              />
+            ))}
+          </div>
+          {battleState.damageMultiplier > 1.0 && (
+            <div className="text-center text-yellow-300 font-bold text-sm md:text-lg mt-1 combo-multiplier-appear">
+              {Math.round(battleState.damageMultiplier * 100)}% Damage
             </div>
           )}
         </div>
+      )}
+
+      {/* Flee Button - Bottom Left Corner */}
+      <div className="fixed bottom-8 left-8 z-50">
+        <button 
+          className="w-16 h-16 md:w-20 md:h-20 bg-red-600/80 hover:bg-red-500 rounded-full flex items-center justify-center transition-all duration-200 transform hover:scale-110 border-2 border-red-400 shadow-lg"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering tap-to-attack
+            if (window.confirm("Are you sure you want to flee from battle?")) {
+              handleRetreat();
+            }
+          }}
+        >
+          <img 
+            src={fleeButtonIcon} 
+            alt="Flee" 
+            className="w-10 h-10 md:w-12 md:h-12 object-contain"
+            style={{ imageRendering: 'pixelated' }}
+          />
+        </button>
       </div>
+
+      {/* Enemy Turn Display */}
+      {!battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
+          <div className="text-center text-lg md:text-xl font-bold text-red-300 tracking-wider uppercase py-4 px-8 bg-red-900/70 rounded-lg border-2 border-red-400/50 animate-pulse">
+            ⏳ ENEMY TURN
+          </div>
+        </div>
+      )}
 
       </div>
     </BattleAccessGuard>

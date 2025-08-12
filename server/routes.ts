@@ -3755,7 +3755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/battle/attack", async (req, res) => {
     try {
       const userId = requireAuth(req);
-      const { monster, playerHp, playerMp } = req.body;
+      const { monster, playerHp, playerMp, damageMultiplier = 1.0 } = req.body;
       
       // Check battle access
       const user = await storage.getUser(userId);
@@ -3774,13 +3774,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate damage dealt by player to monster
       const baseDamage = Math.max(1, playerAttack - Math.floor(monster.level * 1.5));
       const damageVariance = Math.floor(Math.random() * Math.max(1, baseDamage * 0.3));
-      const playerDamage = baseDamage + damageVariance;
+      const rawDamage = baseDamage + damageVariance;
+      
+      // Apply combo damage multiplier
+      const playerDamage = Math.floor(rawDamage * damageMultiplier);
       
       // Apply damage to monster
       const newMonsterHp = Math.max(0, monster.currentHp - playerDamage);
       
-      // Initialize battle log
-      const battleLog = [`You deal ${playerDamage} damage to ${monster.name}!`];
+      // Initialize battle log with combo information
+      const battleLog = [];
+      if (damageMultiplier > 1.0) {
+        const comboBonus = Math.floor((damageMultiplier - 1.0) * 100);
+        battleLog.push(`COMBO HIT! You deal ${playerDamage} damage to ${monster.name}! (+${comboBonus}% combo bonus)`);
+      } else {
+        battleLog.push(`You deal ${playerDamage} damage to ${monster.name}!`);
+      }
       
       // Check if monster is defeated
       let battleResult = 'ongoing';
