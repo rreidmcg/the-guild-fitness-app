@@ -621,7 +621,7 @@ export default function DungeonBattlePage() {
             {/* Character shadow */}
             <div 
               className="absolute bottom-0 w-16 h-4 bg-black/30 rounded-full blur-sm"
-              style={{ transform: 'translateY(10px)' }}
+              style={{ transform: 'translateY(20px)' }}
             />
             <div className="relative">
               <div 
@@ -660,7 +660,7 @@ export default function DungeonBattlePage() {
               {/* Monster shadow */}
               <div 
                 className="absolute bottom-0 w-24 h-6 bg-black/30 rounded-full blur-sm"
-                style={{ transform: 'translateY(-15px)' }}
+                style={{ transform: 'translateY(-25px)' }}
               />
               <div className="relative">
                 <img 
