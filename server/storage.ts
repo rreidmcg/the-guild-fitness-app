@@ -501,6 +501,7 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         not(eq(users.username, 'Zero')),
         not(eq(users.username, 'Rob')),
+        not(eq(users.username, 'testuser')),
         not(eq(users.isDemoAccount, true))
       ))
       .orderBy(desc(users.experience))
@@ -577,8 +578,8 @@ export class DatabaseStorage implements IStorage {
         .update(userExercisePreferences)
         .set(updateData)
         .where(and(
-          eq(userExercisePreferences.userId, preference.userId),
-          eq(userExercisePreferences.exerciseId, preference.exerciseId)
+          eq(userExercisePreferences.userId, preference.userId!),
+          eq(userExercisePreferences.exerciseId, preference.exerciseId!)
         ))
         .returning();
       console.log('Storage: Updated preference result:', updated);
@@ -1843,7 +1844,7 @@ Start your fitness journey today and watch your character grow stronger with eve
 
 **The Guild Development Team**`,
       mailType: "announcement",
-      isRead: false,
+
       rewards: null,
       rewardsClaimed: false,
       expiresAt: null
@@ -1916,7 +1917,7 @@ Start your fitness journey today and watch your character grow stronger with eve
     const achieved: any[] = [];
     const rewards: any[] = [];
     const updatedMilestones = goal.milestones?.map(milestone => {
-      if (!milestone.achieved && goal.currentValue >= milestone.value) {
+      if (!milestone.achieved && (goal.currentValue ?? 0) >= milestone.value) {
         milestone.achieved = true;
         milestone.achievedAt = new Date().toISOString().split('T')[0];
         achieved.push(milestone);
@@ -1936,7 +1937,7 @@ Start your fitness journey today and watch your character grow stronger with eve
       // Award XP to user
       for (const reward of rewards) {
         if (reward.type === 'xp') {
-          await this.updateUserStats(userId, { experience: sql`experience + ${reward.value}` });
+          await this.updateUser(userId, { experience: sql`experience + ${reward.value}` });
         }
       }
     }
@@ -2005,7 +2006,7 @@ Start your fitness journey today and watch your character grow stronger with eve
     const goals = await this.getUserFitnessGoals(userId);
     const goalAchievements = goals.map(goal => ({
       goalType: goal.goalType,
-      progress: Math.min(100, (goal.currentValue / goal.targetValue) * 100),
+      progress: Math.min(100, ((goal.currentValue ?? 0) / goal.targetValue) * 100),
       milestones: goal.milestones?.filter(m => m.achieved) || []
     }));
 
@@ -2101,7 +2102,7 @@ Start your fitness journey today and watch your character grow stronger with eve
     await this.ensureInitialized();
     const [newProgram] = await db
       .insert(trainingPrograms)
-      .values(program)
+      .values([program])
       .returning();
     return newProgram;
   }
@@ -2210,11 +2211,11 @@ Start your fitness journey today and watch your character grow stronger with eve
 
     const [newCompletion] = await db
       .insert(programCompletions)
-      .values(completion)
+      .values([completion])
       .onConflictDoUpdate({
         target: [programCompletions.userId, programCompletions.programId],
         set: {
-          byWeek: completion.byWeek,
+          byWeek: completion.byWeek as any,
           isActive: true,
           startedAt: completion.startedAt,
           updatedAt: new Date()
