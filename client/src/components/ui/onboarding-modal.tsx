@@ -267,7 +267,7 @@ export function OnboardingModal({ isOpen, onClose, onComplete }: OnboardingModal
           <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg p-4 border border-green-500/20">
             <div className="flex items-center space-x-2 text-green-600 font-medium">
               <Gift className="w-4 h-4" />
-              <span>Pro Tip: Complete 3 daily quests or 1 workout to advance your streak!</span>
+              <span>Pro Tip: Complete workouts to advance your streak, and 3+ daily quests earn streak freezes!</span>
             </div>
           </div>
         </div>
