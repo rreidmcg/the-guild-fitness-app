@@ -600,7 +600,7 @@ export default function DungeonBattlePage() {
               </div>
               {/* MP Bar */}
               <div className="relative">
-                <div className="bg-black/50 rounded-full h-3 w-28 border border-blue-500/50 overflow-hidden">
+                <div className="bg-black/50 rounded-full h-3 w-32 border border-blue-500/50 overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-blue-400 to-blue-300 transition-all duration-500"
                     style={{ 
@@ -660,7 +660,7 @@ export default function DungeonBattlePage() {
               {/* Monster shadow */}
               <div 
                 className="absolute bottom-0 w-24 h-6 bg-black/30 rounded-full blur-sm"
-                style={{ transform: 'translateY(-5px)' }}
+                style={{ transform: 'translateY(-15px)' }}
               />
               <div className="relative">
                 <img 
@@ -707,11 +707,13 @@ export default function DungeonBattlePage() {
           {/* Visual feedback overlay */}
           <div className="absolute inset-0 bg-transparent hover:bg-white/5 transition-colors duration-100" />
           
-          {/* Tap instruction text */}
+          {/* Tap instruction text - only show before first attack */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-            <div className="text-center text-white/80 text-lg md:text-2xl font-bold animate-pulse">
-              TAP TO ATTACK
-            </div>
+            {!battleState.isInCombatTurn && (
+              <div className="text-center text-white/80 text-lg md:text-2xl font-bold animate-pulse">
+                TAP TO ATTACK
+              </div>
+            )}
             {battleState.isInCombatTurn && (
               <div className="text-center text-yellow-300 text-sm md:text-lg mt-2">
                 Attacks Remaining: {battleState.attacksRemaining}
