@@ -438,11 +438,15 @@ export default function DungeonBattlePage() {
           }));
         }, 2000);
       } else {
-        // Dungeon complete
-        toast({
-          title: "Dungeon Complete!",
-          description: `You earned ${battleState.totalGoldEarned + (data.goldEarned || 0)} gold total!`,
-        });
+        // Dungeon complete - show completion screen
+        const finalGoldTotal = battleState.totalGoldEarned + (data.goldEarned || 0);
+        setTimeout(() => {
+          setBattleState(prev => ({
+            ...prev,
+            battleResult: 'dungeon_complete',
+            totalGoldEarned: finalGoldTotal
+          }));
+        }, 2000);
         queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       }
     } else if (data.battleResult === 'defeat') {
@@ -714,11 +718,7 @@ export default function DungeonBattlePage() {
                 TAP TO ATTACK
               </div>
             )}
-            {battleState.isInCombatTurn && (
-              <div className="text-center text-yellow-300 text-sm md:text-lg mt-2">
-                Attacks Remaining: {battleState.attacksRemaining}
-              </div>
-            )}
+
           </div>
         </div>
       )}
@@ -771,6 +771,57 @@ export default function DungeonBattlePage() {
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
           <div className="text-center text-lg md:text-xl font-bold text-red-300 tracking-wider uppercase py-4 px-8 bg-red-900/70 rounded-lg border-2 border-red-400/50 animate-pulse">
             ⏳ ENEMY TURN
+          </div>
+        </div>
+      )}
+
+      {/* Dungeon Completion Screen */}
+      {battleState.battleResult === 'dungeon_complete' && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl p-8 max-w-md w-full border-2 border-yellow-400/50 shadow-2xl">
+            <div className="text-center space-y-6">
+              {/* Victory Title */}
+              <div className="text-3xl font-bold text-yellow-400 mb-4">
+                🎉 DUNGEON COMPLETE! 🎉
+              </div>
+
+              {/* Zone Name */}
+              <div className="text-xl font-semibold text-white mb-6">
+                {battleState.zone?.name}
+              </div>
+
+              {/* Stats Summary */}
+              <div className="space-y-4 bg-slate-700/50 rounded-lg p-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300">Gold Earned:</span>
+                  <span className="text-yellow-400 font-bold text-lg">
+                    {battleState.totalGoldEarned} 🪙
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300">Monsters Defeated:</span>
+                  <span className="text-green-400 font-bold">
+                    {battleState.zone?.monsters.length || 0}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300">Zone Level:</span>
+                  <span className="text-blue-400 font-bold">
+                    {battleState.zone?.level || 1}
+                  </span>
+                </div>
+              </div>
+
+              {/* Exit Button */}
+              <button
+                onClick={() => navigate("/pve-dungeons")}
+                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg border-2 border-green-400/50"
+              >
+                Exit Dungeon
+              </button>
+            </div>
           </div>
         </div>
       )}
