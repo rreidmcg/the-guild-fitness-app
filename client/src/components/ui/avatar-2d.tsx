@@ -114,14 +114,7 @@ export function Avatar2D({ user, playerStats, size = "md", className }: Avatar2D
           }}
         />
         
-        {/* Glow effect overlay based on fitness level */}
-        <div 
-          className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-transparent"
-          style={{
-            background: `radial-gradient(circle at center, rgba(239, 68, 68, ${muscleDefinition * 0.15}) 0%, rgba(34, 197, 94, ${athleticBuild * 0.15}) 30%, rgba(168, 85, 247, ${explosiveness * 0.15}) 60%, transparent 80%)`,
-            mixBlendMode: 'overlay'
-          }}
-        />
+        {/* Glow effect overlay removed to eliminate blue aura */}
 
         
 

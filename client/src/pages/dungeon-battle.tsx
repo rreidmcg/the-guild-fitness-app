@@ -721,9 +721,9 @@ export default function DungeonBattlePage() {
         </div>
       )}
 
-      {/* Circular Combo Points Display - Top Center */}
+      {/* Circular Combo Points Display - Bottom Center */}
       {battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
-        <div className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none">
           <div className="flex items-center justify-center space-x-2">
             {[1, 2, 3, 4].map((point) => (
               <div
@@ -758,7 +758,7 @@ export default function DungeonBattlePage() {
           <img 
             src={fleeButtonIcon} 
             alt="Flee" 
-            className="w-10 h-10 md:w-12 md:h-12 object-contain"
+            className="w-full h-full object-contain p-1"
             style={{ imageRendering: 'pixelated' }}
           />
         </button>
