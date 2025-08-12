@@ -546,8 +546,8 @@ export default function DungeonBattlePage() {
                   <p 
                     className="text-sm md:text-base font-bold" 
                     style={{ 
-                      color: '#7f1d1d', 
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                      color: '#ffffff', 
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)',
                       filter: 'none'
                     }}
                   >
@@ -555,12 +555,11 @@ export default function DungeonBattlePage() {
                   </p>
                   <h3 
                     style={{ 
-                      color: '#7f1d1d !important', 
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.8) !important',
+                      color: '#ffffff', 
+                      textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)',
                       fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
                       fontWeight: 'bold',
-                      filter: 'none !important',
-                      WebkitTextFillColor: '#7f1d1d !important'
+                      filter: 'none'
                     }}
                   >
                     {battleState.monster.name}
@@ -726,7 +725,13 @@ export default function DungeonBattlePage() {
           {/* Tap instruction text - only show before first attack */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
             {!battleState.isInCombatTurn && (
-              <div className="text-center text-white/80 text-lg md:text-2xl font-bold animate-pulse">
+              <div 
+                className="text-center text-white text-lg md:text-2xl font-bold animate-pulse"
+                style={{ 
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)',
+                  filter: 'drop-shadow(0 0 6px rgba(0,0,0,0.8))'
+                }}
+              >
                 TAP TO ATTACK
               </div>
             )}
@@ -758,7 +763,13 @@ export default function DungeonBattlePage() {
             })}
           </div>
           {battleState.damageMultiplier > 1.0 && (
-            <div className="text-center text-yellow-300 font-bold text-sm md:text-lg mt-1 combo-multiplier-appear">
+            <div 
+              className="text-center text-yellow-300 font-bold text-sm md:text-lg mt-1 combo-multiplier-appear"
+              style={{ 
+                textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)',
+                filter: 'drop-shadow(0 0 4px rgba(0,0,0,0.8))'
+              }}
+            >
               {Math.round(battleState.damageMultiplier * 100)}% Damage
             </div>
           )}
@@ -788,7 +799,13 @@ export default function DungeonBattlePage() {
       {/* Enemy Turn Display */}
       {!battleState.isPlayerTurn && battleState.battleResult === 'ongoing' && (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none">
-          <div className="text-center text-lg md:text-xl font-bold text-red-300 tracking-wider uppercase py-4 px-8 bg-red-900/70 rounded-lg border-2 border-red-400/50 animate-pulse">
+          <div 
+            className="text-center text-lg md:text-xl font-bold text-red-200 tracking-wider uppercase py-4 px-8 bg-red-900/80 rounded-lg border-2 border-red-400/70 animate-pulse"
+            style={{ 
+              textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)',
+              boxShadow: '0 0 16px rgba(0,0,0,0.5)'
+            }}
+          >
             ⏳ ENEMY TURN
           </div>
         </div>
@@ -796,38 +813,38 @@ export default function DungeonBattlePage() {
 
       {/* Dungeon Completion Screen */}
       {battleState.battleResult === 'dungeon_complete' && (
-        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl p-8 max-w-md w-full border-2 border-yellow-400/50 shadow-2xl">
+        <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl p-8 max-w-md w-full border-2 border-yellow-400/70 shadow-2xl shadow-yellow-400/20">
             <div className="text-center space-y-6">
               {/* Victory Title */}
-              <div className="text-3xl font-bold text-yellow-400 mb-4">
+              <div className="text-3xl font-bold text-yellow-300 mb-4 drop-shadow-lg">
                 🎉 DUNGEON COMPLETE! 🎉
               </div>
 
               {/* Zone Name */}
-              <div className="text-xl font-semibold text-white mb-6">
+              <div className="text-xl font-semibold text-white mb-6 drop-shadow-md">
                 {battleState.zone?.name}
               </div>
 
               {/* Stats Summary */}
-              <div className="space-y-4 bg-slate-700/50 rounded-lg p-6">
+              <div className="space-y-4 bg-slate-700/70 rounded-lg p-6 border border-slate-600/50">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300">Gold Earned:</span>
-                  <span className="text-yellow-400 font-bold text-lg">
+                  <span className="text-gray-200 font-medium drop-shadow">Gold Earned:</span>
+                  <span className="text-yellow-300 font-bold text-lg drop-shadow-lg">
                     {battleState.totalGoldEarned} 🪙
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300">Monsters Defeated:</span>
-                  <span className="text-green-400 font-bold">
+                  <span className="text-gray-200 font-medium drop-shadow">Monsters Defeated:</span>
+                  <span className="text-green-300 font-bold drop-shadow-lg">
                     {battleState.zone?.monsters.length || 0}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300">Zone Level:</span>
-                  <span className="text-blue-400 font-bold">
+                  <span className="text-gray-200 font-medium drop-shadow">Zone Level:</span>
+                  <span className="text-blue-300 font-bold drop-shadow-lg">
                     {battleState.zone?.level || 1}
                   </span>
                 </div>
@@ -836,7 +853,7 @@ export default function DungeonBattlePage() {
               {/* Exit Button */}
               <button
                 onClick={() => navigate("/pve-dungeons")}
-                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg border-2 border-green-400/50"
+                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg border-2 border-green-400/70 drop-shadow-lg"
               >
                 Exit Dungeon
               </button>
