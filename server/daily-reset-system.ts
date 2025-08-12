@@ -219,3 +219,58 @@ export class DailyResetSystem implements DailyResetService {
 
 // Export singleton instance
 export const dailyResetService = new DailyResetSystem();
+
+/**
+ * Setup automatic daily quest reset scheduler
+ * Runs every hour and checks all users for daily quest resets
+ */
+export function setupDailyQuestScheduler() {
+  console.log("Setting up automatic daily quest reset scheduler...");
+  
+  // Run every hour (3,600,000 ms)
+  setInterval(async () => {
+    try {
+      console.log("Running automatic daily quest reset check...");
+      await processAllUserDailyResets();
+    } catch (error) {
+      console.error("Error in daily quest scheduler:", error);
+    }
+  }, 60 * 60 * 1000); // 1 hour
+  
+  console.log("Daily quest scheduler active - checking every hour for resets");
+}
+
+/**
+ * Process daily quest resets for all users
+ * Checks every user and resets their daily quests if needed
+ */
+async function processAllUserDailyResets() {
+  try {
+    // Get all users
+    const allUsers = await db.select().from(users);
+    let resetCount = 0;
+    
+    for (const user of allUsers) {
+      try {
+        // Check and reset daily quests for this user
+        const resetOccurred = await dailyResetService.checkAndResetDailyQuests(
+          user.id, 
+          user.timezone || undefined
+        );
+        
+        if (resetOccurred) {
+          resetCount++;
+          console.log(`Daily quests reset for user ${user.username} (ID: ${user.id})`);
+        }
+      } catch (error) {
+        console.error(`Error resetting daily quests for user ${user.id}:`, error);
+      }
+    }
+    
+    if (resetCount > 0) {
+      console.log(`Daily quest reset complete: ${resetCount} users had their quests reset`);
+    }
+  } catch (error) {
+    console.error("Error processing daily quest resets for all users:", error);
+  }
+}

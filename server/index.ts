@@ -76,6 +76,11 @@ app.use((req, res, next) => {
   setInterval(() => {
     AtrophySystem.processAtrophy().catch(console.error);
   }, 24 * 60 * 60 * 1000); // 24 hours
+
+  // Setup automatic daily quest reset system
+  // This runs every hour and checks if any users need their daily quests reset
+  const { setupDailyQuestScheduler } = await import("./daily-reset-system.js");
+  setupDailyQuestScheduler();
   
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Other ports are firewalled. Default to 5000 if not specified.
