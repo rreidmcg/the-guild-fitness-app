@@ -26,6 +26,7 @@ export const users = pgTable("users", {
   // Health system
   currentHp: integer("current_hp").default(40), // Default HP for starting character
   lastHpUpdateAt: timestamp("last_hp_update_at").defaultNow(),
+  lastBattleTime: integer("last_battle_time"), // Timestamp when user last left battle for HP regen
   // Magic Points system
   currentMp: integer("current_mp").default(20), // Default MP for starting character
   lastMpUpdateAt: timestamp("last_mp_update_at").defaultNow(),

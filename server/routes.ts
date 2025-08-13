@@ -1992,17 +1992,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           const currentTime = Date.now();
           
-          // Apply HP regeneration if not at max HP and out of combat
-          const lastHpUpdateTime = userWithStats.lastHpUpdateAt ? new Date(userWithStats.lastHpUpdateAt).getTime() : currentTime;
-          const hpMinutesElapsed = Math.floor((currentTime - lastHpUpdateTime) / (1000 * 60));
-          
+          // Apply HP regeneration if not at max HP and out of combat (1% per minute when outside dungeons)
           let hpChanged = false;
-          if (currentHp < maxHp && hpMinutesElapsed > 0) {
-            const hpRegenAmount = Math.max(1, Math.floor(maxHp * 0.01)) * hpMinutesElapsed; // At least 1 HP per minute
-            currentHp = Math.min(maxHp, currentHp + hpRegenAmount);
-            hpChanged = hpRegenAmount > 0;
-            if (hpChanged) {
-              console.log(`HP regeneration: +${hpRegenAmount} HP over ${hpMinutesElapsed} minutes (${currentHp}/${maxHp})`);
+          if (currentHp < maxHp && userWithStats.lastBattleTime) {
+            const timeSinceBattle = currentTime - userWithStats.lastBattleTime;
+            const minutesSinceBattle = Math.floor(timeSinceBattle / (60 * 1000));
+            
+            if (minutesSinceBattle > 0) {
+              const hpRegenRate = 0.01; // 1% per minute
+              const hpToRegenerate = Math.floor(maxHp * hpRegenRate * minutesSinceBattle);
+              const newHp = Math.min(maxHp, currentHp + hpToRegenerate);
+              
+              if (newHp > currentHp) {
+                currentHp = newHp;
+                hpChanged = true;
+                console.log(`HP regeneration: +${hpToRegenerate} HP over ${minutesSinceBattle} minutes (${currentHp}/${maxHp})`);
+              }
             }
           }
           
@@ -3440,6 +3445,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error checking onboarding status:", error);
       res.status(500).json({ error: "Failed to check onboarding status" });
+    }
+  });
+
+  // Update HP persistence for battle system
+  app.post("/api/user/update-hp", async (req, res) => {
+    try {
+      const userId = requireAuth(req);
+      const { currentHp, maxHp } = req.body;
+      
+      if (typeof currentHp !== 'number' || typeof maxHp !== 'number') {
+        return res.status(400).json({ error: "Valid currentHp and maxHp required" });
+      }
+      
+      // Ensure currentHp doesn't exceed maxHp and isn't negative
+      const validCurrentHp = Math.max(0, Math.min(currentHp, maxHp));
+      
+      await db.update(users)
+        .set({ 
+          currentHp: validCurrentHp,
+          lastBattleTime: Date.now() // Track when user left battle for HP regen
+        })
+        .where(eq(users.id, userId));
+      
+      res.json({ success: true, currentHp: validCurrentHp });
+    } catch (error) {
+      console.error("Error updating HP:", error);
+      res.status(500).json({ error: "Failed to update HP" });
     }
   });
 

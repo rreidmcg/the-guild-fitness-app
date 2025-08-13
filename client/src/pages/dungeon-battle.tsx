@@ -187,6 +187,9 @@ interface BattleState {
   lastAttackTime: number; // Timestamp of last attack
   damageMultiplier: number; // Current damage multiplier from combo
   isInCombatTurn: boolean; // True when player is in their 4-attack turn
+  // Defeat system state
+  showDefeatModal: boolean; // Show defeat modal
+  defeatModalTimer: number; // Auto-exit countdown timer
 }
 
 
@@ -220,7 +223,10 @@ export default function DungeonBattlePage() {
     attacksRemaining: 4,
     lastAttackTime: 0,
     damageMultiplier: 1.0,
-    isInCombatTurn: false
+    isInCombatTurn: false,
+    // Defeat system state
+    showDefeatModal: false,
+    defeatModalTimer: 15
   });
 
   const { data: userStats } = useQuery<UserStats>({
@@ -456,10 +462,25 @@ export default function DungeonBattlePage() {
         queryClient.invalidateQueries({ queryKey: ["/api/user/stats"] });
       }
     } else if (data.battleResult === 'defeat') {
-      // Player defeated
-      setTimeout(() => {
-        navigate("/pve-dungeons");
-      }, 3000);
+      // Player defeated - show defeat modal
+      setBattleState(prev => ({
+        ...prev,
+        showDefeatModal: true,
+        defeatModalTimer: 15
+      }));
+      
+      // Start countdown timer
+      const countdownInterval = setInterval(() => {
+        setBattleState(prev => {
+          const newTimer = prev.defeatModalTimer - 1;
+          if (newTimer <= 0) {
+            clearInterval(countdownInterval);
+            handleExitDungeon();
+            return prev;
+          }
+          return { ...prev, defeatModalTimer: newTimer };
+        });
+      }, 1000);
     }
   };
 
@@ -522,6 +543,24 @@ export default function DungeonBattlePage() {
   const handleAttack = handleComboAttack;
 
   const handleRetreat = () => {
+    handleExitDungeon();
+  };
+
+  const handleExitDungeon = async () => {
+    // Persist current HP to server before leaving
+    try {
+      await fetch('/api/user/update-hp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          currentHp: battleState.playerHp,
+          maxHp: battleState.playerMaxHp 
+        })
+      });
+    } catch (error) {
+      console.error('Failed to persist HP:', error);
+    }
+    
     navigate("/pve-dungeons");
   };
 
@@ -845,6 +884,49 @@ export default function DungeonBattlePage() {
         </div>
       )}
 
+      {/* Defeat Modal */}
+      {battleState.showDefeatModal && (
+        <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-red-900 to-red-950 rounded-xl p-8 max-w-md w-full border-2 border-red-500/70 shadow-2xl shadow-red-500/20">
+            <div className="text-center space-y-6">
+              {/* Defeat Title */}
+              <div 
+                className="text-4xl font-bold mb-4"
+                style={{ 
+                  color: '#dc2626',
+                  textShadow: '3px 3px 6px rgba(0,0,0,0.9), 0 0 12px rgba(220, 38, 38, 0.8)',
+                  fontFamily: 'monospace',
+                  letterSpacing: '0.1em'
+                }}
+              >
+                YOU WERE DEFEATED
+              </div>
+
+              {/* HP Status */}
+              <div className="text-xl font-semibold text-red-200 mb-6 drop-shadow-md">
+                Your health has been depleted
+              </div>
+
+              {/* Auto-exit countdown */}
+              <div className="bg-red-800/50 rounded-lg p-4 border border-red-600/50">
+                <div className="text-red-200 font-medium mb-2">Auto-exit in:</div>
+                <div className="text-3xl font-bold text-red-300 drop-shadow-lg">
+                  {battleState.defeatModalTimer}s
+                </div>
+              </div>
+
+              {/* Exit Button */}
+              <button
+                onClick={handleExitDungeon}
+                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg border-2 border-red-400/70 drop-shadow-lg"
+              >
+                Exit Dungeon
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Dungeon Completion Screen */}
       {battleState.battleResult === 'dungeon_complete' && (
         <div className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
@@ -886,7 +968,7 @@ export default function DungeonBattlePage() {
 
               {/* Exit Button */}
               <button
-                onClick={() => navigate("/pve-dungeons")}
+                onClick={handleExitDungeon}
                 className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg border-2 border-green-400/70 drop-shadow-lg"
               >
                 Exit Dungeon
