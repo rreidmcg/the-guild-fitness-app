@@ -1058,7 +1058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         subscriptionId: subscription.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
         planDetails: {
           name: 'Premium AI Fitness Coach',
           duration: '3 months minimum',
@@ -1359,7 +1359,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hashedNewPassword = await authUtils.hashPassword(newPassword);
       
       // Update password in database
-      await storage.updateUser(getCurrentUserId(req), { password: hashedNewPassword });
+      await storage.updateUser(userId, { password: hashedNewPassword });
       
       res.json({ message: "Password changed successfully" });
     } catch (error) {
@@ -2995,7 +2995,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currency: "usd",
         metadata: {
           goldAmount: goldAmount?.toString() || "0",
-          userId: getCurrentUserId(req).toString(),
+          userId: getCurrentUserId(req)?.toString() || "",
           description: description || "Gold purchase"
         }
       });
@@ -3126,7 +3126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.json({
           subscriptionId: subscription.id,
-          clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+          clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
         });
         return;
       }
@@ -3159,7 +3159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
       res.json({
         subscriptionId: subscription.id,
-        clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+        clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret,
       });
     } catch (error: any) {
       console.error('Subscription creation error:', error);
@@ -3420,9 +3420,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Complete onboarding
-  app.post("/api/user/complete-onboarding", requireAuth, async (req, res) => {
+  app.post("/api/user/complete-onboarding", async (req, res) => {
     try {
-      await storage.updateUser(req.user!.id, { hasCompletedOnboarding: true });
+      const userId = requireAuth(req);
+      await storage.updateUser(userId, { hasCompletedOnboarding: true });
       res.json({ success: true });
     } catch (error) {
       console.error("Error completing onboarding:", error);
@@ -3431,9 +3432,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Check onboarding status
-  app.get("/api/user/onboarding-status", requireAuth, async (req, res) => {
+  app.get("/api/user/onboarding-status", async (req, res) => {
     try {
-      const user = await storage.getUser(req.user!.id);
+      const userId = requireAuth(req);
+      const user = await storage.getUser(userId);
       res.json({ hasCompletedOnboarding: user?.hasCompletedOnboarding || false });
     } catch (error) {
       console.error("Error checking onboarding status:", error);
@@ -3498,7 +3500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid request ID" });
       }
 
-      const updatedRequest = await storage.updateAppRequestStatus(requestId, status, adminNotes, adminUserId);
+      const updatedRequest = await storage.updateAppRequestStatus(requestId, status, adminNotes, adminUserId || undefined);
       res.json(updatedRequest);
     } catch (error) {
       console.error("Error updating app request:", error);
@@ -3552,11 +3554,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         level,
         tier,
-        health,
+        maxHp: health,
         attack,
-        defense,
-        goldReward,
-        imageUrl: imageUrl || null
+        goldReward
       });
 
       res.json(monster);
@@ -3571,6 +3571,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, reason, duration } = req.body;
       const adminUserId = getCurrentUserId(req);
+      if (!adminUserId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
       const adminUser = await storage.getUser(adminUserId);
       
       if (!userId || !reason) {
@@ -3628,6 +3631,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { userId, reason } = req.body;
       const adminUserId = getCurrentUserId(req);
+      if (!adminUserId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
       const adminUser = await storage.getUser(adminUserId);
       
       if (!userId || !reason) {
@@ -3927,8 +3933,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = requireAuth(req);
       const user = await storage.getUser(userId);
       
-      // Only allow admin users (G.M. title or admin role)
-      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+      // Only allow admin users (G.M. title)
+      if (!user || user.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Admin access required" });
       }
 
@@ -3951,7 +3957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = requireAuth(req);
       const user = await storage.getUser(userId);
       
-      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+      if (!user || user.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Admin access required" });
       }
 
@@ -3974,7 +3980,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = requireAuth(req);
       const user = await storage.getUser(userId);
       
-      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+      if (!user || user.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Admin access required" });
       }
 
@@ -3997,7 +4003,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = requireAuth(req);
       const user = await storage.getUser(userId);
       
-      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+      if (!user || user.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Admin access required" });
       }
 
@@ -4020,7 +4026,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = requireAuth(req);
       const user = await storage.getUser(userId);
       
-      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+      if (!user || user.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Admin access required" });
       }
 
@@ -4038,7 +4044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = requireAuth(req);
       const user = await storage.getUser(userId);
       
-      if (!user || (user.currentTitle !== "<G.M.>" && !user.isAdmin)) {
+      if (!user || user.currentTitle !== "<G.M.>") {
         return res.status(403).json({ error: "Admin access required" });
       }
 
