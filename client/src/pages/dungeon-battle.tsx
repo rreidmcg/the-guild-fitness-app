@@ -385,7 +385,7 @@ export default function DungeonBattlePage() {
                 isPlayerTurn: true
               }));
             }, 400);
-          }, 600);
+          }, 1200); // Increased pause from 600ms to 1200ms before enemy attack
         } else {
           // No monster counter-attack or battle ended, reset for next turn
           setBattleState(prev => ({
@@ -741,8 +741,9 @@ export default function DungeonBattlePage() {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
             {!battleState.isInCombatTurn && (
               <div 
-                className="text-center text-white text-lg md:text-2xl font-bold animate-pulse"
+                className="text-center text-lg md:text-2xl font-bold animate-pulse"
                 style={{ 
+                  color: '#ffffff',
                   textShadow: '2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7)',
                   filter: 'drop-shadow(0 0 6px rgba(0,0,0,0.8))'
                 }}
