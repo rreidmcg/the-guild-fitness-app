@@ -367,7 +367,7 @@ export default function DungeonBattlePage() {
               monsterLunging: true,
               monsterDamage: monsterDamage,
               playerFlashing: true,
-              // Reset for next turn
+              // Reset for next turn - only reset combo when turn fully ends
               comboPoints: 0,
               attacksRemaining: 4,
               lastAttackTime: 0,
@@ -397,7 +397,7 @@ export default function DungeonBattlePage() {
             battleResult: data.battleResult,
             totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
             isPlayerTurn: data.battleResult === 'ongoing',
-            // Reset for next turn
+            // Reset for next turn - only reset combo when turn fully ends
             comboPoints: 0,
             attacksRemaining: 4,
             lastAttackTime: 0,
@@ -406,7 +406,7 @@ export default function DungeonBattlePage() {
           }));
         }
       } else {
-        // Turn continues, just update battle state
+        // Turn continues, just update battle state - DON'T reset combo within same turn
         setBattleState(prev => ({
           ...prev,
           playerHp: data.playerHp,
@@ -416,6 +416,7 @@ export default function DungeonBattlePage() {
           battleResult: data.battleResult,
           totalGoldEarned: prev.totalGoldEarned + (data.goldEarned || 0),
           isPlayerTurn: true
+          // Keep combo points and damage multiplier intact for next attack in same turn
         }));
       }
     }, 400);
@@ -469,20 +470,34 @@ export default function DungeonBattlePage() {
     const currentTime = Date.now();
     const timeDifference = currentTime - battleState.lastAttackTime;
     
-    // Check if this is a combo hit (within 200ms of last attack)
+    // Check if this is a combo hit (within 1 second of last attack)
     let newDamageMultiplier = 1.0;
     let newComboPoints = battleState.comboPoints;
     
-    if (battleState.lastAttackTime > 0 && timeDifference <= 200 && battleState.comboPoints < 4) {
-      // Combo hit! Stack damage
+    if (battleState.lastAttackTime > 0 && timeDifference <= 1000 && battleState.comboPoints < 4) {
+      // Combo hit! Stack damage (within 1 second)
       newComboPoints += 1;
       newDamageMultiplier = 1.0 + (newComboPoints * 0.25); // Each combo point adds 25% damage
-    } else if (battleState.lastAttackTime > 0 && timeDifference > 200) {
-      // Too slow, reset combo
+    } else if (battleState.lastAttackTime > 0 && timeDifference > 1000) {
+      // Too slow, reset combo (more than 1 second)
       newComboPoints = 0;
       newDamageMultiplier = 1.0;
+    } else if (battleState.lastAttackTime === 0) {
+      // First attack - start combo
+      newComboPoints = 1;
+      newDamageMultiplier = 1.25;
     }
     
+    // Debug logging for combo system
+    console.log('Combo Debug:', {
+      currentCombo: battleState.comboPoints,
+      newCombo: newComboPoints,
+      timeDiff: timeDifference,
+      lastAttackTime: battleState.lastAttackTime,
+      currentTime: currentTime,
+      multiplier: newDamageMultiplier
+    });
+
     // INSTANT update state with combo progress - no waiting for server response
     setBattleState(prev => ({
       ...prev,
