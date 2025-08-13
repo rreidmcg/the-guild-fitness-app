@@ -102,12 +102,12 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "You descend into the damp, echoing caverns where the walls glisten with slime trails. The air is thick and humid...",
     completionStory: "The caverns fall silent as the last slime dissolves. You notice strange crystals embedded in the walls.",
     monsters: [
-      { id: 1, name: "Green Slime", level: 1, maxHp: 19, currentHp: 19, attack: 4, goldReward: 2, description: "A bouncing ball of green goo", image: greenSlimeImage },
-      { id: 2, name: "Blue Slime", level: 2, maxHp: 23, currentHp: 23, attack: 5, goldReward: 3, description: "A slightly tougher slime with blue coloring", image: greenSlimeImage },
-      { id: 3, name: "Red Slime", level: 3, maxHp: 26, currentHp: 26, attack: 6, goldReward: 4, description: "An aggressive red slime that burns to the touch", image: greenSlimeImage },
-      { id: 4, name: "Crystal Slime", level: 4, maxHp: 30, currentHp: 30, attack: 8, goldReward: 5, description: "A translucent slime infused with magical crystals", image: greenSlimeImage },
-      { id: 5, name: "Giant Slime", level: 5, maxHp: 34, currentHp: 34, attack: 9, goldReward: 6, description: "A massive slime that towers above the rest", image: greenSlimeImage },
-      { id: 6, name: "Slime King", level: 6, maxHp: 56, currentHp: 56, attack: 10, goldReward: 12, description: "🏆 BOSS: The ruler of all slimes in the caverns", image: slimeKingImage }
+      { id: 1, name: "Green Slime", level: 1, maxHp: 8, currentHp: 8, attack: 2, goldReward: 2, description: "A bouncing ball of green goo", image: greenSlimeImage },
+      { id: 2, name: "Blue Slime", level: 2, maxHp: 12, currentHp: 12, attack: 3, goldReward: 3, description: "A slightly tougher slime with blue coloring", image: greenSlimeImage },
+      { id: 3, name: "Red Slime", level: 3, maxHp: 16, currentHp: 16, attack: 4, goldReward: 4, description: "An aggressive red slime that burns to the touch", image: greenSlimeImage },
+      { id: 4, name: "Crystal Slime", level: 4, maxHp: 20, currentHp: 20, attack: 5, goldReward: 5, description: "A translucent slime infused with magical crystals", image: greenSlimeImage },
+      { id: 5, name: "Giant Slime", level: 5, maxHp: 24, currentHp: 24, attack: 6, goldReward: 6, description: "A massive slime that towers above the rest", image: greenSlimeImage },
+      { id: 6, name: "Slime King", level: 6, maxHp: 36, currentHp: 36, attack: 8, goldReward: 12, description: "🏆 BOSS: The ruler of all slimes in the caverns", image: slimeKingImage }
     ]
   },
   {
@@ -119,12 +119,12 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "You squeeze through narrow tunnels as the sound of scurrying echoes around you. Red eyes gleam in the darkness...",
     completionStory: "The tunnels grow quiet as you defeat the last of the rat pack. You discover hidden passages leading deeper underground.",
     monsters: [
-      { id: 7, name: "Cave Rat", level: 2, maxHp: 23, currentHp: 23, attack: 5, goldReward: 3, description: "A mangy rat with sharp teeth", image: caveRatImage },
-      { id: 8, name: "Dire Rat", level: 3, maxHp: 26, currentHp: 26, attack: 6, goldReward: 4, description: "A larger, more aggressive rat", image: caveRatImage },
-      { id: 9, name: "Rat Scout", level: 4, maxHp: 30, currentHp: 30, attack: 8, goldReward: 5, description: "A nimble rat that strikes quickly", image: caveRatImage },
-      { id: 10, name: "Rat Warrior", level: 5, maxHp: 34, currentHp: 34, attack: 9, goldReward: 6, description: "A battle-hardened rat with scars", image: caveRatImage },
-      { id: 11, name: "Giant Rat", level: 6, maxHp: 38, currentHp: 38, attack: 10, goldReward: 7, description: "A massive rat the size of a dog", image: caveRatImage },
-      { id: 12, name: "Rat Chieftain", level: 7, maxHp: 61, currentHp: 61, attack: 11, goldReward: 14, description: "🏆 BOSS: The alpha rat ruling the warrens", image: ratChieftainImage }
+      { id: 7, name: "Cave Rat", level: 2, maxHp: 12, currentHp: 12, attack: 3, goldReward: 3, description: "A mangy rat with sharp teeth", image: caveRatImage },
+      { id: 8, name: "Dire Rat", level: 3, maxHp: 16, currentHp: 16, attack: 4, goldReward: 4, description: "A larger, more aggressive rat", image: caveRatImage },
+      { id: 9, name: "Rat Scout", level: 4, maxHp: 20, currentHp: 20, attack: 5, goldReward: 5, description: "A nimble rat that strikes quickly", image: caveRatImage },
+      { id: 10, name: "Rat Warrior", level: 5, maxHp: 24, currentHp: 24, attack: 6, goldReward: 6, description: "A battle-hardened rat with scars", image: caveRatImage },
+      { id: 11, name: "Giant Rat", level: 6, maxHp: 28, currentHp: 28, attack: 7, goldReward: 7, description: "A massive rat the size of a dog", image: caveRatImage },
+      { id: 12, name: "Rat Chieftain", level: 7, maxHp: 42, currentHp: 42, attack: 9, goldReward: 14, description: "🏆 BOSS: The alpha rat ruling the warrens", image: ratChieftainImage }
     ]
   },
   {
@@ -136,12 +136,12 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "You enter the shadowy forest where enormous webs block your path and eight-legged creatures lurk in the canopy...",
     completionStory: "The forest grows quiet as the last spider retreats. You notice rare herbs growing beneath the cleared webs.",
     monsters: [
-      { id: 13, name: "Web Spinner", level: 3, maxHp: 26, currentHp: 26, attack: 6, goldReward: 4, description: "A nimble spider that sets traps", image: forestSpiderImage },
-      { id: 14, name: "Venom Spider", level: 4, maxHp: 30, currentHp: 30, attack: 8, goldReward: 5, description: "A spider with deadly poison", image: forestSpiderImage },
-      { id: 15, name: "Hunter Spider", level: 5, maxHp: 34, currentHp: 34, attack: 9, goldReward: 6, description: "An aggressive predator spider", image: forestSpiderImage },
-      { id: 16, name: "Shadow Spider", level: 6, maxHp: 38, currentHp: 38, attack: 10, goldReward: 7, description: "A spider that strikes from darkness", image: forestSpiderImage },
-      { id: 17, name: "Giant Spider", level: 7, maxHp: 41, currentHp: 41, attack: 11, goldReward: 8, description: "A massive arachnid with thick chitin", image: forestSpiderImage },
-      { id: 18, name: "Broodmother", level: 8, maxHp: 70, currentHp: 70, attack: 13, goldReward: 16, description: "🏆 BOSS: The queen of all forest spiders", image: broodmotherImage }
+      { id: 13, name: "Web Spinner", level: 3, maxHp: 16, currentHp: 16, attack: 4, goldReward: 4, description: "A nimble spider that sets traps", image: forestSpiderImage },
+      { id: 14, name: "Venom Spider", level: 4, maxHp: 20, currentHp: 20, attack: 5, goldReward: 5, description: "A spider with deadly poison", image: forestSpiderImage },
+      { id: 15, name: "Hunter Spider", level: 5, maxHp: 24, currentHp: 24, attack: 6, goldReward: 6, description: "An aggressive predator spider", image: forestSpiderImage },
+      { id: 16, name: "Shadow Spider", level: 6, maxHp: 28, currentHp: 28, attack: 7, goldReward: 7, description: "A spider that strikes from darkness", image: forestSpiderImage },
+      { id: 17, name: "Giant Spider", level: 7, maxHp: 32, currentHp: 32, attack: 8, goldReward: 8, description: "A massive arachnid with thick chitin", image: forestSpiderImage },
+      { id: 18, name: "Broodmother", level: 8, maxHp: 48, currentHp: 48, attack: 10, goldReward: 16, description: "🏆 BOSS: The queen of all forest spiders", image: broodmotherImage }
     ]
   },
   {
@@ -153,12 +153,12 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
     storyIntro: "You approach the chaotic goblin encampment where crude weapons glint in firelight and war drums echo...",
     completionStory: "The camps fall silent as goblin resistance crumbles. You discover stolen treasures and crude maps.",
     monsters: [
-      { id: 19, name: "Goblin Scout", level: 4, maxHp: 30, currentHp: 30, attack: 8, goldReward: 5, description: "A sneaky goblin with a rusty blade", image: wildGoblinImage },
-      { id: 20, name: "Forest Spider", level: 7, maxHp: 38, currentHp: 38, attack: 8, goldReward: 4, description: "A venomous hunter with razor-sharp fangs", image: forestSpiderImage },
-      { id: 21, name: "Goblin Warrior", level: 5, maxHp: 34, currentHp: 34, attack: 9, goldReward: 6, description: "A battle-hardened goblin fighter", image: wildGoblinImage },
-      { id: 22, name: "Goblin Shaman", level: 6, maxHp: 38, currentHp: 38, attack: 10, goldReward: 7, description: "A goblin wielding dark magic", image: wildGoblinImage },
-      { id: 23, name: "Goblin Berserker", level: 7, maxHp: 41, currentHp: 41, attack: 11, goldReward: 8, description: "A frenzied goblin warrior", image: wildGoblinImage },
-      { id: 24, name: "Goblin Warlord", level: 8, maxHp: 70, currentHp: 70, attack: 13, goldReward: 16, description: "🏆 BOSS: The brutal leader of the goblin horde", image: goblinWarlordImage }
+      { id: 19, name: "Goblin Scout", level: 4, maxHp: 20, currentHp: 20, attack: 5, goldReward: 5, description: "A sneaky goblin with a rusty blade", image: wildGoblinImage },
+      { id: 20, name: "Forest Spider", level: 7, maxHp: 32, currentHp: 32, attack: 8, goldReward: 4, description: "A venomous hunter with razor-sharp fangs", image: forestSpiderImage },
+      { id: 21, name: "Goblin Warrior", level: 5, maxHp: 24, currentHp: 24, attack: 6, goldReward: 6, description: "A battle-hardened goblin fighter", image: wildGoblinImage },
+      { id: 22, name: "Goblin Shaman", level: 6, maxHp: 28, currentHp: 28, attack: 7, goldReward: 7, description: "A goblin wielding dark magic", image: wildGoblinImage },
+      { id: 23, name: "Goblin Berserker", level: 7, maxHp: 32, currentHp: 32, attack: 8, goldReward: 8, description: "A frenzied goblin warrior", image: wildGoblinImage },
+      { id: 24, name: "Goblin Warlord", level: 8, maxHp: 48, currentHp: 48, attack: 10, goldReward: 16, description: "🏆 BOSS: The brutal leader of the goblin horde", image: goblinWarlordImage }
     ]
   }
 ];

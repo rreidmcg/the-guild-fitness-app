@@ -3785,13 +3785,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Monster data is required" });
       }
 
-      // Calculate player stats with equipment bonuses
-      const playerAttack = (user.strength || 0) + Math.floor((user.agility || 0) / 2);
-      const playerDefense = (user.stamina || 0) + Math.floor((user.strength || 0) / 3);
+      // Calculate player stats with equipment bonuses (rebalanced for proper scaling)
+      const playerAttack = Math.floor((user.strength || 1) * 1.2) + Math.floor((user.agility || 1) * 0.5);
+      const playerDefense = Math.floor((user.stamina || 1) * 0.8) + Math.floor((user.strength || 1) * 0.3);
       
-      // Calculate damage dealt by player to monster
-      const baseDamage = Math.max(1, playerAttack - Math.floor(monster.level * 1.5));
-      const damageVariance = Math.floor(Math.random() * Math.max(1, baseDamage * 0.3));
+      // Calculate monster defense (lighter defense for balanced combat)
+      const monsterDefense = Math.floor(monster.level * 0.5) + 1;
+      
+      // Calculate damage dealt by player to monster (balanced for 3-hit kills at equal level)
+      const baseDamage = Math.max(2, playerAttack - monsterDefense);
+      const damageVariance = Math.floor(Math.random() * Math.max(1, Math.floor(baseDamage * 0.5)));
       const rawDamage = baseDamage + damageVariance;
       
       // Apply combo damage multiplier
@@ -3842,10 +3845,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Monster counter-attack if still alive
-      const monsterDamage = Math.max(1, monster.attack - playerDefense);
-      const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, monsterDamage * 0.2));
-      const actualMonsterDamage = monsterDamage + monsterDamageVariance;
+      // Monster counter-attack if still alive (rebalanced)
+      const monsterBaseDamage = Math.max(1, Math.floor(monster.attack * 0.9) - Math.floor(playerDefense * 0.8));
+      const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, Math.floor(monsterBaseDamage * 0.3)));
+      const actualMonsterDamage = monsterBaseDamage + monsterDamageVariance;
       
       const newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
       
