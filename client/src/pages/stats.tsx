@@ -17,6 +17,8 @@ import { getTitleComponent } from "@/lib/title-rarity";
 
 // Import defensive coding standards
 import "../styles/defensive-coding-standards.css";
+// Import Day 3 enhancements
+import "../styles/day3-enhancements.css";
 import { 
   Dumbbell, 
   Trophy, 
@@ -38,6 +40,8 @@ import {
 import { CompactAchievementCard } from "@/components/ui/compact-achievement-card";
 import { FitnessGoalProgress } from "@/components/ui/fitness-goal-progress";
 import { FitnessAnalyticsDashboard } from "@/components/ui/fitness-analytics-dashboard";
+import { EnhancedStatsDashboard } from "@/components/enhanced-stats-dashboard";
+import { EnhancedErrorBoundary } from "@/components/enhanced-error-boundary";
 
 export default function Stats() {
   const navigate = useNavigate();
@@ -47,7 +51,8 @@ export default function Stats() {
   const [statsPageState, setStatsPageState] = useState({
     showWardrobe: false,
     isLoading: false,
-    selectedTab: 'overview'
+    selectedTab: 'overview',
+    useEnhancedView: false // Day 3 enhancement toggle
   });
   
   // Calculator functions removed - no longer needed for wardrobe system
@@ -167,15 +172,37 @@ export default function Stats() {
               <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
             </div>
             <div className="flex items-center space-x-3">
-              {/* Calculator button hidden per user request */}
+              {/* Day 3 Enhancement: Enhanced View Toggle */}
+              <Button
+                size="sm"
+                variant={statsPageState.useEnhancedView ? "default" : "outline"}
+                onClick={() => setStatsPageState(prev => ({ 
+                  ...prev, 
+                  useEnhancedView: !prev.useEnhancedView 
+                }))}
+                className="text-xs"
+              >
+                <Star className="w-3 h-3 mr-1" />
+                Enhanced
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Atrophy Warning */}
-        <AtrophyWarning />
+        {/* Day 3 Enhancement: Enhanced Stats Dashboard */}
+        {statsPageState.useEnhancedView ? (
+          <EnhancedErrorBoundary>
+            <EnhancedStatsDashboard 
+              showPerformanceMonitor={import.meta.env.DEV}
+              className="enhanced-view-active"
+            />
+          </EnhancedErrorBoundary>
+        ) : (
+          <>
+            {/* Atrophy Warning */}
+            <AtrophyWarning />
         {/* Character Profile */}
         <Card className="bg-card border-border relative">
           {/* Wardrobe Button in Corner */}
@@ -504,16 +531,18 @@ export default function Stats() {
         {statsPageState.selectedTab === 'analytics' && (
           <FitnessAnalyticsDashboard />
         )}
+          </>
+        )}
 
 
       </div>
 
-      {/* Wardrobe Modal */}
-      <WardrobeModal 
-        isOpen={statsPageState.showWardrobe}
-        onClose={() => setStatsPageState(prev => ({ ...prev, showWardrobe: false }))}
-        user={safeUserStats}
-      />
+        {/* Wardrobe Modal */}
+        <WardrobeModal 
+          isOpen={statsPageState.showWardrobe}
+          onClose={() => setStatsPageState(prev => ({ ...prev, showWardrobe: false }))}
+          user={safeUserStats}
+        />
       </div>
     </ParallaxBackground>
   );
