@@ -463,9 +463,9 @@ export default function DungeonBattlePage() {
     }
   };
 
-  // New combo attack system with instant response
+  // New combo attack system with attack cooldown
   const handleComboAttack = () => {
-    if (battleState.battleResult !== 'ongoing' || attackMutation.isPending) return;
+    if (battleState.battleResult !== 'ongoing' || attackMutation.isPending || battleState.playerLunging) return;
     
     const currentTime = Date.now();
     const timeDifference = currentTime - battleState.lastAttackTime;
@@ -510,10 +510,10 @@ export default function DungeonBattlePage() {
       playerLunging: true
     }));
 
-    // Clear attack animation quickly
+    // Clear attack animation after cooldown period
     setTimeout(() => {
       setBattleState(prev => ({ ...prev, playerLunging: false }));
-    }, 300);
+    }, 600); // 600ms cooldown between attacks
     
     // Execute attack with current multiplier in background
     attackMutation.mutate({ damageMultiplier: newDamageMultiplier });
@@ -761,18 +761,36 @@ export default function DungeonBattlePage() {
           <div className="flex items-center justify-center space-x-2">
             {[1, 2, 3, 4].map((point) => {
               const isActive = point <= battleState.comboPoints;
-              const hasBonus = battleState.damageMultiplier > 1.0 && isActive;
+              
+              // Determine color based on combo progression
+              let colorClass = 'bg-gray-600/50 border-gray-500'; // Default inactive
+              
+              if (isActive) {
+                if (point === 1) {
+                  // First combo point is always yellow
+                  colorClass = 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50';
+                } else if (point === 2) {
+                  // Second point: orange if it's part of a combo, yellow if standalone
+                  colorClass = battleState.comboPoints >= 2 
+                    ? 'bg-orange-400 border-orange-300 shadow-lg shadow-orange-400/50'
+                    : 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50';
+                } else if (point === 3) {
+                  // Third point: darker orange if combo, yellow if standalone
+                  colorClass = battleState.comboPoints >= 3
+                    ? 'bg-orange-600 border-orange-500 shadow-lg shadow-orange-600/50'
+                    : 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50';
+                } else if (point === 4) {
+                  // Fourth point: red if combo, yellow if standalone
+                  colorClass = battleState.comboPoints >= 4
+                    ? 'bg-red-500 border-red-400 shadow-lg shadow-red-500/50'
+                    : 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50';
+                }
+              }
               
               return (
                 <div
                   key={point}
-                  className={`w-4 h-4 md:w-6 md:h-6 rounded-full border-2 transition-all duration-300 ${
-                    hasBonus
-                      ? 'bg-red-500 border-red-400 shadow-lg shadow-red-500/50 combo-point-bonus'
-                      : isActive
-                      ? 'bg-yellow-400 border-yellow-300 shadow-lg shadow-yellow-400/50 combo-point-filled'
-                      : 'bg-gray-600/50 border-gray-500'
-                  }`}
+                  className={`w-4 h-4 md:w-6 md:h-6 rounded-full border-2 transition-all duration-300 ${colorClass} combo-point-filled`}
                 />
               );
             })}
