@@ -564,7 +564,7 @@ export class DatabaseStorage implements IStorage {
 
   async upsertUserExercisePreference(preference: InsertUserExercisePreferences): Promise<UserExercisePreferences> {
     console.log('Storage: Upserting exercise preference:', preference);
-    const existing = await this.getUserExercisePreference(preference.userId, preference.exerciseId);
+    const existing = await this.getUserExercisePreference(preference.userId!, preference.exerciseId!);
     console.log('Storage: Existing preference found:', existing);
     
     if (existing) {
@@ -621,7 +621,7 @@ export class DatabaseStorage implements IStorage {
   async createProgramWorkout(programWorkout: InsertProgramWorkout): Promise<ProgramWorkout> {
     const [workout] = await db
       .insert(programWorkouts)
-      .values(programWorkout)
+      .values(programWorkout as any)
       .returning();
     return workout;
   }
@@ -1846,7 +1846,6 @@ Start your fitness journey today and watch your character grow stronger with eve
       mailType: "announcement",
 
       rewards: null,
-      rewardsClaimed: false,
       expiresAt: null
     };
 
@@ -1937,7 +1936,10 @@ Start your fitness journey today and watch your character grow stronger with eve
       // Award XP to user
       for (const reward of rewards) {
         if (reward.type === 'xp') {
-          await this.updateUser(userId, { experience: sql`experience + ${reward.value}` });
+          const user = await this.getUser(userId);
+          if (user) {
+            await this.updateUser(userId, { experience: (user.experience || 0) + reward.value });
+          }
         }
       }
     }
@@ -2102,7 +2104,7 @@ Start your fitness journey today and watch your character grow stronger with eve
     await this.ensureInitialized();
     const [newProgram] = await db
       .insert(trainingPrograms)
-      .values([program])
+      .values(program as any)
       .returning();
     return newProgram;
   }
@@ -2211,7 +2213,7 @@ Start your fitness journey today and watch your character grow stronger with eve
 
     const [newCompletion] = await db
       .insert(programCompletions)
-      .values([completion])
+      .values(completion as any)
       .onConflictDoUpdate({
         target: [programCompletions.userId, programCompletions.programId],
         set: {

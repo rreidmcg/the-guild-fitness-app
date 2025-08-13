@@ -375,8 +375,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add purchase status to each traditional program
       const programsWithStatus = programs.map(program => ({
         ...program,
-        isPurchased: purchasedPrograms.includes(program.id.toString()) || program.price === 0,
-        priceFormatted: `$${(program.price / 100).toFixed(2)}`
+        isPurchased: purchasedPrograms.includes(program.id.toString()) || (program.price || 0) === 0,
+        priceFormatted: `$${((program.price || 0) / 100).toFixed(2)}`
       }));
       
       // Combine both types of programs
@@ -423,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             description: trainingProgram.description,
             price: 0,
             durationWeeks: trainingProgram.durationWeeks || 4,
-            difficultyLevel: trainingProgram.difficulty || 'intermediate',
+            difficultyLevel: 'intermediate', // Training programs don't have difficulty property
             targetAudience: trainingProgram.goal || 'General fitness enthusiasts',
             estimatedDuration: 45,
             workoutsPerWeek: trainingProgram.daysPerWeek || 3,
@@ -454,7 +454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         ...program,
         isPurchased,
-        priceFormatted: isTrainingProgram ? "Free" : `$${(program.price / 100).toFixed(2)}`,
+        priceFormatted: isTrainingProgram ? "Free" : `$${((program.price || 0) / 100).toFixed(2)}`,
         isTrainingProgram
       });
     } catch (error) {
@@ -477,8 +477,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if it's a training program first
       const trainingProgram = await storage.getTrainingProgram(req.params.id);
       if (trainingProgram) {
-        // Return the training program schedule directly
-        res.json(trainingProgram.schedule || []);
+        // Return the training program calendar directly
+        res.json(trainingProgram.calendar || []);
         return;
       }
       
@@ -531,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create Stripe payment intent for one-time purchase
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: program.price, // Already in cents
+        amount: program.price || 0, // Already in cents
         currency: "usd",
         metadata: {
           userId: userId.toString(),
@@ -600,7 +600,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Program workout not found" });
       }
 
-      // Get program to verify access
+      // Get program to verify access (null safety check)
+      if (!workout.programId) {
+        return res.status(400).json({ error: "Workout has no associated program" });
+      }
       const program = await storage.getWorkoutProgram(workout.programId);
       if (!program) {
         return res.status(404).json({ error: "Program not found" });
@@ -608,7 +611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if user has access to this program
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const hasAccess = purchasedPrograms.includes(workout.programId.toString()) || program.price === 0;
+      const hasAccess = purchasedPrograms.includes(workout.programId.toString()) || (program.price || 0) === 0;
       
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied" });
@@ -682,14 +685,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Program workout not found" });
       }
 
-      // Verify program access
+      // Verify program access (null safety check)
+      if (!existingWorkout.programId) {
+        return res.status(400).json({ error: "Workout has no associated program" });
+      }
       const program = await storage.getWorkoutProgram(existingWorkout.programId);
       if (!program) {
         return res.status(404).json({ error: "Program not found" });
       }
 
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const hasAccess = purchasedPrograms.includes(existingWorkout.programId.toString()) || program.price === 0;
+      const hasAccess = purchasedPrograms.includes(existingWorkout.programId.toString()) || (program.price || 0) === 0;
       
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied" });
@@ -721,14 +727,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Program workout not found" });
       }
 
-      // Verify program access
+      // Verify program access (null safety check)
+      if (!existingWorkout.programId) {
+        return res.status(400).json({ error: "Workout has no associated program" });
+      }
       const program = await storage.getWorkoutProgram(existingWorkout.programId);
       if (!program) {
         return res.status(404).json({ error: "Program not found" });
       }
 
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const hasAccess = purchasedPrograms.includes(existingWorkout.programId.toString()) || program.price === 0;
+      const hasAccess = purchasedPrograms.includes(existingWorkout.programId.toString()) || (program.price || 0) === 0;
       
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied" });
@@ -761,14 +770,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Source workout not found" });
       }
 
-      // Verify program access
+      // Verify program access (null safety check)
+      if (!sourceWorkout.programId) {
+        return res.status(400).json({ error: "Source workout has no associated program" });
+      }
       const program = await storage.getWorkoutProgram(sourceWorkout.programId);
       if (!program) {
         return res.status(404).json({ error: "Program not found" });
       }
 
       const purchasedPrograms = await storage.getUserPurchasedPrograms(userId);
-      const hasAccess = purchasedPrograms.includes(sourceWorkout.programId.toString()) || program.price === 0;
+      const hasAccess = purchasedPrograms.includes(sourceWorkout.programId.toString()) || (program.price || 0) === 0;
       
       if (!hasAccess) {
         return res.status(403).json({ error: "Access denied" });

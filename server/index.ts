@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { registerRoutes } from "./routes";
+import { registerAllRoutes } from "./routes/index";
 import { setupVite, serveStatic, log } from "./vite";
 import { AtrophySystem } from "./atrophy-system";
 
@@ -51,7 +52,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Register both old monolithic routes and new modular routes for gradual migration
   const server = await registerRoutes(app);
+  registerAllRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
