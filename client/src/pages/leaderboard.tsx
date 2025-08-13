@@ -67,7 +67,7 @@ export default function LeaderboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Leaderboard</h1>
-              <p className="text-muted-foreground mt-0.5 text-sm">Top adventurers ranked by experience</p>
+              <p className="text-muted-foreground mt-0.5 text-sm">Top adventurers ranked by experience (100+ XP required)</p>
             </div>
             <Trophy className="w-8 h-8 text-yellow-500" />
           </div>
@@ -173,8 +173,11 @@ export default function LeaderboardPage() {
           <div className="text-center py-12">
             <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-foreground mb-2">No Rankings Yet</h3>
-            <p className="text-muted-foreground">
-              Complete workouts to earn XP and appear on the leaderboard!
+            <p className="text-muted-foreground mb-2">
+              Complete workouts to earn experience and appear on the leaderboard!
+            </p>
+            <p className="text-xs text-muted-foreground bg-card border border-border rounded-lg px-3 py-2 inline-block">
+              <strong>Note:</strong> You need at least 100 XP to appear on the leaderboard
             </p>
           </div>
         ) : null}
@@ -192,7 +195,7 @@ export default function LeaderboardPage() {
                 {selectedPlayer && (
                   <>
                     {(() => {
-                      const rank = leaderboard?.findIndex((p: any) => p.id === selectedPlayer.id) + 1 || 0;
+                      const rank = (leaderboard && Array.isArray(leaderboard)) ? leaderboard.findIndex((p: any) => p.id === selectedPlayer.id) + 1 : 0;
                       switch (rank) {
                         case 1:
                           return <Crown className="w-5 h-5 text-yellow-500" />;
@@ -204,7 +207,7 @@ export default function LeaderboardPage() {
                           return <Trophy className="w-5 h-5 text-muted-foreground" />;
                       }
                     })()}
-                    <span>#{leaderboard?.findIndex((p: any) => p.id === selectedPlayer.id) + 1 || 0}</span>
+                    <span>#{(leaderboard && Array.isArray(leaderboard)) ? leaderboard.findIndex((p: any) => p.id === selectedPlayer.id) + 1 : 0}</span>
                     <span>{selectedPlayer.username}</span>
                     {selectedPlayer.currentTitle && (
                       <span className={getTitleComponent(selectedPlayer.currentTitle, "sm").className}>

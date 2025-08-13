@@ -10,6 +10,7 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **Real-time Battle System Enhancement**: ✓ Implemented WebSocket-based multiplayer combat with improved battle mechanics
 - **Advanced Analytics Dashboard**: ✓ Built comprehensive user analytics with data visualization and insights
 - **Combat Balance Rebalancing**: ✓ Fixed game balance so equal-level monsters require 3 attacks to defeat (reduced player stats from 25 to 4 at level 2, reduced monster HP/attack proportionally, improved damage formulas)
+- **Leaderboard XP Threshold**: ✓ Implemented 100 XP minimum requirement to appear on leaderboards, preventing new account spam
 - **Smart Caching System**: Implementing intelligent caching strategies for performance optimization
 - **Progressive Web App Features**: Adding offline functionality, push notifications, and app-like experience
 - **AI-Powered Recommendations**: Integrating machine learning for personalized workout suggestions
