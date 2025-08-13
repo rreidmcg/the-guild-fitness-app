@@ -51,8 +51,7 @@ export default function Stats() {
   const [statsPageState, setStatsPageState] = useState({
     showWardrobe: false,
     isLoading: false,
-    selectedTab: 'overview',
-    useEnhancedView: false // Day 3 enhancement toggle
+    selectedTab: 'overview'
   });
   
   // Calculator functions removed - no longer needed for wardrobe system
@@ -172,37 +171,15 @@ export default function Stats() {
               <p className="mt-0.5 text-sm text-muted-foreground">Your fitness progression journey</p>
             </div>
             <div className="flex items-center space-x-3">
-              {/* Day 3 Enhancement: Enhanced View Toggle */}
-              <Button
-                size="sm"
-                variant={statsPageState.useEnhancedView ? "default" : "outline"}
-                onClick={() => setStatsPageState(prev => ({ 
-                  ...prev, 
-                  useEnhancedView: !prev.useEnhancedView 
-                }))}
-                className="text-xs"
-              >
-                <Star className="w-3 h-3 mr-1" />
-                Enhanced
-              </Button>
+              {/* Calculator button hidden per user request */}
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
-        {/* Day 3 Enhancement: Enhanced Stats Dashboard */}
-        {statsPageState.useEnhancedView ? (
-          <EnhancedErrorBoundary>
-            <EnhancedStatsDashboard 
-              showPerformanceMonitor={import.meta.env.DEV}
-              className="enhanced-view-active"
-            />
-          </EnhancedErrorBoundary>
-        ) : (
-          <>
-            {/* Atrophy Warning */}
-            <AtrophyWarning />
+        {/* Atrophy Warning */}
+        <AtrophyWarning />
         {/* Character Profile */}
         <Card className="bg-card border-border relative">
           {/* Wardrobe Button in Corner */}
@@ -530,8 +507,6 @@ export default function Stats() {
 
         {statsPageState.selectedTab === 'analytics' && (
           <FitnessAnalyticsDashboard />
-        )}
-          </>
         )}
 
 
