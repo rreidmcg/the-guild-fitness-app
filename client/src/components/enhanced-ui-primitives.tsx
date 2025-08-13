@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import type { ReactNode } from 'react';
 import { 
   Dumbbell, 
   Trophy, 
@@ -114,7 +115,7 @@ EnhancedStatCard.displayName = 'EnhancedStatCard';
  * Consistent styling for primary user actions
  */
 interface EnhancedActionButtonProps {
-  children: React.ReactNode;
+  children: ReactNode;
   icon?: LucideIcon;
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
   size?: 'sm' | 'md' | 'lg';

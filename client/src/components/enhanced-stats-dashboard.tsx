@@ -1,23 +1,18 @@
 /**
  * Enhanced Stats Dashboard for Day 3 Frontend Modernization
  * 
- * Replaces the traditional stats display with an optimized, mobile-first
- * design using the new enhanced UI primitives and performance optimizations
+ * Simplified version that demonstrates enhanced UI patterns
+ * while maintaining compatibility with existing systems
  */
 
 import { memo, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  EnhancedStatCard, 
-  EnhancedActionButton, 
-  EnhancedAchievement,
-  EnhancedLoading 
-} from '@/components/enhanced-ui-primitives';
-import { PerformanceMonitor } from '@/components/performance-monitor';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { Avatar2D } from '@/components/ui/avatar-2d';
 import { getTitleComponent } from '@/lib/title-rarity';
-import { useNavigate } from '@/hooks/use-navigate';
 import { 
   Dumbbell, 
   Heart, 
@@ -47,9 +42,9 @@ interface UserStats {
   mp: number;
   maxMp: number;
   currentTitle: string;
-  streakCount: number;
-  totalWorkouts: number;
-  achievementCount: number;
+  currentStreak?: number;
+  totalWorkouts?: number;
+  achievementCount?: number;
 }
 
 interface EnhancedStatsDashboardProps {
@@ -64,8 +59,6 @@ export const EnhancedStatsDashboard = memo(({
   className, 
   showPerformanceMonitor = false 
 }: EnhancedStatsDashboardProps) => {
-  const navigate = useNavigate();
-
   const { data: userStats, isLoading } = useQuery<UserStats>({
     queryKey: ['/api/user/stats'],
     staleTime: 30000, // Cache for 30 seconds
@@ -74,11 +67,6 @@ export const EnhancedStatsDashboard = memo(({
   const { data: recentAchievements } = useQuery({
     queryKey: ['/api/user-achievements'],
     staleTime: 60000, // Cache for 1 minute
-  });
-
-  const { data: dailyProgress } = useQuery({
-    queryKey: ['/api/daily-progress'],
-    staleTime: 30000,
   });
 
   // Calculate derived stats for enhanced display
@@ -103,11 +91,8 @@ export const EnhancedStatsDashboard = memo(({
   if (isLoading || !enhancedStats) {
     return (
       <div className="space-y-6">
-        <EnhancedLoading variant="skeleton" size="lg" text="Loading your character..." />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => (
-            <EnhancedLoading key={i} variant="skeleton" size="md" />
-          ))}
+        <div className="flex items-center justify-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </div>
     );
@@ -115,10 +100,6 @@ export const EnhancedStatsDashboard = memo(({
 
   return (
     <div className={`enhanced-stats-dashboard space-y-6 ${className || ''}`}>
-      {/* Performance Monitor (Dev Mode) */}
-      {showPerformanceMonitor && import.meta.env.DEV && (
-        <PerformanceMonitor enabled className="md:max-w-sm md:absolute md:top-4 md:right-4" />
-      )}
 
       {/* Character Overview Card */}
       <Card className="character-overview bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
@@ -159,156 +140,123 @@ export const EnhancedStatsDashboard = memo(({
         </CardContent>
       </Card>
 
-      {/* Core Stats Grid */}
+      {/* Core Stats Grid - Enhanced Design */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <EnhancedStatCard
-          title="Health"
-          value={enhancedStats.hp}
-          maxValue={enhancedStats.maxHp}
-          icon={Heart}
-          color="red"
-          size="md"
-        />
-        
-        <EnhancedStatCard
-          title="Magic"
-          value={enhancedStats.mp}
-          maxValue={enhancedStats.maxMp}
-          icon={Zap}
-          color="blue"
-          size="md"
-        />
-        
-        <EnhancedStatCard
-          title="Strength"
-          value={enhancedStats.strength}
-          icon={Dumbbell}
-          color="red"
-          trend="up"
-          size="md"
-        />
-        
-        <EnhancedStatCard
-          title="Stamina"
-          value={enhancedStats.stamina}
-          icon={Heart}
-          color="green"
-          trend="up"
-          size="md"
-        />
-      </div>
-
-      {/* Secondary Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <EnhancedStatCard
-          title="Agility"
-          value={enhancedStats.agility}
-          icon={Zap}
-          color="purple"
-          trend="stable"
-          size="sm"
-        />
-        
-        <EnhancedStatCard
-          title="Overall Power"
-          value={enhancedStats.overallPower}
-          icon={Shield}
-          color="gold"
-          trend="up"
-          size="sm"
-        />
-        
-        <EnhancedStatCard
-          title="Streak"
-          value={enhancedStats.streakCount}
-          icon={Flame}
-          color="red"
-          size="sm"
-        />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="quick-actions grid grid-cols-2 md:grid-cols-4 gap-4">
-        <EnhancedActionButton
-          icon={Dumbbell}
-          variant="primary"
-          onClick={() => navigate('/workouts')}
-          fullWidth
-        >
-          Start Workout
-        </EnhancedActionButton>
-        
-        <EnhancedActionButton
-          icon={Trophy}
-          variant="secondary"
-          onClick={() => navigate('/battle')}
-          fullWidth
-        >
-          Battle
-        </EnhancedActionButton>
-        
-        <EnhancedActionButton
-          icon={Coins}
-          variant="warning"
-          onClick={() => navigate('/shop')}
-          fullWidth
-        >
-          Shop
-        </EnhancedActionButton>
-        
-        <EnhancedActionButton
-          icon={Shirt}
-          variant="success"
-          onClick={() => navigate('/wardrobe')}
-          fullWidth
-        >
-          Wardrobe
-        </EnhancedActionButton>
-      </div>
-
-      {/* Daily Progress Section */}
-      {dailyProgress && (
-        <Card className="daily-progress">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5" />
-              <span>Daily Progress</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div className="space-y-1">
-                <div className={`text-lg font-bold ${dailyProgress.waterIntake ? 'text-blue-400' : 'text-muted-foreground'}`}>
-                  {dailyProgress.waterIntake ? '✓' : '○'}
-                </div>
-                <p className="text-xs text-muted-foreground">Water</p>
-              </div>
-              <div className="space-y-1">
-                <div className={`text-lg font-bold ${dailyProgress.sleep ? 'text-purple-400' : 'text-muted-foreground'}`}>
-                  {dailyProgress.sleep ? '✓' : '○'}
-                </div>
-                <p className="text-xs text-muted-foreground">Sleep</p>
-              </div>
-              <div className="space-y-1">
-                <div className={`text-lg font-bold ${dailyProgress.stretching ? 'text-green-400' : 'text-muted-foreground'}`}>
-                  {dailyProgress.stretching ? '✓' : '○'}
-                </div>
-                <p className="text-xs text-muted-foreground">Stretch</p>
-              </div>
-              <div className="space-y-1">
-                <div className={`text-lg font-bold ${dailyProgress.vitamins ? 'text-yellow-400' : 'text-muted-foreground'}`}>
-                  {dailyProgress.vitamins ? '✓' : '○'}
-                </div>
-                <p className="text-xs text-muted-foreground">Vitamins</p>
-              </div>
+        <Card className="bg-gradient-to-br from-red-500/10 to-red-600/10 border-red-500/30">
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Heart className="h-6 w-6 text-red-400" />
             </div>
+            <p className="text-sm text-muted-foreground">Health</p>
+            <div className="text-2xl font-bold">{enhancedStats.hp}</div>
+            <div className="text-xs text-muted-foreground">/ {enhancedStats.maxHp}</div>
+            <Progress value={(enhancedStats.hp / enhancedStats.maxHp) * 100} className="h-2 mt-2" />
           </CardContent>
         </Card>
-      )}
+        
+        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/30">
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Zap className="h-6 w-6 text-blue-400" />
+            </div>
+            <p className="text-sm text-muted-foreground">Magic</p>
+            <div className="text-2xl font-bold">{enhancedStats.mp}</div>
+            <div className="text-xs text-muted-foreground">/ {enhancedStats.maxMp}</div>
+            <Progress value={(enhancedStats.mp / enhancedStats.maxMp) * 100} className="h-2 mt-2" />
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-red-500/10 to-red-600/10 border-red-500/30">
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Dumbbell className="h-6 w-6 text-red-400" />
+            </div>
+            <p className="text-sm text-muted-foreground">Strength</p>
+            <div className="text-2xl font-bold">{enhancedStats.strength}</div>
+            <Badge variant="outline" className="text-green-400 border-green-400 mt-1">↗</Badge>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-green-500/10 to-green-600/10 border-green-500/30">
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Heart className="h-6 w-6 text-green-400" />
+            </div>
+            <p className="text-sm text-muted-foreground">Stamina</p>
+            <div className="text-2xl font-bold">{enhancedStats.stamina}</div>
+            <Badge variant="outline" className="text-green-400 border-green-400 mt-1">↗</Badge>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Secondary Stats - Enhanced Layout */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border-purple-500/30">
+          <CardContent className="p-3 text-center">
+            <Zap className="h-5 w-5 text-purple-400 mx-auto mb-1" />
+            <p className="text-xs text-muted-foreground">Agility</p>
+            <div className="text-xl font-bold">{enhancedStats.agility}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border-yellow-500/30">
+          <CardContent className="p-3 text-center">
+            <Shield className="h-5 w-5 text-yellow-400 mx-auto mb-1" />
+            <p className="text-xs text-muted-foreground">Power</p>
+            <div className="text-xl font-bold">{enhancedStats.overallPower}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 border-orange-500/30">
+          <CardContent className="p-3 text-center">
+            <Flame className="h-5 w-5 text-orange-400 mx-auto mb-1" />
+            <p className="text-xs text-muted-foreground">Streak</p>
+            <div className="text-xl font-bold">{enhancedStats.currentStreak || 0}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions - Enhanced Buttons */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Button 
+          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          onClick={() => window.location.href = '/workouts'}
+        >
+          <Dumbbell className="h-4 w-4 mr-2" />
+          Workout
+        </Button>
+        
+        <Button 
+          variant="outline"
+          className="border-yellow-500/30 hover:bg-yellow-500/10"
+          onClick={() => window.location.href = '/battle'}
+        >
+          <Trophy className="h-4 w-4 mr-2" />
+          Battle
+        </Button>
+        
+        <Button 
+          variant="outline"
+          className="border-green-500/30 hover:bg-green-500/10"
+          onClick={() => window.location.href = '/shop'}
+        >
+          <Coins className="h-4 w-4 mr-2" />
+          Shop
+        </Button>
+        
+        <Button 
+          variant="outline"
+          className="border-purple-500/30 hover:bg-purple-500/10"
+          onClick={() => window.location.href = '/wardrobe'}
+        >
+          <Shirt className="h-4 w-4 mr-2" />
+          Style
+        </Button>
+      </div>
 
       {/* Recent Achievements */}
       {recentAchievements && recentAchievements.length > 0 && (
-        <Card className="recent-achievements">
+        <Card className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Star className="h-5 w-5 text-yellow-400" />
@@ -318,14 +266,17 @@ export const EnhancedStatsDashboard = memo(({
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {recentAchievements.slice(0, 4).map((achievement: any) => (
-                <EnhancedAchievement
-                  key={achievement.id}
-                  name={achievement.name}
-                  description={achievement.description}
-                  isUnlocked={true}
-                  rarity={achievement.rarity || 'common'}
-                  icon={achievement.icon}
-                />
+                <Card key={achievement.id} className="border-yellow-500/30">
+                  <CardContent className="p-3">
+                    <div className="flex items-center space-x-2">
+                      <Trophy className="h-4 w-4 text-yellow-400" />
+                      <div>
+                        <p className="text-sm font-medium">{achievement.name}</p>
+                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </CardContent>
