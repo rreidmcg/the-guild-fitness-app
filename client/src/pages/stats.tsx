@@ -43,10 +43,14 @@ import { FitnessAnalyticsDashboard } from "@/components/ui/fitness-analytics-das
 import { EnhancedStatsDashboard } from "@/components/enhanced-stats-dashboard";
 import { EnhancedErrorBoundary } from "@/components/enhanced-error-boundary";
 import { HpRegenDebug } from "@/components/ui/hp-regen-debug";
+import { usePlayerHp } from "@/hooks/use-player-hp";
 
 export default function Stats() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Get real-time HP updates from the regeneration service
+  const { hp: liveHp, maxHp: liveMaxHp } = usePlayerHp();
 
   // STATS PAGE COMPONENT - Isolated state management
   const [statsPageState, setStatsPageState] = useState({
@@ -263,14 +267,14 @@ export default function Stats() {
                   <span className="font-semibold text-red-400">Health</span>
                 </div>
                 <span className="text-sm text-red-300">
-                  {safeUserStats.currentHp || 0} / {safeUserStats.maxHp || 40}
+                  {Math.floor(liveHp || safeUserStats.currentHp || 0)} / {liveMaxHp || safeUserStats.maxHp || 40}
                 </span>
               </div>
               <div className="w-full bg-red-900/40 rounded-full h-3">
                 <div 
                   className="bg-gradient-to-r from-red-500 to-red-400 h-3 rounded-full transition-all duration-300"
                   style={{
-                    width: `${Math.max(0, Math.min(100, ((safeUserStats.currentHp || 0) / (safeUserStats.maxHp || 1)) * 100))}%`
+                    width: `${Math.max(0, Math.min(100, ((liveHp || safeUserStats.currentHp || 0) / (liveMaxHp || safeUserStats.maxHp || 1)) * 100))}%`
                   }}
                 />
               </div>

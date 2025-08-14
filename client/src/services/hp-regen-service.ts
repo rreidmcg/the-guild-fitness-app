@@ -71,9 +71,21 @@ class HpRegenerationService {
   private saveState() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+      this.notifyPlayerUpdate(this.state);
       this.debug('Saved state:', this.state);
     } catch (error) {
       this.debug('Failed to save state:', error);
+    }
+  }
+
+  // Emit player update event for real-time UI updates
+  private notifyPlayerUpdate(state: HpRegenState): void {
+    try {
+      window.dispatchEvent(new CustomEvent('player:update', {
+        detail: { hp: state.hp, maxHp: state.maxHp, lastRegenMs: state.lastRegenMs }
+      }));
+    } catch (error) {
+      // Silently fail in case window is not available
     }
   }
 
@@ -172,6 +184,12 @@ class HpRegenerationService {
       this.debug('ReplaceState detected');
       setTimeout(() => this.tick(), 100);
     };
+
+    // Add force regen tick event listener
+    window.addEventListener('force:regenTick', () => {
+      this.debug('Force regen tick requested');
+      this.tick();
+    });
   }
 
   // Public API
@@ -186,6 +204,12 @@ class HpRegenerationService {
     
     // Initial tick to catch up from any time away
     this.tick();
+    
+    // Fire initial player update for late subscribers
+    this.notifyPlayerUpdate(this.state);
+    
+    // Fire initial player update for late subscribers
+    this.notifyPlayerUpdate(this.state);
   }
 
   stop() {

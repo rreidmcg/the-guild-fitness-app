@@ -1,0 +1,167 @@
+Nice—sounds like the regen math is good but your stat page isn’t subscribed to updates, so the bar only refreshes after a full app reload (log out/in).
+
+Here’s a small, safe patch you can drop in to make the stat page live-update without touching your regen math.
+
+⸻
+
+1) Emit a “player updated” event whenever HP changes
+
+Add this right after you saveState(state) inside your regen code (wherever you already persist HP). If you save in multiple places (potions, damage), emit there too.
+
+function notifyPlayerUpdate(s) {
+  try {
+    window.dispatchEvent(new CustomEvent('player:update', {
+      detail: { hp: s.hp, maxHp: s.maxHp, lastRegenMs: s.lastRegenMs }
+    }));
+  } catch {}
+}
+
+Call it after each save:
+
+saveState(state);
+notifyPlayerUpdate(state);
+
+Also fire on load so late subscribers get an initial value:
+
+notifyPlayerUpdate(state); // after your first render on boot
+
+
+⸻
+
+2) Make the stat page listen and repaint the bar
+
+Vanilla JS stat page
+
+In the stat page script (or a module it imports), subscribe once:
+
+(function attachHpBarBinding(){
+  const bar = document.querySelector('[data-hp-bar]');
+  const txt = document.querySelector('[data-hp-text]');
+
+  function render(hp, maxHp) {
+    if (!bar) return;
+    const pct = Math.round((hp / maxHp) * 100);
+    bar.style.width = pct + '%';
+    if (txt) txt.textContent = `${Math.floor(hp)}/${maxHp}`;
+  }
+
+  // Initial paint from storage (in case event fires before we mount)
+  try {
+    const s = JSON.parse(localStorage.getItem('player_state_v1')) || {};
+    if (typeof s.hp === 'number' && typeof s.maxHp === 'number') render(s.hp, s.maxHp);
+  } catch {}
+
+  // Live updates from our custom event
+  window.addEventListener('player:update', (e) => {
+    const { hp, maxHp } = e.detail || {};
+    if (typeof hp === 'number' && typeof maxHp === 'number') render(hp, maxHp);
+  });
+
+  // If your regen runs in another tab, sync via storage events too
+  window.addEventListener('storage', (e) => {
+    if (e.key !== 'player_state_v1' || !e.newValue) return;
+    try {
+      const s = JSON.parse(e.newValue);
+      render(s.hp, s.maxHp);
+    } catch {}
+  });
+
+  // Ensure we catch up when showing/returning to this page/route
+  window.addEventListener('pageshow', () => window.dispatchEvent(new Event('force:regenTick')));
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) window.dispatchEvent(new Event('force:regenTick'));
+  });
+})();
+
+And expose a tiny hook in your regen module to respond to force:regenTick:
+
+window.addEventListener('force:regenTick', () => {
+  try { regenTick(); } catch {}
+});
+
+(If regenTick isn’t in global scope, export a tiny function on window that calls it.)
+
+⸻
+
+React stat page (Hook)
+
+Use a subscription instead of copying HP into local component state forever.
+
+import { useEffect, useState } from 'react';
+
+export function usePlayerHp() {
+  const [hp, setHp] = useState(0);
+  const [maxHp, setMaxHp] = useState(100);
+
+  useEffect(() => {
+    // initial
+    try {
+      const s = JSON.parse(localStorage.getItem('player_state_v1')) || {};
+      if (typeof s.hp === 'number') setHp(s.hp);
+      if (typeof s.maxHp === 'number') setMaxHp(s.maxHp);
+    } catch {}
+
+    const onUpdate = (e) => {
+      const { hp, maxHp } = e.detail || {};
+      if (typeof hp === 'number') setHp(hp);
+      if (typeof maxHp === 'number') setMaxHp(maxHp);
+    };
+    const onStorage = (e) => {
+      if (e.key !== 'player_state_v1' || !e.newValue) return;
+      try {
+        const s = JSON.parse(e.newValue);
+        if (typeof s.hp === 'number') setHp(s.hp);
+        if (typeof s.maxHp === 'number') setMaxHp(s.maxHp);
+      } catch {}
+    };
+    const onShow = () => window.dispatchEvent(new Event('force:regenTick'));
+
+    window.addEventListener('player:update', onUpdate);
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('pageshow', onShow);
+    document.addEventListener('visibilitychange', onShow);
+
+    return () => {
+      window.removeEventListener('player:update', onUpdate);
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('pageshow', onShow);
+      document.removeEventListener('visibilitychange', onShow);
+    };
+  }, []);
+
+  return { hp, maxHp };
+}
+
+Use it in your stat page:
+
+const { hp, maxHp } = usePlayerHp();
+<div className="hp-wrap">
+  <div className="hp-bar" style={{ width: `${Math.round((hp/maxHp)*100)}%` }} />
+  <span>{Math.floor(hp)}/{maxHp}</span>
+</div>
+
+(If you already have a global store like Zustand, subscribe to the store’s selector instead of local state and ensure the regen code updates the same store, not just localStorage.)
+
+⸻
+
+3) Make sure regen triggers a repaint on navigation
+
+If your SPA pushes routes, make sure you call regenTick() on route changes (you may already do this). Minimal patch:
+
+(function patchHistory(){
+  const _push = history.pushState, _replace = history.replaceState;
+  function afterNav(){ window.dispatchEvent(new Event('force:regenTick')); }
+  history.pushState = function(){ const r = _push.apply(this, arguments); afterNav(); return r; };
+  history.replaceState = function(){ const r = _replace.apply(this, arguments); afterNav(); return r; };
+})();
+window.addEventListener('hashchange', () => window.dispatchEvent(new Event('force:regenTick')));
+window.addEventListener('popstate', () => window.dispatchEvent(new Event('force:regenTick')));
+
+
+⸻
+
+Why this fixes your symptom
+	•	Before: stat page read HP once on mount (or from a stale store) → no UI changes until a full reload.
+	•	After: regen writes → emits event → stat page subscribes and repaints immediately. Also catches wake-from-sleep and route entries with pageshow/visibilitychange + a forced regenTick.
+
+If you paste your stack (vanilla/React/Vue and whether you use a store like Zustand/Redux/Pinia), I’ll tailor the exact lines to your files.
