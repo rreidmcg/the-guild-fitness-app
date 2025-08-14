@@ -125,12 +125,15 @@ export function HpRegenDebug() {
           <Button
             onClick={() => {
               console.log('HP Debug Storage Check:', localStorage.getItem('hp_regen_state'));
+              (window as any).__DEBUG_HP_HOOK__ = true;
+              (window as any).__DEBUG_REGEN__ = true;
               window.dispatchEvent(new Event('force:regenTick'));
+              console.log('Debug flags enabled, forced regen tick');
             }}
             size="sm"
             className="w-full bg-green-600 hover:bg-green-700"
           >
-            Debug Storage State
+            Enable Debug & Tick
           </Button>
         </div>
 

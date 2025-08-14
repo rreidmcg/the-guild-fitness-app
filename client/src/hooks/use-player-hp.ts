@@ -14,6 +14,13 @@ export function usePlayerHp() {
   const [hp, setHp] = useState(0);
   const [maxHp, setMaxHp] = useState(100);
   const [lastRegenMs, setLastRegenMs] = useState(Date.now());
+  
+  // Debug logging
+  const debug = (...args: any[]) => {
+    if ((window as any).__DEBUG_HP_HOOK__) {
+      console.log('[HP Hook]', ...args);
+    }
+  };
 
   useEffect(() => {
     // Load initial state from localStorage with proper number coercion
@@ -41,6 +48,7 @@ export function usePlayerHp() {
 
     // Set initial state
     const initialState = loadPlayerState();
+    debug('Initial state loaded:', initialState);
     setHp(initialState.hp);
     setMaxHp(initialState.maxHp);
     setLastRegenMs(initialState.lastRegenMs);
@@ -48,13 +56,23 @@ export function usePlayerHp() {
     // Listen for real-time HP updates from the regeneration service
     const onPlayerUpdate = (e: CustomEvent) => {
       const { hp, maxHp, lastRegenMs } = e.detail || {};
+      debug('Received player update event:', { hp, maxHp, lastRegenMs });
+      
       // Ensure numbers are properly coerced
       const numHp = Number(hp);
       const numMaxHp = Number(maxHp);
       const numLastRegen = Number(lastRegenMs);
       
-      if (Number.isFinite(numHp)) setHp(numHp);
-      if (Number.isFinite(numMaxHp)) setMaxHp(numMaxHp);
+      debug('Coerced numbers:', { numHp, numMaxHp, numLastRegen });
+      
+      if (Number.isFinite(numHp)) {
+        debug('Setting HP to:', numHp);
+        setHp(numHp);
+      }
+      if (Number.isFinite(numMaxHp)) {
+        debug('Setting maxHp to:', numMaxHp);
+        setMaxHp(numMaxHp);
+      }
       if (Number.isFinite(numLastRegen)) setLastRegenMs(numLastRegen);
     };
 
@@ -87,15 +105,23 @@ export function usePlayerHp() {
     };
 
     // Set up event listeners
+    debug('Setting up event listeners');
     window.addEventListener('player:update', onPlayerUpdate as EventListener);
     window.addEventListener('storage', onStorageChange);
     window.addEventListener('pageshow', onForceRegenTick);
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) onForceRegenTick();
     });
+    
+    // Initial forced refresh to sync with current state
+    setTimeout(() => {
+      debug('Initial forced refresh');
+      onForceRegenTick();
+    }, 100);
 
     // Cleanup function
     return () => {
+      debug('Cleaning up event listeners');
       window.removeEventListener('player:update', onPlayerUpdate as EventListener);
       window.removeEventListener('storage', onStorageChange);
       window.removeEventListener('pageshow', onForceRegenTick);
@@ -103,5 +129,8 @@ export function usePlayerHp() {
     };
   }, []);
 
+  // Log current state for debugging
+  debug('Current hook state:', { hp, maxHp, lastRegenMs });
+  
   return { hp, maxHp, lastRegenMs };
 }
