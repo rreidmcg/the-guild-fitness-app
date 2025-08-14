@@ -267,14 +267,14 @@ export default function Stats() {
                   <span className="font-semibold text-red-400">Health</span>
                 </div>
                 <span className="text-sm text-red-300">
-                  {Math.floor(liveHp || safeUserStats.currentHp || 0)} / {liveMaxHp || safeUserStats.maxHp || 40}
+                  {Math.floor(liveHp || 0)} / {Math.floor(liveMaxHp || 0)}
                 </span>
               </div>
               <div className="w-full bg-red-900/40 rounded-full h-3">
                 <div 
                   className="bg-gradient-to-r from-red-500 to-red-400 h-3 rounded-full transition-all duration-300"
                   style={{
-                    width: `${Math.max(0, Math.min(100, ((liveHp || safeUserStats.currentHp || 0) / (liveMaxHp || safeUserStats.maxHp || 1)) * 100))}%`
+                    width: `${Math.max(0, Math.min(100, ((liveHp || 0) / (liveMaxHp || 1)) * 100))}%`
                   }}
                 />
               </div>

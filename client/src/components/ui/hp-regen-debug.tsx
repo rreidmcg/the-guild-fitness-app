@@ -122,6 +122,16 @@ export function HpRegenDebug() {
           >
             Force Regeneration Tick
           </Button>
+          <Button
+            onClick={() => {
+              console.log('HP Debug Storage Check:', localStorage.getItem('hp_regen_state'));
+              window.dispatchEvent(new Event('force:regenTick'));
+            }}
+            size="sm"
+            className="w-full bg-green-600 hover:bg-green-700"
+          >
+            Debug Storage State
+          </Button>
         </div>
 
         {/* Info Text */}

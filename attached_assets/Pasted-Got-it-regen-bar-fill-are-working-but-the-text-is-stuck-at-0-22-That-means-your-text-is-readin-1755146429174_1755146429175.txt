@@ -1,0 +1,83 @@
+Got it — regen & bar fill are working, but the text is stuck at 0/22. That means your text is reading from a different (stale) source than the bar. Fix by making both pull from the same numeric state on every update.
+
+Here’s a tiny, safe patch you can drop in:
+
+1) Use one canonical getter (coerce to numbers)
+
+const STORAGE_KEY = 'player_state_v1';
+
+function loadPlayer() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    // Coerce to numbers. Strings like "11" → 11. NaN → defaults.
+    const hp    = Number(s.hp);
+    const maxHp = Number(s.maxHp);
+    const last  = Number(s.lastRegenMs);
+    return {
+      hp:    Number.isFinite(hp)    ? hp    : 0,
+      maxHp: Number.isFinite(maxHp) ? maxHp : 100,
+      lastRegenMs: Number.isFinite(last) ? last : Date.now(),
+    };
+  } catch {
+    return { hp: 0, maxHp: 100, lastRegenMs: Date.now() };
+  }
+}
+
+function savePlayer(s) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+2) Render function that updates both bar & text from that state
+
+function renderHP() {
+  const { hp, maxHp } = loadPlayer(); // always fresh, numeric
+  const clampedHp = Math.max(0, Math.min(hp, maxHp));
+  const pct = maxHp > 0 ? Math.round((clampedHp / maxHp) * 100) : 0;
+
+  const bar = document.querySelector('[data-hp-bar]');
+  const txt = document.querySelector('[data-hp-text]');
+
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = `${Math.floor(clampedHp)}/${Math.floor(maxHp)}`;
+}
+
+3) Call renderHP() whenever HP changes
+
+Wherever your regen saves state, immediately re-render:
+
+// after you compute new hp...
+savePlayer(state);
+renderHP();
+
+// if you already broadcast a custom event, you can also:
+window.dispatchEvent(new Event('ui:hp-updated'));
+
+…and on the stat page, subscribe so it live-updates even when you navigate back:
+
+window.addEventListener('ui:hp-updated', renderHP);
+window.addEventListener('storage', (e) => {
+  if (e.key === STORAGE_KEY && e.newValue) renderHP();
+});
+window.addEventListener('pageshow', renderHP);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderHP(); });
+
+4) Quick debug to verify the mismatch
+
+Paste this, then trigger a regen tick:
+
+(function debugHp(){
+  const s = loadPlayer();
+  const bar = document.querySelector('[data-hp-bar]');
+  const txt = document.querySelector('[data-hp-text]');
+  console.log('HP DEBUG:', { hp: s.hp, maxHp: s.maxHp, barWidth: bar?.style.width, text: txt?.textContent });
+})();
+
+If you see hp increasing but text still 0/22, it means your text wasn’t being repainted; the render hook above fixes that.
+
+⸻
+
+Why this solves your symptom
+	•	Half bar but 0/22 text happens when the bar width is being updated from the new value, but the text is reading a stale variable (initial state, different store, or string → number bug).
+	•	By coercing to numbers and rerendering text from the same persisted state every time, both stay in lockstep.
+
+If you’re on React/Vue/Zustand/Redux, I can give you the exact subscription snippet for that stack—just say which one you’re using.
