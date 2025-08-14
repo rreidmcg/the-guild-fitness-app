@@ -1998,9 +1998,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const timeSinceBattle = currentTime - userWithStats.lastBattleTime;
             const minutesSinceBattle = Math.floor(timeSinceBattle / (60 * 1000));
             
+            console.log(`HP Regen Debug: currentHp=${currentHp}, maxHp=${maxHp}, timeSinceBattle=${timeSinceBattle}ms, minutes=${minutesSinceBattle}`);
+            
             if (minutesSinceBattle > 0) {
               const hpRegenRate = 0.01; // 1% per minute
-              const hpToRegenerate = Math.floor(maxHp * hpRegenRate * minutesSinceBattle);
+              const hpToRegenerate = Math.max(1, Math.floor(maxHp * hpRegenRate * minutesSinceBattle)); // Minimum 1 HP per minute
               const newHp = Math.min(maxHp, currentHp + hpToRegenerate);
               
               if (newHp > currentHp) {
@@ -2009,6 +2011,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 console.log(`HP regeneration: +${hpToRegenerate} HP over ${minutesSinceBattle} minutes (${currentHp}/${maxHp})`);
               }
             }
+          } else if (currentHp < maxHp) {
+            console.log(`HP Regen Blocked: lastBattleTime=${userWithStats.lastBattleTime}, currentHp=${currentHp}, maxHp=${maxHp}`);
           }
           
           // Apply MP regeneration if not at max MP and out of combat
