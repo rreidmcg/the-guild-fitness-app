@@ -14,6 +14,7 @@ import { AuthGuard, PublicRoute } from "@/components/auth-guard";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { OnboardingModal } from "@/components/ui/onboarding-modal";
 import { useOnboarding } from "@/hooks/use-onboarding";
+import { hpRegenService } from "@/services/hp-regen-service";
 import Stats from "@/pages/stats";
 import Workouts from "@/pages/workouts";
 import Settings from "@/pages/settings";

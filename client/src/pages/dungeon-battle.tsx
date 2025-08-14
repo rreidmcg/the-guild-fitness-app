@@ -30,6 +30,7 @@ import { ParallaxBackground } from "@/components/ui/parallax-background";
 import { Avatar2D } from "@/components/ui/avatar-2d";
 import { BattleAccessGuard } from "@/components/ui/battle-access-guard";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { hpRegenService } from "@/services/hp-regen-service";
 
 // Import monster images
 import greenSlimeImage from "@assets/IMG_3665_1753055571089.png";
@@ -233,12 +234,14 @@ export default function DungeonBattlePage() {
     queryKey: ["/api/user/stats"],
   });
 
-  // Initialize battle when component loads
+  // Initialize battle when component loads and sync HP regeneration service
   useEffect(() => {
     if (userStats && zoneId) {
       const zone = ERANK_DUNGEON_ZONES.find(z => z.id === zoneId);
       if (zone) {
         initializeBattle(zone);
+        // Update HP regeneration service with current player stats
+        hpRegenService.updatePlayerState(userStats.currentHp, userStats.maxHp);
       } else {
         toast({
           title: "Zone Not Found",
@@ -301,7 +304,10 @@ export default function DungeonBattlePage() {
       attacksRemaining: 4,
       lastAttackTime: 0,
       damageMultiplier: 1.0,
-      isInCombatTurn: false
+      isInCombatTurn: false,
+      // Initialize defeat system
+      showDefeatModal: false,
+      defeatModalTimer: 0
     });
   };
 
@@ -557,6 +563,10 @@ export default function DungeonBattlePage() {
           maxHp: battleState.playerMaxHp 
         })
       });
+      
+      // Update HP regeneration service with final HP state
+      hpRegenService.updatePlayerState(battleState.playerHp, battleState.playerMaxHp);
+      
     } catch (error) {
       console.error('Failed to persist HP:', error);
     }

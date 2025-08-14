@@ -1,0 +1,104 @@
+Here’s a clean, copy-paste prompt for Replit. Drop it into your project’s chat exactly as-is.
+
+⸻
+
+Prompt for Replit (debug + fix HP regen):
+
+You are auditing and fixing my web app’s HP regeneration. The intended behavior: regenerate 1% of max HP per minute only when NOT on the dungeon page. It must be accurate across page reloads, SPA route changes, and sleeping tabs.
+
+What to do (step-by-step)
+	1.	Locate current logic
+	•	Search for HP/state code: hp, maxHp, health, player, store, zustand, redux, vuex, pinia, context, usePlayer, setHp, updateHp, regen.
+	•	Search for routing: router, history.pushState, react-router, next/router, vue-router, hashchange, popstate, location.hash, location.pathname.
+	•	Search for persistence: localStorage, indexedDB, cookies, load/save player.
+	2.	Identify the current bug(s)
+	•	Does it tick on a fixed interval without timestamps? (causes drift / sleep bugs)
+	•	Does it regenerate while on the dungeon page?
+	•	Does it fail to “catch up” after tab sleep or reload?
+	•	Is lastRegenMs missing, never updated, or updated while in the dungeon?
+	•	Are there multiple intervals created on re-renders?
+	•	Is regen tied to FPS / requestAnimationFrame?
+	3.	Implement a timestamp-based regen service
+	•	Create (or fix) a single source of truth for player state (reuse existing store if present).
+	•	Add fields if missing: hp: number, maxHp: number, lastRegenMs: number.
+	•	Constants:
+	•	MINUTE_MS = 60000
+	•	REGEN_PERCENT_PER_MIN = 1 (1% of max per minute)
+	•	Route gate: Create isOnDungeonPage() that returns true if current route matches our dungeon route. It must support:
+	•	Path-based: location.pathname.includes('/dungeon')
+	•	Hash-based: location.hash.includes('#/dungeon')
+	•	If we use a router, use the official current route API (e.g., React Router, Vue Router).
+	•	Tick function (idempotent):
+
+now = Date.now()
+if (isOnDungeonPage()) {
+  lastRegenMs = now        // reset clock while inside dungeon
+  persist()
+  render()
+  return
+}
+elapsedMs = now - lastRegenMs
+if (elapsedMs > 0) {
+  regenPct = (elapsedMs / MINUTE_MS) * REGEN_PERCENT_PER_MIN
+  gain = (regenPct / 100) * maxHp
+  hp = min(maxHp, hp + gain)
+  lastRegenMs = now
+  persist()
+  render()
+}
+
+
+	•	Heartbeat: one lightweight setInterval(tick, 5000) (5s). Do NOT rely on exact-minute intervals. Timestamps handle accuracy.
+	•	Navigation hooks: call tick() on hashchange, popstate, and after SPA route changes (router.afterEach or monkey patch history.pushState/replaceState if no router hook).
+	•	Visibility: add visibilitychange listener → tick() when tab becomes visible.
+	•	Persistence: load/save from existing persistence; if none, use localStorage. Keep it backward compatible with existing schema.
+
+	4.	Make it safe and single-instanced
+	•	Ensure only one interval exists (store interval id in a module/global; clear any previous).
+	•	If using React/Vue, mount the service once at app root; clean up on unmount.
+	•	Guard against NaN/undefined (hp, maxHp, lastRegenMs).
+	5.	UI update
+	•	Wire the HP bar width/text to the canonical state (don’t compute separately).
+	•	Clamp: hp = Math.max(0, Math.min(hp, maxHp)).
+	6.	Do NOT accumulate regen time while in dungeon
+	•	The reset of lastRegenMs while in dungeon is required.
+
+Acceptance criteria (must pass)
+	•	With app open on non-dungeon page, HP rises ~1% of max per minute (fractional per 5s is fine).
+	•	On the dungeon page, HP does not increase; lastRegenMs keeps resetting to Date.now().
+	•	After being away/asleep for N minutes on a non-dungeon page, on wake or reload, HP catches up by N%.
+	•	HP never exceeds maxHp.
+	•	Only one interval runs (verify by logging once).
+	•	Works for hash routes and path routes.
+	•	Works after SPA navigations via router methods (push/replace) and browser back/forward.
+
+If the app uses a specific stack, integrate accordingly
+	•	React: Initialize the regen service in App (or a top-level provider) with useEffect once. Ensure cleanup. Subscribe the HP bar to the store.
+	•	Vue: Initialize in App.vue or a plugin; use router.afterEach(() => tick()).
+	•	Vanilla: Put service in main bundle; add global listeners.
+
+Telemetry (temporary for debugging)
+	•	Add guarded debug logs (if (window.__DEBUG_REGEN__) console.log(...)) showing:
+	•	route, isOnDungeonPage()
+	•	elapsedMs, computed gain, resulting hp, and lastRegenMs
+	•	interval creation message (once)
+	•	I’ll toggle window.__DEBUG_REGEN__ = true in console when needed.
+
+Tests / smoke steps (perform these manually if no test framework)
+	1.	Set hp = maxHp - 10 on a non-dungeon page. Wait 5 minutes → HP increased by ~5% of max.
+	2.	Navigate to dungeon → wait 2 minutes → HP unchanged.
+	3.	Navigate back to non-dungeon → immediate catch-up of the elapsed time since last tick (only time spent outside dungeon should count).
+	4.	Reload the page on non-dungeon with hp < maxHp → immediate catch-up based on persisted lastRegenMs.
+	5.	Background the tab for 10 minutes on non-dungeon → return → catch-up applied once.
+	6.	Verify only one interval exists (only one “interval started” log).
+
+Deliverables
+	•	Updated code with the regen service integrated.
+	•	Brief note listing:
+	•	Files changed
+	•	Where isOnDungeonPage() lives and how it matches routes
+	•	Where the single interval is created/cleaned up
+	•	Where state is persisted/loaded
+	•	Any guards added to prevent multiple timers
+
+Important: Keep existing app architecture intact; do not rewrite unrelated systems. If you must change the store shape, migrate old data safely.

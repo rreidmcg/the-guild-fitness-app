@@ -42,6 +42,7 @@ import { FitnessGoalProgress } from "@/components/ui/fitness-goal-progress";
 import { FitnessAnalyticsDashboard } from "@/components/ui/fitness-analytics-dashboard";
 import { EnhancedStatsDashboard } from "@/components/enhanced-stats-dashboard";
 import { EnhancedErrorBoundary } from "@/components/enhanced-error-boundary";
+import { HpRegenDebug } from "@/components/ui/hp-regen-debug";
 
 export default function Stats() {
   const navigate = useNavigate();
@@ -179,7 +180,7 @@ export default function Stats() {
 
       <div className="max-w-4xl mx-auto p-6 space-y-8">
         {/* Atrophy Warning */}
-        <AtrophyWarning />
+        <AtrophyWarning userStats={safeUserStats} />
         {/* Character Profile */}
         <Card className="bg-card border-border relative">
           {/* Wardrobe Button in Corner */}
@@ -509,6 +510,10 @@ export default function Stats() {
           <FitnessAnalyticsDashboard />
         )}
 
+        {/* HP Regeneration Debug - Only show for admin users */}
+        {(safeUserStats.username === 'Zero' || safeUserStats.username === 'Rob') && (
+          <HpRegenDebug />
+        )}
 
       </div>
 
