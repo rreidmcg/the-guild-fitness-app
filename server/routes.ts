@@ -1543,7 +1543,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const allUsers = await storage.getAllUsers();
-      res.json(allUsers);
+      console.log('Admin users fetch: Total users from DB:', allUsers.length);
+      console.log('Admin users fetch: User list includes:', allUsers.map(u => `${u.username}(ID:${u.id})`).join(', '));
+      
+      // Sort users by ID for consistent ordering
+      const sortedUsers = allUsers.sort((a, b) => a.id - b.id);
+      res.json(sortedUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ error: "Failed to fetch users" });

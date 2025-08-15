@@ -22,6 +22,11 @@ export default function AdminPage() {
   const { data: allUsers = [], isLoading: usersLoading } = useQuery({
     queryKey: ["/api/admin/users"],
     staleTime: 30000, // 30 seconds
+    onSuccess: (data) => {
+      console.log('Admin users data:', data);
+      console.log('Total users fetched:', data?.length || 0);
+      console.log('Doorz in list:', data?.find((u: any) => u.username === 'Doorz'));
+    }
   });
 
   return (
@@ -160,7 +165,7 @@ export default function AdminPage() {
                   {allUsers.length === 0 ? (
                     <p className="text-muted-foreground">No users found</p>
                   ) : (
-                    allUsers.slice(0, 10).map((user: any) => (
+                    allUsers.slice(0, 20).map((user: any) => (
                       <div key={user.id} className="admin-page__user-row flex items-center justify-between p-4 border rounded-lg">
                         <div>
                           <h4 className="font-medium">{user.username}</h4>
@@ -179,11 +184,17 @@ export default function AdminPage() {
                       </div>
                     ))
                   )}
-                  {allUsers.length > 10 && (
+                  {allUsers.length > 20 && (
                     <p className="text-sm text-muted-foreground text-center">
-                      Showing first 10 users of {allUsers.length} total
+                      Showing first 20 users of {allUsers.length} total
                     </p>
                   )}
+                  <div className="text-xs text-muted-foreground mt-4 p-2 bg-muted rounded">
+                    Debug: Total users in response: {allUsers.length}
+                    {allUsers.length > 0 && (
+                      <span className="block">User IDs: {allUsers.map((u: any) => `${u.username}(${u.id})`).join(', ')}</span>
+                    )}
+                  </div>
                 </div>
               )}
             </CardContent>
