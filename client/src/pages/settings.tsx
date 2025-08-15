@@ -40,7 +40,7 @@ export default function Settings() {
   const { toast } = useToast();
   const { isPlaying, isMuted, toggleMusic } = useBackgroundMusic();
   const { openOnboarding } = useOnboarding();
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
   
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
@@ -104,6 +104,38 @@ export default function Settings() {
       </div>
 
       <div className="max-w-4xl mx-auto p-6 space-y-6">
+        {/* Admin Section - Moved to top for GM users */}
+        {(userStats as any)?.currentTitle === "<G.M.>" && (
+          <Card className="bg-card border-border border-yellow-500/30 bg-yellow-900/10">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2 text-yellow-400">
+                <Shield className="w-5 h-5" />
+                <span>Admin Tools</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center border-yellow-500/50 text-yellow-400 hover:bg-yellow-900/20"
+                  onClick={() => navigate('/admin')}
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Admin Panel
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center border-yellow-500/50 text-yellow-400 hover:bg-yellow-900/20"
+                  onClick={() => navigate('/analytics')}
+                >
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Analytics Dashboard
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Profile Section */}
         <Card className="bg-card border-border">
           <CardHeader>
@@ -331,28 +363,6 @@ export default function Settings() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(userStats as any)?.currentTitle === "<G.M.>" && (
-                <>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center justify-center"
-                    onClick={() => setLocation('/admin')}
-                  >
-                    <Shield className="w-4 h-4 mr-2" />
-                    Admin Panel
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center justify-center"
-                    onClick={() => setLocation('/analytics')}
-                  >
-                    <BarChart3 className="w-4 h-4 mr-2" />
-                    Analytics Dashboard
-                  </Button>
-                </>
-              )}
-            </div>
             
             <div className="text-center py-4 border-t border-border">
               <p className="text-sm text-muted-foreground mb-2">The Guild: Gamified Fitness v1.0.0</p>
