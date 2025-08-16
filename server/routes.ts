@@ -1555,6 +1555,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fix user levels based on their experience points
+  app.post("/api/admin/fix-user-levels", async (req, res) => {
+    try {
+      const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
+      const currentUser = await storage.getUser(userId);
+      if (!currentUser || currentUser.currentTitle !== "<G.M.>") {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const allUsers = await storage.getAllUsers();
+      let fixedUsers = 0;
+      
+      for (const user of allUsers) {
+        const correctLevel = calculateLevel(user.experience || 0);
+        if (user.level !== correctLevel) {
+          console.log(`Fixing ${user.username}: Level ${user.level} -> ${correctLevel} (${user.experience} XP)`);
+          await storage.updateUser(user.id, { level: correctLevel });
+          fixedUsers++;
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        message: `Fixed ${fixedUsers} user levels`,
+        details: `Checked ${allUsers.length} users, corrected ${fixedUsers} incorrect levels`
+      });
+    } catch (error) {
+      console.error("Error fixing user levels:", error);
+      res.status(500).json({ error: "Failed to fix user levels" });
+    }
+  });
+
   app.get("/api/admin/system-stats", async (req, res) => {
     try {
       const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); }
