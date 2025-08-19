@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, workoutSessions, achievements, userAchievements, monsters, exercises } from "@shared/schema";
+import { users, workoutSessions, achievements, userAchievements, monsters, exercises } from "../shared/schema.js";
 import { eq, sql, and, gte, lte, desc, count } from "drizzle-orm";
 
 export interface AnalyticsData {

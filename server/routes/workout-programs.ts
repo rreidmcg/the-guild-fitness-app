@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { storage } from "../storage";
-import { insertProgramWorkoutSchema } from "@shared/schema";
+import { insertProgramWorkoutSchema } from "../../shared/schema.js";
 import Stripe from "stripe";
 
 // Initialize Stripe

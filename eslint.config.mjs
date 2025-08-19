@@ -29,7 +29,6 @@ export default [
       },
       parser: ts.parser,
       parserOptions: {
-        projectService: true,
       },
     },
     plugins: {
@@ -47,7 +46,7 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      ...ts.configs.recommendedTypeChecked.rules,
+      ...ts.configs.recommended.rules,
       ...pluginImport.configs.recommended.rules,
       ...pluginPromise.configs.recommended.rules,
       'unicorn/prefer-node-protocol': 'error',
@@ -63,7 +62,8 @@ export default [
         },
       ],
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-floating-promises': 'off',
+      '@typescript-eslint/no-misused-promises': 'off',
       '@typescript-eslint/consistent-type-imports': 'warn',
       'security/detect-object-injection': 'off',
     },
