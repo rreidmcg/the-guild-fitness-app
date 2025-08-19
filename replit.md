@@ -37,7 +37,7 @@ The Guild: Gamified Fitness is a full-stack fitness tracking application that ga
 - **Streamlined Login Process**: Removed email verification requirement for initial login - users can now access their accounts immediately after registration
 - **Enhanced Security**: Email verification still required for password reset functionality to maintain account security
 - **Improved Liability Waiver**: Enhanced text readability with larger fonts, better contrast, and improved spacing for better user experience during signup
-- **ActiveCampaign Email Migration**: Successfully migrated from MailerSend to ActiveCampaign + Postmark for enterprise-grade email delivery, contact management, and marketing automation with Gmail SMTP as fallback
+- **Email Service Integration**: Implemented Nodemailer as primary email service with Gmail SMTP, maintaining MailerSend as fallback option
 
 **Mail Interface & New Player Experience:**
 - **Enhanced Mail Hierarchy**: Improved visual hierarchy with larger bold sender names, smaller bold subjects, and light-weight body previews

@@ -4,7 +4,7 @@
  */
 
 import { db } from "./db";
-import { users, exercises, workoutSessions, exercisePerformances } from "../shared/schema.js";
+import { users, exercises, workoutSessions, exercisePerformances } from "@shared/schema";
 import { eq, desc, gte, sql } from "drizzle-orm";
 
 export interface WorkoutRecommendation {

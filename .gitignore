@@ -1,34 +1,3 @@
-cookies*.txt
-
-# Environment / secrets
-.env
-.env.*
-
-# Replit-specific
-.replit
-.cache/
-
-# Editors
-.idea/
-.vscode/
-
-# Coverage / build caches
-coverage/
-.pnpm-store/
-.next/
-.output/
-.vercel/
-
-# Python (if any gets added)
-__pycache__/
-.pytest_cache/
-*.pyc
-
-# Godot (if you experiment with a client later)
-.import/
-.godot/
-*.import
-
 node_modules
 dist
 .DS_Store

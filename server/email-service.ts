@@ -1,7 +1,5 @@
-// Email service using ActiveCampaign and Postmark for transactional emails
+// Email service using MailerSend API and Nodemailer as fallback for transactional emails
 import nodemailer from 'nodemailer';
-import * as postmark from "postmark";
-const ActiveCampaign = require("activecampaign");
 
 interface EmailParams {
   to: string;
@@ -10,44 +8,7 @@ interface EmailParams {
   text?: string;
 }
 
-// ActiveCampaign client initialization
-let activeCampaignClient: any = null;
-
-function createActiveCampaignClient() {
-  if (activeCampaignClient) return activeCampaignClient;
-  
-  const apiUrl = process.env.ACTIVECAMPAIGN_API_URL;
-  const apiKey = process.env.ACTIVECAMPAIGN_API_KEY;
-  
-  if (!apiUrl || !apiKey) {
-    console.warn('ActiveCampaign credentials not configured');
-    return null;
-  }
-  
-  activeCampaignClient = new ActiveCampaign(apiUrl, apiKey);
-  console.log('✅ ActiveCampaign client created');
-  return activeCampaignClient;
-}
-
-// Postmark client initialization
-let postmarkClient: postmark.ServerClient | null = null;
-
-function createPostmarkClient() {
-  if (postmarkClient) return postmarkClient;
-  
-  const serverToken = process.env.POSTMARK_SERVER_TOKEN;
-  
-  if (!serverToken) {
-    console.warn('Postmark server token not configured');
-    return null;
-  }
-  
-  postmarkClient = new postmark.ServerClient(serverToken);
-  console.log('✅ Postmark client created');
-  return postmarkClient;
-}
-
-// Nodemailer transporter for Gmail SMTP (legacy fallback)
+// Nodemailer transporter for Gmail SMTP
 let nodemailerTransporter: nodemailer.Transporter | null = null;
 
 function createNodemailerTransporter() {
@@ -95,134 +56,88 @@ async function sendEmailViaNodemailer(params: EmailParams): Promise<boolean> {
   }
 }
 
-// Send email via Postmark
-async function sendEmailViaPostmark(params: EmailParams): Promise<boolean> {
-  const client = createPostmarkClient();
-  if (!client) return false;
+// Send email via MailerSend API
+async function sendEmailViaMailerSend(params: EmailParams): Promise<boolean> {
+  const apiKey = process.env.MAILERSEND_API_KEY;
   
-  try {
-    const result = await client.sendEmail({
-      "From": "noreply@theguildfitness.com", // Replace with your verified domain
-      "To": params.to,
-      "Subject": params.subject,
-      "HtmlBody": params.html,
-      "TextBody": params.text || params.html.replace(/<[^>]*>/g, ''), // Strip HTML for text version
-      "MessageStream": "outbound"
-    });
-    
-    console.log(`✅ Email sent successfully to ${params.to} via Postmark:`, result.MessageID);
-    return true;
-  } catch (error) {
-    console.error('Postmark error:', error);
+  if (!apiKey) {
+    console.warn('MailerSend API key not configured');
     return false;
   }
-}
 
-// Sync contact with ActiveCampaign
-async function syncContactWithActiveCampaign(email: string, firstName?: string, lastName?: string): Promise<boolean> {
-  const client = createActiveCampaignClient();
-  if (!client) return false;
-  
   try {
-    const contactData: any = { email };
-    if (firstName) contactData.firstName = firstName;
-    if (lastName) contactData.lastName = lastName;
-    
-    const result = await client.api("contact/sync", contactData);
-    
-    if (result.success) {
-      console.log(`✅ Contact synced with ActiveCampaign: ${email}`);
-      return true;
-    } else {
-      console.warn('ActiveCampaign contact sync failed:', result);
+    const response = await fetch('https://api.mailersend.com/v1/email', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({
+        from: {
+          email: "noreply@test-dnvo4d968wxg5r86.mlsender.net",
+          name: "The Guild: Gamified Fitness"
+        },
+        to: [
+          {
+            email: params.to,
+            name: "User"
+          }
+        ],
+        subject: params.subject,
+        html: params.html,
+        text: params.text || params.html.replace(/<[^>]*>/g, ''), // Strip HTML for text version
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`MailerSend API error (${response.status}):`, errorText);
       return false;
     }
+
+    // Check if response has content before trying to parse JSON
+    const responseText = await response.text();
+    let result = {};
+    if (responseText) {
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        // If no JSON response, that's often normal for successful email sends
+        console.log('MailerSend response (no JSON):', responseText);
+      }
+    }
+    
+    console.log(`✅ Email sent successfully to ${params.to} via MailerSend`);
+    return true;
+    
   } catch (error) {
-    console.error('ActiveCampaign sync error:', error);
+    console.error('MailerSend connection error:', error);
     return false;
   }
 }
 
 // Main email sending function with fallback support
-export async function sendEmail(params: EmailParams, contactInfo?: { firstName?: string, lastName?: string }): Promise<boolean> {
+export async function sendEmail(params: EmailParams): Promise<boolean> {
   console.log(`📧 Attempting to send email to: ${params.to}`);
   
-  // Sync contact with ActiveCampaign for marketing and CRM (non-blocking)
-  if (contactInfo) {
-    syncContactWithActiveCampaign(params.to, contactInfo.firstName, contactInfo.lastName)
-      .catch(error => console.warn('ActiveCampaign sync failed (non-blocking):', error));
-  }
-  
-  // Try Postmark first (best for transactional emails)
-  const postmarkSuccess = await sendEmailViaPostmark(params);
-  if (postmarkSuccess) {
+  // Try Nodemailer first (Gmail SMTP) - more reliable for development
+  const nodemailerSuccess = await sendEmailViaNodemailer(params);
+  if (nodemailerSuccess) {
     return true;
   }
   
-  console.log('⚠️ Postmark failed, trying Nodemailer (Gmail)...');
+  console.log('⚠️ Nodemailer failed, trying MailerSend...');
   
-  // Fallback to Nodemailer
-  const nodemailerSuccess = await sendEmailViaNodemailer(params);
-  if (nodemailerSuccess) {
+  // Fallback to MailerSend
+  const mailerSendSuccess = await sendEmailViaMailerSend(params);
+  if (mailerSendSuccess) {
     return true;
   }
   
   console.log('❌ All email services failed, logging notification instead');
   logEmailNotification(params);
   return false;
-}
-
-// Utility function to send welcome email with ActiveCampaign integration
-export async function sendWelcomeEmail(email: string, firstName: string, lastName?: string): Promise<boolean> {
-  const welcomeHtml = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Welcome to The Guild: Gamified Fitness</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #4f46e5; color: white; padding: 20px; border-radius: 8px 8px 0 0; text-align: center; }
-        .content { background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; }
-        .footer { background: #374151; color: white; padding: 15px; border-radius: 0 0 8px 8px; text-align: center; font-size: 12px; }
-        h2 { color: #4f46e5; margin-top: 0; }
-        .cta { background: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 20px 0; }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>⚔️ Welcome to The Guild!</h1>
-      </div>
-      
-      <div class="content">
-        <h2>Hey ${firstName}!</h2>
-        
-        <p>Welcome to <strong>The Guild: Gamified Fitness</strong> - where your workout routine becomes an epic adventure!</p>
-        
-        <p>Your journey begins now:</p>
-        <ul>
-          <li>🎮 <strong>Level up</strong> by completing workouts and earning XP</li>
-          <li>⚔️ <strong>Battle monsters</strong> to test your growing strength</li>
-          <li>🏆 <strong>Unlock achievements</strong> and climb the leaderboards</li>
-          <li>💪 <strong>Track your progress</strong> with RPG-style character stats</li>
-        </ul>
-        
-        <p>Ready to start your fitness adventure?</p>
-        <a href="${process.env.VITE_API_BASE_URL || 'https://theguildfitness.com'}" class="cta">Start Your Journey</a>
-      </div>
-      
-      <div class="footer">
-        <p>The Guild: Gamified Fitness | Transform Your Workouts Into Adventures</p>
-      </div>
-    </body>
-    </html>
-  `;
-
-  return await sendEmail({
-    to: email,
-    subject: "⚔️ Welcome to The Guild: Your Fitness Adventure Begins!",
-    html: welcomeHtml
-  }, { firstName, lastName });
 }
 
 function logEmailNotification(params: EmailParams) {

@@ -25,7 +25,7 @@ import {
   type AppRequest, type InsertAppRequest,
   type TrainingProgram, type InsertTrainingProgram,
   type ProgramCompletion, type InsertProgramCompletion
-} from "../shared/schema.js";
+} from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, not, gte } from "drizzle-orm";
 import { dailyResetService } from "./daily-reset-system.js";

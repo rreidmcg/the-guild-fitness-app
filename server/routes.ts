@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
 import { storage } from "./storage";
-import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, insertProgramWorkoutSchema, users, playerInventory, insertCustomAvatarSchema } from "../shared/schema.js";
+import { insertWorkoutSchema, insertWorkoutSessionSchema, insertExercisePerformanceSchema, insertProgramWorkoutSchema, users, playerInventory, insertCustomAvatarSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc } from "drizzle-orm";
 import { authUtils } from "./auth";
@@ -3763,7 +3763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           to: email,
           subject: "Liability Waiver Confirmation - The Guild: Gamified Fitness",
           html: userEmailHtml
-        }, { firstName: fullName.split(' ')[0], lastName: fullName.split(' ').slice(1).join(' ') });
+        });
 
         // Send notification to admin
         const adminEmailHtml = generateAdminWaiverNotification(fullName, email, ipAddress || 'unknown', userAgent || 'unknown');

@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { storage } from "../storage";
-import { insertProgramWorkoutSchema } from "../../shared/schema.js";
+import { insertProgramWorkoutSchema } from "@shared/schema";
 
 /**
  * Program workout management routes (CRUD operations for individual workouts within programs)
