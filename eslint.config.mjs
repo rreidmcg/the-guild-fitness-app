@@ -42,6 +42,9 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
+      'import/no-unresolved': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      'unicorn/filename-case': 'off',
       ...ts.configs.recommended.rules,
       ...pluginImport.configs.recommended.rules,
       ...pluginPromise.configs.recommended.rules,
@@ -68,4 +71,19 @@ export default [
     files: ['**/*.js'],
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
+{
+  files: ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+  languageOptions: {
+    globals: {
+      describe: 'readonly',
+      it: 'readonly',
+      test: 'readonly',
+      expect: 'readonly',
+      beforeEach: 'readonly',
+      afterEach: 'readonly',
+      beforeAll: 'readonly',
+      afterAll: 'readonly',
+    },
+  },
+},
 ];

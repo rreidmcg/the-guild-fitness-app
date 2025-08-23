@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { storage } from '../storage.js';
+import { AtrophySystem } from '../atrophy-system.js';
 // Import getCurrentUserId function from routes.ts for now
 // TODO: Extract auth utilities to a shared module
 const getCurrentUserId = (req: any) => req.session?.passport?.user;
@@ -220,11 +221,24 @@ router.post("/recalculate-level/:userId", requireAdmin, async (req, res) => {
       return res.status(400).json({ error: "Valid user ID required" });
     }
 
-    // Import calculate level function (we'll need to ensure this is available)
-    // For now, we'll keep a simplified version
+    // Use the correct exponential leveling formula
+    const getXpRequiredForLevel = (level: number): number => {
+      if (level <= 1) return 0;
+      return Math.floor(Math.pow(level - 1, 1.8) * 16);
+    };
+
     const calculateLevel = (experience: number): number => {
-      if (experience <= 0) return 1;
-      return Math.floor(Math.sqrt(experience / 50)) + 1;
+      if (experience < 0) return 1;
+      
+      let level = 1;
+      let xpRequired = 0;
+      
+      while (xpRequired <= experience) {
+        level++;
+        xpRequired = getXpRequiredForLevel(level);
+      }
+      
+      return level - 1;
     };
 
     const user = await storage.getUser(userId);
@@ -247,6 +261,21 @@ router.post("/recalculate-level/:userId", requireAdmin, async (req, res) => {
   } catch (error) {
     console.error("Level recalculation error:", error);
     res.status(500).json({ error: "Failed to recalculate level" });
+  }
+});
+
+// Manual atrophy processing trigger
+router.post("/trigger-atrophy", requireAdmin, async (req, res) => {
+  try {
+    console.log("Manual atrophy processing triggered by admin");
+    await AtrophySystem.processAtrophy();
+    res.json({ 
+      message: "Atrophy processing completed successfully",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Manual atrophy processing error:", error);
+    res.status(500).json({ error: "Failed to process atrophy" });
   }
 });
 

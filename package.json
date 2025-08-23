@@ -6,7 +6,7 @@
   "scripts": {
     "validate": "node ./scripts/validate.mjs",
     "typecheck": "tsc -p tsconfig.validate.json --noEmit",
-    "lint": "eslint -c eslint.config.mjs \"test/**/*.{ts,tsx,js}\" --cache --no-error-on-unmatched-pattern",
+    "lint": "eslint -c eslint.config.mjs \"shared/**/*.{ts,tsx,js}\" --cache --no-error-on-unmatched-pattern",
     "format": "prettier . --write",
     "test": "vitest run --config vitest.config.ts --root . --dir .",
     "prepare": "husky install",

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { BattleLoadingState } from "@/components/ui/loading-spinner";
+import { hpRegenService } from "@/services/hp-regen-service";
 import { 
   Sword, 
   Users,
@@ -69,6 +70,16 @@ export default function BattlePage() {
   const { data: userStats } = useQuery({
     queryKey: ["/api/user/stats"],
   });
+
+  // Sync HP regeneration service when user stats are loaded
+  useEffect(() => {
+    if (userStats && typeof userStats === 'object' && 'currentHp' in userStats && 'maxHp' in userStats) {
+      const stats = userStats as UserStats;
+      if (stats.currentHp !== undefined && stats.maxHp !== undefined) {
+        hpRegenService.updatePlayerState(stats.currentHp, stats.maxHp);
+      }
+    }
+  }, [userStats]);
 
   if (!userStats) {
     return <BattleLoadingState />;
