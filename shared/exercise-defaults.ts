@@ -7,6 +7,11 @@
 import { EXTENDED_EXERCISES } from './exercise-extended';
 
 /**
+ * Available tracking field types for exercises
+ */
+export type TrackingField = 'weight' | 'reps' | 'RIR' | 'time' | 'RPE' | 'duration';
+
+/**
  * Get default tracking fields for an exercise based on its category
  */
 export function getDefaultTrackingFields(category: string): TrackingField[] {

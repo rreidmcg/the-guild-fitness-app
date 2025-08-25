@@ -500,17 +500,17 @@ export default function WorkoutSession() {
 
   // Show workout summary if completed
   if (showSummary && completedSession && userStats) {
-    const leveledUp = completedSession.newLevel && completedSession.newLevel > userStats.level;
+    const leveledUp = completedSession.newLevel && completedSession.newLevel > (userStats.level || 1);
     
     // Calculate XP to next level
-    const currentLevel = leveledUp ? completedSession.newLevel : userStats.level;
-    const currentXP = leveledUp ? (userStats.experience + completedSession.xpEarned) : userStats.experience;
+    const currentLevel = leveledUp ? completedSession.newLevel : (userStats.level || 1);
+    const currentXP = leveledUp ? ((userStats.experience || 0) + completedSession.xpEarned) : (userStats.experience || 0);
     const xpForNextLevel = Math.floor(100 * Math.pow(1.5, currentLevel));
     const xpToNextLevel = xpForNextLevel - currentXP;
     
     return (
       <WorkoutSummary
-        workoutName={workout?.name || "Workout"}
+        workoutName={(workout as any)?.name || "Workout"}
         xpGained={completedSession.xpEarned || 0}
         currentLevel={currentLevel}
         currentXP={currentXP}
