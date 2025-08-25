@@ -655,9 +655,9 @@ export default function DungeonBattlePage() {
 
         {/* Character Sprites - Battle Field with enhanced positioning */}
         <div className="flex-1 flex items-end justify-between px-8 md:px-16 pb-24 md:pb-32 relative mt-32" style={{ touchAction: 'none', userSelect: 'none' }}>
-          {/* Player Character with HP/MP bars above (Invisible Card) */}
+          {/* Player Character with HP bar above (Invisible Card) */}
           <div className="flex flex-col items-center relative" style={{ transform: 'translateY(-20px)' }}>
-            {/* Player HP/MP Bars above character - No visible card */}
+            {/* Player HP Bar above character - No visible card */}
             <div className="mb-4 space-y-1">
               {/* HP Bar */}
               <div className="relative">
@@ -674,24 +674,6 @@ export default function DungeonBattlePage() {
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <span className="text-white font-bold text-xs drop-shadow-lg">
                     {battleState.playerHp}/{battleState.playerMaxHp}
-                  </span>
-                </div>
-              </div>
-              {/* MP Bar */}
-              <div className="relative">
-                <div className="bg-black/50 rounded-full h-3 w-32 border border-blue-500/50 overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-blue-400 to-blue-300 transition-all duration-500"
-                    style={{ 
-                      width: `${(battleState.playerMp / battleState.playerMaxMp) * 100}%`,
-                      boxShadow: '0 0 6px rgba(59, 130, 246, 0.4)'
-                    }}
-                  />
-                </div>
-                {/* MP Ratio Text Inside Bar */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="text-white font-bold text-xs drop-shadow-lg">
-                    {battleState.playerMp}/{battleState.playerMaxMp}
                   </span>
                 </div>
               </div>

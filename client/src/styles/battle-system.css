@@ -111,11 +111,6 @@
   will-change: width;
 }
 
-.dungeon-battle__mana-bar {
-  /* Mana bar component */
-  transition: width 0.3s ease-out;
-  will-change: width;
-}
 
 .dungeon-battle__action-button {
   /* Battle action buttons (attack, flee) */

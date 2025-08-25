@@ -53,8 +53,6 @@ interface UserStats {
   currentTitle: string;
   currentHp: number;
   maxHp: number;
-  currentMp: number;
-  maxMp: number;
   username: string;
   height?: number;
   weight?: number;
@@ -81,8 +79,6 @@ interface Monster {
 interface BattleState {
   playerHp: number;
   playerMaxHp: number;
-  playerMp: number;
-  playerMaxMp: number;
   monster: Monster;
   battleLog: string[];
   isPlayerTurn: boolean;

@@ -1993,34 +1993,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Calculate max HP and MP
+      // Calculate max HP
       const maxHp = Math.max(10, 10 + (user.stamina || 0) * 3);
-      const maxMp = ((user.stamina || 0) * 2) + ((user.agility || 0) * 1); // MP Formula: (Stamina × 2) + (Agility × 1)
       let currentHp = maxHp; // Default to max HP if no HP tracking yet
-      let currentMp = maxMp; // Default to max MP if no MP tracking yet
       
       try {
-        // Try to get current HP and MP from database (may not exist yet)
+        // Try to get current HP from database (may not exist yet)
         const [userWithStats] = await db
           .select()
           .from(users)
           .where(eq(users.id, userId));
           
         if (userWithStats && userWithStats.currentHp !== null) {
-          // Fix legacy data: ensure current HP/MP doesn't exceed new max values
+          // Fix legacy data: ensure current HP doesn't exceed new max values
           // This handles cases where stats were reduced (like after stat squish)
           currentHp = Math.min(userWithStats.currentHp, maxHp);
-          currentMp = Math.min(userWithStats.currentMp || maxMp, maxMp);
           
           // If values were capped, update database with corrected values
           const needsHpUpdate = userWithStats.currentHp > maxHp;
-          const needsMpUpdate = (userWithStats.currentMp || 0) > maxMp;
           
-          if (needsHpUpdate || needsMpUpdate) {
-            console.log(`Fixing legacy HP/MP data: HP ${userWithStats.currentHp} -> ${currentHp}, MP ${userWithStats.currentMp} -> ${currentMp}`);
+          if (needsHpUpdate) {
+            console.log(`Fixing legacy HP data: HP ${userWithStats.currentHp} -> ${currentHp}`);
             const updateData: any = {};
             if (needsHpUpdate) updateData.currentHp = currentHp;
-            if (needsMpUpdate) updateData.currentMp = currentMp;
             
             await db.update(users)
               .set(updateData)
@@ -2052,33 +2047,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`HP Regen Blocked: lastBattleTime=${userWithStats.lastBattleTime}, currentHp=${currentHp}, maxHp=${maxHp}`);
           }
           
-          // Apply MP regeneration if not at max MP and out of combat
-          const lastMpUpdateTime = userWithStats.lastMpUpdateAt ? new Date(userWithStats.lastMpUpdateAt).getTime() : currentTime;
-          const mpMinutesElapsed = Math.floor((currentTime - lastMpUpdateTime) / (1000 * 60));
           
-          let mpChanged = false;
-          if (currentMp < maxMp && mpMinutesElapsed > 0) {
-            // MP Regen = (Agility ÷ 2)% of Max MP per minute, minimum 1% regen
-            const mpRegenRate = Math.max(0.01, ((user.agility || 0) / 2) / 100);
-            const mpRegenAmount = Math.max(1, Math.floor(maxMp * mpRegenRate)) * mpMinutesElapsed;
-            currentMp = Math.min(maxMp, currentMp + mpRegenAmount);
-            mpChanged = mpRegenAmount > 0;
-            if (mpChanged) {
-              console.log(`MP regeneration: +${mpRegenAmount} MP over ${mpMinutesElapsed} minutes (${currentMp}/${maxMp})`);
-            }
-          }
-          
-          // Update HP and/or MP in database if they changed
-          if (hpChanged || mpChanged) {
-            const updateData: any = {};
-            if (hpChanged) {
-              updateData.currentHp = currentHp;
-              updateData.lastHpUpdateAt = new Date();
-            }
-            if (mpChanged) {
-              updateData.currentMp = currentMp;
-              updateData.lastMpUpdateAt = new Date();
-            }
+          // Update HP in database if it changed
+          if (hpChanged) {
+            const updateData: any = {
+              currentHp: currentHp,
+              lastHpUpdateAt: new Date()
+            };
             
             await db.update(users)
               .set(updateData)
@@ -2086,7 +2061,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       } catch (error) {
-        console.log("HP/MP columns may not exist yet, defaulting to max values");
+        console.log("HP columns may not exist yet, defaulting to max values");
       }
 
       res.json({
@@ -2101,8 +2076,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentTitle: user.currentTitle,
         currentHp,
         maxHp,
-        currentMp,
-        maxMp,
         username: user.username,
         height: user.height,
         weight: user.weight,
@@ -2817,7 +2790,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const userId = getCurrentUserId(req); if (!userId) { return res.status(401).json({ error: "Authentication required" }); } // Use the current logged-in user
     const { potionType } = req.body;
     
-    if (!potionType || !["minor_healing", "major_healing", "full_healing", "minor_mana", "major_mana", "full_mana"].includes(potionType)) {
+    if (!potionType || !["minor_healing", "major_healing", "full_healing"].includes(potionType)) {
       return res.status(400).json({ error: "Invalid potion type" });
     }
     
@@ -2848,9 +2821,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
       
-      // Determine if this is a healing or mana potion
+      // Determine if this is a healing potion
       const isHealingPotion = potionType.includes("healing");
-      const isManaPotion = potionType.includes("mana");
       
       let result: any = { success: true };
       let updateData: any = {};
@@ -2886,38 +2858,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         result.healedAmount = actualHealing;
         result.newHp = newHp;
         result.maxHp = maxHp;
-      } else if (isManaPotion) {
-        // Calculate max MP: (Stamina × 2) + (Agility × 1)
-        const maxMp = ((user.stamina || 0) * 2) + ((user.agility || 0) * 1);
-        
-        // Calculate mana restoration amount based on potion type
-        let manaAmount = 0;
-        switch (potionType) {
-          case "minor_mana":
-            manaAmount = Math.ceil(maxMp * 0.25); // 25% of max MP
-            break;
-          case "major_mana":
-            manaAmount = Math.ceil(maxMp * 0.50); // 50% of max MP
-            break;
-          case "full_mana":
-            manaAmount = maxMp; // Full MP
-            break;
-        }
-        
-        // Calculate new MP (can't exceed max MP)
-        const currentMp = user.currentMp || maxMp;
-        const newMp = Math.min(maxMp, currentMp + manaAmount);
-        const actualRestoration = newMp - currentMp;
-        
-        if (actualRestoration <= 0) {
-          return res.status(400).json({ error: "Full Mana. Cannot use potion" });
-        }
-        
-        updateData.currentMp = newMp;
-        updateData.lastMpUpdateAt = new Date();
-        result.restoredAmount = actualRestoration;
-        result.newMp = newMp;
-        result.maxMp = maxMp;
       }
       
       // Update user stats and potion quantity in a transaction
@@ -2956,10 +2896,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const potionPrices = {
       minor_healing: 10,
       major_healing: 25,
-      full_healing: 50,
-      minor_mana: 8,
-      major_mana: 20,
-      full_mana: 40
+      full_healing: 50
     };
     
     if (!potionType || !potionPrices[potionType as keyof typeof potionPrices]) {

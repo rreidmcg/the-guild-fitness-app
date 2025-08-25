@@ -73,8 +73,6 @@ interface UserStats {
   currentTitle: string;
   currentHp: number;
   maxHp: number;
-  currentMp: number;
-  maxMp: number;
   username: string;
   height?: number;
   weight?: number;
@@ -481,9 +479,6 @@ export default function Shop() {
     if (category === "health") {
       return potions.filter((potion) => potion.type === "healing");
     }
-    if (category === "mana") {
-      return potions.filter((potion) => potion.type === "mana");
-    }
     // For now, food and drink return empty arrays since we don't have those items yet
     return [];
   };
@@ -492,7 +487,6 @@ export default function Shop() {
 
   const consumableCategories = [
     { id: "health", name: "Health", icon: Heart },
-    { id: "mana", name: "Mana", icon: Sparkles },
     { id: "food", name: "Food", icon: Beef },
     { id: "drink", name: "Drink", icon: Coffee },
   ];
@@ -524,33 +518,6 @@ export default function Shop() {
       healing: "100%",
       color: "from-red-700 to-red-800",
       type: "healing"
-    },
-    {
-      id: "minor_mana",
-      name: "Minor Mana",
-      description: "Restores 25% MP",
-      price: 8,
-      healing: "25%",
-      color: "from-blue-500 to-blue-600",
-      type: "mana"
-    },
-    {
-      id: "major_mana", 
-      name: "Major Mana",
-      description: "Restores 50% MP",
-      price: 20,
-      healing: "50%",
-      color: "from-blue-600 to-blue-700",
-      type: "mana"
-    },
-    {
-      id: "full_mana",
-      name: "Mega Mana",
-      description: "Restores 100% MP",
-      price: 40,
-      healing: "100%",
-      color: "from-blue-700 to-blue-800",
-      type: "mana"
     }
   ];
 
@@ -688,36 +655,6 @@ export default function Shop() {
                             filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
                           }}
                         />
-                      ) : potion.id === 'minor_mana' ? (
-                        <img 
-                          src={minorManaPotionImage} 
-                          alt="Minor Mana Potion"
-                          className="w-16 h-16 object-contain"
-                          style={{ 
-                            imageRendering: 'pixelated',
-                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
-                          }}
-                        />
-                      ) : potion.id === 'major_mana' ? (
-                        <img 
-                          src={majorManaPotionImage} 
-                          alt="Major Mana Potion"
-                          className="w-16 h-16 object-contain"
-                          style={{ 
-                            imageRendering: 'pixelated',
-                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
-                          }}
-                        />
-                      ) : potion.id === 'full_mana' ? (
-                        <img 
-                          src={megaManaPotionImage} 
-                          alt="Mega Mana Potion"
-                          className="w-16 h-16 object-contain"
-                          style={{ 
-                            imageRendering: 'pixelated',
-                            filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.5))'
-                          }}
-                        />
                       ) : (
                         <div className="text-white text-2xl">🧪</div>
                       )}
@@ -727,17 +664,8 @@ export default function Shop() {
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center space-x-1">
-                          {potion.type === 'healing' ? (
-                            <>
-                              <Heart className="w-3 h-3 text-red-400" />
-                              <span className="font-medium text-green-400">{potion.healing}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Zap className="w-3 h-3 text-blue-400" />
-                              <span className="font-medium text-blue-400">{potion.healing}</span>
-                            </>
-                          )}
+                          <Heart className="w-3 h-3 text-red-400" />
+                          <span className="font-medium text-green-400">{potion.healing}</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <Coins className="w-3 h-3 text-yellow-500" />
@@ -757,7 +685,7 @@ export default function Shop() {
                       <Button 
                         onClick={() => handleBuyPotion(potion.id, potion.price)}
                         disabled={purchasePotionMutation.isPending}
-                        className={`w-full text-xs h-8 ${potion.type === 'healing' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                        className="w-full text-xs h-8 bg-red-600 hover:bg-red-700"
                       >
                         Buy {potion.price}g
                       </Button>
