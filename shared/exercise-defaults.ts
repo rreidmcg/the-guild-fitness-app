@@ -4,8 +4,7 @@
  * Determines which tracking fields should be shown for each exercise category
  * based on what metrics are most relevant for that type of exercise.
  */
-
-export type TrackingField = 'weight' | 'reps' | 'time' | 'RIR' | 'RPE';
+import { EXTENDED_EXERCISES } from './exercise-extended';
 
 /**
  * Get default tracking fields for an exercise based on its category
