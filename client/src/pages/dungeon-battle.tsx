@@ -548,13 +548,13 @@ export default function DungeonBattlePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          currentHp: battleState.playerHp,
+          currentHp: Math.max(1, battleState.playerHp), // Ensure minimum 1 HP
           maxHp: battleState.playerMaxHp 
         })
       });
       
-      // Update HP regeneration service with final HP state
-      hpRegenService.updatePlayerState(battleState.playerHp, battleState.playerMaxHp);
+      // Update HP regeneration service with final HP state (minimum 1 HP)
+      hpRegenService.updatePlayerState(Math.max(1, battleState.playerHp), battleState.playerMaxHp);
       
     } catch (error) {
       console.error('Failed to persist HP:', error);
