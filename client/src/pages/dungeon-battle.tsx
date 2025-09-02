@@ -61,8 +61,6 @@ interface UserStats {
   currentTitle: string;
   currentHp: number;
   maxHp: number;
-  currentMp: number;
-  maxMp: number;
   username: string;
   skinColor?: string;
   hairColor?: string;
@@ -167,8 +165,6 @@ const ERANK_DUNGEON_ZONES: DungeonZone[] = [
 interface BattleState {
   playerHp: number;
   playerMaxHp: number;
-  playerMp: number;
-  playerMaxMp: number;
   monster: Monster | null;
   battleLog: string[];
   isPlayerTurn: boolean;
@@ -284,8 +280,6 @@ export default function DungeonBattlePage() {
     setBattleState({
       playerHp: userStats!.currentHp,
       playerMaxHp: userStats!.maxHp,
-      playerMp: userStats!.currentMp,
-      playerMaxMp: userStats!.maxMp,
       monster: { ...firstMonster, currentHp: firstMonster.maxHp },
       battleLog: [`You enter ${zone.name}...`, `A wild ${firstMonster.name} appears!`],
       isPlayerTurn: true,

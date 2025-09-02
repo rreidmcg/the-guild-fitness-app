@@ -43,8 +43,6 @@ interface BattlePlayer {
   level: number;
   hp: number;
   maxHp: number;
-  mp: number;
-  maxMp: number;
   strength: number;
   stamina: number;
   agility: number;
@@ -281,21 +279,6 @@ export const RealTimeBattleSystem = memo(({
                       className="h-2 bg-red-900"
                     />
                   </div>
-                  
-                  {/* Mana Bar */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="flex items-center space-x-1">
-                        <Zap className="h-3 w-3 text-blue-400" />
-                        <span>MP</span>
-                      </span>
-                      <span>{currentPlayer.mp}/{currentPlayer.maxMp}</span>
-                    </div>
-                    <Progress 
-                      value={(currentPlayer.mp / currentPlayer.maxMp) * 100}
-                      className="h-2 bg-blue-900"
-                    />
-                  </div>
 
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-2 text-xs">
@@ -342,21 +325,6 @@ export const RealTimeBattleSystem = memo(({
                       className="h-2 bg-red-900"
                     />
                   </div>
-                  
-                  {/* Mana Bar */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="flex items-center space-x-1">
-                        <Zap className="h-3 w-3 text-blue-400" />
-                        <span>MP</span>
-                      </span>
-                      <span>{opponent.mp}/{opponent.maxMp}</span>
-                    </div>
-                    <Progress 
-                      value={(opponent.mp / opponent.maxMp) * 100}
-                      className="h-2 bg-blue-900"
-                    />
-                  </div>
 
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-2 text-xs">
@@ -391,30 +359,30 @@ export const RealTimeBattleSystem = memo(({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <Button
                     onClick={() => performAction('attack')}
-                    disabled={!currentPlayer || currentPlayer.mp < 5}
+                    disabled={!currentPlayer}
                     className="bg-red-600 hover:bg-red-700 text-white"
                   >
                     <Sword className="h-4 w-4 mr-1" />
-                    Attack (5 MP)
+                    Attack
                   </Button>
                   
                   <Button
                     onClick={() => performAction('defend')}
-                    disabled={!currentPlayer || currentPlayer.mp < 3}
+                    disabled={!currentPlayer}
                     variant="outline"
                     className="border-green-500/50 hover:bg-green-500/10"
                   >
                     <Shield className="h-4 w-4 mr-1" />
-                    Defend (3 MP)
+                    Defend
                   </Button>
                   
                   <Button
                     onClick={() => performAction('special')}
-                    disabled={!currentPlayer || currentPlayer.mp < 15}
+                    disabled={!currentPlayer}
                     className="bg-purple-600 hover:bg-purple-700"
                   >
                     <Zap className="h-4 w-4 mr-1" />
-                    Special (15 MP)
+                    Special
                   </Button>
                   
                   <Button

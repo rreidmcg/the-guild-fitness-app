@@ -4,6 +4,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
+    "lint:file": "eslint -c eslint.config.mjs",
     "validate": "node ./scripts/validate.mjs",
     "typecheck": "tsc -p tsconfig.validate.json --noEmit",
     "lint": "eslint -c eslint.config.mjs \"shared/**/*.{ts,tsx,js}\" --cache --no-error-on-unmatched-pattern",

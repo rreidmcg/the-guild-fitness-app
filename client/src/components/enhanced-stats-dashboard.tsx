@@ -39,8 +39,6 @@ interface UserStats {
   gold: number;
   hp: number;
   maxHp: number;
-  mp: number;
-  maxMp: number;
   currentTitle: string;
   currentStreak?: number;
   totalWorkouts?: number;
@@ -83,7 +81,6 @@ export const EnhancedStatsDashboard = memo(({
       experienceNeeded,
       experienceToNext,
       hpPercentage: Math.round((userStats.hp / userStats.maxHp) * 100),
-      mpPercentage: Math.round((userStats.mp / userStats.maxMp) * 100),
       overallPower: Math.round((userStats.strength + userStats.stamina + userStats.agility) / 3)
     };
   }, [userStats]);
@@ -154,17 +151,6 @@ export const EnhancedStatsDashboard = memo(({
           </CardContent>
         </Card>
         
-        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border-blue-500/30">
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <Zap className="h-6 w-6 text-blue-400" />
-            </div>
-            <p className="text-sm text-muted-foreground">Magic</p>
-            <div className="text-2xl font-bold">{enhancedStats.mp}</div>
-            <div className="text-xs text-muted-foreground">/ {enhancedStats.maxMp}</div>
-            <Progress value={(enhancedStats.mp / enhancedStats.maxMp) * 100} className="h-2 mt-2" />
-          </CardContent>
-        </Card>
         
         <Card className="bg-gradient-to-br from-red-500/10 to-red-600/10 border-red-500/30">
           <CardContent className="p-4 text-center">

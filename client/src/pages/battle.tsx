@@ -33,8 +33,6 @@ interface UserStats {
   currentTitle: string;
   currentHp: number;
   maxHp: number;
-  currentMp: number;
-  maxMp: number;
   username: string;
   height?: number;
   weight?: number;
