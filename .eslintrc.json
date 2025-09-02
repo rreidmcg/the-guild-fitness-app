@@ -1,0 +1,18 @@
+{
+  "root": true,
+  "parserOptions": { "ecmaVersion": "latest", "sourceType": "module" },
+  "env": { "es2021": true, "node": true },
+  "extends": [
+    "eslint:recommended",
+    "plugin:promise/recommended",
+    "plugin:n/recommended",
+    "plugin:import/recommended",
+    "prettier"
+  ],
+  "plugins": ["promise", "n", "import"],
+  "settings": { "import/resolver": { "node": true, "typescript": true } },
+  "rules": {
+    "no-console": ["warn", { "allow": ["error"] }],
+    "import/no-unresolved": "off"
+  }
+}
