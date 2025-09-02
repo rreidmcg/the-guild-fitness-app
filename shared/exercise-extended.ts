@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // shared/exercise-extended.ts
 //
 // Drop this file into /shared.

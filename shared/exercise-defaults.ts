@@ -4,7 +4,6 @@
  * Determines which tracking fields should be shown for each exercise category
  * based on what metrics are most relevant for that type of exercise.
  */
-import { EXTENDED_EXERCISES } from './exercise-extended';
 
 /**
  * Available tracking field types for exercises
