@@ -200,7 +200,6 @@ export default function DungeonBattlePage() {
   const [battleState, setBattleState] = useState<BattleState>({
     playerHp: 0,
     playerMaxHp: 0,
-    playerMp: 0,
     playerMaxMp: 0,
     monster: null,
     battleLog: [],
@@ -312,7 +311,6 @@ export default function DungeonBattlePage() {
         body: {
           monster: battleState.monster,
           playerHp: battleState.playerHp,
-          playerMp: battleState.playerMp,
           damageMultiplier: damageMultiplier // Send combo multiplier to server
         }
       });
@@ -364,7 +362,6 @@ export default function DungeonBattlePage() {
             setBattleState(prev => ({
               ...prev,
               playerHp: data.playerHp,
-              playerMp: data.playerMp,
               monster: data.monster,
               battleLog: [...prev.battleLog, ...data.battleLog],
               battleResult: data.battleResult,
@@ -397,7 +394,6 @@ export default function DungeonBattlePage() {
           setBattleState(prev => ({
             ...prev,
             playerHp: data.playerHp,
-            playerMp: data.playerMp,
             monster: data.monster,
             battleLog: [...prev.battleLog, ...data.battleLog],
             battleResult: data.battleResult,
@@ -416,7 +412,6 @@ export default function DungeonBattlePage() {
         setBattleState(prev => ({
           ...prev,
           playerHp: data.playerHp,
-          playerMp: data.playerMp,
           monster: data.monster,
           battleLog: [...prev.battleLog, ...data.battleLog],
           battleResult: data.battleResult,

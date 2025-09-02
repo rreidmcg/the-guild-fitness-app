@@ -3436,8 +3436,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Valid currentHp and maxHp required" });
       }
       
-      // Ensure currentHp doesn't exceed maxHp and isn't negative
-      const validCurrentHp = Math.max(0, Math.min(currentHp, maxHp));
+      // Ensure currentHp doesn't exceed maxHp and has minimum of 1 (never 0)
+      const validCurrentHp = Math.max(1, Math.min(currentHp, maxHp));
       
       await db.update(users)
         .set({ 
@@ -3860,13 +3860,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const monsterDamageVariance = Math.floor(Math.random() * Math.max(1, Math.floor(monsterBaseDamage * 0.3)));
       const actualMonsterDamage = monsterBaseDamage + monsterDamageVariance;
       
-      const newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
+      let newPlayerHp = Math.max(0, playerHp - actualMonsterDamage);
       
       battleLog.push(`${monster.name} attacks for ${actualMonsterDamage} damage!`);
       
       if (newPlayerHp <= 0) {
         battleResult = 'defeat';
         battleLog.push("You have been defeated!");
+        // Set HP to 1 when defeated (never 0)
+        newPlayerHp = 1;
       }
       
       // Update player HP in database
