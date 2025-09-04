@@ -1,8 +1,10 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src", "server", "client", "shared", "tests", "vitest.config.ts"],
+  "include": ["src", "server", "client"],
   "exclude": [
-    "shared/exercise-extended.ts",
-    "shared/stat-allocation.ts"
+    "shared/**",
+    "tests/**",
+    "**/*.test.ts",
+    "**/__tests__/**"
   ]
 }
