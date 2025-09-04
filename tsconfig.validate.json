@@ -1,9 +1,8 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "types": ["vitest/globals", "node"],
-    "skipLibCheck": true
-  },
-  "include": ["shared/**/*", "scripts/**/*"],
-  "exclude": ["**/*.test.*", "client/**/*", "server/**/*", "node_modules", "dist", "build", ".next", "out"]
+  "include": ["src", "server", "client", "shared", "tests", "vitest.config.ts"],
+  "exclude": [
+    "shared/exercise-extended.ts",
+    "shared/stat-allocation.ts"
+  ]
 }
